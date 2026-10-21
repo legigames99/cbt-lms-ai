@@ -1205,6 +1205,66 @@
               </div>
             </div>
 
+            <!-- Card: Opsi Tampilan & Cetak Elemen Kartu (Foto, Tanda Tangan, Tata Tertib) -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                  <i class="fa-solid fa-sliders text-indigo-400"></i> Opsi Tampilan & Cetak Elemen Kartu
+                </h4>
+                <span class="text-[10px] text-slate-400">Pilih Komponen Tampil & Print</span>
+              </div>
+
+              <div class="space-y-3 text-xs">
+                <!-- Opsi 1: Pasfoto Siswa 3x4 -->
+                <label class="flex items-start gap-3 p-3.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-indigo-500/50 cursor-pointer transition select-none group">
+                  <input type="checkbox" id="settingShowStudentPhoto" checked onchange="handleOptionToggle()" class="mt-0.5 rounded text-indigo-600 focus:ring-0 focus:outline-none w-4 h-4 bg-slate-900 border-slate-700">
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold text-white flex items-center gap-2 group-hover:text-indigo-300 transition">
+                        <i class="fa-solid fa-camera text-indigo-400"></i> Tampilkan & Cetak Pasfoto Siswa (3 x 4 cm)
+                      </span>
+                      <span id="badgePhotoStatus" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Ditampilkan</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                      Sertakan kotak pasfoto 3x4 cm pada kartu. Bila dinonaktifkan, kolom biodata siswa otomatis melebar penuh (hemat ruang).
+                    </p>
+                  </div>
+                </label>
+
+                <!-- Opsi 2: Tanda Tangan & Pengesahan -->
+                <label class="flex items-start gap-3 p-3.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-indigo-500/50 cursor-pointer transition select-none group">
+                  <input type="checkbox" id="settingShowSignatures" checked onchange="handleOptionToggle()" class="mt-0.5 rounded text-indigo-600 focus:ring-0 focus:outline-none w-4 h-4 bg-slate-900 border-slate-700">
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold text-white flex items-center gap-2 group-hover:text-emerald-300 transition">
+                        <i class="fa-solid fa-signature text-emerald-400"></i> Tampilkan & Cetak Tanda Tangan & Pengesahan
+                      </span>
+                      <span id="badgeSigStatus" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Ditampilkan</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                      Sertakan tanda tangan siswa, QR-code otentikasi CBT, cap stempel, dan tanda tangan Kepala Sekolah.
+                    </p>
+                  </div>
+                </label>
+
+                <!-- Opsi 3: Catatan & Tata Tertib -->
+                <label class="flex items-start gap-3 p-3.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-indigo-500/50 cursor-pointer transition select-none group">
+                  <input type="checkbox" id="settingShowExamRules" checked onchange="handleOptionToggle()" class="mt-0.5 rounded text-indigo-600 focus:ring-0 focus:outline-none w-4 h-4 bg-slate-900 border-slate-700">
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold text-white flex items-center gap-2 group-hover:text-amber-300 transition">
+                        <i class="fa-solid fa-list-check text-amber-400"></i> Tampilkan & Cetak Catatan / Tata Tertib
+                      </span>
+                      <span id="badgeRulesStatus" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Ditampilkan</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                      Sertakan butir tata tertib ujian di bagian bawah kartu peserta.
+                    </p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
             <!-- Card 2: Tata Tertib Peserta Ujian pada Kartu -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
               <div class="flex items-center justify-between pb-3 border-b border-slate-800">
@@ -1272,7 +1332,7 @@
                 <!-- Isi Data Siswa (Foto 3x4 + Tabel) -->
                 <div class="grid grid-cols-12 gap-3 mb-3">
                   <!-- Foto 3x4 -->
-                  <div class="col-span-3 flex flex-col items-center">
+                  <div id="previewPhotoCol" class="col-span-3 flex flex-col items-center">
                     <input type="file" id="sampleStudentPhotoInput" accept="image/*" class="hidden" onchange="handleSampleStudentPhoto(event)">
                     <div id="previewStudentPhotoBox" onclick="document.getElementById('sampleStudentPhotoInput').click()" class="w-16 h-20 border border-slate-400 bg-slate-100 rounded flex flex-col items-center justify-center p-1 text-slate-400 shadow-inner cursor-pointer hover:border-indigo-500 hover:bg-indigo-50/40 transition group relative overflow-hidden" title="Klik untuk coba pasfoto siswa 3x4">
                       <i class="fa-solid fa-user text-2xl text-slate-300 mb-1 group-hover:text-indigo-400 transition"></i>
@@ -1283,7 +1343,7 @@
                   </div>
 
                   <!-- Tabel Data Siswa -->
-                  <div class="col-span-9 text-[9px] leading-tight space-y-1">
+                  <div id="previewDataCol" class="col-span-9 text-[9px] leading-tight space-y-1">
                     <div class="grid grid-cols-12 gap-1 pb-0.5 border-b border-slate-200">
                       <span class="col-span-4 text-slate-500 font-semibold">No. Peserta</span>
                       <span class="col-span-8 font-mono font-bold text-slate-900">: 26-01-05-1001</span>
@@ -1314,7 +1374,7 @@
                 </div>
 
                 <!-- Bagian Bawah: QR Code + TTD -->
-                <div class="grid grid-cols-12 gap-2 items-end pt-2 border-t border-slate-200 text-[8px]">
+                <div id="previewSignatureSection" class="grid grid-cols-12 gap-2 items-end pt-2 border-t border-slate-200 text-[8px]">
                   <div class="col-span-4 text-center">
                     <span class="text-slate-500 block">Tanda Tangan Siswa</span>
                     <div class="h-9 flex items-center justify-center font-cursive text-slate-400 italic">Ahmad Rizki</div>
@@ -1352,7 +1412,7 @@
                 </div>
 
                 <!-- Ringkasan Tata Tertib Mini -->
-                <div class="mt-2.5 pt-1.5 border-t border-slate-200 text-[7px] text-slate-500 space-y-0.5">
+                <div id="previewRulesSection" class="mt-2.5 pt-1.5 border-t border-slate-200 text-[7px] text-slate-500 space-y-0.5">
                   <div class="font-bold text-slate-700">Catatan & Tata Tertib:</div>
                   <div id="previewRulesSummary" class="leading-normal">
                     1. Wajib membawa kartu ujian ini saat tes berlangsung.<br>
@@ -1780,6 +1840,24 @@
             <select id="printFilterSession" onchange="filterPrintCards()" class="bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-white">
               <option value="all">Semua Sesi</option>
             </select>
+          </div>
+
+          <!-- Opsi Cetak Cepat di Modal -->
+          <div class="flex items-center gap-2.5 text-xs bg-slate-950/80 px-3 py-1.5 rounded-xl border border-slate-800">
+            <span class="text-slate-400 font-semibold text-[11px] flex items-center gap-1">
+              <i class="fa-solid fa-sliders text-indigo-400"></i> Cetak:
+            </span>
+            <label class="flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer text-[11px] select-none">
+              <input type="checkbox" id="modalOptShowPhoto" checked onchange="syncModalOptionToSettings('photo')" class="rounded text-indigo-500 w-3.5 h-3.5 bg-slate-900 border-slate-700"> Foto
+            </label>
+            <span class="text-slate-700">•</span>
+            <label class="flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer text-[11px] select-none">
+              <input type="checkbox" id="modalOptShowSignatures" checked onchange="syncModalOptionToSettings('signatures')" class="rounded text-indigo-500 w-3.5 h-3.5 bg-slate-900 border-slate-700"> TTD
+            </label>
+            <span class="text-slate-700">•</span>
+            <label class="flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer text-[11px] select-none">
+              <input type="checkbox" id="modalOptShowRules" checked onchange="syncModalOptionToSettings('rules')" class="rounded text-indigo-500 w-3.5 h-3.5 bg-slate-900 border-slate-700"> Tata Tertib
+            </label>
           </div>
 
           <span id="printCardCountBadge" class="px-2.5 py-1 rounded-xl bg-indigo-500/20 text-indigo-300 font-mono text-xs font-bold border border-indigo-500/40">
@@ -2688,6 +2766,22 @@
       setVal('settingLogoUrl', p.logo_url || '');
       setVal('settingExamRules', p.exam_rules);
 
+      // Opsi Tampilan & Cetak Elemen Kartu
+      const showPhoto = p.show_student_photo !== false;
+      const showSignatures = p.show_signatures !== false;
+      const showRules = p.show_exam_rules !== false;
+
+      const setCheck = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = !!val;
+      };
+      setCheck('settingShowStudentPhoto', showPhoto);
+      setCheck('settingShowSignatures', showSignatures);
+      setCheck('settingShowExamRules', showRules);
+      setCheck('modalOptShowPhoto', showPhoto);
+      setCheck('modalOptShowSignatures', showSignatures);
+      setCheck('modalOptShowRules', showRules);
+
       // Perbarui tampilan preview box logo upload
       const logoPreviewBox = document.getElementById('logoUploadPreviewBox');
       const logoStatus = document.getElementById('logoFileStatusText');
@@ -2913,6 +3007,100 @@
       if (previewRules) {
         previewRules.innerHTML = rules.split('\n').filter(Boolean).slice(0, 3).map(r => `<div>${r}</div>`).join('');
       }
+
+      // Terapkan Opsi Tampilan & Cetak (Foto, Tanda Tangan, Tata Tertib) ke Pratinjau
+      const showPhoto = document.getElementById('settingShowStudentPhoto') ? document.getElementById('settingShowStudentPhoto').checked : (p.show_student_photo !== false);
+      const showSignatures = document.getElementById('settingShowSignatures') ? document.getElementById('settingShowSignatures').checked : (p.show_signatures !== false);
+      const showRules = document.getElementById('settingShowExamRules') ? document.getElementById('settingShowExamRules').checked : (p.show_exam_rules !== false);
+
+      const previewPhotoCol = document.getElementById('previewPhotoCol');
+      const previewDataCol = document.getElementById('previewDataCol');
+      if (previewPhotoCol && previewDataCol) {
+        if (showPhoto) {
+          previewPhotoCol.classList.remove('hidden');
+          previewDataCol.className = 'col-span-9 text-[9px] leading-tight space-y-1';
+        } else {
+          previewPhotoCol.classList.add('hidden');
+          previewDataCol.className = 'col-span-12 text-[9px] leading-tight space-y-1';
+        }
+      }
+
+      const previewSignatureSection = document.getElementById('previewSignatureSection');
+      if (previewSignatureSection) {
+        if (showSignatures) {
+          previewSignatureSection.classList.remove('hidden');
+        } else {
+          previewSignatureSection.classList.add('hidden');
+        }
+      }
+
+      const previewRulesSection = document.getElementById('previewRulesSection');
+      if (previewRulesSection) {
+        if (showRules) {
+          previewRulesSection.classList.remove('hidden');
+        } else {
+          previewRulesSection.classList.add('hidden');
+        }
+      }
+
+      // Update badge status di opsi form
+      const bPhoto = document.getElementById('badgePhotoStatus');
+      if (bPhoto) {
+        bPhoto.innerText = showPhoto ? 'Ditampilkan' : 'Disembunyikan';
+        bPhoto.className = showPhoto 
+          ? 'px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+          : 'px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700';
+      }
+      const bSig = document.getElementById('badgeSigStatus');
+      if (bSig) {
+        bSig.innerText = showSignatures ? 'Ditampilkan' : 'Disembunyikan';
+        bSig.className = showSignatures 
+          ? 'px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+          : 'px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700';
+      }
+      const bRules = document.getElementById('badgeRulesStatus');
+      if (bRules) {
+        bRules.innerText = showRules ? 'Ditampilkan' : 'Disembunyikan';
+        bRules.className = showRules 
+          ? 'px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+          : 'px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700';
+      }
+    };
+
+    // Handler Toggle Opsi Tampilan & Sinkronisasi Real-time
+    window.handleOptionToggle = function() {
+      const showPhoto = document.getElementById('settingShowStudentPhoto')?.checked ?? true;
+      const showSignatures = document.getElementById('settingShowSignatures')?.checked ?? true;
+      const showRules = document.getElementById('settingShowExamRules')?.checked ?? true;
+
+      const mPhoto = document.getElementById('modalOptShowPhoto');
+      if (mPhoto) mPhoto.checked = showPhoto;
+      const mSig = document.getElementById('modalOptShowSignatures');
+      if (mSig) mSig.checked = showSignatures;
+      const mRules = document.getElementById('modalOptShowRules');
+      if (mRules) mRules.checked = showRules;
+
+      updateLiveCardPreview();
+      renderPrintCards();
+    };
+
+    // Sinkronisasi Toggle dari Modal Cetak ke Form Utama
+    window.syncModalOptionToSettings = function(type) {
+      if (type === 'photo') {
+        const val = document.getElementById('modalOptShowPhoto')?.checked ?? true;
+        const target = document.getElementById('settingShowStudentPhoto');
+        if (target) target.checked = val;
+      } else if (type === 'signatures') {
+        const val = document.getElementById('modalOptShowSignatures')?.checked ?? true;
+        const target = document.getElementById('settingShowSignatures');
+        if (target) target.checked = val;
+      } else if (type === 'rules') {
+        const val = document.getElementById('modalOptShowRules')?.checked ?? true;
+        const target = document.getElementById('settingShowExamRules');
+        if (target) target.checked = val;
+      }
+      updateLiveCardPreview();
+      renderPrintCards();
     };
 
     // Handler Coba Upload Pasfoto Siswa 3x4 pada Pratinjau
@@ -2964,6 +3152,9 @@
         semester: document.getElementById('settingSemester')?.value || p.semester,
         logo_url: (document.getElementById('settingLogoUrl')?.value?.trim() !== undefined && document.getElementById('settingLogoUrl')?.value?.trim() !== '') ? document.getElementById('settingLogoUrl').value.trim() : (p.logo_url || ''),
         exam_rules: document.getElementById('settingExamRules')?.value?.trim() || p.exam_rules,
+        show_student_photo: document.getElementById('settingShowStudentPhoto')?.checked ?? true,
+        show_signatures: document.getElementById('settingShowSignatures')?.checked ?? true,
+        show_exam_rules: document.getElementById('settingShowExamRules')?.checked ?? true,
       };
 
       try {
@@ -3228,6 +3419,12 @@
       const dinasLines = (p.dinas || '').replace(/\n/g, '<br>');
       const rulesHtml = (p.exam_rules || '').split('\n').filter(Boolean).map(r => `<div>${r}</div>`).join('');
 
+      // Opsi Tampilan & Cetak (Foto, Tanda Tangan, Tata Tertib)
+      const showPhoto = document.getElementById('modalOptShowPhoto') ? document.getElementById('modalOptShowPhoto').checked : (document.getElementById('settingShowStudentPhoto')?.checked ?? (p.show_student_photo !== false));
+      const showSignatures = document.getElementById('modalOptShowSignatures') ? document.getElementById('modalOptShowSignatures').checked : (document.getElementById('settingShowSignatures')?.checked ?? (p.show_signatures !== false));
+      const showRules = document.getElementById('modalOptShowRules') ? document.getElementById('modalOptShowRules').checked : (document.getElementById('settingShowExamRules')?.checked ?? (p.show_exam_rules !== false));
+      const printOpts = { showPhoto, showSignatures, showRules };
+
       // Kelompokkan siswa ke dalam lembar fisik A4 (maksimal 4 kartu per lembar: 2 kolom x 2 baris)
       const chunks = [];
       const chunkSize = 4;
@@ -3252,14 +3449,63 @@
 
           <!-- Grid 2 Kolom x 2 Baris per Lembar Halaman A4 -->
           <div class="page-cards-grid grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-900/60 p-4 rounded-b-xl border border-slate-700 print:bg-white print:p-0 print:border-none print:m-0">
-            ${chunk.map(st => renderSingleCardHtml(st, p, logoSvg, dinasLines, rulesHtml)).join('')}
+            ${chunk.map(st => renderSingleCardHtml(st, p, logoSvg, dinasLines, rulesHtml, printOpts)).join('')}
           </div>
         </div>
       `).join('');
     };
 
     // Helper Pembuat HTML 1 Kartu Peserta Ujian Proporsional A4
-    function renderSingleCardHtml(st, p, logoSvg, dinasLines, rulesHtml) {
+    function renderSingleCardHtml(st, p, logoSvg, dinasLines, rulesHtml, opts = {}) {
+      const showPhoto = opts.showPhoto !== false;
+      const showSignatures = opts.showSignatures !== false;
+      const showRules = opts.showRules !== false;
+
+      const photoHtml = showPhoto ? `
+        <div class="col-span-3 flex flex-col items-center justify-start">
+          <div class="w-14 h-18 border border-slate-400 bg-slate-50 rounded flex flex-col items-center justify-center p-1 text-slate-400">
+            <i class="fa-solid fa-user text-xl text-slate-300 mb-0.5"></i>
+            <span class="text-[7px] font-bold text-slate-600">3 x 4 cm</span>
+          </div>
+          <span class="mt-1 text-[6.5px] font-mono text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-1 py-0.5 rounded">TERVERIFIKASI</span>
+        </div>
+      ` : '';
+
+      const detailCols = showPhoto ? 'col-span-9' : 'col-span-12';
+
+      const signaturesHtml = showSignatures ? `
+        <div class="grid grid-cols-12 gap-1.5 items-end pt-1 border-t border-slate-300 text-[7.5px]">
+          <div class="col-span-4 text-center">
+            <span class="text-slate-600 block">Tanda Tangan Siswa</span>
+            <div class="h-6 flex items-center justify-center font-cursive text-slate-400 italic text-[9px]">${st.full_name.split(' ')[0]}</div>
+            <div class="border-t border-dotted border-slate-500 text-slate-800 font-bold">Peserta Ujian</div>
+          </div>
+
+          <div class="col-span-3 flex flex-col items-center justify-center">
+            ${generateStudentQrSvg(st.username)}
+            <span class="text-[6px] font-mono text-slate-600 mt-0.5">${st.username}</span>
+          </div>
+
+          <div class="col-span-5 text-center leading-tight">
+            <div class="text-slate-700">${p.signature_place || 'Jakarta'}, ${p.signature_date || '21 Oktober 2026'}</div>
+            <div class="text-slate-800 font-semibold">Kepala Sekolah,</div>
+            <div class="h-6 flex items-center justify-center relative">
+              <div class="w-6 h-6 rounded-full border border-indigo-500/30 text-indigo-500/30 absolute -left-1 flex items-center justify-center text-[5.5px] font-bold rotate-12">CAP</div>
+              <span class="font-serif italic text-slate-500 text-[8.5px]">ttd. sah</span>
+            </div>
+            <div class="font-bold underline text-black">${p.headmaster_name}</div>
+            <div class="text-[6.5px] font-mono text-slate-700">NIP. ${p.headmaster_nip}</div>
+          </div>
+        </div>
+      ` : '';
+
+      const rulesBlockHtml = (showRules && rulesHtml) ? `
+        <div class="mt-1 pt-0.5 border-t border-slate-200 text-[6.5px] text-slate-600 space-y-0.5 leading-tight">
+          <div class="font-bold text-slate-800">Tata Tertib Singkat:</div>
+          <div>${rulesHtml}</div>
+        </div>
+      ` : '';
+
       return `
         <div class="exam-card-paper bg-white text-slate-900 border border-dashed border-slate-400 p-3 rounded-lg relative shadow-sm">
           <div class="no-print absolute -top-3 right-4 bg-slate-900 text-slate-300 border border-slate-700 rounded-full px-2 py-0.5 text-[8px] font-mono flex items-center gap-1 shadow">
@@ -3288,17 +3534,10 @@
 
           <!-- Badan Kartu: Foto & Data Siswa -->
           <div class="grid grid-cols-12 gap-2 mb-1.5">
-            <!-- Foto 3x4 -->
-            <div class="col-span-3 flex flex-col items-center justify-start">
-              <div class="w-14 h-18 border border-slate-400 bg-slate-50 rounded flex flex-col items-center justify-center p-1 text-slate-400">
-                <i class="fa-solid fa-user text-xl text-slate-300 mb-0.5"></i>
-                <span class="text-[7px] font-bold text-slate-600">3 x 4 cm</span>
-              </div>
-              <span class="mt-1 text-[6.5px] font-mono text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-1 py-0.5 rounded">TERVERIFIKASI</span>
-            </div>
+            ${photoHtml}
 
             <!-- Detail Siswa -->
-            <div class="col-span-9 text-[8.5px] leading-tight space-y-0.5">
+            <div class="${detailCols} text-[8.5px] leading-tight space-y-0.5">
               <div class="grid grid-cols-12 gap-1 pb-0.5 border-b border-slate-200">
                 <span class="col-span-4 text-slate-600 font-semibold">Nomor Peserta</span>
                 <span class="col-span-8 font-mono font-bold text-black">: ${st.exam_no || '26-01-05-' + st.id}</span>
@@ -3330,36 +3569,13 @@
           </div>
 
           <!-- TTD, QR, & Pengesahan -->
-          <div class="grid grid-cols-12 gap-1.5 items-end pt-1 border-t border-slate-300 text-[7.5px]">
-            <div class="col-span-4 text-center">
-              <span class="text-slate-600 block">Tanda Tangan Siswa</span>
-              <div class="h-6 flex items-center justify-center font-cursive text-slate-400 italic text-[9px]">${st.full_name.split(' ')[0]}</div>
-              <div class="border-t border-dotted border-slate-500 text-slate-800 font-bold">Peserta Ujian</div>
-            </div>
-
-            <div class="col-span-3 flex flex-col items-center justify-center">
-              ${generateStudentQrSvg(st.username)}
-              <span class="text-[6px] font-mono text-slate-600 mt-0.5">${st.username}</span>
-            </div>
-
-            <div class="col-span-5 text-center leading-tight">
-              <div class="text-slate-700">${p.signature_place || 'Jakarta'}, ${p.signature_date || '21 Oktober 2026'}</div>
-              <div class="text-slate-800 font-semibold">Kepala Sekolah,</div>
-              <div class="h-6 flex items-center justify-center relative">
-                <div class="w-6 h-6 rounded-full border border-indigo-500/30 text-indigo-500/30 absolute -left-1 flex items-center justify-center text-[5.5px] font-bold rotate-12">CAP</div>
-                <span class="font-serif italic text-slate-500 text-[8.5px]">ttd. sah</span>
-              </div>
-              <div class="font-bold underline text-black">${p.headmaster_name}</div>
-              <div class="text-[6.5px] font-mono text-slate-700">NIP. ${p.headmaster_nip}</div>
-            </div>
-          </div>
+          ${signaturesHtml}
 
           <!-- Tata Tertib Mini -->
-          <div class="mt-1 pt-0.5 border-t border-slate-200 text-[6.5px] text-slate-600 space-y-0.5 leading-tight">
-            <div class="font-bold text-slate-800">Tata Tertib Singkat:</div>
-            <div>${rulesHtml}</div>
-          </div>
+          ${rulesBlockHtml}
         </div>
+      `;
+    }
       `;
     }
 

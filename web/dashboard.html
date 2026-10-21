@@ -977,11 +977,11 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                 <div>
                   <label class="block font-semibold text-slate-300 mb-1">Nama Kepala Sekolah (Lengkap Gelar) <span class="text-rose-400">*</span></label>
-                  <input type="text" id="settingHeadmasterName" oninput="updateSchoolProfileCardPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white font-semibold focus:outline-none focus:border-indigo-500" placeholder="Drs. H. Ahmad Fauzi, M.Pd.">
+                  <input type="text" id="settingHeadmasterName" oninput="updateSchoolProfileCardPreview(); updateLiveCardPreview();" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white font-semibold focus:outline-none focus:border-indigo-500" placeholder="Drs. H. Ahmad Fauzi, M.Pd.">
                 </div>
                 <div>
                   <label class="block font-semibold text-slate-300 mb-1">NIP Kepala Sekolah</label>
-                  <input type="text" id="settingHeadmasterNIP" oninput="updateSchoolProfileCardPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white font-mono focus:outline-none focus:border-indigo-500" placeholder="19710815 199802 1 003">
+                  <input type="text" id="settingHeadmasterNIP" oninput="updateSchoolProfileCardPreview(); updateLiveCardPreview();" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white font-mono focus:outline-none focus:border-indigo-500" placeholder="19710815 199802 1 003">
                 </div>
                 <div>
                   <label class="block font-semibold text-slate-300 mb-1">Tempat Penerbitan Dokumen</label>
@@ -1275,23 +1275,33 @@
               </div>
 
               <div class="space-y-4 text-xs">
-                <!-- Identitas Kepala Sekolah & Tanggal -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label class="block font-semibold text-slate-300 mb-1">Tempat Pengesahan (Kota)</label>
-                    <input type="text" id="settingSignaturePlace" oninput="updateLiveCardPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-white font-medium focus:outline-none focus:border-indigo-500" placeholder="Kota Bandung">
+                <!-- Tempat & Tanggal Pengesahan (Nama Kepala Sekolah & NIP diambil dari Menu Pengaturan) -->
+                <div class="space-y-3">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label class="block font-semibold text-slate-300 mb-1">Tempat Pengesahan (Kota)</label>
+                      <input type="text" id="settingCardSignaturePlace" oninput="updateLiveCardPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-white font-medium focus:outline-none focus:border-indigo-500" placeholder="Kota Bandung">
+                    </div>
+                    <div>
+                      <label class="block font-semibold text-slate-300 mb-1">Tanggal Pengesahan</label>
+                      <input type="text" id="settingCardSignatureDate" oninput="updateLiveCardPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-white font-medium focus:outline-none focus:border-indigo-500" placeholder="21 Oktober 2026">
+                    </div>
                   </div>
-                  <div>
-                    <label class="block font-semibold text-slate-300 mb-1">Tanggal Pengesahan</label>
-                    <input type="text" id="settingSignatureDate" oninput="updateLiveCardPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-white font-medium focus:outline-none focus:border-indigo-500" placeholder="21 Oktober 2026">
-                  </div>
-                  <div>
-                    <label class="block font-semibold text-slate-300 mb-1">Nama Kepala Sekolah</label>
-                    <input type="text" id="settingHeadmasterName" oninput="updateLiveCardPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-white font-bold focus:outline-none focus:border-indigo-500" placeholder="Drs. H. Ahmad Fauzi, M.Pd.">
-                  </div>
-                  <div>
-                    <label class="block font-semibold text-slate-300 mb-1">NIP Kepala Sekolah</label>
-                    <input type="text" id="settingHeadmasterNIP" oninput="updateLiveCardPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-white font-mono focus:outline-none focus:border-indigo-500" placeholder="19710815 199802 1 003">
+
+                  <!-- Keterangan Sumber Nama & NIP Kepala Sekolah dari Pengaturan -->
+                  <div class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center gap-2 text-slate-300">
+                      <div class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-user-tie text-xs"></i>
+                      </div>
+                      <div>
+                        <span class="text-slate-400 text-[10px] block font-medium">Kepala Sekolah (Tersinkron dari Pengaturan Sekolah):</span>
+                        <span id="displayCardHeadmasterInfo" class="font-bold text-white text-xs">Drs. H. Ahmad Fauzi, M.Pd. • NIP. 19710815 199802 1 003</span>
+                      </div>
+                    </div>
+                    <button type="button" onclick="switchTab('pengaturan')" class="text-indigo-400 hover:text-indigo-300 font-semibold text-[11px] flex items-center gap-1.5 self-start sm:self-center bg-indigo-500/10 hover:bg-indigo-500/20 px-3 py-1.5 rounded-lg border border-indigo-500/30 transition">
+                      <i class="fa-solid fa-sliders"></i> Ubah di Pengaturan
+                    </button>
                   </div>
                 </div>
 
@@ -2918,7 +2928,9 @@
       setVal('settingHeadmasterName', p.headmaster_name);
       setVal('settingHeadmasterNIP', p.headmaster_nip);
       setVal('settingSignaturePlace', p.signature_place);
+      setVal('settingCardSignaturePlace', p.signature_place);
       setVal('settingSignatureDate', p.signature_date);
+      setVal('settingCardSignatureDate', p.signature_date);
       setVal('settingExamTitle1', p.exam_title_1);
       setVal('settingExamTitle2', p.exam_title_2);
       setVal('settingAcademicYear', p.academic_year);
@@ -3447,11 +3459,11 @@
       const previewSemester = document.getElementById('previewSemester');
       if (previewSemester) previewSemester.innerText = sem;
 
-      const sigPlace = getVal('settingSignaturePlace', p.signature_place || 'Jakarta');
+      const sigPlace = getVal('settingCardSignaturePlace', getVal('settingSignaturePlace', p.signature_place || 'Kota Bandung'));
       const previewSignaturePlace = document.getElementById('previewSignaturePlace');
       if (previewSignaturePlace) previewSignaturePlace.innerText = sigPlace;
 
-      const sigDate = getVal('settingSignatureDate', p.signature_date || '21 Oktober 2026');
+      const sigDate = getVal('settingCardSignatureDate', getVal('settingSignatureDate', p.signature_date || '21 Oktober 2026'));
       const previewSignatureDate = document.getElementById('previewSignatureDate');
       if (previewSignatureDate) previewSignatureDate.innerText = sigDate;
 
@@ -3462,6 +3474,11 @@
       const hmNip = getVal('settingHeadmasterNIP', p.headmaster_nip || '19710815 199802 1 003');
       const previewHeadmasterNIP = document.getElementById('previewHeadmasterNIP');
       if (previewHeadmasterNIP) previewHeadmasterNIP.innerText = `NIP. ${hmNip}`;
+
+      const cardHmDisplay = document.getElementById('displayCardHeadmasterInfo');
+      if (cardHmDisplay) {
+        cardHmDisplay.innerText = `${hmName} • NIP. ${hmNip}`;
+      }
 
       const rules = getVal('settingExamRules', p.exam_rules || '1. Wajib membawa kartu ujian ini saat tes berlangsung.\n2. Hadir di ruang ujian 15 menit sebelum waktu mulai.\n3. Dilarang membawa HP / catatan ke dalam ruang ujian.');
       const previewRules = document.getElementById('previewRulesSummary');
@@ -3652,8 +3669,8 @@
         stamp_url: (document.getElementById('settingStampUrl')?.value?.trim() !== undefined && document.getElementById('settingStampUrl')?.value?.trim() !== '') ? document.getElementById('settingStampUrl').value.trim() : (p.stamp_url || ''),
         headmaster_name: document.getElementById('settingHeadmasterName')?.value?.trim() || p.headmaster_name,
         headmaster_nip: document.getElementById('settingHeadmasterNIP')?.value?.trim() || p.headmaster_nip,
-        signature_place: document.getElementById('settingSignaturePlace')?.value?.trim() || p.signature_place,
-        signature_date: document.getElementById('settingSignatureDate')?.value?.trim() || p.signature_date,
+        signature_place: document.getElementById('settingCardSignaturePlace')?.value?.trim() || document.getElementById('settingSignaturePlace')?.value?.trim() || p.signature_place,
+        signature_date: document.getElementById('settingCardSignatureDate')?.value?.trim() || document.getElementById('settingSignatureDate')?.value?.trim() || p.signature_date,
         exam_rules: document.getElementById('settingExamRules')?.value?.trim() || p.exam_rules,
         show_student_photo: document.getElementById('settingShowStudentPhoto')?.checked ?? true,
         show_signatures: document.getElementById('settingShowSignatures')?.checked ?? true,
@@ -3710,8 +3727,8 @@
         website: document.getElementById('settingSchoolWebsite')?.value?.trim() || p.website,
         headmaster_name: document.getElementById('settingHeadmasterName')?.value?.trim() || p.headmaster_name,
         headmaster_nip: document.getElementById('settingHeadmasterNIP')?.value?.trim() || p.headmaster_nip,
-        signature_place: document.getElementById('settingSignaturePlace')?.value?.trim() || p.signature_place,
-        signature_date: document.getElementById('settingSignatureDate')?.value?.trim() || p.signature_date,
+        signature_place: document.getElementById('settingCardSignaturePlace')?.value?.trim() || document.getElementById('settingSignaturePlace')?.value?.trim() || p.signature_place,
+        signature_date: document.getElementById('settingCardSignatureDate')?.value?.trim() || document.getElementById('settingSignatureDate')?.value?.trim() || p.signature_date,
       };
 
       try {
@@ -3938,6 +3955,15 @@
 
       const printOpts = { showPhoto, showSignatures, showRules, sigSize, stampSize, stampX, stampY };
 
+      // Pastikan nama & NIP Kepala Sekolah tersinkron dari Pengaturan Sekolah, serta tempat & tanggal dari Kartu
+      const profileToRender = {
+        ...p,
+        headmaster_name: document.getElementById('settingHeadmasterName')?.value?.trim() || p.headmaster_name,
+        headmaster_nip: document.getElementById('settingHeadmasterNIP')?.value?.trim() || p.headmaster_nip,
+        signature_place: document.getElementById('settingCardSignaturePlace')?.value?.trim() || document.getElementById('settingSignaturePlace')?.value?.trim() || p.signature_place,
+        signature_date: document.getElementById('settingCardSignatureDate')?.value?.trim() || document.getElementById('settingSignatureDate')?.value?.trim() || p.signature_date,
+      };
+
       // Kelompokkan siswa ke dalam lembar fisik A4 (maksimal 4 kartu per lembar: 2 kolom x 2 baris)
       const chunks = [];
       const chunkSize = 4;
@@ -3962,7 +3988,7 @@
 
           <!-- Grid 2 Kolom x 2 Baris per Lembar Halaman A4 -->
           <div class="page-cards-grid grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-900/60 p-4 rounded-b-xl border border-slate-700 print:bg-white print:p-0 print:border-none print:m-0">
-            ${chunk.map(st => renderSingleCardHtml(st, p, logoSvg, dinasLines, rulesHtml, printOpts)).join('')}
+            ${chunk.map(st => renderSingleCardHtml(st, profileToRender, logoSvg, dinasLines, rulesHtml, printOpts)).join('')}
           </div>
         </div>
       `).join('');

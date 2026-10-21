@@ -1237,12 +1237,12 @@
                   <div class="flex-1">
                     <div class="flex items-center justify-between">
                       <span class="font-bold text-white flex items-center gap-2 group-hover:text-emerald-300 transition">
-                        <i class="fa-solid fa-signature text-emerald-400"></i> Tampilkan & Cetak Tanda Tangan & Pengesahan
+                        <i class="fa-solid fa-signature text-emerald-400"></i> Tampilkan & Cetak Pengesahan (TTD & Cap)
                       </span>
                       <span id="badgeSigStatus" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Ditampilkan</span>
                     </div>
                     <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                      Sertakan tanda tangan siswa, QR-code otentikasi CBT, cap stempel, dan tanda tangan Kepala Sekolah.
+                      Sertakan kolom pengesahan Kepala Sekolah dengan cap stempel bertumpuk di atas tanda tangan.
                     </p>
                   </div>
                 </label>
@@ -1262,6 +1262,117 @@
                     </p>
                   </div>
                 </label>
+              </div>
+            </div>
+
+            <!-- Card: Pengesahan, Unggah TTD & Cap Stempel Sekolah -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                  <i class="fa-solid fa-stamp text-indigo-400"></i> Pengesahan, Tanda Tangan & Cap Stempel
+                </h4>
+                <span class="text-[10px] text-slate-400">Posisi Cap di Atas TTD</span>
+              </div>
+
+              <div class="space-y-4 text-xs">
+                <!-- Identitas Kepala Sekolah & Tanggal -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-semibold text-slate-300 mb-1">Tempat Pengesahan (Kota)</label>
+                    <input type="text" id="settingSignaturePlace" oninput="updateLiveCardPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-white font-medium focus:outline-none focus:border-indigo-500" placeholder="Kota Bandung">
+                  </div>
+                  <div>
+                    <label class="block font-semibold text-slate-300 mb-1">Tanggal Pengesahan</label>
+                    <input type="text" id="settingSignatureDate" oninput="updateLiveCardPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-white font-medium focus:outline-none focus:border-indigo-500" placeholder="21 Oktober 2026">
+                  </div>
+                  <div>
+                    <label class="block font-semibold text-slate-300 mb-1">Nama Kepala Sekolah</label>
+                    <input type="text" id="settingHeadmasterName" oninput="updateLiveCardPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-white font-bold focus:outline-none focus:border-indigo-500" placeholder="Drs. H. Ahmad Fauzi, M.Pd.">
+                  </div>
+                  <div>
+                    <label class="block font-semibold text-slate-300 mb-1">NIP Kepala Sekolah</label>
+                    <input type="text" id="settingHeadmasterNIP" oninput="updateLiveCardPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-white font-mono focus:outline-none focus:border-indigo-500" placeholder="19710815 199802 1 003">
+                  </div>
+                </div>
+
+                <!-- Bagian 1: Unggah Tanda Tangan Kepala Sekolah -->
+                <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                  <label class="block font-semibold text-slate-300 flex items-center justify-between">
+                    <span class="flex items-center gap-1.5">
+                      <i class="fa-solid fa-file-signature text-emerald-400"></i> Berkas Tanda Tangan Kepala Sekolah
+                    </span>
+                    <span class="text-[10px] text-slate-500 font-normal">Disarankan PNG Transparan (Maks. 2MB)</span>
+                  </label>
+
+                  <div class="flex flex-col sm:flex-row items-center gap-4">
+                    <div class="w-24 h-14 rounded-xl bg-slate-900 border border-slate-700/80 p-1 flex items-center justify-center shrink-0 shadow-inner">
+                      <div id="signatureUploadPreviewBox" class="w-full h-full flex items-center justify-center">
+                        <span class="font-serif italic text-slate-500 text-xs">ttd. digital</span>
+                      </div>
+                    </div>
+
+                    <div class="flex-1 space-y-1.5 text-center sm:text-left w-full">
+                      <div class="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
+                        <input type="file" id="signatureFileInput" accept="image/png, image/jpeg, image/jpg, image/svg+xml, image/webp" class="hidden" onchange="handleSignatureFileSelected(event)">
+                        
+                        <button type="button" onclick="document.getElementById('signatureFileInput').click()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-indigo-600/30">
+                          <i class="fa-solid fa-upload"></i> Unggah TTD Kepsek
+                        </button>
+
+                        <button type="button" id="btnResetSignature" onclick="handleResetSignature()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-slate-700 hover:border-rose-500/30 text-xs font-semibold transition flex items-center gap-1">
+                          <i class="fa-solid fa-arrow-rotate-left"></i> Pakai TTD Digital
+                        </button>
+                      </div>
+
+                      <div id="signatureFileStatusText" class="text-[11px] text-slate-400 flex items-center gap-1.5 justify-center sm:justify-start">
+                        <i class="fa-solid fa-circle-info text-indigo-400"></i> Menggunakan tanda tangan digital baku
+                      </div>
+                      <input type="hidden" id="settingSignatureUrl">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Bagian 2: Unggah Cap Stempel Sekolah -->
+                <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                  <label class="block font-semibold text-slate-300 flex items-center justify-between">
+                    <span class="flex items-center gap-1.5">
+                      <i class="fa-solid fa-stamp text-amber-400"></i> Berkas Cap / Stempel Resmi Sekolah
+                    </span>
+                    <span class="text-[10px] text-slate-500 font-normal">Disarankan PNG Transparan Berwarna (Maks. 2MB)</span>
+                  </label>
+
+                  <div class="flex flex-col sm:flex-row items-center gap-4">
+                    <div class="w-16 h-16 rounded-xl bg-slate-900 border border-slate-700/80 p-1 flex items-center justify-center shrink-0 shadow-inner">
+                      <div id="stampUploadPreviewBox" class="w-full h-full flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-full border-2 border-indigo-500/50 text-indigo-500/60 flex items-center justify-center text-[8px] font-bold rotate-12">CAP</div>
+                      </div>
+                    </div>
+
+                    <div class="flex-1 space-y-1.5 text-center sm:text-left w-full">
+                      <div class="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
+                        <input type="file" id="stampFileInput" accept="image/png, image/jpeg, image/jpg, image/svg+xml, image/webp" class="hidden" onchange="handleStampFileSelected(event)">
+                        
+                        <button type="button" onclick="document.getElementById('stampFileInput').click()" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-amber-600/30">
+                          <i class="fa-solid fa-upload"></i> Unggah Cap Stempel
+                        </button>
+
+                        <button type="button" id="btnResetStamp" onclick="handleResetStamp()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-slate-700 hover:border-rose-500/30 text-xs font-semibold transition flex items-center gap-1">
+                          <i class="fa-solid fa-arrow-rotate-left"></i> Pakai Cap Standar
+                        </button>
+                      </div>
+
+                      <div id="stampFileStatusText" class="text-[11px] text-slate-400 flex items-center gap-1.5 justify-center sm:justify-start">
+                        <i class="fa-solid fa-circle-info text-indigo-400"></i> Menggunakan cap stempel bulat standar
+                      </div>
+                      <input type="hidden" id="settingStampUrl">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="text-[11px] text-slate-400 bg-indigo-950/30 border border-indigo-800/40 rounded-xl p-2.5 flex items-center gap-2">
+                  <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+                  <span>Posisi cap stempel secara otomatis dicetak menimpa di atas tanda tangan (*overlap*) seperti dokumen stempel basah aslinya.</span>
+                </div>
               </div>
             </div>
 
@@ -1373,41 +1484,27 @@
                   </div>
                 </div>
 
-                <!-- Bagian Bawah: QR Code + TTD -->
-                <div id="previewSignatureSection" class="grid grid-cols-12 gap-2 items-end pt-2 border-t border-slate-200 text-[8px]">
-                  <div class="col-span-4 text-center">
-                    <span class="text-slate-500 block">Tanda Tangan Siswa</span>
-                    <div class="h-9 flex items-center justify-center font-cursive text-slate-400 italic">Ahmad Rizki</div>
-                    <div class="border-t border-dotted border-slate-400 text-slate-700 font-bold">Peserta Ujian</div>
-                  </div>
-
-                  <div class="col-span-3 flex flex-col items-center justify-center">
-                    <svg viewBox="0 0 50 50" class="w-10 h-10 border border-slate-300 p-0.5 bg-white">
-                      <rect x="0" y="0" width="16" height="16" fill="#0f172a"/>
-                      <rect x="3" y="3" width="10" height="10" fill="#ffffff"/>
-                      <rect x="6" y="6" width="4" height="4" fill="#0f172a"/>
-                      <rect x="34" y="0" width="16" height="16" fill="#0f172a"/>
-                      <rect x="37" y="3" width="10" height="10" fill="#ffffff"/>
-                      <rect x="40" y="6" width="4" height="4" fill="#0f172a"/>
-                      <rect x="0" y="34" width="16" height="16" fill="#0f172a"/>
-                      <rect x="3" y="37" width="10" height="10" fill="#ffffff"/>
-                      <rect x="6" y="40" width="4" height="4" fill="#0f172a"/>
-                      <rect x="20" y="10" width="8" height="6" fill="#0f172a"/>
-                      <rect x="22" y="24" width="12" height="6" fill="#0f172a"/>
-                      <rect x="36" y="36" width="12" height="12" fill="#0f172a"/>
-                    </svg>
-                    <span class="text-[7px] text-slate-500 font-mono mt-0.5">CBT-AUTH</span>
-                  </div>
-
-                  <div class="col-span-5 text-center leading-tight">
+                <!-- Bagian Bawah: Pengesahan & Tanda Tangan Kepala Sekolah + Cap Bertumpuk -->
+                <div id="previewSignatureSection" class="pt-2 border-t border-slate-200 text-[8px] flex justify-end">
+                  <div class="w-52 text-center leading-tight flex flex-col items-center">
                     <div class="text-slate-600"><span id="previewSignaturePlace">Jakarta</span>, <span id="previewSignatureDate">21 Oktober 2026</span></div>
-                    <div class="text-slate-700 font-semibold">Kepala Sekolah,</div>
-                    <div class="h-7 flex items-center justify-center relative">
-                      <div class="w-8 h-8 rounded-full border border-indigo-400/40 text-indigo-400/40 absolute -left-1 flex items-center justify-center text-[7px] font-bold rotate-12">CAP</div>
-                      <span class="font-serif italic text-slate-500 text-[10px]">ttd. digital</span>
+                    <div class="text-slate-800 font-semibold mt-0.5">Kepala Sekolah,</div>
+
+                    <!-- Area TTD dan Cap Saling Bertumpuk (Cap stempel di atas Tanda Tangan) -->
+                    <div class="relative w-44 h-16 my-0.5 flex items-center justify-center select-none">
+                      <!-- Layer Dasar: Tanda Tangan Kepala Sekolah -->
+                      <div id="previewSignatureImgBox" class="w-full h-full flex items-center justify-center z-0">
+                        <span class="font-serif italic text-slate-500 text-sm">ttd. digital</span>
+                      </div>
+
+                      <!-- Layer Atas: Cap Stempel Sekolah (Menimpa TTD secara Realistis) -->
+                      <div id="previewStampImgBox" class="absolute left-2 -top-1 w-16 h-16 z-10 flex items-center justify-center pointer-events-none opacity-90 mix-blend-multiply">
+                        <div class="w-12 h-12 rounded-full border-2 border-indigo-500/50 text-indigo-500/60 flex items-center justify-center text-[9px] font-bold rotate-12">CAP</div>
+                      </div>
                     </div>
-                    <div id="previewHeadmasterName" class="font-bold underline text-slate-900">Drs. H. Ahmad Fauzi, M.Pd.</div>
-                    <div id="previewHeadmasterNIP" class="text-[7px] font-mono text-slate-600">NIP. 19710815 199802 1 003</div>
+
+                    <div id="previewHeadmasterName" class="font-bold underline text-slate-900 text-[9px]">Drs. H. Ahmad Fauzi, M.Pd.</div>
+                    <div id="previewHeadmasterNIP" class="text-[7.5px] font-mono text-slate-600 mt-0.5">NIP. 19710815 199802 1 003</div>
                   </div>
                 </div>
 
@@ -2782,6 +2879,50 @@
       setCheck('modalOptShowSignatures', showSignatures);
       setCheck('modalOptShowRules', showRules);
 
+      // Kredensial & URL Berkas Pengesahan
+      setVal('settingSignatureUrl', p.signature_url || '');
+      setVal('settingStampUrl', p.stamp_url || '');
+
+      // TTD preview box & status
+      const sigPreviewBox = document.getElementById('signatureUploadPreviewBox');
+      const sigStatus = document.getElementById('signatureFileStatusText');
+      if (p.signature_url) {
+        if (sigPreviewBox) {
+          sigPreviewBox.innerHTML = `<img src="${p.signature_url}" class="max-h-12 max-w-[90px] object-contain" alt="TTD Kepsek">`;
+        }
+        if (sigStatus) {
+          const fname = p.signature_url.split('/').pop();
+          sigStatus.innerHTML = `<span class="text-emerald-400 font-semibold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Tanda tangan aktif (${fname})</span>`;
+        }
+      } else {
+        if (sigPreviewBox) {
+          sigPreviewBox.innerHTML = `<span class="font-serif italic text-slate-500 text-xs">ttd. digital</span>`;
+        }
+        if (sigStatus) {
+          sigStatus.innerHTML = `<span class="text-slate-400 flex items-center gap-1"><i class="fa-solid fa-circle-info text-indigo-400"></i> Menggunakan tanda tangan digital baku</span>`;
+        }
+      }
+
+      // Stamp preview box & status
+      const stampPreviewBox = document.getElementById('stampUploadPreviewBox');
+      const stampStatus = document.getElementById('stampFileStatusText');
+      if (p.stamp_url) {
+        if (stampPreviewBox) {
+          stampPreviewBox.innerHTML = `<img src="${p.stamp_url}" class="w-full h-full object-contain" alt="Cap Sekolah">`;
+        }
+        if (stampStatus) {
+          const fname = p.stamp_url.split('/').pop();
+          stampStatus.innerHTML = `<span class="text-emerald-400 font-semibold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Cap stempel aktif (${fname})</span>`;
+        }
+      } else {
+        if (stampPreviewBox) {
+          stampPreviewBox.innerHTML = `<div class="w-10 h-10 rounded-full border-2 border-indigo-500/50 text-indigo-500/60 flex items-center justify-center text-[8px] font-bold rotate-12">CAP</div>`;
+        }
+        if (stampStatus) {
+          stampStatus.innerHTML = `<span class="text-slate-400 flex items-center gap-1"><i class="fa-solid fa-circle-info text-indigo-400"></i> Menggunakan cap stempel bulat standar</span>`;
+        }
+      }
+
       // Perbarui tampilan preview box logo upload
       const logoPreviewBox = document.getElementById('logoUploadPreviewBox');
       const logoStatus = document.getElementById('logoFileStatusText');
@@ -2898,6 +3039,178 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ logo_url: '' })
+        });
+      } catch (e) {}
+    };
+
+    // Handler Pilih & Upload Berkas Tanda Tangan Kepala Sekolah
+    window.handleSignatureFileSelected = async function(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      if (file.size > 2 * 1024 * 1024) {
+        alert('Ukuran file tanda tangan terlalu besar. Maksimal 2 MB.');
+        event.target.value = '';
+        return;
+      }
+
+      const statusEl = document.getElementById('signatureFileStatusText');
+      if (statusEl) {
+        statusEl.innerHTML = `<span class="text-amber-400 font-semibold flex items-center gap-1"><i class="fa-solid fa-spinner fa-spin"></i> Mengunggah ${file.name}...</span>`;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const dataUrl = e.target.result;
+        const previewBox = document.getElementById('signatureUploadPreviewBox');
+        if (previewBox) {
+          previewBox.innerHTML = `<img src="${dataUrl}" class="max-h-12 max-w-[90px] object-contain" alt="TTD Preview">`;
+        }
+
+        const sigInput = document.getElementById('settingSignatureUrl');
+        if (sigInput) sigInput.value = dataUrl;
+
+        updateLiveCardPreview();
+        renderPrintCards();
+
+        try {
+          const res = await fetch('/api/v1/school/upload-signature', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image_data: dataUrl, filename: file.name })
+          });
+          const json = await res.json();
+          if (!res.ok) throw new Error(json.message);
+
+          if (sigInput) sigInput.value = json.signature_url;
+          if (currentSchoolProfile) currentSchoolProfile.signature_url = json.signature_url;
+
+          if (statusEl) {
+            statusEl.innerHTML = `<span class="text-emerald-400 font-semibold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> TTD berhasil disimpan (${file.name})</span>`;
+          }
+
+          updateLiveCardPreview();
+          renderPrintCards();
+        } catch (err) {
+          console.error('Gagal simpan TTD:', err);
+        }
+      };
+      reader.readAsDataURL(file);
+    };
+
+    // Handler Reset Tanda Tangan
+    window.handleResetSignature = async function() {
+      const sigInput = document.getElementById('settingSignatureUrl');
+      if (sigInput) sigInput.value = '';
+      if (currentSchoolProfile) currentSchoolProfile.signature_url = '';
+
+      const fileInput = document.getElementById('signatureFileInput');
+      if (fileInput) fileInput.value = '';
+
+      const previewBox = document.getElementById('signatureUploadPreviewBox');
+      if (previewBox) {
+        previewBox.innerHTML = `<span class="font-serif italic text-slate-500 text-xs">ttd. digital</span>`;
+      }
+
+      const statusEl = document.getElementById('signatureFileStatusText');
+      if (statusEl) {
+        statusEl.innerHTML = `<span class="text-slate-400 flex items-center gap-1"><i class="fa-solid fa-circle-info text-indigo-400"></i> Menggunakan tanda tangan digital baku</span>`;
+      }
+
+      updateLiveCardPreview();
+      renderPrintCards();
+
+      try {
+        await fetch('/api/v1/school/profile/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ signature_url: '' })
+        });
+      } catch (e) {}
+    };
+
+    // Handler Pilih & Upload Berkas Cap Stempel Sekolah
+    window.handleStampFileSelected = async function(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      if (file.size > 2 * 1024 * 1024) {
+        alert('Ukuran file cap stempel terlalu besar. Maksimal 2 MB.');
+        event.target.value = '';
+        return;
+      }
+
+      const statusEl = document.getElementById('stampFileStatusText');
+      if (statusEl) {
+        statusEl.innerHTML = `<span class="text-amber-400 font-semibold flex items-center gap-1"><i class="fa-solid fa-spinner fa-spin"></i> Mengunggah ${file.name}...</span>`;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const dataUrl = e.target.result;
+        const previewBox = document.getElementById('stampUploadPreviewBox');
+        if (previewBox) {
+          previewBox.innerHTML = `<img src="${dataUrl}" class="w-full h-full object-contain" alt="Cap Preview">`;
+        }
+
+        const stampInput = document.getElementById('settingStampUrl');
+        if (stampInput) stampInput.value = dataUrl;
+
+        updateLiveCardPreview();
+        renderPrintCards();
+
+        try {
+          const res = await fetch('/api/v1/school/upload-stamp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image_data: dataUrl, filename: file.name })
+          });
+          const json = await res.json();
+          if (!res.ok) throw new Error(json.message);
+
+          if (stampInput) stampInput.value = json.stamp_url;
+          if (currentSchoolProfile) currentSchoolProfile.stamp_url = json.stamp_url;
+
+          if (statusEl) {
+            statusEl.innerHTML = `<span class="text-emerald-400 font-semibold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Cap stempel berhasil disimpan (${file.name})</span>`;
+          }
+
+          updateLiveCardPreview();
+          renderPrintCards();
+        } catch (err) {
+          console.error('Gagal simpan Cap:', err);
+        }
+      };
+      reader.readAsDataURL(file);
+    };
+
+    // Handler Reset Cap Stempel
+    window.handleResetStamp = async function() {
+      const stampInput = document.getElementById('settingStampUrl');
+      if (stampInput) stampInput.value = '';
+      if (currentSchoolProfile) currentSchoolProfile.stamp_url = '';
+
+      const fileInput = document.getElementById('stampFileInput');
+      if (fileInput) fileInput.value = '';
+
+      const previewBox = document.getElementById('stampUploadPreviewBox');
+      if (previewBox) {
+        previewBox.innerHTML = `<div class="w-10 h-10 rounded-full border-2 border-indigo-500/50 text-indigo-500/60 flex items-center justify-center text-[8px] font-bold rotate-12">CAP</div>`;
+      }
+
+      const statusEl = document.getElementById('stampFileStatusText');
+      if (statusEl) {
+        statusEl.innerHTML = `<span class="text-slate-400 flex items-center gap-1"><i class="fa-solid fa-circle-info text-indigo-400"></i> Menggunakan cap stempel bulat standar</span>`;
+      }
+
+      updateLiveCardPreview();
+      renderPrintCards();
+
+      try {
+        await fetch('/api/v1/school/profile/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ stamp_url: '' })
         });
       } catch (e) {}
     };
@@ -3043,6 +3356,27 @@
         }
       }
 
+      // Perbarui Tanda Tangan & Cap Stempel pada Live Preview
+      const sigUrl = (document.getElementById('settingSignatureUrl')?.value?.trim() || p.signature_url || '').trim();
+      const previewSigBox = document.getElementById('previewSignatureImgBox');
+      if (previewSigBox) {
+        if (sigUrl) {
+          previewSigBox.innerHTML = `<img src="${sigUrl}" class="max-h-12 max-w-[130px] object-contain" alt="Tanda Tangan Kepala Sekolah">`;
+        } else {
+          previewSigBox.innerHTML = `<span class="font-serif italic text-slate-500 text-sm">ttd. digital</span>`;
+        }
+      }
+
+      const stampUrl = (document.getElementById('settingStampUrl')?.value?.trim() || p.stamp_url || '').trim();
+      const previewStampBox = document.getElementById('previewStampImgBox');
+      if (previewStampBox) {
+        if (stampUrl) {
+          previewStampBox.innerHTML = `<img src="${stampUrl}" class="w-full h-full object-contain" alt="Cap Stempel Sekolah">`;
+        } else {
+          previewStampBox.innerHTML = `<div class="w-12 h-12 rounded-full border-2 border-indigo-500/50 text-indigo-500/60 flex items-center justify-center text-[9px] font-bold rotate-12">CAP</div>`;
+        }
+      }
+
       // Update badge status di opsi form
       const bPhoto = document.getElementById('badgePhotoStatus');
       if (bPhoto) {
@@ -3151,6 +3485,12 @@
         academic_year: document.getElementById('settingAcademicYear')?.value?.trim() || p.academic_year,
         semester: document.getElementById('settingSemester')?.value || p.semester,
         logo_url: (document.getElementById('settingLogoUrl')?.value?.trim() !== undefined && document.getElementById('settingLogoUrl')?.value?.trim() !== '') ? document.getElementById('settingLogoUrl').value.trim() : (p.logo_url || ''),
+        signature_url: (document.getElementById('settingSignatureUrl')?.value?.trim() !== undefined && document.getElementById('settingSignatureUrl')?.value?.trim() !== '') ? document.getElementById('settingSignatureUrl').value.trim() : (p.signature_url || ''),
+        stamp_url: (document.getElementById('settingStampUrl')?.value?.trim() !== undefined && document.getElementById('settingStampUrl')?.value?.trim() !== '') ? document.getElementById('settingStampUrl').value.trim() : (p.stamp_url || ''),
+        headmaster_name: document.getElementById('settingHeadmasterName')?.value?.trim() || p.headmaster_name,
+        headmaster_nip: document.getElementById('settingHeadmasterNIP')?.value?.trim() || p.headmaster_nip,
+        signature_place: document.getElementById('settingSignaturePlace')?.value?.trim() || p.signature_place,
+        signature_date: document.getElementById('settingSignatureDate')?.value?.trim() || p.signature_date,
         exam_rules: document.getElementById('settingExamRules')?.value?.trim() || p.exam_rules,
         show_student_photo: document.getElementById('settingShowStudentPhoto')?.checked ?? true,
         show_signatures: document.getElementById('settingShowSignatures')?.checked ?? true,
@@ -3473,28 +3813,38 @@
 
       const detailCols = showPhoto ? 'col-span-9' : 'col-span-12';
 
+      // Konten Tanda Tangan Kepala Sekolah
+      let ttdContent = `<span class="font-serif italic text-slate-500 text-[9px]">ttd. digital</span>`;
+      if (p.signature_url) {
+        ttdContent = `<img src="${p.signature_url}" class="max-h-12 max-w-[130px] object-contain" alt="Tanda Tangan">`;
+      }
+
+      // Konten Cap Stempel Sekolah (Dicetak menimpa di atas Tanda Tangan)
+      let capContent = `<div class="w-10 h-10 rounded-full border-2 border-indigo-600/40 text-indigo-600/60 flex items-center justify-center text-[7.5px] font-bold rotate-12">CAP</div>`;
+      if (p.stamp_url) {
+        capContent = `<img src="${p.stamp_url}" class="w-full h-full object-contain" alt="Cap Stempel">`;
+      }
+
       const signaturesHtml = showSignatures ? `
-        <div class="grid grid-cols-12 gap-1.5 items-end pt-1 border-t border-slate-300 text-[7.5px]">
-          <div class="col-span-4 text-center">
-            <span class="text-slate-600 block">Tanda Tangan Siswa</span>
-            <div class="h-6 flex items-center justify-center font-cursive text-slate-400 italic text-[9px]">${st.full_name.split(' ')[0]}</div>
-            <div class="border-t border-dotted border-slate-500 text-slate-800 font-bold">Peserta Ujian</div>
-          </div>
-
-          <div class="col-span-3 flex flex-col items-center justify-center">
-            ${generateStudentQrSvg(st.username)}
-            <span class="text-[6px] font-mono text-slate-600 mt-0.5">${st.username}</span>
-          </div>
-
-          <div class="col-span-5 text-center leading-tight">
-            <div class="text-slate-700">${p.signature_place || 'Jakarta'}, ${p.signature_date || '21 Oktober 2026'}</div>
-            <div class="text-slate-800 font-semibold">Kepala Sekolah,</div>
-            <div class="h-6 flex items-center justify-center relative">
-              <div class="w-6 h-6 rounded-full border border-indigo-500/30 text-indigo-500/30 absolute -left-1 flex items-center justify-center text-[5.5px] font-bold rotate-12">CAP</div>
-              <span class="font-serif italic text-slate-500 text-[8.5px]">ttd. sah</span>
+        <div class="pt-1.5 border-t border-slate-300 text-[7.5px] flex justify-end">
+          <div class="w-48 text-center leading-tight flex flex-col items-center">
+            <div class="text-slate-700">${p.signature_place || 'Bandung'}, ${p.signature_date || '21 Oktober 2026'}</div>
+            <div class="text-slate-800 font-semibold mt-0.5">Kepala Sekolah,</div>
+            
+            <!-- Area Bertumpuk: Cap di atas Tanda Tangan -->
+            <div class="relative w-40 h-14 my-0.5 flex items-center justify-center select-none">
+              <!-- Layer TTD (Dasar) -->
+              <div class="w-full h-full flex items-center justify-center z-0">
+                ${ttdContent}
+              </div>
+              <!-- Layer Cap (Di atas TTD, menimpa secara realistis) -->
+              <div class="absolute left-1 -top-1 w-14 h-14 z-10 flex items-center justify-center pointer-events-none opacity-90 mix-blend-multiply">
+                ${capContent}
+              </div>
             </div>
-            <div class="font-bold underline text-black">${p.headmaster_name}</div>
-            <div class="text-[6.5px] font-mono text-slate-700">NIP. ${p.headmaster_nip}</div>
+
+            <div class="font-bold underline text-black text-[8.5px]">${p.headmaster_name}</div>
+            <div class="text-[6.5px] font-mono text-slate-700 mt-0.5">NIP. ${p.headmaster_nip}</div>
           </div>
         </div>
       ` : '';

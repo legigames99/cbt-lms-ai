@@ -155,6 +155,8 @@ const DEFAULT_SCHOOL_PROFILE = {
   signature_place: 'Jakarta',
   signature_date: '21 Oktober 2026',
   logo_url: '',
+  signature_url: '',
+  stamp_url: '',
   exam_rules: '1. Membawa Kartu Peserta Ujian ini selama berlangsungnya tes.\n2. Hadir di ruang ujian 15 menit sebelum ujian dimulai.\n3. Dilarang membawa HP, alat komunikasi atau catatan ke dalam ruang ujian.\n4. Mentaati tata tertib dan petunjuk dari pengawas ujian.',
   show_student_photo: true,
   show_signatures: true,
@@ -461,7 +463,7 @@ const server = http.createServer(async (req, res) => {
       'district', 'city', 'province', 'postal_code', 'phone', 'email',
       'website', 'headmaster_name', 'headmaster_nip', 'exam_title_1',
       'exam_title_2', 'academic_year', 'semester', 'signature_place',
-      'signature_date', 'logo_url', 'exam_rules',
+      'signature_date', 'logo_url', 'signature_url', 'stamp_url', 'exam_rules',
       'show_student_photo', 'show_signatures', 'show_exam_rules'
     ];
     for (const k of updatableKeys) {
@@ -525,6 +527,100 @@ const server = http.createServer(async (req, res) => {
       });
     } catch (err) {
       return sendJSON(500, { status: 'error', message: 'Gagal memproses unggahan logo: ' + err.message });
+    }
+  }
+
+  // POST /api/v1/school/upload-signature (Unggah Berkas Tanda Tangan Kepala Sekolah)
+  if (pathname === '/api/v1/school/upload-signature' && req.method === 'POST') {
+    const body = await parseBody(req);
+    if (!body.image_data) {
+      return sendJSON(400, { status: 'error', message: 'Data gambar tanda tangan tidak ditemukan.' });
+    }
+
+    try {
+      const match = body.image_data.match(/^data:image\/([a-zA-Z0-9\+\-]+);base64,(.+)$/);
+      let ext = 'png';
+      let buffer;
+      if (match) {
+        ext = match[1].replace('svg+xml', 'svg').replace('jpeg', 'jpg');
+        buffer = Buffer.from(match[2], 'base64');
+      } else {
+        buffer = Buffer.from(body.image_data, 'base64');
+      }
+
+      if (!fs.existsSync(STATIC_UPLOADS_DIR)) {
+        fs.mkdirSync(STATIC_UPLOADS_DIR, { recursive: true });
+      }
+
+      const safeExt = ['png', 'jpg', 'jpeg', 'svg', 'webp'].includes(ext) ? ext : 'png';
+      const filename = `ttd_kepsek_${Date.now()}.${safeExt}`;
+      const filePath = path.join(STATIC_UPLOADS_DIR, filename);
+      fs.writeFileSync(filePath, buffer);
+
+      const fileUrl = `/static/uploads/${filename}`;
+      schoolProfile.signature_url = fileUrl;
+
+      try {
+        fs.writeFileSync(SCHOOL_PROFILE_PATH, JSON.stringify(schoolProfile, null, 2), 'utf8');
+      } catch (e) {
+        console.error('[Pengaturan] Gagal menulis school_profile.json:', e.message);
+      }
+
+      return sendJSON(200, {
+        status: 'success',
+        message: 'Tanda tangan kepala sekolah berhasil diunggah!',
+        signature_url: fileUrl,
+        filename: filename
+      });
+    } catch (err) {
+      return sendJSON(500, { status: 'error', message: 'Gagal memproses tanda tangan: ' + err.message });
+    }
+  }
+
+  // POST /api/v1/school/upload-stamp (Unggah Berkas Cap Stempel Sekolah)
+  if (pathname === '/api/v1/school/upload-stamp' && req.method === 'POST') {
+    const body = await parseBody(req);
+    if (!body.image_data) {
+      return sendJSON(400, { status: 'error', message: 'Data gambar cap tidak ditemukan.' });
+    }
+
+    try {
+      const match = body.image_data.match(/^data:image\/([a-zA-Z0-9\+\-]+);base64,(.+)$/);
+      let ext = 'png';
+      let buffer;
+      if (match) {
+        ext = match[1].replace('svg+xml', 'svg').replace('jpeg', 'jpg');
+        buffer = Buffer.from(match[2], 'base64');
+      } else {
+        buffer = Buffer.from(body.image_data, 'base64');
+      }
+
+      if (!fs.existsSync(STATIC_UPLOADS_DIR)) {
+        fs.mkdirSync(STATIC_UPLOADS_DIR, { recursive: true });
+      }
+
+      const safeExt = ['png', 'jpg', 'jpeg', 'svg', 'webp'].includes(ext) ? ext : 'png';
+      const filename = `cap_sekolah_${Date.now()}.${safeExt}`;
+      const filePath = path.join(STATIC_UPLOADS_DIR, filename);
+      fs.writeFileSync(filePath, buffer);
+
+      const fileUrl = `/static/uploads/${filename}`;
+      schoolProfile.stamp_url = fileUrl;
+
+      try {
+        fs.writeFileSync(SCHOOL_PROFILE_PATH, JSON.stringify(schoolProfile, null, 2), 'utf8');
+      } catch (e) {
+        console.error('[Pengaturan] Gagal menulis school_profile.json:', e.message);
+      }
+
+      return sendJSON(200, {
+        status: 'success',
+        message: 'Cap stempel sekolah berhasil diunggah!',
+        stamp_url: fileUrl,
+        filename: filename
+      });
+    } catch (err) {
+      return sendJSON(500, { status: 'error', message: 'Gagal memproses cap sekolah: ' + err.message });
     }
   }
 

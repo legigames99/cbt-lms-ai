@@ -1369,9 +1369,72 @@
                   </div>
                 </div>
 
+                <!-- Bagian 3: Kontrol Penyesuaian Ukuran & Posisi TTD dan Cap -->
+                <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+                  <div class="flex items-center justify-between pb-2 border-b border-slate-800/80">
+                    <span class="font-bold text-slate-200 flex items-center gap-1.5">
+                      <i class="fa-solid fa-up-right-and-down-left-from-center text-indigo-400"></i> Penyesuaian Ukuran & Posisi Tumpukan
+                    </span>
+                    <button type="button" onclick="handleResetSignatureAndStampSize()" class="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1 transition">
+                      <i class="fa-solid fa-rotate-left"></i> Reset Ukuran Baku
+                    </button>
+                  </div>
+
+                  <!-- Slider 1: Ukuran Lebar Tanda Tangan -->
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between">
+                      <label class="text-slate-300 font-semibold flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-signature text-emerald-400"></i> Ukuran Tanda Tangan:
+                      </label>
+                      <span id="badgeSignatureSize" class="px-2 py-0.5 rounded font-mono font-bold text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">110 px</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-[10px] text-slate-500 font-mono">50px</span>
+                      <input type="range" id="settingSignatureSize" min="50" max="180" value="110" oninput="handleSignatureSizeChange(this.value)" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                      <span class="text-[10px] text-slate-500 font-mono">180px</span>
+                    </div>
+                  </div>
+
+                  <!-- Slider 2: Ukuran Diameter Cap Stempel -->
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between">
+                      <label class="text-slate-300 font-semibold flex items-center gap-1.5">
+                        <i class="fa-solid fa-stamp text-amber-400"></i> Ukuran Cap / Stempel:
+                      </label>
+                      <span id="badgeStampSize" class="px-2 py-0.5 rounded font-mono font-bold text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30">60 px</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-[10px] text-slate-500 font-mono">35px</span>
+                      <input type="range" id="settingStampSize" min="35" max="110" value="60" oninput="handleStampSizeChange(this.value)" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                      <span class="text-[10px] text-slate-500 font-mono">110px</span>
+                    </div>
+                  </div>
+
+                  <!-- Slider 3: Posisi Geser Cap Stempel (Horizontal & Vertikal) -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-900">
+                    <div class="space-y-1">
+                      <div class="flex items-center justify-between">
+                        <label class="text-slate-300 font-semibold text-[11px]">Geser Cap Horizontal (X):</label>
+                        <span id="badgeStampOffsetX" class="px-1.5 py-0.5 rounded font-mono font-bold text-[10px] bg-indigo-500/20 text-indigo-300">+10 px</span>
+                      </div>
+                      <input type="range" id="settingStampOffsetX" min="-30" max="60" value="10" oninput="handleStampOffsetChange()" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                      <div class="flex justify-between text-[9px] text-slate-500"><span>← Kiri</span><span>Kanan →</span></div>
+                    </div>
+
+                    <div class="space-y-1">
+                      <div class="flex items-center justify-between">
+                        <label class="text-slate-300 font-semibold text-[11px]">Geser Cap Vertikal (Y):</label>
+                        <span id="badgeStampOffsetY" class="px-1.5 py-0.5 rounded font-mono font-bold text-[10px] bg-indigo-500/20 text-indigo-300">-5 px</span>
+                      </div>
+                      <input type="range" id="settingStampOffsetY" min="-30" max="30" value="-5" oninput="handleStampOffsetChange()" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                      <div class="flex justify-between text-[9px] text-slate-500"><span>↑ Naik</span><span>Turun ↓</span></div>
+                    </div>
+                  </div>
+                </div>
+
                 <div class="text-[11px] text-slate-400 bg-indigo-950/30 border border-indigo-800/40 rounded-xl p-2.5 flex items-center gap-2">
                   <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
-                  <span>Posisi cap stempel secara otomatis dicetak menimpa di atas tanda tangan (*overlap*) seperti dokumen stempel basah aslinya.</span>
+                  <span>Ukuran tanda tangan dan cap dapat diatur bebas sesuai bentuk berkas dan kebutuhan lembar kartu.</span>
                 </div>
               </div>
             </div>
@@ -1491,14 +1554,14 @@
                     <div class="text-slate-800 font-semibold mt-0.5">Kepala Sekolah,</div>
 
                     <!-- Area TTD dan Cap Saling Bertumpuk (Cap stempel di atas Tanda Tangan) -->
-                    <div class="relative w-44 h-16 my-0.5 flex items-center justify-center select-none">
+                    <div id="previewSignatureAreaBox" class="relative w-48 my-0.5 flex items-center justify-center select-none overflow-visible" style="min-height: 56px;">
                       <!-- Layer Dasar: Tanda Tangan Kepala Sekolah -->
                       <div id="previewSignatureImgBox" class="w-full h-full flex items-center justify-center z-0">
                         <span class="font-serif italic text-slate-500 text-sm">ttd. digital</span>
                       </div>
 
                       <!-- Layer Atas: Cap Stempel Sekolah (Menimpa TTD secara Realistis) -->
-                      <div id="previewStampImgBox" class="absolute left-2 -top-1 w-16 h-16 z-10 flex items-center justify-center pointer-events-none opacity-90 mix-blend-multiply">
+                      <div id="previewStampImgBox" class="absolute z-10 flex items-center justify-center pointer-events-none opacity-90 mix-blend-multiply" style="left: 10px; top: -5px; width: 60px; height: 60px;">
                         <div class="w-12 h-12 rounded-full border-2 border-indigo-500/50 text-indigo-500/60 flex items-center justify-center text-[9px] font-bold rotate-12">CAP</div>
                       </div>
                     </div>
@@ -2943,6 +3006,32 @@
         }
       }
 
+      // Ukuran & Posisi TTD dan Cap
+      const sigSize = p.signature_size || 110;
+      const stampSize = p.stamp_size || 60;
+      const stampX = p.stamp_offset_x !== undefined ? p.stamp_offset_x : 10;
+      const stampY = p.stamp_offset_y !== undefined ? p.stamp_offset_y : -5;
+
+      const elSigSize = document.getElementById('settingSignatureSize');
+      if (elSigSize) elSigSize.value = sigSize;
+      const bSigSize = document.getElementById('badgeSignatureSize');
+      if (bSigSize) bSigSize.innerText = `${sigSize} px`;
+
+      const elStampSize = document.getElementById('settingStampSize');
+      if (elStampSize) elStampSize.value = stampSize;
+      const bStampSize = document.getElementById('badgeStampSize');
+      if (bStampSize) bStampSize.innerText = `${stampSize} px`;
+
+      const elStampX = document.getElementById('settingStampOffsetX');
+      if (elStampX) elStampX.value = stampX;
+      const bStampX = document.getElementById('badgeStampOffsetX');
+      if (bStampX) bStampX.innerText = `${stampX >= 0 ? '+' : ''}${stampX} px`;
+
+      const elStampY = document.getElementById('settingStampOffsetY');
+      if (elStampY) elStampY.value = stampY;
+      const bStampY = document.getElementById('badgeStampOffsetY');
+      if (bStampY) bStampY.innerText = `${stampY >= 0 ? '+' : ''}${stampY} px`;
+
       updateSchoolProfileCardPreview();
       updateLiveCardPreview();
     }
@@ -3215,6 +3304,65 @@
       } catch (e) {}
     };
 
+    // Handler Penyesuaian Ukuran Tanda Tangan
+    window.handleSignatureSizeChange = function(val) {
+      const size = parseInt(val, 10) || 110;
+      const badge = document.getElementById('badgeSignatureSize');
+      if (badge) badge.innerText = `${size} px`;
+      updateLiveCardPreview();
+      renderPrintCards();
+    };
+
+    // Handler Penyesuaian Ukuran Cap Stempel
+    window.handleStampSizeChange = function(val) {
+      const size = parseInt(val, 10) || 60;
+      const badge = document.getElementById('badgeStampSize');
+      if (badge) badge.innerText = `${size} px`;
+      updateLiveCardPreview();
+      renderPrintCards();
+    };
+
+    // Handler Penyesuaian Posisi Geser Cap Stempel (X & Y)
+    window.handleStampOffsetChange = function() {
+      const offsetX = parseInt(document.getElementById('settingStampOffsetX')?.value || 10, 10);
+      const offsetY = parseInt(document.getElementById('settingStampOffsetY')?.value || -5, 10);
+
+      const bX = document.getElementById('badgeStampOffsetX');
+      if (bX) bX.innerText = `${offsetX >= 0 ? '+' : ''}${offsetX} px`;
+
+      const bY = document.getElementById('badgeStampOffsetY');
+      if (bY) bY.innerText = `${offsetY >= 0 ? '+' : ''}${offsetY} px`;
+
+      updateLiveCardPreview();
+      renderPrintCards();
+    };
+
+    // Handler Reset Ukuran & Posisi TTD dan Cap ke Standar Baku
+    window.handleResetSignatureAndStampSize = function() {
+      const elSigSize = document.getElementById('settingSignatureSize');
+      if (elSigSize) elSigSize.value = 110;
+      const bSigSize = document.getElementById('badgeSignatureSize');
+      if (bSigSize) bSigSize.innerText = '110 px';
+
+      const elStampSize = document.getElementById('settingStampSize');
+      if (elStampSize) elStampSize.value = 60;
+      const bStampSize = document.getElementById('badgeStampSize');
+      if (bStampSize) bStampSize.innerText = '60 px';
+
+      const elStampX = document.getElementById('settingStampOffsetX');
+      if (elStampX) elStampX.value = 10;
+      const bStampX = document.getElementById('badgeStampOffsetX');
+      if (bStampX) bStampX.innerText = '+10 px';
+
+      const elStampY = document.getElementById('settingStampOffsetY');
+      if (elStampY) elStampY.value = -5;
+      const bStampY = document.getElementById('badgeStampOffsetY');
+      if (bStampY) bStampY.innerText = '-5 px';
+
+      updateLiveCardPreview();
+      renderPrintCards();
+    };
+
     // Update Pratinjau Profil Sekolah di Tab Pengaturan
     window.updateSchoolProfileCardPreview = function() {
       const getVal = (id, fallback) => {
@@ -3357,11 +3505,21 @@
       }
 
       // Perbarui Tanda Tangan & Cap Stempel pada Live Preview
+      const sigSize = parseInt(document.getElementById('settingSignatureSize')?.value || p.signature_size || 110, 10);
+      const stampSize = parseInt(document.getElementById('settingStampSize')?.value || p.stamp_size || 60, 10);
+      const stampX = parseInt(document.getElementById('settingStampOffsetX')?.value !== undefined ? document.getElementById('settingStampOffsetX').value : (p.stamp_offset_x !== undefined ? p.stamp_offset_x : 10), 10);
+      const stampY = parseInt(document.getElementById('settingStampOffsetY')?.value !== undefined ? document.getElementById('settingStampOffsetY').value : (p.stamp_offset_y !== undefined ? p.stamp_offset_y : -5), 10);
+
+      const previewSigAreaBox = document.getElementById('previewSignatureAreaBox');
+      if (previewSigAreaBox) {
+        previewSigAreaBox.style.minHeight = `${Math.max(50, Math.round(sigSize * 0.52))}px`;
+      }
+
       const sigUrl = (document.getElementById('settingSignatureUrl')?.value?.trim() || p.signature_url || '').trim();
       const previewSigBox = document.getElementById('previewSignatureImgBox');
       if (previewSigBox) {
         if (sigUrl) {
-          previewSigBox.innerHTML = `<img src="${sigUrl}" class="max-h-12 max-w-[130px] object-contain" alt="Tanda Tangan Kepala Sekolah">`;
+          previewSigBox.innerHTML = `<img src="${sigUrl}" style="max-width: ${sigSize}px; max-height: ${Math.round(sigSize * 0.52)}px;" class="object-contain" alt="Tanda Tangan Kepala Sekolah">`;
         } else {
           previewSigBox.innerHTML = `<span class="font-serif italic text-slate-500 text-sm">ttd. digital</span>`;
         }
@@ -3370,10 +3528,15 @@
       const stampUrl = (document.getElementById('settingStampUrl')?.value?.trim() || p.stamp_url || '').trim();
       const previewStampBox = document.getElementById('previewStampImgBox');
       if (previewStampBox) {
+        previewStampBox.style.width = `${stampSize}px`;
+        previewStampBox.style.height = `${stampSize}px`;
+        previewStampBox.style.left = `${stampX}px`;
+        previewStampBox.style.top = `${stampY}px`;
+
         if (stampUrl) {
           previewStampBox.innerHTML = `<img src="${stampUrl}" class="w-full h-full object-contain" alt="Cap Stempel Sekolah">`;
         } else {
-          previewStampBox.innerHTML = `<div class="w-12 h-12 rounded-full border-2 border-indigo-500/50 text-indigo-500/60 flex items-center justify-center text-[9px] font-bold rotate-12">CAP</div>`;
+          previewStampBox.innerHTML = `<div class="w-full h-full rounded-full border-2 border-indigo-500/50 text-indigo-500/60 flex items-center justify-center font-bold rotate-12" style="font-size: ${Math.max(7, Math.round(stampSize * 0.16))}px;">CAP</div>`;
         }
       }
 
@@ -3495,6 +3658,10 @@
         show_student_photo: document.getElementById('settingShowStudentPhoto')?.checked ?? true,
         show_signatures: document.getElementById('settingShowSignatures')?.checked ?? true,
         show_exam_rules: document.getElementById('settingShowExamRules')?.checked ?? true,
+        signature_size: parseInt(document.getElementById('settingSignatureSize')?.value || p.signature_size || 110, 10),
+        stamp_size: parseInt(document.getElementById('settingStampSize')?.value || p.stamp_size || 60, 10),
+        stamp_offset_x: parseInt(document.getElementById('settingStampOffsetX')?.value !== undefined ? document.getElementById('settingStampOffsetX').value : (p.stamp_offset_x !== undefined ? p.stamp_offset_x : 10), 10),
+        stamp_offset_y: parseInt(document.getElementById('settingStampOffsetY')?.value !== undefined ? document.getElementById('settingStampOffsetY').value : (p.stamp_offset_y !== undefined ? p.stamp_offset_y : -5), 10),
       };
 
       try {
@@ -3759,11 +3926,17 @@
       const dinasLines = (p.dinas || '').replace(/\n/g, '<br>');
       const rulesHtml = (p.exam_rules || '').split('\n').filter(Boolean).map(r => `<div>${r}</div>`).join('');
 
-      // Opsi Tampilan & Cetak (Foto, Tanda Tangan, Tata Tertib)
+      // Opsi Tampilan & Cetak (Foto, Tanda Tangan, Tata Tertib, Ukuran TTD & Cap)
       const showPhoto = document.getElementById('modalOptShowPhoto') ? document.getElementById('modalOptShowPhoto').checked : (document.getElementById('settingShowStudentPhoto')?.checked ?? (p.show_student_photo !== false));
       const showSignatures = document.getElementById('modalOptShowSignatures') ? document.getElementById('modalOptShowSignatures').checked : (document.getElementById('settingShowSignatures')?.checked ?? (p.show_signatures !== false));
       const showRules = document.getElementById('modalOptShowRules') ? document.getElementById('modalOptShowRules').checked : (document.getElementById('settingShowExamRules')?.checked ?? (p.show_exam_rules !== false));
-      const printOpts = { showPhoto, showSignatures, showRules };
+
+      const sigSize = parseInt(document.getElementById('settingSignatureSize')?.value || p.signature_size || 110, 10);
+      const stampSize = parseInt(document.getElementById('settingStampSize')?.value || p.stamp_size || 60, 10);
+      const stampX = parseInt(document.getElementById('settingStampOffsetX')?.value !== undefined ? document.getElementById('settingStampOffsetX').value : (p.stamp_offset_x !== undefined ? p.stamp_offset_x : 10), 10);
+      const stampY = parseInt(document.getElementById('settingStampOffsetY')?.value !== undefined ? document.getElementById('settingStampOffsetY').value : (p.stamp_offset_y !== undefined ? p.stamp_offset_y : -5), 10);
+
+      const printOpts = { showPhoto, showSignatures, showRules, sigSize, stampSize, stampX, stampY };
 
       // Kelompokkan siswa ke dalam lembar fisik A4 (maksimal 4 kartu per lembar: 2 kolom x 2 baris)
       const chunks = [];
@@ -3801,6 +3974,11 @@
       const showSignatures = opts.showSignatures !== false;
       const showRules = opts.showRules !== false;
 
+      const sigSize = opts.sigSize || p.signature_size || 110;
+      const stampSize = opts.stampSize || p.stamp_size || 60;
+      const stampX = opts.stampX !== undefined ? opts.stampX : (p.stamp_offset_x !== undefined ? p.stamp_offset_x : 10);
+      const stampY = opts.stampY !== undefined ? opts.stampY : (p.stamp_offset_y !== undefined ? p.stamp_offset_y : -5);
+
       const photoHtml = showPhoto ? `
         <div class="col-span-3 flex flex-col items-center justify-start">
           <div class="w-14 h-18 border border-slate-400 bg-slate-50 rounded flex flex-col items-center justify-center p-1 text-slate-400">
@@ -3816,11 +3994,11 @@
       // Konten Tanda Tangan Kepala Sekolah
       let ttdContent = `<span class="font-serif italic text-slate-500 text-[9px]">ttd. digital</span>`;
       if (p.signature_url) {
-        ttdContent = `<img src="${p.signature_url}" class="max-h-12 max-w-[130px] object-contain" alt="Tanda Tangan">`;
+        ttdContent = `<img src="${p.signature_url}" style="max-width: ${sigSize}px; max-height: ${Math.round(sigSize * 0.52)}px;" class="object-contain" alt="Tanda Tangan">`;
       }
 
       // Konten Cap Stempel Sekolah (Dicetak menimpa di atas Tanda Tangan)
-      let capContent = `<div class="w-10 h-10 rounded-full border-2 border-indigo-600/40 text-indigo-600/60 flex items-center justify-center text-[7.5px] font-bold rotate-12">CAP</div>`;
+      let capContent = `<div class="w-full h-full rounded-full border-2 border-indigo-600/40 text-indigo-600/60 flex items-center justify-center font-bold rotate-12" style="font-size: ${Math.max(7, Math.round(stampSize * 0.16))}px;">CAP</div>`;
       if (p.stamp_url) {
         capContent = `<img src="${p.stamp_url}" class="w-full h-full object-contain" alt="Cap Stempel">`;
       }
@@ -3831,14 +4009,14 @@
             <div class="text-slate-700">${p.signature_place || 'Bandung'}, ${p.signature_date || '21 Oktober 2026'}</div>
             <div class="text-slate-800 font-semibold mt-0.5">Kepala Sekolah,</div>
             
-            <!-- Area Bertumpuk: Cap di atas Tanda Tangan -->
-            <div class="relative w-40 h-14 my-0.5 flex items-center justify-center select-none">
+            <!-- Area Bertumpuk: Cap di atas Tanda Tangan (Ukuran & Posisi Dinamis) -->
+            <div class="relative w-48 my-0.5 flex items-center justify-center select-none overflow-visible" style="min-height: ${Math.max(48, Math.round(sigSize * 0.52))}px;">
               <!-- Layer TTD (Dasar) -->
               <div class="w-full h-full flex items-center justify-center z-0">
                 ${ttdContent}
               </div>
               <!-- Layer Cap (Di atas TTD, menimpa secara realistis) -->
-              <div class="absolute left-1 -top-1 w-14 h-14 z-10 flex items-center justify-center pointer-events-none opacity-90 mix-blend-multiply">
+              <div class="absolute z-10 flex items-center justify-center pointer-events-none opacity-90 mix-blend-multiply" style="left: ${stampX}px; top: ${stampY}px; width: ${stampSize}px; height: ${stampSize}px;">
                 ${capContent}
               </div>
             </div>

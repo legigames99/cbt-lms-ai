@@ -157,6 +157,10 @@ const DEFAULT_SCHOOL_PROFILE = {
   logo_url: '',
   signature_url: '',
   stamp_url: '',
+  signature_size: 110,
+  stamp_size: 60,
+  stamp_offset_x: 10,
+  stamp_offset_y: -5,
   exam_rules: '1. Membawa Kartu Peserta Ujian ini selama berlangsungnya tes.\n2. Hadir di ruang ujian 15 menit sebelum ujian dimulai.\n3. Dilarang membawa HP, alat komunikasi atau catatan ke dalam ruang ujian.\n4. Mentaati tata tertib dan petunjuk dari pengawas ujian.',
   show_student_photo: true,
   show_signatures: true,
@@ -463,7 +467,8 @@ const server = http.createServer(async (req, res) => {
       'district', 'city', 'province', 'postal_code', 'phone', 'email',
       'website', 'headmaster_name', 'headmaster_nip', 'exam_title_1',
       'exam_title_2', 'academic_year', 'semester', 'signature_place',
-      'signature_date', 'logo_url', 'signature_url', 'stamp_url', 'exam_rules',
+      'signature_date', 'logo_url', 'signature_url', 'stamp_url',
+      'signature_size', 'stamp_size', 'stamp_offset_x', 'stamp_offset_y', 'exam_rules',
       'show_student_photo', 'show_signatures', 'show_exam_rules'
     ];
     for (const k of updatableKeys) {

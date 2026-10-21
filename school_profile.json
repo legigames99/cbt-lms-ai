@@ -22,10 +22,14 @@
   "signature_place": "Jakarta",
   "signature_date": "21 Oktober 2026",
   "logo_url": "/static/uploads/logo_sekolah_1792567623623.png",
+  "signature_url": "/static/uploads/ttd_kepsek_1792625983878.png",
+  "stamp_url": "/static/uploads/cap_sekolah_1792625946689.jpg",
+  "signature_size": 110,
+  "stamp_size": 60,
+  "stamp_offset_x": 10,
+  "stamp_offset_y": -5,
   "exam_rules": "1. Membawa Kartu Peserta Ujian ini selama berlangsungnya tes.\n2. Hadir di ruang ujian 15 menit sebelum ujian dimulai.\n3. Dilarang membawa HP / catatan ke dalam ruang ujian.",
-  "show_student_photo": true,
+  "show_student_photo": false,
   "show_signatures": true,
-  "show_exam_rules": true,
-  "signature_url": "",
-  "stamp_url": ""
+  "show_exam_rules": false
 }

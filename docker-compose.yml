@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cbt_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: cbt_user
+      POSTGRES_PASSWORD: secret_cbt_pass
+      POSTGRES_DB: cbt_lms_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./migrations/001_init_schemas.sql:/docker-entrypoint-initdb.d/01_init_schemas.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cbt_user -d cbt_lms_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: cbt_redis
+    restart: always
+    command: redis-server --maxmemory 512mb --maxmemory-policy volatile-lru --appendonly yes --appendfsync everysec
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+  redisdata:

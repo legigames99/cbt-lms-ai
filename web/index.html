@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - CBT & LMS AI High-Concurrency</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-8 max-w-md w-full">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 mb-4">
+        <i class="fa-solid fa-graduation-cap text-3xl"></i>
+      </div>
+      <h1 class="text-2xl font-bold tracking-tight text-white">CBT & LMS AI</h1>
+      <p class="text-sm text-slate-400 mt-1">High-Concurrency Edition (1.700 Siswa / 4GB RAM)</p>
+    </div>
+
+    <!-- Quick Role Switcher Buttons for Demo -->
+    <div class="mb-6 p-3 bg-slate-900/60 rounded-xl border border-slate-700/60">
+      <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
+        <i class="fa-solid fa-bolt text-amber-400"></i> Akun Cepat untuk Uji Coba:
+      </div>
+      <div class="grid grid-cols-3 gap-2">
+        <button onclick="fillLogin('siswa_1001', 'siswa123')" class="px-2 py-1.5 text-xs font-medium rounded-lg bg-emerald-600/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-600/30 transition">
+          Siswa
+        </button>
+        <button onclick="fillLogin('guru', 'guru123')" class="px-2 py-1.5 text-xs font-medium rounded-lg bg-blue-600/20 text-blue-300 border border-blue-500/30 hover:bg-blue-600/30 transition">
+          Guru
+        </button>
+        <button onclick="fillLogin('admin', 'admin123')" class="px-2 py-1.5 text-xs font-medium rounded-lg bg-purple-600/20 text-purple-300 border border-purple-500/30 hover:bg-purple-600/30 transition">
+          Admin
+        </button>
+      </div>
+    </div>
+
+    <form id="loginForm" class="space-y-4" onsubmit="handleLogin(event)">
+      <div>
+        <label class="block text-xs font-medium text-slate-300 mb-1">NISN / NIP / Username</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500">
+            <i class="fa-regular fa-user"></i>
+          </span>
+          <input type="text" id="username" required
+            class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition"
+            placeholder="Masukkan username">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-slate-300 mb-1">Kata Sandi</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500">
+            <i class="fa-solid fa-lock"></i>
+          </span>
+          <input type="password" id="password" required
+            class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition"
+            placeholder="Masukkan password">
+        </div>
+      </div>
+
+      <div id="alertBox" class="hidden p-3 rounded-xl text-xs font-medium"></div>
+
+      <button type="submit" id="btnSubmit"
+        class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30">
+        <span>Masuk ke Sistem</span>
+        <i class="fa-solid fa-arrow-right text-xs"></i>
+      </button>
+    </form>
+
+    <div class="mt-6 text-center text-xs text-slate-500">
+      Arsitektur Modular Monolith & Local-First CBT
+    </div>
+  </div>
+
+  <script>
+    // Cek sesi login aktif saat halaman awal dibuka / direfresh
+    window.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('cbt_token');
+      const userStr = localStorage.getItem('cbt_user');
+      if (token && userStr) {
+        try {
+          const u = JSON.parse(userStr);
+          if (u && u.role) {
+            if (u.role === 'student') {
+              window.location.replace('/exam');
+            } else {
+              const savedTab = localStorage.getItem('cbt_active_tab') || 'overview';
+              window.location.replace(`/dashboard#${savedTab}`);
+            }
+          }
+        } catch (e) {}
+      }
+    });
+
+    function fillLogin(u, p) {
+      document.getElementById('username').value = u;
+      document.getElementById('password').value = p;
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('username').value.trim();
+      const p = document.getElementById('password').value;
+      const alertBox = document.getElementById('alertBox');
+      const btn = document.getElementById('btnSubmit');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Memproses...';
+      alertBox.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: u, password: p }),
+        });
+        const json = await res.json();
+
+        if (!res.ok) {
+          throw new Error(json.message || 'Login gagal');
+        }
+
+        localStorage.setItem('cbt_token', json.data.access_token);
+        localStorage.setItem('cbt_user', JSON.stringify(json.data.user));
+
+        alertBox.className = 'p-3 rounded-xl text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+        alertBox.innerText = 'Login berhasil! Mengalihkan...';
+        alertBox.classList.remove('hidden');
+
+        setTimeout(() => {
+          if (json.data.user.role === 'student') {
+            window.location.href = '/exam';
+          } else {
+            window.location.href = '/dashboard';
+          }
+        }, 600);
+      } catch (err) {
+        alertBox.className = 'p-3 rounded-xl text-xs font-medium bg-rose-500/20 text-rose-300 border border-rose-500/30';
+        alertBox.innerText = err.message;
+        alertBox.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Masuk ke Sistem</span><i class="fa-solid fa-arrow-right text-xs"></i>';
+      }
+    }
+  </script>
+</body>
+</html>

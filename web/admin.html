@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin & Proktor - Monitoring 1.700 Siswa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- TOPBAR -->
+  <header class="bg-slate-800 border-b border-slate-700 px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-purple-600/20 text-purple-400 border border-purple-500/30 flex items-center justify-center font-bold">
+        <i class="fa-solid fa-gauge-high"></i>
+      </div>
+      <div>
+        <h1 class="text-sm font-bold text-white">Monitoring Sistem & Pengawasan Ujian</h1>
+        <p class="text-xs text-slate-400">Spesifikasi Target: 4 Core CPU • 4 GB RAM • 1.700 Siswa</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <a href="/teacher" class="text-xs text-slate-400 hover:text-white transition flex items-center gap-1.5">
+        <i class="fa-solid fa-chalkboard-user"></i> Panel Guru
+      </a>
+      <button onclick="handleLogout()" class="text-xs text-rose-400 hover:text-rose-300 transition">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-1 p-6 max-w-6xl mx-auto w-full space-y-6">
+
+    <!-- BARIS 1: SAKELAR EXAM LOCKDOWN MODE -->
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div id="lockdownIcon" class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xl">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-base font-bold text-white">Exam Lockdown Mode</h2>
+            <span id="lockdownBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-700 text-slate-300 border border-slate-600">
+              NON-AKTIF
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Membekukan fitur berat LMS (upload tugas, generator AI, cetak rapor) agar 100% memori 4GB server fokus melayani ujian 1.700 siswa.
+          </p>
+        </div>
+      </div>
+
+      <button id="btnToggleLockdown" onclick="toggleLockdown()"
+        class="px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30">
+        <i class="fa-solid fa-power-off"></i>
+        <span>Aktifkan Lockdown Mode</span>
+      </button>
+    </div>
+
+    <!-- BARIS 2: KARTU METRIK REALTIME (< 2ms LATENCY) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- SISWA AKTIF DI UJIAN -->
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg">
+        <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+          <span>Siswa Aktif Ujian</span>
+          <i class="fa-solid fa-users text-emerald-400"></i>
+        </div>
+        <div id="metricStudents" class="text-3xl font-extrabold text-white font-mono">0</div>
+        <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>Online dalam 2 menit terakhir</span>
+        </div>
+      </div>
+
+      <!-- ALOKASI MEMORI RAM GO -->
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg">
+        <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+          <span>RAM Go Runtime</span>
+          <i class="fa-solid fa-microchip text-indigo-400"></i>
+        </div>
+        <div class="flex items-baseline gap-1">
+          <span id="metricRAM" class="text-3xl font-extrabold text-white font-mono">0.0</span>
+          <span class="text-xs font-semibold text-slate-400">/ 250 MB</span>
+        </div>
+        <div class="text-[11px] text-slate-400 mt-1">
+          GOMEMLIMIT: <strong class="text-emerald-400">250 MiB</strong>
+        </div>
+      </div>
+
+      <!-- REDIS BUFFER JAWABAN -->
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg">
+        <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+          <span>Dirty Sessions di Redis</span>
+          <i class="fa-solid fa-database text-amber-400"></i>
+        </div>
+        <div id="metricDirty" class="text-3xl font-extrabold text-white font-mono">0</div>
+        <div class="text-[11px] text-slate-400 mt-1">
+          Disinkronkan massal tiap <strong class="text-slate-300">20 detik</strong>
+        </div>
+      </div>
+
+      <!-- PG POOL CONNECTIONS -->
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg">
+        <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+          <span>Koneksi PostgreSQL</span>
+          <i class="fa-solid fa-server text-blue-400"></i>
+        </div>
+        <div class="flex items-baseline gap-1">
+          <span id="metricDBConns" class="text-3xl font-extrabold text-white font-mono">0</span>
+          <span class="text-xs font-semibold text-slate-400">/ 80 Max</span>
+        </div>
+        <div class="text-[11px] text-slate-400 mt-1">
+          pgxpool connection pool
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BARIS 3: TABEL PEMANTAUAN LOG KEGIATAN UJIAN -->
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-clock-rotate-left text-slate-400"></i>
+          Audit Log Kejadian Ujian
+        </h3>
+        <span class="text-xs text-slate-400">Pembaruan otomatis tiap 3 detik</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left">
+          <thead class="text-slate-400 bg-slate-900/60 uppercase text-[10px] tracking-wider">
+            <tr>
+              <th class="px-4 py-2.5 rounded-l-lg">Waktu</th>
+              <th class="px-4 py-2.5">Siswa</th>
+              <th class="px-4 py-2.5">Jadwal Ujian</th>
+              <th class="px-4 py-2.5">Event</th>
+              <th class="px-4 py-2.5 rounded-r-lg">Status</th>
+            </tr>
+          </thead>
+          <tbody id="auditTableBody" class="divide-y divide-slate-700/60">
+            <tr>
+              <td class="px-4 py-3 font-mono text-slate-400">10:35:12</td>
+              <td class="px-4 py-3 font-semibold text-white">siswa_1001 (Siswa Contoh 01)</td>
+              <td class="px-4 py-3 text-slate-300">UAS Fisika Peminatan XII</td>
+              <td class="px-4 py-3 text-emerald-400"><i class="fa-solid fa-check"></i> Sesi Dimulai</td>
+              <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold">working</span></td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-mono text-slate-400">10:35:28</td>
+              <td class="px-4 py-3 font-semibold text-white">siswa_1002 (Siswa Contoh 02)</td>
+              <td class="px-4 py-3 text-slate-300">UAS Fisika Peminatan XII</td>
+              <td class="px-4 py-3 text-blue-400"><i class="fa-solid fa-arrows-rotate"></i> Sync Jawaban (Jitter)</td>
+              <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-semibold">buffered</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const token = localStorage.getItem('cbt_token');
+    let isLockdownActive = false;
+
+    if (!token) {
+      window.location.href = '/';
+    }
+
+    async function fetchMetrics() {
+      try {
+        const res = await fetch('/api/v1/system/metrics');
+        const json = await res.json();
+        if (!res.ok) return;
+
+        document.getElementById('metricStudents').innerText = json.active_exam_students;
+        document.getElementById('metricRAM').innerText = json.ram_alloc_mb.toFixed(1);
+        document.getElementById('metricDirty').innerText = json.pending_redis_dirty_sessions;
+        document.getElementById('metricDBConns').innerText = json.pg_pool_acquired_conns;
+      } catch (e) {}
+    }
+
+    async function toggleLockdown() {
+      const targetState = !isLockdownActive;
+      try {
+        const res = await fetch('/api/v1/admin/lockdown/toggle', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ enabled: targetState }),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+
+        setLockdownUI(targetState);
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    function setLockdownUI(active) {
+      isLockdownActive = active;
+      const badge = document.getElementById('lockdownBadge');
+      const btn = document.getElementById('btnToggleLockdown');
+      const icon = document.getElementById('lockdownIcon');
+
+      if (active) {
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40';
+        badge.innerText = 'AKTIF (UJIAN MASSAL)';
+        btn.className = 'px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/30';
+        btn.innerHTML = '<i class="fa-solid fa-power-off"></i> <span>Nonaktifkan Lockdown</span>';
+        icon.className = 'w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-xl';
+      } else {
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-700 text-slate-300 border border-slate-600';
+        badge.innerText = 'NON-AKTIF';
+        btn.className = 'px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30';
+        btn.innerHTML = '<i class="fa-solid fa-power-off"></i> <span>Aktifkan Lockdown Mode</span>';
+        icon.className = 'w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xl';
+      }
+    }
+
+    fetchMetrics();
+    setInterval(fetchMetrics, 3000);
+
+    function handleLogout() {
+      localStorage.removeItem('cbt_token');
+      localStorage.removeItem('cbt_user');
+      window.location.href = '/';
+    }
+  </script>
+</body>
+</html>

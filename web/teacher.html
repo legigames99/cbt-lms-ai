@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Guru - CBT & LMS AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- TOPBAR -->
+  <header class="bg-slate-800 border-b border-slate-700 px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold">
+        <i class="fa-solid fa-chalkboard-user"></i>
+      </div>
+      <div>
+        <h1 class="text-sm font-bold text-white">Panel Guru & Generator AI</h1>
+        <p id="teacherName" class="text-xs text-slate-400">Memuat...</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <a href="/admin" class="text-xs text-slate-400 hover:text-white transition flex items-center gap-1.5">
+        <i class="fa-solid fa-gauge"></i> Ke Monitoring
+      </a>
+      <button onclick="handleLogout()" class="text-xs text-rose-400 hover:text-rose-300 transition">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-1 p-6 max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- KOLOM KIRI: GENERATOR SOAL AI (2 Kolom) -->
+    <div class="lg:col-span-2 space-y-6">
+      
+      <!-- CARD AI QUESTION GENERATOR -->
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl">
+        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-700">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div>
+              <h2 class="text-base font-bold text-white">AI Question & Rubric Generator</h2>
+              <p class="text-xs text-slate-400">Didukung Google Gemini API (Structured JSON Outputs)</p>
+            </div>
+          </div>
+          <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-semibold border border-emerald-500/30">
+            Aktif
+          </span>
+        </div>
+
+        <form id="aiForm" onsubmit="handleGenerateAI(event)" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Materi Sumber Pembelajaran</label>
+              <select id="materialSelect" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                <option value="1">Hukum Termodinamika & Kekekalan Energi (Bab 1)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Jumlah Butir Soal</label>
+              <input type="number" id="questionCount" value="5" min="1" max="50"
+                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Instruksi Khusus untuk AI (Opsional)</label>
+            <textarea id="additionalPrompt" rows="2"
+              class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+              placeholder="Contoh: Fokuskan pada soal kontekstual kehidupan sehari-hari dan mesin motor bakar."></textarea>
+          </div>
+
+          <button type="submit" id="btnGenAI"
+            class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30">
+            <i class="fa-solid fa-robot"></i>
+            <span>Hasilkan Soal Otomatis dengan AI</span>
+          </button>
+        </form>
+
+        <!-- PROGRESS BAR & SSE LOG CONTAINER -->
+        <div id="aiProgressContainer" class="hidden mt-6 pt-4 border-t border-slate-700/60 space-y-3">
+          <div class="flex justify-between items-center text-xs">
+            <span id="aiStatusText" class="text-slate-300 font-medium">Memproses...</span>
+            <span id="aiProgressPercent" class="text-indigo-400 font-bold">0%</span>
+          </div>
+          <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-700">
+            <div id="aiProgressBar" class="bg-indigo-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <div id="aiEventLogs" class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 text-[11px] font-mono text-slate-400 max-h-32 overflow-y-auto space-y-1"></div>
+        </div>
+      </div>
+
+      <!-- DAFTAR MATERI & TUGAS -->
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl">
+        <h3 class="text-sm font-bold text-white mb-3">Materi Ajar Aktif</h3>
+        <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-700/60 flex items-center justify-between">
+          <div>
+            <div class="text-sm font-semibold text-white">Hukum Termodinamika & Kekekalan Energi</div>
+            <div class="text-xs text-slate-400">Kelas XII IPA • Terbit</div>
+          </div>
+          <span class="text-xs px-2.5 py-1 bg-blue-500/20 text-blue-300 rounded-full border border-blue-500/30 font-medium">5 Soal Terkait</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- KOLOM KANAN: PAKET SOAL UJIAN & PUBLISH (1 Kolom) -->
+    <div class="space-y-6">
+      
+      <!-- COMPILER PACKAGER CARD -->
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl">
+        <div class="flex items-center gap-3 pb-4 mb-4 border-b border-slate-700">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-white">Publikasi Paket Soal CBT</h3>
+            <p class="text-xs text-slate-400">Enkripsi AES-256-GCM</p>
+          </div>
+        </div>
+
+        <p class="text-xs text-slate-300 mb-4 leading-relaxed">
+          Kompilasi butir soal menjadi berkas JSON statis terenkripsi. Kunci dekripsi akan disimpan di RAM Redis untuk melayani 1.700 siswa secara instan.
+        </p>
+
+        <button onclick="handlePublishPackage()" id="btnPublish"
+          class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30">
+          <i class="fa-solid fa-file-shield"></i>
+          <span>Kompilasi & Kunci Paket Soal</span>
+        </button>
+
+        <div id="publishResult" class="hidden mt-4 p-3 bg-slate-900/80 rounded-xl border border-slate-700 text-xs space-y-2">
+          <div class="text-emerald-400 font-semibold flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-check"></i> Paket Berhasil Diterbitkan!
+          </div>
+          <div class="text-[11px] text-slate-400 break-all font-mono">
+            <strong>Path:</strong> <span id="pubPath">/static/packages/exam_1_enc.json</span>
+          </div>
+          <div class="text-[11px] text-slate-400 break-all font-mono">
+            <strong>SHA256:</strong> <span id="pubHash">...</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const token = localStorage.getItem('cbt_token');
+    const userStr = localStorage.getItem('cbt_user');
+
+    if (!token || !userStr) {
+      window.location.href = '/';
+    } else {
+      const u = JSON.parse(userStr);
+      document.getElementById('teacherName').innerText = `${u.full_name} (${u.role})`;
+    }
+
+    async function handleGenerateAI(e) {
+      e.preventDefault();
+      const count = parseInt(document.getElementById('questionCount').value);
+      const prompt = document.getElementById('additionalPrompt').value;
+      const btn = document.getElementById('btnGenAI');
+      const progressContainer = document.getElementById('aiProgressContainer');
+      const logs = document.getElementById('aiEventLogs');
+      const progressBar = document.getElementById('aiProgressBar');
+      const statusText = document.getElementById('aiStatusText');
+      const percentText = document.getElementById('aiProgressPercent');
+
+      btn.disabled = true;
+      progressContainer.classList.remove('hidden');
+      logs.innerHTML = '';
+      progressBar.style.width = '10%';
+      percentText.innerText = '10%';
+      statusText.innerText = 'Mengirim antrean tugas AI ke server...';
+
+      try {
+        const res = await fetch('/api/v1/ai/generate-questions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            course_id: 1,
+            material_id: 1,
+            bank_id: 1,
+            question_count: count,
+            question_type: 'mcq',
+            cognitive_distribution: { 'C2': Math.ceil(count * 0.4), 'C3': Math.floor(count * 0.6) },
+            additional_prompt: prompt,
+          }),
+        });
+
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+
+        // Buka SSE stream
+        const eventSource = new EventSource(json.stream_url);
+
+        eventSource.addEventListener('progress', (ev) => {
+          const data = JSON.parse(ev.data);
+          const pct = Math.min(Math.round((data.completed / data.total) * 90), 90);
+          progressBar.style.width = `${pct}%`;
+          percentText.innerText = `${pct}%`;
+          statusText.innerText = data.message || 'AI sedang menyusun soal...';
+
+          const line = document.createElement('div');
+          line.innerText = `[${new Date().toLocaleTimeString()}] ${data.message}`;
+          logs.appendChild(line);
+          logs.scrollTop = logs.scrollHeight;
+        });
+
+        eventSource.addEventListener('completed', (ev) => {
+          const data = JSON.parse(ev.data);
+          progressBar.style.width = '100%';
+          percentText.innerText = '100%';
+          statusText.innerText = data.message;
+          eventSource.close();
+
+          btn.disabled = false;
+          alert('Soal AI berhasil ditambahkan ke bank soal!');
+        });
+
+        eventSource.addEventListener('error', (err) => {
+          eventSource.close();
+          btn.disabled = false;
+        });
+
+      } catch (err) {
+        alert(err.message);
+        btn.disabled = false;
+      }
+    }
+
+    async function handlePublishPackage() {
+      const btn = document.getElementById('btnPublish');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Mengenkripsi...';
+
+      try {
+        const res = await fetch('/api/v1/cbt/schedules/1/publish-package', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+
+        document.getElementById('publishResult').classList.remove('hidden');
+        document.getElementById('pubPath').innerText = json.data.package_url;
+        document.getElementById('pubHash').innerText = json.data.package_sha256;
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-file-shield"></i> <span>Kompilasi & Kunci Paket Soal</span>';
+      } catch (err) {
+        alert('Gagal: ' + err.message);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-file-shield"></i> <span>Kompilasi & Kunci Paket Soal</span>';
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('cbt_token');
+      localStorage.removeItem('cbt_user');
+      window.location.href = '/';
+    }
+  </script>
+</body>
+</html>

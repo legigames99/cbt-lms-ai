@@ -1,0 +1,25 @@
+# Binary & Build Artifacts
+/bin/
+cbt-server
+*.exe
+*.out
+powershell.cmd
+*.log
+
+# Environment & Rahasia
+.env
+.env.production
+*.pem
+*.key
+
+# Paket Soal Terenkripsi & Backup Lokal
+/static/packages/*.json
+*.dump
+*.rdb
+*.aof
+*.zst
+
+# Node & Dependencies
+node_modules/
+/web/dist/
+.DS_Store

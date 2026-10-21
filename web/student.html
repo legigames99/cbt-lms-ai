@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruang Ujian Siswa - CBT Local-First</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .option-card:hover { border-color: #6366f1; }
+    .option-card.selected { border-color: #6366f1; background-color: rgba(99, 102, 241, 0.15); }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- TOPBAR -->
+  <header class="bg-slate-800 border-b border-slate-700 px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-md">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold">
+        <i class="fa-solid fa-laptop-code text-sm"></i>
+      </div>
+      <div>
+        <h1 id="topbarExamTitle" class="text-sm font-bold text-white">Memuat Jadwal Ujian...</h1>
+        <p id="topbarStudentName" class="text-xs text-slate-400">Siswa</p>
+      </div>
+    </div>
+
+    <!-- TIMER -->
+    <div id="timerContainer" class="hidden flex items-center gap-2 bg-slate-900/80 border border-slate-700 px-4 py-1.5 rounded-xl font-mono text-base font-bold text-amber-400 shadow-inner">
+      <i class="fa-regular fa-clock text-sm"></i>
+      <span id="timerText">00:00:00</span>
+    </div>
+
+    <button onclick="handleLogout()" class="text-xs text-slate-400 hover:text-rose-400 transition flex items-center gap-1.5">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      <span class="hidden sm:inline">Keluar</span>
+    </button>
+  </header>
+
+  <!-- TOAST NOTIFIKASI TAMBAHAN WAKTU PROKTOR -->
+  <div id="timeExtendedToast" class="hidden fixed top-16 left-1/2 transform -translate-x-1/2 z-50 bg-amber-500 text-slate-950 px-6 py-2.5 rounded-2xl font-bold text-xs shadow-2xl flex items-center gap-2 border border-amber-400 animate-bounce">
+    <i class="fa-solid fa-clock-rotate-left text-base"></i>
+    <span>Pengawas telah menambahkan waktu ujian Anda sebesar +<span id="toastExtraMinutes">15</span> Menit!</span>
+  </div>
+
+  <!-- SCREEN: UJIAN TELAH SELESAI & TERKUNCI -->
+  <main id="alreadySubmittedScreen" class="hidden flex-1 flex items-center justify-center p-6">
+    <div class="max-w-md w-full bg-slate-800 border border-slate-700 rounded-2xl p-8 shadow-2xl text-center space-y-5">
+      <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 mx-auto flex items-center justify-center text-3xl">
+        <i class="fa-solid fa-lock"></i>
+      </div>
+      <div>
+        <h2 class="text-xl font-bold text-white">Ujian Telah Selesai Dikerjakan</h2>
+        <span class="inline-block mt-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold uppercase tracking-wider">
+          Status: Dikunci (Submitted)
+        </span>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Anda sudah menyelesaikan dan mengumpulkan lembar jawaban untuk ujian ini. Jawaban Anda telah tersimpan aman di server dan sesi telah dikunci permanen. Anda tidak dapat mengulang ujian ini kembali.
+      </p>
+
+      <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-700 text-xs text-slate-400 space-y-1 text-left font-mono">
+        <div class="flex justify-between">
+          <span>Jadwal:</span>
+          <span class="text-white font-semibold" id="lockedExamTitle">UAS Fisika Peminatan XII</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Waktu Selesai:</span>
+          <span class="text-emerald-400 font-semibold" id="lockedSubmittedAt">Sudah Dikumpulkan</span>
+        </div>
+      </div>
+
+      <button onclick="handleLogout(true)" class="w-full px-4 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-xs font-semibold text-white transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        <span>Keluar / Ganti Akun Siswa Lain</span>
+      </button>
+    </div>
+  </main>
+
+  <!-- STAGE 1: RUANG TUNGGU (WAITING ROOM & PRE-FETCH) -->
+  <main id="waitingRoom" class="flex-1 flex items-center justify-center p-6">
+    <div class="max-w-lg w-full bg-slate-800 border border-slate-700 rounded-2xl p-8 shadow-2xl text-center">
+      <div class="w-16 h-16 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 mx-auto flex items-center justify-center text-2xl mb-4">
+        <i class="fa-solid fa-hourglass-start"></i>
+      </div>
+
+      <h2 id="waitTitle" class="text-xl font-bold text-white mb-2">UAS Fisika Peminatan XII</h2>
+      <p class="text-sm text-slate-400 mb-6">Paket soal diunduh dan dienkripsi di memori perangkat Anda untuk navigasi instan tanpa buffer.</p>
+
+      <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-700/80 text-left space-y-2 mb-6 text-xs text-slate-300">
+        <div class="flex justify-between">
+          <span class="text-slate-500">Durasi:</span>
+          <span id="waitDuration" class="font-semibold text-white">90 Menit</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500">Status Pre-Fetch:</span>
+          <span id="waitPrefetchStatus" class="font-semibold text-amber-400 flex items-center gap-1">
+            <i class="fa-solid fa-circle-notch fa-spin"></i> Mengunduh paket soal...
+          </span>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 text-left mb-1">KODE TOKEN UJIAN DARI PENGAWAS</label>
+          <input type="text" id="tokenCodeInput" value="FISIKA26" uppercase
+            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center text-lg font-mono font-bold tracking-widest text-indigo-300 uppercase focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <button id="btnStartExam" onclick="handleStartExam()" disabled
+          class="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30">
+          <span>Mulai Kerjakan Ujian</span>
+          <i class="fa-solid fa-play text-xs"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- STAGE 2: LAYAR PENGERJAAN SOAL UJIAN (EXAM WORKBENCH) -->
+  <main id="examWorkbench" class="hidden flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 p-6 max-w-7xl mx-auto w-full">
+    
+    <!-- AREA SOAL UTAMA (3 Kolom) -->
+    <div class="lg:col-span-3 flex flex-col justify-between bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl">
+      <div>
+        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-700/60">
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Nomor Soal</span>
+            <span id="currentQNumber" class="text-lg font-bold text-white bg-slate-900 border border-slate-700 px-3 py-0.5 rounded-lg">1</span>
+          </div>
+          <span id="currentQCognitive" class="text-xs px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">C2</span>
+        </div>
+
+        <!-- STEM HTML -->
+        <div id="qStemHTML" class="text-slate-100 text-base leading-relaxed mb-6 font-medium"></div>
+
+        <!-- OPTIONS LIST -->
+        <div id="qOptionsList" class="space-y-3"></div>
+      </div>
+
+      <!-- FOOTER BUTTONS -->
+      <div class="pt-6 mt-6 border-t border-slate-700/60 flex items-center justify-between">
+        <button id="btnPrevQ" onclick="navigateQ(-1)" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-xs font-semibold text-white transition flex items-center gap-2">
+          <i class="fa-solid fa-chevron-left"></i> Sebelumnya
+        </button>
+
+        <button id="btnDoubtQ" onclick="toggleDoubt()" class="px-4 py-2 rounded-xl bg-amber-600/20 border border-amber-500/40 text-amber-300 hover:bg-amber-600/30 text-xs font-semibold transition flex items-center gap-2">
+          <i class="fa-regular fa-flag"></i> Ragu-Ragu
+        </button>
+
+        <button id="btnNextQ" onclick="navigateQ(1)" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white transition flex items-center gap-2 shadow-lg shadow-indigo-600/20">
+          Selanjutnya <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- AREA NAVIGASI NOMOR SOAL (1 Kolom) -->
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+      <div>
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between">
+          <span>Daftar Nomor Soal</span>
+          <span id="answeredCounter" class="text-indigo-400 font-mono">0/0</span>
+        </h3>
+
+        <!-- GRID NOMOR -->
+        <div id="numberGrid" class="grid grid-cols-5 gap-2 max-h-96 overflow-y-auto pr-1"></div>
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-slate-700/60">
+        <button onclick="handleFinishExam()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20">
+          <i class="fa-solid fa-check-double"></i> Selesaikan Ujian
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL KONFIRMASI SELESAI UJIAN -->
+  <div id="finishConfirmModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl space-y-4">
+      <div class="w-14 h-14 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 mx-auto flex items-center justify-center text-2xl">
+        <i class="fa-solid fa-clipboard-check"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-white">Selesaikan Ujian Ini?</h3>
+        <p class="text-xs text-slate-400 mt-1">Pastikan Anda telah memeriksa seluruh jawaban. Setelah dikumpulkan, sesi ujian akan ditutup permanen.</p>
+      </div>
+
+      <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-700/80 text-xs flex justify-between items-center text-slate-300">
+        <span>Soal Terjawab:</span>
+        <span id="finishModalAnsweredCount" class="font-bold text-emerald-400 font-mono">0 / 0</span>
+      </div>
+
+      <div class="flex items-center gap-2 pt-2">
+        <button onclick="document.getElementById('finishConfirmModal').classList.add('hidden')"
+          class="flex-1 px-4 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-xs font-semibold text-slate-300 transition">
+          Lanjut Mengerjakan
+        </button>
+        <button onclick="executeFinalSubmit()" id="btnConfirmSubmit"
+          class="flex-1 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition shadow-lg shadow-emerald-600/30">
+          Ya, Kumpulkan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL SUKSES SELESAI UJIAN -->
+  <div id="examDoneModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-emerald-500/40 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl space-y-4">
+      <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 mx-auto flex items-center justify-center text-3xl animate-bounce">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <div>
+        <h3 class="text-lg font-bold text-white">Ujian Telah Selesai!</h3>
+        <p class="text-xs text-slate-400 mt-1">Seluruh lembar jawaban Anda telah berhasil disimpan dan diamankan di database server.</p>
+      </div>
+      <button onclick="handleLogout(true)"
+        class="w-full px-4 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition shadow-lg shadow-indigo-600/30">
+        Keluar ke Halaman Login
+      </button>
+    </div>
+  </div>
+
+  <!-- ANTI-CHEAT MODAL -->
+  <div id="antiCheatModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-rose-500/50 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
+      <div class="w-12 h-12 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 mx-auto flex items-center justify-center text-xl mb-3">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 class="text-base font-bold text-white mb-1">Peringatan Kecurangan!</h3>
+      <p class="text-xs text-slate-300 mb-4">Terdeteksi berpindah tab/jendela browser. Aktivitas ini dicatat dan dilaporkan langsung ke pengawas.</p>
+      <div class="text-xs font-mono text-rose-300 bg-rose-950/60 p-2 rounded-lg border border-rose-800/40 mb-4">
+        Total Pelanggaran: <span id="violationCountBadge">1</span>x
+      </div>
+      <button onclick="document.getElementById('antiCheatModal').classList.add('hidden')"
+        class="w-full bg-rose-600 hover:bg-rose-500 text-white font-medium py-2 rounded-xl text-xs transition">
+        Saya Mengerti & Kembali Ujian
+      </button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { ExamEngine } from './exam_engine.js';
+
+    let engine = null;
+    let schedule = null;
+    let user = null;
+    let currentIndex = 0;
+    let timerSeconds = 0;
+    let timerInterval = null;
+    let sessionId = null;
+    let rawEncryptedData = null;
+
+    // Inisialisasi Halaman
+    window.addEventListener('DOMContentLoaded', async () => {
+      const token = localStorage.getItem('cbt_token');
+      const userStr = localStorage.getItem('cbt_user');
+
+      if (!token || !userStr) {
+        window.location.href = '/';
+        return;
+      }
+
+      user = JSON.parse(userStr);
+      document.getElementById('topbarStudentName').innerText = `${user.full_name} (${user.class_name || 'Siswa'})`;
+
+      await loadActiveSchedule(token);
+    });
+
+    function showAlreadySubmittedScreen(title, submittedAt) {
+      document.getElementById('waitingRoom').classList.add('hidden');
+      document.getElementById('examWorkbench').classList.add('hidden');
+      document.getElementById('timerContainer').classList.add('hidden');
+
+      const lockedScreen = document.getElementById('alreadySubmittedScreen');
+      if (lockedScreen) {
+        if (title) {
+          document.getElementById('lockedExamTitle').innerText = title;
+          document.getElementById('topbarExamTitle').innerText = title;
+        }
+        if (submittedAt) {
+          document.getElementById('lockedSubmittedAt').innerText = submittedAt;
+        }
+        lockedScreen.classList.remove('hidden');
+      }
+    }
+
+    async function loadActiveSchedule(token) {
+      try {
+        const res = await fetch('/api/v1/cbt/schedules/active', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const json = await res.json();
+        if (!res.ok) {
+          if (json.code === 'ALREADY_SUBMITTED') {
+            showAlreadySubmittedScreen(schedule.title, json.submitted_at);
+            return;
+          }
+          throw new Error(json.message);
+        }
+
+        schedule = json.data;
+        document.getElementById('topbarExamTitle').innerText = schedule.title;
+        document.getElementById('waitTitle').innerText = schedule.title;
+        document.getElementById('waitDuration').innerText = `${schedule.duration_minutes} Menit`;
+
+        // CEK APAKAH SISWA SUDAH MENYELESAIKAN UJIAN INI
+        if (schedule.session_status === 'submitted') {
+          showAlreadySubmittedScreen(schedule.title, schedule.submitted_at);
+          return;
+        }
+
+        // Pre-fetch file paket soal statis
+        await prefetchEncryptedPackage(schedule.package_url);
+
+        // OTOMATIS RESUME UJIAN KE SOAL TERAKHIR JIKA SEDANG BERLANGSUNG SAAT BROWSER DI-REFRESH
+        if (schedule.session_status === 'in_progress' && schedule.decryption_key_hex) {
+          await resumeActiveExam(schedule);
+        }
+      } catch (err) {
+        document.getElementById('waitPrefetchStatus').innerHTML = `<span class="text-rose-400">${err.message}</span>`;
+      }
+    }
+
+    // Fungsi Resume Otomatis Sesi Ujian Siswa
+    async function resumeActiveExam(sched) {
+      sessionId = sched.session_id || (88400 + user.id);
+      const keyHex = sched.decryption_key_hex;
+
+      engine = new ExamEngine(sched.schedule_id, user.id, token);
+      await engine.initDB();
+
+      if (sched.saved_answers) {
+        engine.answers = sched.saved_answers;
+      }
+
+      await engine.decryptPackage(rawEncryptedData, keyHex);
+
+      // Kembalikan ke nomor soal yang sedang dibuka sebelum refresh
+      const savedIndex = parseInt(localStorage.getItem(`cbt_last_q_${user.id}_${sched.schedule_id}`), 10);
+      if (!isNaN(savedIndex) && savedIndex >= 0 && savedIndex < engine.questions.length) {
+        currentIndex = savedIndex;
+      }
+
+      engine.initAntiCheat((count) => {
+        document.getElementById('violationCountBadge').innerText = count;
+        document.getElementById('antiCheatModal').classList.remove('hidden');
+      });
+
+      engine.startJitterSync(sessionId);
+
+      document.getElementById('waitingRoom').classList.add('hidden');
+      document.getElementById('examWorkbench').classList.remove('hidden');
+      document.getElementById('timerContainer').classList.remove('hidden');
+
+      const savedTimer = parseInt(localStorage.getItem(`cbt_timer_${user.id}_${sched.schedule_id}`), 10);
+      const initialSeconds = (!isNaN(savedTimer) && savedTimer > 0) ? savedTimer : (sched.duration_minutes * 60);
+      startTimer(initialSeconds);
+
+      renderCurrentQuestion();
+      renderNumberGrid();
+    }
+
+    async function prefetchEncryptedPackage(url) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('File paket soal belum tersedia di server');
+        rawEncryptedData = await res.json();
+
+        const badge = document.getElementById('waitPrefetchStatus');
+        badge.className = 'font-semibold text-emerald-400 flex items-center gap-1';
+        badge.innerHTML = '<i class="fa-solid fa-check"></i> Siap di IndexedDB (Terkunci)';
+
+        document.getElementById('btnStartExam').disabled = false;
+      } catch (err) {
+        const badge = document.getElementById('waitPrefetchStatus');
+        badge.className = 'font-semibold text-rose-400 flex items-center gap-1';
+        badge.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> ${err.message}`;
+      }
+    }
+
+    window.handleStartExam = async function() {
+      const tokenCode = document.getElementById('tokenCodeInput').value.trim();
+      const token = localStorage.getItem('cbt_token');
+      const btn = document.getElementById('btnStartExam');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Mendekripsi Soal...';
+
+      try {
+        const res = await fetch(`/api/v1/cbt/schedules/${schedule.schedule_id}/start`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ token_code: tokenCode }),
+        });
+
+        const json = await res.json();
+        if (!res.ok) {
+          if (json.code === 'ALREADY_SUBMITTED') {
+            showAlreadySubmittedScreen(schedule.title, json.submitted_at);
+            return;
+          }
+          throw new Error(json.message);
+        }
+
+        sessionId = json.data.session_id;
+        const keyHex = json.data.decryption_key_hex;
+
+        // Inisialisasi Engine Local-First
+        engine = new ExamEngine(schedule.schedule_id, user.id, token);
+        await engine.initDB();
+
+        // Restore saved answers jika ada
+        if (json.data.saved_answers) {
+          engine.answers = json.data.saved_answers;
+        }
+
+        // Dekripsi Paket Soal menggunakan Web Crypto API di memori klien
+        await engine.decryptPackage(rawEncryptedData, keyHex);
+
+        // Mulai Anti-Cheat Listener
+        engine.initAntiCheat((count) => {
+          document.getElementById('violationCountBadge').innerText = count;
+          document.getElementById('antiCheatModal').classList.remove('hidden');
+        });
+
+        // Mulai Sinkronisasi Jitter Latar Belakang
+        engine.startJitterSync(sessionId);
+
+        // Beralih ke layar ujian
+        document.getElementById('waitingRoom').classList.add('hidden');
+        document.getElementById('examWorkbench').classList.remove('hidden');
+        document.getElementById('timerContainer').classList.remove('hidden');
+
+        // Start Countdown Timer
+        startTimer(schedule.duration_minutes * 60);
+
+        renderCurrentQuestion();
+        renderNumberGrid();
+      } catch (err) {
+        alert(err.message);
+        btn.disabled = false;
+        btn.innerHTML = '<span>Mulai Kerjakan Ujian</span><i class="fa-solid fa-play text-xs"></i>';
+      }
+    };
+
+    function renderCurrentQuestion() {
+      if (!engine || !engine.questions || engine.questions.length === 0) return;
+      const q = engine.questions[currentIndex];
+      if (!q) return;
+
+      // Simpan nomor soal terakhir yang dibuka siswa
+      if (user && schedule) {
+        localStorage.setItem(`cbt_last_q_${user.id}_${schedule.schedule_id}`, currentIndex);
+      }
+
+      document.getElementById('currentQNumber').innerText = currentIndex + 1;
+      document.getElementById('currentQCognitive').innerText = q.cog || 'C2';
+      document.getElementById('qStemHTML').innerHTML = q.stem || '';
+
+      const saved = engine.answers[q.id];
+      const selectedAns = saved ? saved.a : null;
+      const isDoubt = saved ? saved.d === 1 : false;
+
+      const doubtBtn = document.getElementById('btnDoubtQ');
+      if (isDoubt) {
+        doubtBtn.className = 'px-4 py-2 rounded-xl bg-amber-500 text-slate-900 font-bold text-xs transition flex items-center gap-2';
+      } else {
+        doubtBtn.className = 'px-4 py-2 rounded-xl bg-amber-600/20 border border-amber-500/40 text-amber-300 hover:bg-amber-600/30 text-xs font-semibold transition flex items-center gap-2';
+      }
+
+      const listContainer = document.getElementById('qOptionsList');
+      listContainer.innerHTML = '';
+
+      const optionsList = Array.isArray(q.options) ? q.options : [];
+      optionsList.forEach((opt, optIndex) => {
+        const displayLetter = String.fromCharCode(65 + optIndex); // Selalu 'A', 'B', 'C', 'D', 'E' berurutan
+        const card = document.createElement('div');
+        const isSelected = selectedAns === opt.id;
+        card.className = `option-card border border-slate-700 bg-slate-900/60 rounded-xl p-4 flex items-center gap-4 cursor-pointer transition ${isSelected ? 'selected' : ''}`;
+        card.onclick = () => selectOption(q.id, opt.id);
+
+        card.innerHTML = `
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs border ${isSelected ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400'}">
+            ${displayLetter}
+          </div>
+          <div class="text-sm text-slate-200">${opt.text}</div>
+        `;
+        listContainer.appendChild(card);
+      });
+
+      document.getElementById('btnPrevQ').disabled = (currentIndex === 0);
+      document.getElementById('btnNextQ').disabled = (currentIndex === engine.questions.length - 1);
+    }
+
+    window.selectOption = async function(qId, letter) {
+      const existing = engine.answers[qId];
+      const isDoubt = existing ? existing.d : 0;
+      await engine.saveAnswer(qId, letter, isDoubt);
+      renderCurrentQuestion();
+      renderNumberGrid();
+    };
+
+    window.toggleDoubt = async function() {
+      const q = engine.questions[currentIndex];
+      const existing = engine.answers[q.id];
+      const currentAns = existing ? existing.a : '';
+      const newDoubt = existing && existing.d === 1 ? 0 : 1;
+      await engine.saveAnswer(q.id, currentAns, newDoubt);
+      renderCurrentQuestion();
+      renderNumberGrid();
+    };
+
+    window.navigateQ = function(delta) {
+      const newIdx = currentIndex + delta;
+      if (newIdx >= 0 && newIdx < engine.questions.length) {
+        currentIndex = newIdx;
+        renderCurrentQuestion();
+        renderNumberGrid();
+      }
+    };
+
+    function renderNumberGrid() {
+      const grid = document.getElementById('numberGrid');
+      grid.innerHTML = '';
+      let answeredCount = 0;
+
+      const questionsList = (engine && Array.isArray(engine.questions)) ? engine.questions : [];
+      questionsList.forEach((q, idx) => {
+        if (!q) return;
+        const btn = document.createElement('button');
+        const ans = engine.answers ? engine.answers[q.id] : null;
+        const isCurrent = (idx === currentIndex);
+        const hasAnswer = (ans && ans.a !== '');
+        const isDoubt = (ans && ans.d === 1);
+
+        if (hasAnswer) answeredCount++;
+
+        let colorClasses = 'bg-slate-900 text-slate-400 border-slate-700'; // Kosong
+        if (isDoubt) {
+          colorClasses = 'bg-amber-500 text-slate-900 font-bold border-amber-400'; // Ragu
+        } else if (hasAnswer) {
+          colorClasses = 'bg-indigo-600 text-white font-bold border-indigo-500'; // Terjawab
+        }
+
+        const ringClass = isCurrent ? 'ring-2 ring-white ring-offset-2 ring-offset-slate-800 scale-105' : '';
+
+        btn.className = `h-10 rounded-xl text-xs border font-medium flex items-center justify-center transition ${colorClasses} ${ringClass}`;
+        btn.innerText = idx + 1;
+        btn.onclick = () => {
+          currentIndex = idx;
+          renderCurrentQuestion();
+          renderNumberGrid();
+        };
+        grid.appendChild(btn);
+      });
+
+      document.getElementById('answeredCounter').innerText = `${answeredCount}/${engine.questions.length}`;
+    }
+
+    function startTimer(seconds) {
+      timerSeconds = seconds;
+      timerInterval = setInterval(() => {
+        timerSeconds--;
+        if (user && schedule) {
+          localStorage.setItem(`cbt_timer_${user.id}_${schedule.schedule_id}`, timerSeconds);
+        }
+
+        if (timerSeconds <= 0) {
+          clearInterval(timerInterval);
+          alert('Waktu ujian telah habis! Sistem akan mengumpulkan jawaban Anda secara otomatis.');
+          handleFinishExam();
+          return;
+        }
+
+        const h = Math.floor(timerSeconds / 3600).toString().padStart(2, '0');
+        const m = Math.floor((timerSeconds % 3600) / 60).toString().padStart(2, '0');
+        const s = (timerSeconds % 60).toString().padStart(2, '0');
+        document.getElementById('timerText').innerText = `${h}:${m}:${s}`;
+      }, 1000);
+    }
+
+    let knownExtraMinutes = 0;
+
+    function extendStudentTimer(totalExtraMin) {
+      if (totalExtraMin > knownExtraMinutes) {
+        const addedMin = totalExtraMin - knownExtraMinutes;
+        knownExtraMinutes = totalExtraMin;
+        timerSeconds += addedMin * 60;
+
+        const toast = document.getElementById('timeExtendedToast');
+        if (toast) {
+          document.getElementById('toastExtraMinutes').innerText = addedMin;
+          toast.classList.remove('hidden');
+          setTimeout(() => toast.classList.add('hidden'), 5000);
+        }
+      }
+    }
+
+    // Cek tambahan waktu proktor secara otomatis saat ujian berlangsung
+    setInterval(async () => {
+      if (!sessionId) return;
+      const t = localStorage.getItem('cbt_token');
+      if (!t) return;
+      try {
+        const res = await fetch('/api/v1/cbt/schedules/active', {
+          headers: { 'Authorization': `Bearer ${t}` }
+        });
+        if (!res.ok) return;
+        const j = await res.json();
+        if (j.data && typeof j.data.extra_minutes === 'number') {
+          extendStudentTimer(j.data.extra_minutes);
+        }
+      } catch (e) {}
+    }, 5000);
+
+    window.handleFinishExam = function() {
+      let answeredCount = 0;
+      if (engine && engine.questions) {
+        engine.questions.forEach((q) => {
+          const ans = engine.answers ? engine.answers[q.id] : null;
+          if (ans && ans.a !== '') answeredCount++;
+        });
+        document.getElementById('finishModalAnsweredCount').innerText = `${answeredCount} / ${engine.questions.length}`;
+      }
+      document.getElementById('finishConfirmModal').classList.remove('hidden');
+    };
+
+    window.executeFinalSubmit = async function() {
+      const btn = document.getElementById('btnConfirmSubmit');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Menyimpan...';
+
+      // Hentikan anti-cheat dan interval background jitter
+      if (engine) engine.stop();
+      if (timerInterval) clearInterval(timerInterval);
+
+      const token = localStorage.getItem('cbt_token');
+      try {
+        const res = await fetch(`/api/v1/cbt/schedules/${schedule.schedule_id}/finish`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            session_id: sessionId,
+            answers: engine ? engine.answers : {},
+          }),
+        });
+
+        const json = await res.json();
+        if (!res.ok) {
+          if (json.code === 'ALREADY_SUBMITTED') {
+            showAlreadySubmittedScreen(schedule.title, json.submitted_at);
+            return;
+          }
+          throw new Error(json.message);
+        }
+
+        document.getElementById('finishConfirmModal').classList.add('hidden');
+        document.getElementById('examDoneModal').classList.remove('hidden');
+
+        // Bersihkan cache posisi soal & timer karena ujian telah selesai
+        if (user && schedule) {
+          localStorage.removeItem(`cbt_last_q_${user.id}_${schedule.schedule_id}`);
+          localStorage.removeItem(`cbt_timer_${user.id}_${schedule.schedule_id}`);
+        }
+
+        // Update schedule state agar jika halaman direfresh, langsung tampil status terkunci
+        if (schedule) {
+          schedule.session_status = 'submitted';
+          schedule.submitted_at = json.submitted_at || 'Baru Saja';
+        }
+      } catch (err) {
+        alert('Gagal menyelesaikan ujian: ' + err.message);
+        btn.disabled = false;
+        btn.innerText = 'Ya, Kumpulkan';
+      }
+    };
+
+    window.handleLogout = function(skipConfirm = false) {
+      if (skipConfirm || confirm('Keluar dari sesi ini?')) {
+        if (user && schedule) {
+          localStorage.removeItem(`cbt_last_q_${user.id}_${schedule.schedule_id}`);
+          localStorage.removeItem(`cbt_timer_${user.id}_${schedule.schedule_id}`);
+        }
+        localStorage.removeItem('cbt_token');
+        localStorage.removeItem('cbt_user');
+        window.location.href = '/';
+      }
+    };
+  </script>
+</body>
+</html>

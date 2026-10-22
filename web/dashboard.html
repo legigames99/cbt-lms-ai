@@ -815,56 +815,166 @@
 
 
       <!-- ============================================================== -->
-      <!-- TAB 5: HASIL & ANALISIS NILAI -->
+      <!-- TAB 5: HASIL & ANALISIS NILAI (PER JADWAL UJIAN) -->
       <!-- ============================================================== -->
       <section id="tab-nilai" class="hidden space-y-6">
+        <!-- Header Toolbar -->
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h3 class="text-lg font-bold text-white">Hasil Ujian & Buku Nilai Terpadu</h3>
-            <p class="text-xs text-slate-400">Rekap nilai ujian CBT otomatis dihitung dan dapat diekspor ke format Excel/CSV.</p>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-award text-amber-400"></i>
+              <span>Hasil Ujian & Buku Nilai Terpadu</span>
+            </h3>
+            <p class="text-xs text-slate-400">Rekap nilai siswa per jadwal ujian, statistik ketuntasan KKM, dan ekspor analisis butir soal lengkap.</p>
           </div>
           <div class="flex items-center gap-3 flex-wrap">
-            <div class="flex items-center gap-2 bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-1">
-              <span class="text-xs text-slate-400 flex items-center gap-1.5">
-                <i class="fa-solid fa-calendar-check text-indigo-400"></i>
-                <span>Jadwal:</span>
+            <input type="hidden" id="nilaiScheduleFilter" value="1">
+            <!-- Tombol Pemilih Jadwal Nilai -->
+            <button onclick="openNilaiSchedulePicker()" class="px-3.5 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-200 border border-indigo-500/40 text-xs font-bold transition flex items-center gap-2 shadow-sm" title="Klik untuk membuka Pusat Pemilihan Jadwal Rekap Nilai">
+              <i class="fa-solid fa-calendar-check text-indigo-400"></i>
+              <span id="nilaiCurrentScheduleLabel" class="max-w-[200px] sm:max-w-xs truncate">1. UAS Fisika Peminatan XII</span>
+              <span class="px-2 py-0.5 rounded-lg bg-indigo-500/30 text-[10px] text-indigo-300 font-bold flex items-center gap-1">
+                Ganti <i class="fa-solid fa-chevron-down text-[9px]"></i>
               </span>
-              <select id="nilaiScheduleFilter" onchange="syncNilaiScheduleChange(this.value)" class="bg-transparent text-xs text-white font-bold py-1 focus:outline-none cursor-pointer">
-                <option value="1">1. UAS Fisika Peminatan XII</option>
-                <option value="2">2. UTS Matematika Wajib XII</option>
-                <option value="3">3. Simulasi CBT Bahasa Indonesia</option>
+            </button>
+
+            <!-- Filter Kelas -->
+            <div class="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5">
+              <span class="text-xs text-slate-400">Kelas:</span>
+              <select id="filterClassNilaiSelect" onchange="handleNilaiFilterChange()" class="bg-transparent text-xs text-white font-medium focus:outline-none cursor-pointer">
+                <option value="all">Semua Kelas</option>
+                <option value="XII IPA 1">XII IPA 1</option>
+                <option value="XII IPA 2">XII IPA 2</option>
               </select>
             </div>
-            <button onclick="exportNilaiCSV()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition flex items-center gap-2 shadow-lg shadow-emerald-600/20">
-              <i class="fa-solid fa-file-excel"></i> Ekspor Nilai Excel
+
+            <!-- Tombol Ekspor Nilai & Analisis Butir Soal (Excel) -->
+            <button onclick="exportNilaiExcelWithAnalysis()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition flex items-center gap-2 shadow-lg shadow-emerald-600/20" title="Unduh Rekap Nilai & Analisis Butir Soal Resmi ke Excel (.xls)">
+              <i class="fa-solid fa-file-excel text-sm"></i>
+              <span>Ekspor Nilai & Analisis Butir Soal</span>
             </button>
           </div>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-          <table class="w-full text-xs text-left">
-            <thead class="text-slate-400 bg-slate-950 uppercase text-[10px] tracking-wider">
-              <tr>
-                <th class="px-4 py-3 rounded-l-lg">Peringkat</th>
-                <th class="px-4 py-3">NISN</th>
-                <th class="px-4 py-3">Nama Siswa</th>
-                <th class="px-4 py-3">Kelas</th>
-                <th class="px-4 py-3">Benar</th>
-                <th class="px-4 py-3">Salah</th>
-                <th class="px-4 py-3">Nilai CBT (Skala 100)</th>
-                <th class="px-4 py-3">Kelulusan</th>
-                <th class="px-4 py-3 rounded-r-lg">Aksi</th>
-              </tr>
-            </thead>
-            <tbody id="nilaiTableBody" class="divide-y divide-slate-800 text-slate-300">
-              <!-- Data nilai otomatis terupdate secara realtime -->
-              <tr>
-                <td colspan="9" class="px-4 py-8 text-center text-slate-400">
-                  <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Memuat data rekapitulasi nilai...
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- Banner Jadwal Terpilih -->
+        <div id="nilaiActiveScheduleBanner" class="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-500/30 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs shadow-lg">
+          <div class="flex items-center gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-lg shrink-0">
+              <i class="fa-solid fa-file-lines"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span id="nilaiActiveScheduleTitle" class="font-bold text-white text-sm">UAS Fisika Peminatan XII</span>
+                <span id="nilaiActiveScheduleTokenBadge" class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono text-[10px] font-bold">Token: FISIKA26</span>
+                <span id="nilaiActiveScheduleStatusBadge" class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-medium flex items-center gap-1.5">
+                  <span id="nilaiActiveScheduleStatusDot" class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span id="nilaiActiveScheduleStatusText">Aktif</span>
+                </span>
+              </div>
+              <p class="text-slate-400 text-[11px] mt-0.5">
+                <span id="nilaiActiveScheduleBank">Bank Soal: Bank Termodinamika & Kalor (5 Butir Soal)</span> •
+                <span id="nilaiActiveScheduleDuration">Durasi: 90 Menit</span> •
+                <span id="nilaiActiveScheduleTarget">Target: Semua Kelas</span> •
+                <span>KKM: <strong class="text-amber-400 font-mono">75.00</strong></span>
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0 flex-wrap">
+            <button onclick="openNilaiSchedulePicker()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-indigo-600/30">
+              <i class="fa-solid fa-arrow-right-arrow-left"></i>
+              <span>Pilih / Ganti Jadwal</span>
+            </button>
+            <span class="px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-[11px] font-mono">
+              <i class="fa-solid fa-hashtag text-indigo-400 mr-1"></i>ID: <span id="nilaiActiveScheduleId">1</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- 4 Stat Metric Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-[11px] text-slate-400 uppercase font-semibold">Total Peserta</p>
+              <h4 id="statNilai_totalStudents" class="text-xl font-bold text-white mt-1 font-mono">0</h4>
+              <p id="statNilai_submittedCount" class="text-[10px] text-slate-500 mt-0.5 font-mono">0 Selesai</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-users"></i>
+            </div>
+          </div>
+
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-[11px] text-slate-400 uppercase font-semibold">Rata-rata Nilai</p>
+              <h4 id="statNilai_avgScore" class="text-xl font-bold text-amber-400 mt-1 font-mono">0.00</h4>
+              <p class="text-[10px] text-slate-500 mt-0.5">Skala 0 - 100</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+          </div>
+
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-[11px] text-slate-400 uppercase font-semibold">Nilai Tertinggi / Terendah</p>
+              <h4 id="statNilai_maxMin" class="text-xl font-bold text-emerald-400 mt-1 font-mono">0 / 0</h4>
+              <p class="text-[10px] text-slate-500 mt-0.5">Max / Min Ujian</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-arrows-up-down"></i>
+            </div>
+          </div>
+
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-[11px] text-slate-400 uppercase font-semibold">Ketuntasan (KKM 75)</p>
+              <h4 id="statNilai_passRate" class="text-xl font-bold text-white mt-1 font-mono">0%</h4>
+              <p class="text-[10px] text-slate-500 mt-0.5"><span id="statNilai_passCount" class="text-emerald-400 font-bold">0 Tuntas</span> • <span id="statNilai_failCount" class="text-rose-400 font-bold">0 Remedial</span></p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabel Rekapitulasi Nilai Siswa -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+          <!-- Toolbar Tabel: Search Siswa & Info -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-2 border-b border-slate-800">
+            <div class="relative w-full sm:w-80">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="searchNilaiStudentInput" oninput="handleNilaiStudentSearch(this.value)" placeholder="Cari nama siswa atau NISN..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:border-indigo-500">
+            </div>
+            <div class="flex items-center gap-2 text-xs text-slate-400 self-end sm:self-center">
+              <span>Menampilkan <strong id="nilaiFilteredCount" class="text-white font-mono">0</strong> siswa</span>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-slate-400 bg-slate-950 uppercase text-[10px] tracking-wider">
+                <tr>
+                  <th class="px-4 py-3 rounded-l-lg text-center w-20">Peringkat</th>
+                  <th class="px-4 py-3">NISN</th>
+                  <th class="px-4 py-3">Nama Siswa</th>
+                  <th class="px-4 py-3">Kelas</th>
+                  <th class="px-4 py-3 text-center">Benar</th>
+                  <th class="px-4 py-3 text-center">Salah</th>
+                  <th class="px-4 py-3 text-center font-bold">Nilai CBT (Skala 100)</th>
+                  <th class="px-4 py-3 text-center">Kelulusan</th>
+                  <th class="px-4 py-3 rounded-r-lg text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="nilaiTableBody" class="divide-y divide-slate-800 text-slate-300">
+                <!-- Data nilai otomatis terupdate secara realtime -->
+                <tr>
+                  <td colspan="9" class="px-4 py-8 text-center text-slate-400">
+                    <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Memuat data rekapitulasi nilai...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -2187,6 +2297,60 @@
     </div>
   </div>
 
+  <!-- ==================== MODAL KHUSUS: PUSAT PEMILIHAN JADWAL BUKU NILAI (GRADEBOOK HUB) ==================== -->
+  <div id="modalSelectScheduleNilai" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div class="bg-slate-900 border border-amber-500/30 rounded-3xl max-w-4xl w-full p-6 shadow-2xl space-y-5 text-xs text-slate-300 flex flex-col max-h-[90vh]">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-award"></i>
+          </div>
+          <div>
+            <h4 class="text-base font-bold text-white flex items-center gap-2">
+              Pusat Pemilihan Rekap Nilai Ujian (Gradebook Hub)
+            </h4>
+            <p class="text-xs text-slate-400">Pilih jadwal ujian untuk menampilkan buku nilai dan mengunduh laporan analisis butir soal lengkap.</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modalSelectScheduleNilai')" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Toolbar: Pencarian & Filter Tab -->
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
+        <div class="relative flex-1">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input type="text" id="nilaiHubSearchInput" oninput="handleNilaiHubSearch(this.value)" placeholder="Cari nama ujian, mata pelajaran, kode token (misal: FISIKA26, MTK2026, TPS2026)..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:border-amber-500">
+        </div>
+        <div class="flex items-center gap-1.5 text-xs shrink-0 bg-slate-950 p-1 rounded-xl border border-slate-800">
+          <button id="nilaiHubFilter_all" onclick="filterNilaiHubTab('all')" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold transition">Semua (<span id="nilaiHubCount_all">0</span>)</button>
+          <button id="nilaiHubFilter_active" onclick="filterNilaiHubTab('active')" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white font-medium transition">Aktif (<span id="nilaiHubCount_active">0</span>)</button>
+          <button id="nilaiHubFilter_inactive" onclick="filterNilaiHubTab('inactive')" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white font-medium transition">Arsip (<span id="nilaiHubCount_inactive">0</span>)</button>
+        </div>
+      </div>
+
+      <!-- Daftar Jadwal Cards (Scrollable) -->
+      <div id="nilaiHubCardsContainer" class="flex-1 overflow-y-auto pr-1 space-y-3 min-h-[300px]">
+        <!-- Rendered dynamically by renderNilaiHubSchedules() -->
+      </div>
+
+      <!-- Footer Info -->
+      <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400 shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>Analisis butir soal otomatis disertakan saat mengekspor nilai ke format Excel (.xls).</span>
+        </div>
+        <button onclick="closeModal('modalSelectScheduleNilai')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium transition">
+          Tutup
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ==================== MODAL 5: BUAT BANK SOAL BARU ==================== -->
   <div id="modalCreateBank" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 text-xs">
@@ -2700,8 +2864,11 @@
         }
       }
 
-      if (tabName === 'monitoring' || tabName === 'nilai') {
+      if (tabName === 'monitoring') {
         fetchProctorSessions();
+      }
+      if (tabName === 'nilai') {
+        fetchNilaiSessions();
       }
       if (tabName === 'jadwal') {
         fetchScheduleList();
@@ -3252,11 +3419,18 @@
 
       if (nSelect) {
         const curN = nSelect.value;
-        nSelect.innerHTML = schedules.map(sch => `<option value="${sch.id}">Jadwal #${sch.id}: ${sch.title} (${sch.token_code})${sch.is_active === false ? ' [TIDAK AKTIF]' : ''}</option>`).join('');
+        if (nSelect.tagName === 'SELECT') {
+          nSelect.innerHTML = schedules.map(sch => `<option value="${sch.id}">Jadwal #${sch.id}: ${sch.title} (${sch.token_code})${sch.is_active === false ? ' [TIDAK AKTIF]' : ''}</option>`).join('');
+        }
         if (schedules.some(s => String(s.id) === String(curN))) {
           nSelect.value = curN;
         } else if (schedules.length > 0) {
           nSelect.value = String(schedules[0].id);
+        }
+        const curSch = schedules.find(s => String(s.id) === String(nSelect.value)) || schedules[0];
+        const lbl = document.getElementById('nilaiCurrentScheduleLabel');
+        if (lbl && curSch) {
+          lbl.innerText = `${curSch.id}. ${curSch.title} (${curSch.token_code})`;
         }
       }
     }
@@ -3634,50 +3808,823 @@
       if (typeof updateProctorSelectionUI === 'function') updateProctorSelectionUI();
     }
 
+    // ==============================================================
+    // TAB 5: BUKU NILAI & ANALISIS BUTIR SOAL PER JADWAL
+    // ==============================================================
+    let currentNilaiScheduleId = 1;
+    let lastNilaiSessionsData = [];
+    let lastNilaiScheduleInfo = null;
+    let lastNilaiQuestions = [];
+    let lastNilaiAnswerKeys = { 1: 'C', 2: 'B', 3: 'C', 4: 'B', 5: 'C' };
+    let lastSchoolProfile = null;
+    let nilaiHubSearchQuery = '';
+    let nilaiHubActiveFilter = 'all';
+    let nilaiStudentSearchQuery = '';
+
+    function getNilaiSelectedScheduleId() {
+      const hidden = document.getElementById('nilaiScheduleFilter');
+      return parseInt(hidden?.value, 10) || currentNilaiScheduleId || 1;
+    }
+
+    window.openNilaiSchedulePicker = function() {
+      nilaiHubSearchQuery = '';
+      nilaiHubActiveFilter = 'all';
+      const inp = document.getElementById('nilaiHubSearchInput');
+      if (inp) inp.value = '';
+      renderNilaiHubSchedules();
+      openModal('modalSelectScheduleNilai');
+      setTimeout(() => { if (inp) inp.focus(); }, 150);
+    };
+
+    window.handleNilaiHubSearch = function(val) {
+      nilaiHubSearchQuery = (val || '').trim().toLowerCase();
+      renderNilaiHubSchedules();
+    };
+
+    window.filterNilaiHubTab = function(filterType) {
+      nilaiHubActiveFilter = filterType;
+      ['all', 'active', 'inactive'].forEach(t => {
+        const btn = document.getElementById(`nilaiHubFilter_${t}`);
+        if (!btn) return;
+        if (t === filterType) {
+          btn.className = 'px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold transition';
+        } else {
+          btn.className = 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white font-medium transition';
+        }
+      });
+      renderNilaiHubSchedules();
+    };
+
+    window.renderNilaiHubSchedules = function() {
+      const container = document.getElementById('nilaiHubCardsContainer');
+      if (!container) return;
+
+      const all = currentSchedules || [];
+      const cAll = document.getElementById('nilaiHubCount_all');
+      const cAct = document.getElementById('nilaiHubCount_active');
+      const cIna = document.getElementById('nilaiHubCount_inactive');
+
+      const activeList = all.filter(s => s.is_active !== false);
+      const inactiveList = all.filter(s => s.is_active === false);
+
+      if (cAll) cAll.innerText = all.length;
+      if (cAct) cAct.innerText = activeList.length;
+      if (cIna) cIna.innerText = inactiveList.length;
+
+      let filtered = all;
+      if (nilaiHubActiveFilter === 'active') {
+        filtered = activeList;
+      } else if (nilaiHubActiveFilter === 'inactive') {
+        filtered = inactiveList;
+      }
+
+      if (nilaiHubSearchQuery) {
+        filtered = filtered.filter(s =>
+          (s.title && s.title.toLowerCase().includes(nilaiHubSearchQuery)) ||
+          (s.token_code && s.token_code.toLowerCase().includes(nilaiHubSearchQuery)) ||
+          (s.bank_name && s.bank_name.toLowerCase().includes(nilaiHubSearchQuery)) ||
+          (s.class_target && s.class_target.toLowerCase().includes(nilaiHubSearchQuery))
+        );
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center bg-slate-950/40 border border-dashed border-slate-800 rounded-2xl space-y-2">
+            <i class="fa-solid fa-calendar-xmark text-3xl text-slate-600"></i>
+            <p class="text-sm font-semibold text-slate-300">Tidak ada jadwal ujian yang cocok</p>
+            <p class="text-xs text-slate-500">Coba ubah kata kunci pencarian atau tab filter status jadwal.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const curId = getNilaiSelectedScheduleId();
+
+      container.innerHTML = filtered.map(sch => {
+        const isCurrent = Number(sch.id) === Number(curId);
+        const isActive = sch.is_active !== false;
+
+        return `
+          <div class="bg-slate-950/70 border ${isCurrent ? 'border-amber-500/60 ring-1 ring-amber-500/30' : 'border-slate-800 hover:border-slate-700'} rounded-2xl p-4 transition flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl ${isCurrent ? 'bg-amber-500 text-slate-950' : 'bg-slate-900 border border-slate-800 text-slate-300'} flex items-center justify-center font-mono font-bold text-sm shrink-0">
+                #${sch.id}
+              </div>
+              <div class="space-y-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-bold text-white text-sm">${sch.title}</span>
+                  <span class="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono text-[10px] font-bold">
+                    Token: ${sch.token_code}
+                  </span>
+                  ${isActive ? `
+                    <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Aktif
+                    </span>
+                  ` : `
+                    <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-[10px] font-medium">
+                      Arsip Nonaktif
+                    </span>
+                  `}
+                  ${isCurrent ? `
+                    <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold">
+                      <i class="fa-solid fa-check text-[9px] mr-1"></i> Sedang Ditampilkan
+                    </span>
+                  ` : ''}
+                </div>
+                <p class="text-slate-400 text-[11px]">
+                  <i class="fa-solid fa-book-bookmark text-indigo-400 mr-1"></i>${sch.bank_name || '-'} •
+                  <i class="fa-regular fa-clock text-amber-400 ml-1 mr-1"></i>${sch.duration_minutes} Menit •
+                  <i class="fa-solid fa-users text-sky-400 ml-1 mr-1"></i>${sch.class_target || 'Semua Kelas'}
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2.5 shrink-0">
+              <button onclick="selectScheduleForNilai(${sch.id})" class="px-4 py-2.5 rounded-xl ${isCurrent ? 'bg-amber-500 text-slate-950 font-bold ring-2 ring-amber-400 shadow-lg shadow-amber-500/30' : 'bg-indigo-600 hover:bg-indigo-500 text-white font-bold'} text-xs transition flex items-center gap-2 shadow-md">
+                <i class="fa-solid fa-award text-sm"></i>
+                <span>${isCurrent ? 'Sedang Dipilih' : 'Buka Rekap Nilai & Analisis &rarr;'}</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    };
+
+    window.selectScheduleForNilai = function(scheduleId) {
+      currentNilaiScheduleId = Number(scheduleId);
+      const hidden = document.getElementById('nilaiScheduleFilter');
+      if (hidden) hidden.value = String(scheduleId);
+      closeModal('modalSelectScheduleNilai');
+      fetchNilaiSessions();
+    };
+
+    window.handleNilaiFilterChange = function() {
+      fetchNilaiSessions();
+    };
+
+    window.handleNilaiStudentSearch = function(query) {
+      nilaiStudentSearchQuery = (query || '').trim().toLowerCase();
+      renderNilaiTable(lastNilaiSessionsData);
+    };
+
+    window.fetchNilaiSessions = async function() {
+      const secNilai = document.getElementById('tab-nilai');
+      if (secNilai && secNilai.classList.contains('hidden') && window.location.hash !== '#nilai') return;
+
+      const scheduleId = getNilaiSelectedScheduleId();
+      const filterClass = document.getElementById('filterClassNilaiSelect')?.value || 'all';
+
+      try {
+        const params = new URLSearchParams();
+        params.append('schedule_id', scheduleId);
+        if (filterClass && filterClass !== 'all') params.append('class', filterClass);
+
+        const res = await fetch(`/api/v1/cbt/proctor/live-sessions?${params.toString()}`);
+        if (!res.ok) return;
+        const json = await res.json();
+
+        lastNilaiSessionsData = json.data || [];
+        lastNilaiScheduleInfo = json.schedule || null;
+        lastNilaiQuestions = json.questions || [];
+        lastNilaiAnswerKeys = json.answer_keys || { 1: 'C', 2: 'B', 3: 'C', 4: 'B', 5: 'C' };
+        lastSchoolProfile = json.school_profile || null;
+
+        // Update Banner UI
+        if (json.schedule) {
+          const sch = json.schedule;
+          const bTitle = document.getElementById('nilaiActiveScheduleTitle');
+          const bToken = document.getElementById('nilaiActiveScheduleTokenBadge');
+          const bBank = document.getElementById('nilaiActiveScheduleBank');
+          const bDuration = document.getElementById('nilaiActiveScheduleDuration');
+          const bTarget = document.getElementById('nilaiActiveScheduleTarget');
+          const bId = document.getElementById('nilaiActiveScheduleId');
+          const bLabel = document.getElementById('nilaiCurrentScheduleLabel');
+          const sBadge = document.getElementById('nilaiActiveScheduleStatusBadge');
+          const sDot = document.getElementById('nilaiActiveScheduleStatusDot');
+          const sText = document.getElementById('nilaiActiveScheduleStatusText');
+
+          if (bTitle) bTitle.innerText = sch.title;
+          if (bToken) bToken.innerText = `Token: ${sch.token_code}`;
+          if (bBank) bBank.innerText = `Bank Soal: ${sch.bank_name || '-'}`;
+          if (bDuration) bDuration.innerText = `Durasi: ${sch.duration_minutes} Menit`;
+          if (bTarget) bTarget.innerText = `Target: ${sch.class_target || 'Semua Kelas'}`;
+          if (bId) bId.innerText = sch.id;
+          if (bLabel) bLabel.innerText = `${sch.id}. ${sch.title} (${sch.token_code})`;
+
+          const isActive = sch.is_active !== false;
+          if (sBadge) {
+            if (isActive) {
+              sBadge.className = "px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-medium flex items-center gap-1.5";
+              if (sDot) sDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse";
+              if (sText) sText.innerText = "Aktif";
+            } else {
+              sBadge.className = "px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-[10px] font-medium flex items-center gap-1.5";
+              if (sDot) sDot.className = "w-1.5 h-1.5 rounded-full bg-slate-500";
+              if (sText) sText.innerText = "Arsip Nonaktif";
+            }
+          }
+        }
+
+        // Update 4 Stat Cards
+        const total = lastNilaiSessionsData.length;
+        const submitted = lastNilaiSessionsData.filter(s => s.status === 'submitted');
+        const scores = lastNilaiSessionsData.map(s => s.score || 0);
+        const avg = total > 0 ? (scores.reduce((a, b) => a + b, 0) / total) : 0;
+        const max = total > 0 ? Math.max(...scores) : 0;
+        const min = total > 0 ? Math.min(...scores) : 0;
+        const passed = lastNilaiSessionsData.filter(s => (s.score || 0) >= 75);
+        const failed = lastNilaiSessionsData.filter(s => (s.score || 0) < 75);
+        const passRate = total > 0 ? (passed.length / total * 100) : 0;
+
+        const elTot = document.getElementById('statNilai_totalStudents');
+        const elSub = document.getElementById('statNilai_submittedCount');
+        const elAvg = document.getElementById('statNilai_avgScore');
+        const elMaxMin = document.getElementById('statNilai_maxMin');
+        const elRate = document.getElementById('statNilai_passRate');
+        const elPass = document.getElementById('statNilai_passCount');
+        const elFail = document.getElementById('statNilai_failCount');
+
+        if (elTot) elTot.innerText = total;
+        if (elSub) elSub.innerText = `${submitted.length} Selesai (${total - submitted.length} Belum)`;
+        if (elAvg) elAvg.innerText = avg.toFixed(2);
+        if (elMaxMin) elMaxMin.innerText = `${max} / ${min}`;
+        if (elRate) elRate.innerText = `${passRate.toFixed(0)}%`;
+        if (elPass) elPass.innerText = `${passed.length} Tuntas`;
+        if (elFail) elFail.innerText = `${failed.length} Remedial`;
+
+        renderNilaiTable(lastNilaiSessionsData);
+      } catch (err) {
+        console.warn('Gagal memuat rekap nilai:', err);
+      }
+    };
+
     function renderNilaiTable(students) {
       const tbody = document.getElementById('nilaiTableBody');
       if (!tbody) return;
 
-      tbody.innerHTML = students.map((s, idx) => {
-        const isPassed = s.is_passed;
-        const passBadge = isPassed
-          ? `<span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">TUNTAS</span>`
-          : `<span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold text-[10px]">REMIDIAL</span>`;
+      // Filter search
+      let list = [...(students || [])];
+      if (nilaiStudentSearchQuery) {
+        list = list.filter(s =>
+          (s.full_name && s.full_name.toLowerCase().includes(nilaiStudentSearchQuery)) ||
+          (s.username && s.username.toLowerCase().includes(nilaiStudentSearchQuery)) ||
+          (s.nisn && s.nisn.toLowerCase().includes(nilaiStudentSearchQuery)) ||
+          (s.class_name && s.class_name.toLowerCase().includes(nilaiStudentSearchQuery))
+        );
+      }
 
-        const scoreColor = s.score >= 75 ? 'text-emerald-400' : 'text-rose-400';
+      const countBadge = document.getElementById('nilaiFilteredCount');
+      if (countBadge) countBadge.innerText = list.length;
+
+      if (list.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="px-4 py-8 text-center text-slate-400">
+              <i class="fa-solid fa-inbox text-2xl mb-2 block text-slate-600"></i>
+              Tidak ada data nilai siswa yang sesuai dengan filter atau kata kunci pencarian.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      // Sort by score descending
+      list.sort((a, b) => (b.score || 0) - (a.score || 0));
+
+      tbody.innerHTML = list.map((s, idx) => {
+        const isPassed = (s.score || 0) >= 75;
+        const passBadge = isPassed
+          ? `<span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-[10px] border border-emerald-500/30">TUNTAS</span>`
+          : `<span class="px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 font-bold text-[10px] border border-rose-500/30">REMIDIAL</span>`;
+
+        let rankBadge = `<span class="font-bold text-slate-400 font-mono">#${idx + 1}</span>`;
+        if (idx === 0) {
+          rankBadge = `<span class="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-bold font-mono border border-amber-500/30">🥇 #1</span>`;
+        } else if (idx === 1) {
+          rankBadge = `<span class="px-2 py-0.5 rounded-lg bg-slate-300/20 text-slate-200 font-bold font-mono border border-slate-300/30">🥈 #2</span>`;
+        } else if (idx === 2) {
+          rankBadge = `<span class="px-2 py-0.5 rounded-lg bg-amber-700/20 text-amber-500 font-bold font-mono border border-amber-700/30">🥉 #3</span>`;
+        }
+
+        const scoreColor = (s.score || 0) >= 75 ? 'text-emerald-400' : 'text-rose-400';
 
         return `
           <tr class="hover:bg-slate-800/40 transition">
-            <td class="px-4 py-3.5 font-bold text-amber-400 font-mono">#${idx + 1}</td>
-            <td class="px-4 py-3.5 font-mono text-slate-400">${s.username}</td>
+            <td class="px-4 py-3.5 text-center">${rankBadge}</td>
+            <td class="px-4 py-3.5 font-mono text-slate-400">${s.nisn || s.username}</td>
             <td class="px-4 py-3.5 font-bold text-white">${s.full_name}</td>
             <td class="px-4 py-3.5">${s.class_name || 'XII IPA 1'}</td>
-            <td class="px-4 py-3.5 text-emerald-400 font-bold">${s.correct_count}</td>
-            <td class="px-4 py-3.5 text-rose-400 font-bold">${s.wrong_count}</td>
-            <td class="px-4 py-3.5 font-mono text-base font-bold ${scoreColor}">${s.score.toFixed(2)}</td>
-            <td class="px-4 py-3.5">${passBadge}</td>
-            <td class="px-4 py-3.5">
-              <button onclick="handleDeleteRow(this, 'Nilai ${s.username}')" class="px-2 py-1 rounded bg-rose-600/20 hover:bg-rose-600/30 text-[11px] text-rose-300 border border-rose-500/30 transition flex items-center gap-1">
-                <i class="fa-regular fa-trash-can"></i> Hapus
-              </button>
+            <td class="px-4 py-3.5 text-center text-emerald-400 font-bold">${s.correct_count}</td>
+            <td class="px-4 py-3.5 text-center text-rose-400 font-bold">${s.wrong_count}</td>
+            <td class="px-4 py-3.5 text-center font-mono text-base font-bold ${scoreColor}">${(s.score || 0).toFixed(2)}</td>
+            <td class="px-4 py-3.5 text-center">${passBadge}</td>
+            <td class="px-4 py-3.5 text-center">
+              <div class="flex items-center justify-center gap-1.5">
+                <button onclick="viewStudentScoreDetail('${s.username}')" class="px-2 py-1 rounded bg-indigo-600/20 hover:bg-indigo-600/30 text-[11px] text-indigo-300 border border-indigo-500/30 transition flex items-center gap-1" title="Lihat rincian lembar jawaban siswa">
+                  <i class="fa-regular fa-eye"></i> Detail
+                </button>
+                <button onclick="handleDeleteRow(this, 'Nilai ${s.username}')" class="px-2 py-1 rounded bg-rose-600/20 hover:bg-rose-600/30 text-[11px] text-rose-300 border border-rose-500/30 transition flex items-center gap-1" title="Hapus rekaman nilai">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              </div>
             </td>
           </tr>
         `;
       }).join('');
     }
 
-    // Ekspor CSV
+    // Modal / Popup Rincian Lembar Jawaban Siswa
+    window.viewStudentScoreDetail = function(username) {
+      const student = lastNilaiSessionsData.find(s => s.username === username);
+      if (!student) return;
+
+      const keys = lastNilaiAnswerKeys || { 1: 'C', 2: 'B', 3: 'C', 4: 'B', 5: 'C' };
+      const userAnswers = student.answers || {};
+
+      let detailHtml = `Rincian Hasil Pengerjaan Siswa:\nNama: ${student.full_name} (${student.username})\nKelas: ${student.class_name}\nNilai: ${student.score} (Benar: ${student.correct_count}, Salah: ${student.wrong_count})\nStatus: ${student.is_passed ? 'TUNTAS' : 'REMIDIAL'}\n\n`;
+
+      Object.keys(keys).forEach(qId => {
+        const key = keys[qId];
+        const studentAns = userAnswers[qId] ? userAnswers[qId].a : '-';
+        const isRight = studentAns === key;
+        detailHtml += `Soal #${qId}: Jawaban Siswa = [${studentAns}], Kunci = [${key}] -> ${isRight ? '✓ BENAR' : '✗ SALAH'}\n`;
+      });
+
+      alert(detailHtml);
+    };
+
+    // ==============================================================
+    // EKSPOR REKAP NILAI & ANALISIS BUTIR SOAL LENGKAP (EXCEL / .XLS)
+    // ==============================================================
+    window.exportNilaiExcelWithAnalysis = function() {
+      const students = lastNilaiSessionsData && lastNilaiSessionsData.length > 0 ? [...lastNilaiSessionsData] : [];
+      if (students.length === 0) {
+        alert('Tidak ada data nilai siswa untuk jadwal ujian ini.');
+        return;
+      }
+
+      const sch = lastNilaiScheduleInfo || {
+        id: currentNilaiScheduleId || 1,
+        title: 'Ujian CBT',
+        token_code: 'CBT2026',
+        bank_name: 'Bank Soal CBT',
+        duration_minutes: 90,
+        class_target: 'Semua Kelas',
+        start_time: 'Hari ini'
+      };
+
+      const profile = lastSchoolProfile || {
+        name: 'SMK NEGERI 5 JAKARTA',
+        dinas: 'PEMERINTAH PROVINSI DAERAH KHUSUS IBUKOTA JAKARTA\nDINAS PENDIDIKAN',
+        address: 'Jl. Pisangan Baru Timur VII No. 6, Matraman, Jakarta Timur',
+        npsn: '20102551',
+        city: 'Jakarta',
+        headmaster_name: 'Drs. H. Ahmad Fauzi, M.Pd.',
+        headmaster_nip: '19710815 199802 1 003'
+      };
+
+      const answerKeys = lastNilaiAnswerKeys || { 1: 'C', 2: 'B', 3: 'C', 4: 'B', 5: 'C' };
+      const qIds = Object.keys(answerKeys).map(k => Number(k)).sort((a, b) => a - b);
+      const totalQuestions = qIds.length;
+      const totalStudents = students.length;
+
+      // Urutkan siswa berdasarkan skor descending
+      students.sort((a, b) => (b.score || 0) - (a.score || 0));
+
+      // 1. STATISTIK DESKRIPTIF
+      const scores = students.map(s => s.score || 0);
+      const sumScore = scores.reduce((acc, v) => acc + v, 0);
+      const avgScore = totalStudents > 0 ? (sumScore / totalStudents) : 0;
+      const maxScore = Math.max(...scores);
+      const minScore = Math.min(...scores);
+
+      const variance = totalStudents > 1
+        ? scores.reduce((acc, v) => acc + Math.pow(v - avgScore, 2), 0) / (totalStudents - 1)
+        : 0;
+      const stdDev = Math.sqrt(variance);
+
+      const passedStudents = students.filter(s => (s.score || 0) >= 75);
+      const failedStudents = students.filter(s => (s.score || 0) < 75);
+      const passRate = totalStudents > 0 ? (passedStudents.length / totalStudents * 100) : 0;
+
+      // 2. PEMBAGIAN KELOMPOK ATAS & BAWAH UNTUK DAYA PEMBEDA (D)
+      const groupSize = Math.max(1, Math.round(totalStudents * 0.50));
+      const upperGroup = students.slice(0, groupSize);
+      const lowerGroup = students.slice(-groupSize);
+
+      // 3. ANALISIS BUTIR SOAL
+      let sumPq = 0;
+      const itemAnalysis = qIds.map((qId, idx) => {
+        const key = answerKeys[qId] || 'C';
+        const optCounts = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+        let correctCount = 0;
+
+        students.forEach(st => {
+          const stAns = (st.answers && st.answers[qId] && st.answers[qId].a) ? st.answers[qId].a.toUpperCase() : '-';
+          if (optCounts[stAns] !== undefined) {
+            optCounts[stAns]++;
+          }
+          if (stAns === key) {
+            correctCount++;
+          }
+        });
+
+        const wrongCount = totalStudents - correctCount;
+        const pVal = totalStudents > 0 ? (correctCount / totalStudents) : 0;
+        const qVal = 1 - pVal;
+        sumPq += (pVal * qVal);
+
+        let pCategory = 'Sedang';
+        let pClass = 'cat-sedang';
+        if (pVal > 0.70) {
+          pCategory = 'Mudah';
+          pClass = 'cat-mudah';
+        } else if (pVal < 0.30) {
+          pCategory = 'Sukar';
+          pClass = 'cat-sukar';
+        }
+
+        let correctUpper = 0;
+        let correctLower = 0;
+        upperGroup.forEach(st => {
+          const a = (st.answers && st.answers[qId] && st.answers[qId].a) ? st.answers[qId].a.toUpperCase() : '-';
+          if (a === key) correctUpper++;
+        });
+        lowerGroup.forEach(st => {
+          const a = (st.answers && st.answers[qId] && st.answers[qId].a) ? st.answers[qId].a.toUpperCase() : '-';
+          if (a === key) correctLower++;
+        });
+
+        const dVal = groupSize > 0 ? ((correctUpper - correctLower) / groupSize) : 0;
+
+        let dCategory = 'Cukup';
+        let dClass = 'disc-cukup';
+        let recommendation = 'Diterima (Perlu Sedikit Revisi)';
+
+        if (dVal >= 0.40) {
+          dCategory = 'Sangat Baik';
+          dClass = 'disc-sangat-baik';
+          recommendation = 'Diterima (Sangat Baik / Masuk Bank Soal)';
+        } else if (dVal >= 0.30) {
+          dCategory = 'Baik';
+          dClass = 'disc-baik';
+          recommendation = 'Diterima (Baik)';
+        } else if (dVal >= 0.20) {
+          dCategory = 'Cukup';
+          dClass = 'disc-cukup';
+          recommendation = 'Diterima (Revisi Minor Pengecoh)';
+        } else if (dVal >= 0.00) {
+          dCategory = 'Buruk';
+          dClass = 'disc-buruk';
+          recommendation = 'Perlu Revisi Total Butir Soal';
+        } else {
+          dCategory = 'Sangat Buruk';
+          dClass = 'disc-buruk';
+          recommendation = 'Ditolak / Kunci Jawaban Tertukar';
+        }
+
+        // Pengecoh: opsi selain kunci minimal dipilih 5%
+        const nonEffectiveDistractors = [];
+        ['A', 'B', 'C', 'D', 'E'].forEach(opt => {
+          if (opt !== key) {
+            const pct = totalStudents > 0 ? (optCounts[opt] / totalStudents * 100) : 0;
+            if (pct < 5) nonEffectiveDistractors.push(opt);
+          }
+        });
+
+        let distractorSummary = 'Semua Pengecoh Berfungsi Baik (≥5%)';
+        if (nonEffectiveDistractors.length > 0) {
+          distractorSummary = `Pengecoh [${nonEffectiveDistractors.join(', ')}] Kurang Berfungsi (<5%)`;
+        }
+
+        return {
+          qNum: idx + 1,
+          qId: qId,
+          key: key,
+          optCounts: optCounts,
+          correctCount: correctCount,
+          wrongCount: wrongCount,
+          pVal: pVal,
+          pCategory: pCategory,
+          pClass: pClass,
+          correctUpper: correctUpper,
+          correctLower: correctLower,
+          dVal: dVal,
+          dCategory: dCategory,
+          dClass: dClass,
+          distractorSummary: distractorSummary,
+          recommendation: recommendation
+        };
+      });
+
+      // Reliabilitas KR-20
+      let kr20 = 0;
+      if (totalQuestions > 1 && variance > 0) {
+        kr20 = (totalQuestions / (totalQuestions - 1)) * (1 - (sumPq / variance));
+        if (kr20 < 0) kr20 = 0;
+        if (kr20 > 1) kr20 = 0.99;
+      }
+
+      const currentDate = new Date().toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+
+      // RENDER HTML SPREADSHEET
+      let html = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+          <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+          <!--[if gte mso 9]>
+          <xml>
+            <x:ExcelWorkbook>
+              <x:ExcelWorksheets>
+                <x:ExcelWorksheet>
+                  <x:Name>Analisis Butir Soal CBT</x:Name>
+                  <x:WorksheetOptions>
+                    <x:DisplayGridlines/>
+                  </x:WorksheetOptions>
+                </x:ExcelWorksheet>
+              </x:ExcelWorksheets>
+            </x:ExcelWorkbook>
+          </xml>
+          <![endif]-->
+          <style>
+            body { font-family: Calibri, 'Segoe UI', Arial, sans-serif; font-size: 10pt; color: #1e293b; }
+            table { border-collapse: collapse; width: 100%; margin-bottom: 22px; }
+            th, td { border: 1px solid #cbd5e1; padding: 6px 8px; vertical-align: middle; }
+            .kop-dinas { font-size: 11pt; font-weight: bold; text-align: center; }
+            .kop-sekolah { font-size: 14pt; font-weight: bold; text-align: center; color: #1e3a8a; }
+            .kop-alamat { font-size: 9pt; text-align: center; color: #475569; }
+            .title-doc { font-size: 13pt; font-weight: bold; text-align: center; padding-top: 10px; }
+            .sec-header { background-color: #1e293b; color: #ffffff; font-weight: bold; font-size: 10.5pt; text-align: left; padding: 7px 10px; }
+            .th-main { background-color: #2563eb; color: #ffffff; font-weight: bold; text-align: center; font-size: 9.5pt; }
+            .th-sub { background-color: #e2e8f0; color: #0f172a; font-weight: bold; text-align: center; font-size: 9pt; }
+            .text-center { text-align: center; }
+            .text-right { text-align: right; }
+            .font-bold { font-weight: bold; }
+            .bg-light { background-color: #f8fafc; }
+            .badge-pass { background-color: #dcfce7; color: #15803d; font-weight: bold; text-align: center; }
+            .badge-fail { background-color: #fee2e2; color: #b91c1c; font-weight: bold; text-align: center; }
+            .badge-key { background-color: #fef08a; font-weight: bold; text-align: center; }
+            .cat-mudah { background-color: #dcfce7; color: #166534; font-weight: bold; text-align: center; }
+            .cat-sedang { background-color: #fef3c7; color: #92400e; font-weight: bold; text-align: center; }
+            .cat-sukar { background-color: #fee2e2; color: #991b1b; font-weight: bold; text-align: center; }
+            .disc-sangat-baik { background-color: #dcfce7; color: #166534; font-weight: bold; text-align: center; }
+            .disc-baik { background-color: #d1fae5; color: #065f46; font-weight: bold; text-align: center; }
+            .disc-cukup { background-color: #fef3c7; color: #92400e; font-weight: bold; text-align: center; }
+            .disc-buruk { background-color: #fee2e2; color: #991b1b; font-weight: bold; text-align: center; }
+          </style>
+        </head>
+        <body>
+          <!-- KOP SURAT RESMI -->
+          <table>
+            <tr><td colspan="12" class="kop-dinas" style="border:none;">${(profile.dinas || 'PEMERINTAH PROVINSI DAERAH KHUSUS IBUKOTA JAKARTA<br>DINAS PENDIDIKAN').replace(/\n/g, '<br>')}</td></tr>
+            <tr><td colspan="12" class="kop-sekolah" style="border:none;">${profile.name || 'SMK NEGERI 5 JAKARTA'}</td></tr>
+            <tr><td colspan="12" class="kop-alamat" style="border:none;">${profile.address || 'Jl. Pisangan Baru Timur VII No. 6, Matraman, Jakarta Timur'} • NPSN: ${profile.npsn || '20102551'}</td></tr>
+            <tr><td colspan="12" style="border-bottom: 3px double #000; border-top:none; border-left:none; border-right:none; height: 4px;"></td></tr>
+            <tr><td colspan="12" class="title-doc" style="border:none;">LAPORAN REKAPITULASI HASIL UJIAN & ANALISIS BUTIR SOAL</td></tr>
+            <tr><td colspan="12" class="text-center" style="border:none; color:#475569; font-size:9.5pt;">Jadwal: <strong>${sch.title}</strong> • Token: <strong>${sch.token_code}</strong> • Bank Soal: <strong>${sch.bank_name || '-'}</strong></td></tr>
+          </table>
+
+          <!-- BAGIAN 1: STATISTIK EVALUASI HASIL ASESMEN -->
+          <table>
+            <thead>
+              <tr><th colspan="4" class="sec-header">BAGIAN I: IDENTITAS & STATISTIK EVALUASI HASIL UJIAN</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="bg-light font-bold" style="width:25%;">Mata Pelajaran / Jadwal</td>
+                <td style="width:25%;">${sch.title} (${sch.token_code})</td>
+                <td class="bg-light font-bold" style="width:25%;">Jumlah Siswa Terdaftar / Peserta</td>
+                <td style="width:25%;">${totalStudents} Siswa (${passedStudents.length + failedStudents.length} Mengikuti)</td>
+              </tr>
+              <tr>
+                <td class="bg-light font-bold">Bank Soal & Jumlah Butir</td>
+                <td>${sch.bank_name || '-'} (${totalQuestions} Butir Soal)</td>
+                <td class="bg-light font-bold">Nilai Rata-rata Ujian (Mean)</td>
+                <td class="font-bold text-blue-600">${avgScore.toFixed(2)} / 100.00</td>
+              </tr>
+              <tr>
+                <td class="bg-light font-bold">Durasi Ujian CBT</td>
+                <td>${sch.duration_minutes} Menit</td>
+                <td class="bg-light font-bold">Nilai Tertinggi / Terendah</td>
+                <td>Max: <strong>${maxScore.toFixed(2)}</strong> | Min: <strong>${minScore.toFixed(2)}</strong></td>
+              </tr>
+              <tr>
+                <td class="bg-light font-bold">Kriteria Ketuntasan (KKM)</td>
+                <td><strong>75.00</strong></td>
+                <td class="bg-light font-bold">Standar Deviasi (Simpangan Baku)</td>
+                <td>${stdDev.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td class="bg-light font-bold">Tingkat Ketuntasan Kelas</td>
+                <td class="${passRate >= 75 ? 'badge-pass' : 'badge-fail'}">${passRate.toFixed(1)}% (${passedStudents.length} Tuntas, ${failedStudents.length} Remedial)</td>
+                <td class="bg-light font-bold">Reliabilitas Tes (KR-20)</td>
+                <td><strong>${kr20.toFixed(3)}</strong> (${kr20 >= 0.70 ? 'Tinggi / Sangat Baik' : 'Cukup'})</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- BAGIAN 2: DAFTAR REKAPITULASI NILAI SISWA -->
+          <table>
+            <thead>
+              <tr><th colspan="9" class="sec-header">BAGIAN II: DAFTAR REKAPITULASI NILAI SISWA (PERINGKAT HASIL BELAJAR)</th></tr>
+              <tr>
+                <th class="th-main" style="width:60px;">Peringkat</th>
+                <th class="th-main" style="width:110px;">NISN</th>
+                <th class="th-main" style="width:90px;">NIS</th>
+                <th class="th-main">Nama Lengkap Siswa</th>
+                <th class="th-main" style="width:90px;">Kelas</th>
+                <th class="th-main" style="width:60px;">Benar</th>
+                <th class="th-main" style="width:60px;">Salah</th>
+                <th class="th-main" style="width:90px;">Nilai Akhir</th>
+                <th class="th-main" style="width:100px;">Status KKM</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${students.map((st, idx) => `
+                <tr>
+                  <td class="text-center font-bold">#${idx + 1}</td>
+                  <td class="text-center" style="mso-number-format:'\\@';">${st.nisn || st.username}</td>
+                  <td class="text-center" style="mso-number-format:'\\@';">${st.nis || '-'}</td>
+                  <td class="font-bold">${st.full_name}</td>
+                  <td class="text-center">${st.class_name || 'XII IPA 1'}</td>
+                  <td class="text-center font-bold" style="color:#16a34a;">${st.correct_count}</td>
+                  <td class="text-center font-bold" style="color:#dc2626;">${st.wrong_count}</td>
+                  <td class="text-center font-bold" style="font-size:10.5pt; color:${(st.score || 0) >= 75 ? '#15803d' : '#b91c1c'};">${(st.score || 0).toFixed(2)}</td>
+                  <td class="${(st.score || 0) >= 75 ? 'badge-pass' : 'badge-fail'}">${(st.score || 0) >= 75 ? 'TUNTAS' : 'REMIDIAL'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <!-- BAGIAN 3: MATRIKS RESPON SISWA PER BUTIR SOAL -->
+          <table>
+            <thead>
+              <tr><th colspan="${4 + totalQuestions + 2}" class="sec-header">BAGIAN III: MATRIKS POLA RESPON SISWA PER BUTIR SOAL (1..${totalQuestions})</th></tr>
+              <tr>
+                <th class="th-main" rowspan="2" style="width:40px;">No</th>
+                <th class="th-main" rowspan="2" style="width:180px;">Nama Siswa</th>
+                <th class="th-main" rowspan="2" style="width:70px;">Kelas</th>
+                <th class="th-main" colspan="${totalQuestions}">Respon Butir Soal (Pilihan Jawaban & Skor)</th>
+                <th class="th-main" rowspan="2" style="width:65px;">Total Benar</th>
+                <th class="th-main" rowspan="2" style="width:70px;">Nilai</th>
+              </tr>
+              <tr>
+                ${qIds.map((qId, qIdx) => `<th class="th-sub" style="width:50px;">S.${qIdx + 1}</th>`).join('')}
+              </tr>
+              <tr style="background-color:#fef08a;">
+                <td colspan="3" class="text-center font-bold" style="background-color:#fef9c3;">KUNCI JAWABAN RESMI</td>
+                ${qIds.map(qId => `<td class="text-center font-bold badge-key">${answerKeys[qId] || 'C'}</td>`).join('')}
+                <td class="text-center font-bold badge-key">${totalQuestions}</td>
+                <td class="text-center font-bold badge-key">100.00</td>
+              </tr>
+            </thead>
+            <tbody>
+              ${students.map((st, idx) => `
+                <tr>
+                  <td class="text-center font-bold">${idx + 1}</td>
+                  <td>${st.full_name}</td>
+                  <td class="text-center">${st.class_name || 'XII IPA 1'}</td>
+                  ${qIds.map(qId => {
+                    const key = answerKeys[qId] || 'C';
+                    const ans = (st.answers && st.answers[qId] && st.answers[qId].a) ? st.answers[qId].a.toUpperCase() : '-';
+                    const isRight = ans === key;
+                    return `<td class="text-center" style="background-color:${isRight ? '#f0fdf4' : '#fef2f2'}; font-weight:${isRight ? 'bold' : 'normal'}; color:${isRight ? '#15803d' : '#b91c1c'};">${ans} (${isRight ? '1' : '0'})</td>`;
+                  }).join('')}
+                  <td class="text-center font-bold">${st.correct_count}</td>
+                  <td class="text-center font-bold">${(st.score || 0).toFixed(2)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <!-- BAGIAN 4: TABEL ANALISIS BUTIR SOAL LENGKAP -->
+          <table>
+            <thead>
+              <tr><th colspan="17" class="sec-header">BAGIAN IV: TABEL ANALISIS BUTIR SOAL LENGKAP (TINGKAT KESUKARAN, DAYA PEMBEDA, & PENGECOH)</th></tr>
+              <tr>
+                <th class="th-main" rowspan="2" style="width:35px;">No</th>
+                <th class="th-main" rowspan="2" style="width:50px;">Kunci</th>
+                <th class="th-main" colspan="5">Distribusi Pilihan Siswa</th>
+                <th class="th-main" rowspan="2" style="width:50px;">Benar (B)</th>
+                <th class="th-main" rowspan="2" style="width:50px;">Salah (S)</th>
+                <th class="th-main" colspan="2">Tingkat Kesukaran (P)</th>
+                <th class="th-main" colspan="3">Daya Pembeda (D)</th>
+                <th class="th-main" rowspan="2" style="width:190px;">Efektivitas Pengecoh</th>
+                <th class="th-main" rowspan="2" style="width:180px;">Rekomendasi Butir</th>
+              </tr>
+              <tr>
+                <th class="th-sub" style="width:35px;">A</th>
+                <th class="th-sub" style="width:35px;">B</th>
+                <th class="th-sub" style="width:35px;">C</th>
+                <th class="th-sub" style="width:35px;">D</th>
+                <th class="th-sub" style="width:35px;">E</th>
+                <th class="th-sub" style="width:60px;">Nilai P</th>
+                <th class="th-sub" style="width:75px;">Kategori</th>
+                <th class="th-sub" style="width:40px;">BA</th>
+                <th class="th-sub" style="width:40px;">BB</th>
+                <th class="th-sub" style="width:75px;">Indeks D</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemAnalysis.map(it => `
+                <tr>
+                  <td class="text-center font-bold">#${it.qNum}</td>
+                  <td class="text-center badge-key font-bold">${it.key}</td>
+                  <td class="text-center ${it.key === 'A' ? 'font-bold bg-amber-100' : ''}">${it.optCounts.A} (${(it.optCounts.A / totalStudents * 100).toFixed(0)}%)</td>
+                  <td class="text-center ${it.key === 'B' ? 'font-bold bg-amber-100' : ''}">${it.optCounts.B} (${(it.optCounts.B / totalStudents * 100).toFixed(0)}%)</td>
+                  <td class="text-center ${it.key === 'C' ? 'font-bold bg-amber-100' : ''}">${it.optCounts.C} (${(it.optCounts.C / totalStudents * 100).toFixed(0)}%)</td>
+                  <td class="text-center ${it.key === 'D' ? 'font-bold bg-amber-100' : ''}">${it.optCounts.D} (${(it.optCounts.D / totalStudents * 100).toFixed(0)}%)</td>
+                  <td class="text-center ${it.key === 'E' ? 'font-bold bg-amber-100' : ''}">${it.optCounts.E} (${(it.optCounts.E / totalStudents * 100).toFixed(0)}%)</td>
+                  <td class="text-center font-bold" style="color:#16a34a;">${it.correctCount}</td>
+                  <td class="text-center font-bold" style="color:#dc2626;">${it.wrongCount}</td>
+                  <td class="text-center font-bold">${it.pVal.toFixed(2)}</td>
+                  <td class="${it.pClass}">${it.pCategory}</td>
+                  <td class="text-center">${it.correctUpper}</td>
+                  <td class="text-center">${it.correctLower}</td>
+                  <td class="${it.dClass}">${it.dVal.toFixed(2)} (${it.dCategory})</td>
+                  <td style="font-size:9pt;">${it.distractorSummary}</td>
+                  <td class="font-bold" style="font-size:9pt;">${it.recommendation}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <!-- KETERANGAN KLASIFIKASI KEMENDIKBUDRISTEK -->
+          <table>
+            <thead>
+              <tr><th colspan="2" class="sec-header">PEDOMAN INTERPRETASI ANALISIS BUTIR SOAL RESMI:</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="width:50%; vertical-align:top; font-size:9pt;">
+                  <strong>Tingkat Kesukaran (P = B / N):</strong><br>
+                  • P &gt; 0.70 : Kategori <strong>Mudah</strong><br>
+                  • 0.30 ≤ P ≤ 0.70 : Kategori <strong>Sedang (Ideal)</strong><br>
+                  • P &lt; 0.30 : Kategori <strong>Sukar</strong>
+                </td>
+                <td style="width:50%; vertical-align:top; font-size:9pt;">
+                  <strong>Daya Pembeda (D = (BA - BB) / n):</strong><br>
+                  • D ≥ 0.40 : Kategori <strong>Sangat Baik</strong> (Diterima)<br>
+                  • 0.30 ≤ D &lt; 0.40 : Kategori <strong>Baik</strong> (Diterima)<br>
+                  • 0.20 ≤ D &lt; 0.30 : Kategori <strong>Cukup</strong> (Revisi Minor)<br>
+                  • D &lt; 0.20 : Kategori <strong>Buruk / Dibuang</strong> (Perlu Ganti Soal)
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- LEMBAR PENGESAHAN & TANDA TANGAN -->
+          <table>
+            <tr>
+              <td colspan="6" style="border:none;"></td>
+              <td colspan="6" class="text-center" style="border:none; font-size:10pt;">${profile.city || 'Jakarta'}, ${currentDate}</td>
+            </tr>
+            <tr>
+              <td colspan="6" class="text-center" style="border:none; font-size:10pt;">Mengetahui,<br>Kepala Sekolah</td>
+              <td colspan="6" class="text-center" style="border:none; font-size:10pt;">Guru Mata Pelajaran / Proktor</td>
+            </tr>
+            <tr><td colspan="12" style="border:none; height:45px;"></td></tr>
+            <tr>
+              <td colspan="6" class="text-center font-bold" style="border:none; font-size:10.5pt; text-decoration:underline;">${profile.headmaster_name || 'Drs. H. Ahmad Fauzi, M.Pd.'}</td>
+              <td colspan="6" class="text-center font-bold" style="border:none; font-size:10.5pt; text-decoration:underline;">Drs. Budi Pratama, M.Pd.</td>
+            </tr>
+            <tr>
+              <td colspan="6" class="text-center" style="border:none; font-size:9pt; color:#475569;">NIP. ${profile.headmaster_nip || '19710815 199802 1 003'}</td>
+              <td colspan="6" class="text-center" style="border:none; font-size:9pt; color:#475569;">NIP. 19800512 200501 1 008</td>
+            </tr>
+          </table>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const safeTitle = (sch.title || 'Ujian_CBT').replace(/[^a-zA-Z0-9_\-]/g, '_');
+      a.href = url;
+      a.download = `Analisis_Butir_Soal_Jadwal_${sch.id}_${safeTitle}.xls`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+
+    // Ekspor CSV Sederhana (Fallback)
     window.exportNilaiCSV = function() {
-      const schedSelect = document.getElementById('proctorScheduleFilter');
-      const schedText = schedSelect ? schedSelect.options[schedSelect.selectedIndex]?.text || 'Jadwal CBT' : 'Jadwal CBT';
-      let csvContent = `data:text/csv;charset=utf-8,Jadwal Ujian: "${schedText}"\nPeringkat,NISN,Nama Siswa,Kelas,Benar,Salah,Nilai Akhir,Status\n`;
-      lastProctorSessionsData.forEach((s, idx) => {
-        csvContent += `#${idx + 1},${s.username},"${s.full_name}",${s.class_name || 'XII IPA 1'},${s.correct_count},${s.wrong_count},${s.score.toFixed(2)},${s.is_passed ? 'TUNTAS' : 'REMIDIAL'}\n`;
+      const schId = getNilaiSelectedScheduleId();
+      const sch = lastNilaiScheduleInfo || { id: schId, title: 'Jadwal CBT' };
+      let csvContent = `data:text/csv;charset=utf-8,Jadwal Ujian: "${sch.title}"\nPeringkat,NISN,Nama Siswa,Kelas,Benar,Salah,Nilai Akhir,Status\n`;
+      (lastNilaiSessionsData || []).forEach((s, idx) => {
+        csvContent += `#${idx + 1},${s.nisn || s.username},"${s.full_name}",${s.class_name || 'XII IPA 1'},${s.correct_count},${s.wrong_count},${(s.score || 0).toFixed(2)},${(s.score || 0) >= 75 ? 'TUNTAS' : 'REMIDIAL'}\n`;
       });
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `rekap_nilai_cbt_jadwal_${schedSelect ? schedSelect.value : '1'}.csv`);
+      link.setAttribute("download", `rekap_nilai_cbt_jadwal_${schId}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

@@ -62,7 +62,7 @@
     "shuffle_options": true,
     "class_target": "XII IPA 2",
     "package_url": "/static/packages/exam_5_enc.json",
-    "is_active": false
+    "is_active": true
   },
   {
     "id": 6,
@@ -88,7 +88,7 @@
     "shuffle_options": true,
     "class_target": "Semua Kelas",
     "package_url": "/static/packages/exam_7_enc.json",
-    "is_active": false
+    "is_active": true
   },
   {
     "id": 8,
@@ -101,6 +101,6 @@
     "shuffle_options": true,
     "class_target": "Semua Kelas",
     "package_url": "/static/packages/exam_8_enc.json",
-    "is_active": false
+    "is_active": true
   }
 ]

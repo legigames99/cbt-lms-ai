@@ -576,6 +576,57 @@ const studentSessions = {
 const scheduleExtraMinutes = {};
 const studentExtraMinutes = {};
 
+// Inisialisasi Sample Jawaban Siswa & Sesi Realistis untuk Seluruh Jadwal
+function initSampleStudentSessions() {
+  const answerKeys = { 1: 'C', 2: 'B', 3: 'C', 4: 'B', 5: 'C' };
+  const allOptions = ['A', 'B', 'C', 'D', 'E'];
+
+  for (const sch of SCHEDULES) {
+    const students = USERS.filter((u) => u.role === 'student');
+    for (const st of students) {
+      const sessionKey = `${sch.id}_${st.id}`;
+      if (!studentAnswersStore[sessionKey] || Object.keys(studentAnswersStore[sessionKey]).length === 0) {
+        studentAnswersStore[sessionKey] = {};
+        const stSeed = (st.id * 17 + sch.id * 31) % 100;
+        let numWrong = 0;
+        if (stSeed < 30) numWrong = 0; // 100%
+        else if (stSeed < 70) numWrong = 1; // 80%
+        else if (stSeed < 90) numWrong = 2; // 60%
+        else numWrong = 3; // 40%
+
+        const wrongQuestions = [(stSeed % 5) + 1, ((stSeed + 2) % 5) + 1, ((stSeed + 3) % 5) + 1].slice(0, numWrong);
+
+        for (let q = 1; q <= 5; q++) {
+          const correct = answerKeys[q] || 'C';
+          let chosen = correct;
+          if (wrongQuestions.includes(q)) {
+            const distractors = allOptions.filter((o) => o !== correct);
+            chosen = distractors[(stSeed + q) % distractors.length];
+          }
+          studentAnswersStore[sessionKey][q] = {
+            a: chosen,
+            d: (stSeed % 6 === 0 && q === 2) ? 1 : 0,
+          };
+        }
+      }
+
+      if (!studentSessions[sessionKey]) {
+        const isCompleted = sch.is_active === false || (st.id % 6 !== 0);
+        studentSessions[sessionKey] = {
+          status: isCompleted ? 'submitted' : 'in_progress',
+          started_at: '21 Okt 2026 07.30.00 WIB',
+          submitted_at: isCompleted ? `21 Okt 2026 08.${20 + (st.id % 35)}.12 WIB` : null,
+          tab_violations: (st.id % 4 === 0) ? (st.id % 3) + 1 : 0,
+          ip_address: `192.168.1.${100 + (st.id % 100)}`,
+          answers: studentAnswersStore[sessionKey],
+        };
+      }
+    }
+  }
+}
+
+initSampleStudentSessions();
+
 // Helper Extract User from Bearer Token
 function getUserFromToken(req) {
   try {
@@ -1386,6 +1437,9 @@ const server = http.createServer(async (req, res) => {
         username: st.username,
         full_name: st.full_name,
         class_name: st.class_name,
+        nisn: st.nisn || '',
+        nis: st.nis || '',
+        exam_no: st.exam_no || '',
         status: sess.status || 'not_started',
         submitted_at: sess.submitted_at || null,
         started_at: sess.started_at || null,
@@ -1399,6 +1453,7 @@ const server = http.createServer(async (req, res) => {
         wrong_count: QUESTIONS.length - correctCount,
         is_passed: score >= 75,
         extra_minutes: schExtra + stExtra,
+        answers: userAnswers,
       };
     });
 
@@ -1412,8 +1467,18 @@ const server = http.createServer(async (req, res) => {
         duration_minutes: curSchedule.duration_minutes,
         token_code: curSchedule.token_code,
         start_time: curSchedule.start_time,
+        class_target: curSchedule.class_target,
         is_active: curSchedule.is_active !== false,
       },
+      questions: QUESTIONS.map((q) => ({
+        id: q.id,
+        stem: q.stem,
+        options: q.options,
+        weight: q.weight,
+        cog: q.cog,
+      })),
+      answer_keys: answerKeys,
+      school_profile: schoolProfile,
       schedules: SCHEDULES.map((s) => ({
         id: s.id,
         title: s.title,
@@ -1421,6 +1486,8 @@ const server = http.createServer(async (req, res) => {
         duration_minutes: s.duration_minutes,
         bank_name: s.bank_name,
         is_active: s.is_active !== false,
+        start_time: s.start_time,
+        class_target: s.class_target,
       })),
       server_time: new Date().toISOString(),
     });

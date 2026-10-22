@@ -6,6 +6,7 @@
   <title>Portal Utama - CBT & LMS AI Admin Suite</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="/static/js/xlsx.full.min.js"></script>
   <style>
     .nav-item.active {
       background-color: rgba(99, 102, 241, 0.2);
@@ -50,6 +51,7 @@
       #modalCreateBank,
       #modalExtendTime,
       #modalAddStudent,
+      #modalImportExcelStudents,
       .no-print {
         display: none !important;
       }
@@ -778,12 +780,15 @@
             <h3 class="text-lg font-bold text-white">Manajemen Data Siswa & Kartu Ujian</h3>
             <p class="text-xs text-slate-400">Kelola master siswa, ruang lab, sesi ujian, dan cetak kartu peserta resmi.</p>
           </div>
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-3 flex-wrap">
             <button onclick="switchTab('kartu-peserta')" class="px-4 py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition flex items-center gap-2">
               <i class="fa-solid fa-id-card-clip"></i> Menu Kartu Peserta →
             </button>
             <button onclick="openPrintCardsModal()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition flex items-center gap-2 shadow-lg shadow-emerald-600/30">
               <i class="fa-solid fa-print"></i> Cetak Kartu Siswa
+            </button>
+            <button onclick="openModal('modalImportExcelStudents')" class="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-xs font-bold text-white transition flex items-center gap-2 shadow-lg shadow-emerald-700/30">
+              <i class="fa-solid fa-file-excel"></i> Upload Siswa (Excel)
             </button>
             <button onclick="openModal('modalAddStudent')" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition flex items-center gap-2 shadow-lg shadow-indigo-600/30">
               <i class="fa-solid fa-user-plus"></i> Tambah Siswa Baru
@@ -2205,6 +2210,107 @@
         <button onclick="handleAddStudentSubmit()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/30">
           <i class="fa-solid fa-check"></i> Simpan Data Siswa
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 9: UPLOAD & IMPORT DATA SISWA (EXCEL .XLSX) ==================== -->
+  <div id="modalImportExcelStudents" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-4xl w-full p-6 shadow-2xl my-6 space-y-5 text-xs">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div>
+          <h4 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-file-excel text-emerald-400 text-base"></i> Import Data Siswa dari Berkas Excel (.xlsx / .xls)
+          </h4>
+          <p class="text-[11px] text-slate-400 mt-0.5">Unggah berkas Microsoft Excel untuk menambahkan atau memperbarui data siswa secara massal.</p>
+        </div>
+        <button onclick="closeModal('modalImportExcelStudents')" class="text-slate-400 hover:text-white transition">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+
+      <!-- Action: Download Template Excel & Panduan -->
+      <div class="bg-emerald-950/30 border border-emerald-500/30 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div class="space-y-1">
+          <div class="text-emerald-300 font-bold flex items-center gap-2">
+            <i class="fa-solid fa-circle-info text-emerald-400"></i> Belum Memiliki Format Excel Resmi?
+          </div>
+          <div class="text-[11px] text-slate-300">
+            Unduh contoh template tabel Excel siap isi lengkap dengan kolom: No. Peserta, Nama Siswa, NISN, NIS, Kelas, Username, Password CBT, Ruang, dan Sesi.
+          </div>
+        </div>
+        <button onclick="handleDownloadExcelTemplate()" class="shrink-0 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-600/30">
+          <i class="fa-solid fa-file-arrow-down"></i> Unduh Template Excel (.xlsx)
+        </button>
+      </div>
+
+      <!-- Area Upload Drag & Drop -->
+      <div id="excelDropZone" onclick="document.getElementById('excelFileInput').click()" class="border-2 border-dashed border-slate-700 hover:border-emerald-500/80 bg-slate-950/70 hover:bg-emerald-950/10 rounded-2xl p-6 text-center cursor-pointer transition space-y-2 group">
+        <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="hidden" onchange="handleExcelFileSelected(event)">
+        <div class="w-12 h-12 mx-auto rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl group-hover:scale-110 transition">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+        </div>
+        <div class="text-xs font-bold text-slate-200">
+          Klik untuk memilih berkas Excel atau tarik dan lepaskan file ke sini
+        </div>
+        <div class="text-[11px] text-slate-400">
+          Format berkas yang didukung: <span class="font-mono text-emerald-400 font-semibold">.XLSX</span> atau <span class="font-mono text-emerald-400 font-semibold">.XLS</span> (Microsoft Excel)
+        </div>
+        <div id="excelSelectedFileInfo" class="hidden text-xs font-mono font-bold text-emerald-300 bg-emerald-500/20 border border-emerald-500/40 rounded-lg py-1 px-3 inline-block">
+        </div>
+      </div>
+
+      <!-- Opsi Import -->
+      <div class="flex items-center justify-between text-xs bg-slate-950 p-3 rounded-xl border border-slate-800">
+        <label class="flex items-center gap-2 text-slate-300 cursor-pointer select-none">
+          <input type="checkbox" id="excelOptOverwrite" checked class="rounded text-indigo-600 w-4 h-4 bg-slate-900 border-slate-700">
+          <span>Timpa data siswa jika Username sudah ada (Perbarui data terdaftar)</span>
+        </label>
+        <span id="excelParsedCountBadge" class="hidden px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 font-bold font-mono">
+          0 Siswa Terbaca
+        </span>
+      </div>
+
+      <!-- Preview Table Container (Terisi saat file dipilih) -->
+      <div id="excelPreviewContainer" class="hidden space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-slate-300 flex items-center gap-2">
+            <i class="fa-solid fa-table-list text-emerald-400"></i> Pratinjau Data Siswa dari Excel:
+          </span>
+          <span id="excelPreviewCountNotice" class="text-[11px] text-slate-400">Menampilkan 5 data pertama</span>
+        </div>
+        <div class="max-h-56 overflow-y-auto border border-slate-800 rounded-xl">
+          <table class="w-full text-left text-[11px]">
+            <thead class="bg-slate-950 text-slate-400 sticky top-0 border-b border-slate-800">
+              <tr>
+                <th class="p-2">No</th>
+                <th class="p-2">No. Peserta</th>
+                <th class="p-2">Nama Lengkap</th>
+                <th class="p-2">Username</th>
+                <th class="p-2">Password CBT</th>
+                <th class="p-2">Kelas</th>
+                <th class="p-2">Ruang & Sesi</th>
+              </tr>
+            </thead>
+            <tbody id="excelPreviewTableBody" class="divide-y divide-slate-800 font-mono">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Footer Action -->
+      <div class="flex items-center justify-between pt-3 border-t border-slate-800">
+        <span id="excelImportStatusText" class="text-xs text-slate-400"></span>
+        <div class="flex items-center gap-2">
+          <button onclick="closeModal('modalImportExcelStudents')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+            Batal
+          </button>
+          <button id="btnExecuteExcelImport" disabled onclick="executeExcelStudentsImport()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-600/30">
+            <i class="fa-solid fa-file-import"></i> Mulai Simpan Data ke Sistem
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -4382,6 +4488,245 @@
         await fetchMasterStudents();
       } catch (err) {
         alert('Gagal menghapus siswa: ' + err.message);
+      }
+    };
+
+    // ==================== EXCEL IMPORT & TEMPLATE LOGIC ====================
+    let parsedExcelStudents = [];
+
+    // Unduh Template Excel Resmi (.xlsx)
+    window.handleDownloadExcelTemplate = function() {
+      if (typeof XLSX === 'undefined') {
+        alert('Modul Excel sedang disiapkan. Silakan coba kembali dalam beberapa detik.');
+        return;
+      }
+
+      const sampleData = [
+        {
+          "No": 1,
+          "No. Peserta": "26-01-05-1001",
+          "Nama Lengkap": "Ahmad Rizki Pratama",
+          "Username": "siswa_1001",
+          "Password CBT": "siswa123",
+          "NISN": "0078123451",
+          "NIS": "23241001",
+          "Kelas": "XII IPA 1",
+          "Jenis Kelamin": "Laki-laki",
+          "Ruang Ujian": "Ruang Lab Komputer 01",
+          "Sesi Ujian": "Sesi 1 (07:30 - 09:30)",
+          "Server": "SRV-01"
+        },
+        {
+          "No": 2,
+          "No. Peserta": "26-01-05-1002",
+          "Nama Lengkap": "Siti Nur Aisyah",
+          "Username": "siswa_1002",
+          "Password CBT": "siswa123",
+          "NISN": "0078123452",
+          "NIS": "23241002",
+          "Kelas": "XII IPA 1",
+          "Jenis Kelamin": "Perempuan",
+          "Ruang Ujian": "Ruang Lab Komputer 01",
+          "Sesi Ujian": "Sesi 1 (07:30 - 09:30)",
+          "Server": "SRV-01"
+        },
+        {
+          "No": 3,
+          "No. Peserta": "26-01-05-1003",
+          "Nama Lengkap": "Budi Santoso",
+          "Username": "siswa_1003",
+          "Password CBT": "siswa123",
+          "NISN": "0078123453",
+          "NIS": "23241003",
+          "Kelas": "XII IPA 2",
+          "Jenis Kelamin": "Laki-laki",
+          "Ruang Ujian": "Ruang Lab Komputer 02",
+          "Sesi Ujian": "Sesi 2 (10:00 - 12:00)",
+          "Server": "SRV-02"
+        }
+      ];
+
+      const worksheet = XLSX.utils.json_to_sheet(sampleData);
+      worksheet['!cols'] = [
+        { wch: 6 },
+        { wch: 18 },
+        { wch: 28 },
+        { wch: 16 },
+        { wch: 16 },
+        { wch: 14 },
+        { wch: 12 },
+        { wch: 14 },
+        { wch: 14 },
+        { wch: 25 },
+        { wch: 25 },
+        { wch: 10 }
+      ];
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Data_Siswa");
+      XLSX.writeFile(workbook, "Template_Data_Siswa_CBT.xlsx");
+    };
+
+    // Handler Pilih Berkas Excel & Parsing Otomatis
+    window.handleExcelFileSelected = function(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      if (typeof XLSX === 'undefined') {
+        alert('Pustaka pemroses Excel belum siap. Silakan refresh browser Anda.');
+        return;
+      }
+
+      const fileInfo = document.getElementById('excelSelectedFileInfo');
+      if (fileInfo) {
+        fileInfo.classList.remove('hidden');
+        fileInfo.innerText = `Berkas: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const rawRows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+
+          if (!rawRows || rawRows.length === 0) {
+            alert('File Excel kosong atau tidak ditemukan data pada sheet pertama!');
+            return;
+          }
+
+          parsedExcelStudents = rawRows.map((row, idx) => {
+            const getCol = (...keys) => {
+              for (const k of keys) {
+                for (const rk of Object.keys(row)) {
+                  if (rk.trim().toLowerCase() === k.toLowerCase()) {
+                    return String(row[rk]).trim();
+                  }
+                }
+              }
+              return '';
+            };
+
+            const fullName = getCol('Nama Lengkap', 'Nama Siswa', 'Nama', 'Full Name');
+            const username = getCol('Username', 'User Name', 'User', 'ID Siswa') || (fullName ? 'siswa_' + (1000 + idx + 1) : '');
+            const password = getCol('Password CBT', 'Password', 'Pass', 'Kata Sandi') || 'siswa123';
+            const examNo = getCol('No. Peserta', 'No Peserta', 'Nomor Peserta', 'No_Peserta');
+            const nisn = getCol('NISN', 'No NISN');
+            const nis = getCol('NIS', 'No Induk', 'Nomor Induk');
+            const className = getCol('Kelas / Rombel', 'Kelas', 'Rombel', 'Class') || 'XII IPA 1';
+            const gender = getCol('Jenis Kelamin', 'Gender', 'JK') || 'Laki-laki';
+            const room = getCol('Ruang & Sesi', 'Ruang Ujian', 'Ruang', 'Lab') || 'Ruang Lab Komputer 01';
+            const session = getCol('Sesi Ujian', 'Sesi', 'Session') || 'Sesi 1 (07:30 - 09:30)';
+            const server = getCol('Server', 'SRV') || 'SRV-01';
+
+            return {
+              full_name: fullName,
+              username: username,
+              password: password,
+              exam_no: examNo,
+              nisn: nisn,
+              nis: nis,
+              class_name: className,
+              gender: gender,
+              room: room,
+              session: session,
+              server: server
+            };
+          }).filter(s => s.full_name && s.username);
+
+          if (parsedExcelStudents.length === 0) {
+            alert('Tidak ditemukan data siswa yang valid pada berkas Excel! Pastikan kolom memiliki Nama Lengkap dan Username.');
+            return;
+          }
+
+          // Tampilkan badge jumlah
+          const badge = document.getElementById('excelParsedCountBadge');
+          if (badge) {
+            badge.classList.remove('hidden');
+            badge.innerText = `${parsedExcelStudents.length} Siswa Terbaca`;
+          }
+
+          // Tampilkan pratinjau tabel
+          const previewContainer = document.getElementById('excelPreviewContainer');
+          const previewTbody = document.getElementById('excelPreviewTableBody');
+          const notice = document.getElementById('excelPreviewCountNotice');
+          if (previewContainer && previewTbody) {
+            previewContainer.classList.remove('hidden');
+            if (notice) notice.innerText = `Menampilkan ${Math.min(5, parsedExcelStudents.length)} dari ${parsedExcelStudents.length} siswa`;
+            const previewRows = parsedExcelStudents.slice(0, 5);
+            previewTbody.innerHTML = previewRows.map((s, i) => `
+              <tr class="hover:bg-slate-800/40">
+                <td class="p-2 text-slate-400">${i + 1}</td>
+                <td class="p-2 text-indigo-400 font-bold">${s.exam_no || '-'}</td>
+                <td class="p-2 text-white font-sans">${s.full_name}</td>
+                <td class="p-2 text-emerald-400">${s.username}</td>
+                <td class="p-2 text-slate-300">${s.password}</td>
+                <td class="p-2 text-slate-300 font-sans">${s.class_name}</td>
+                <td class="p-2 text-slate-400 font-sans">${s.room} (${s.session})</td>
+              </tr>
+            `).join('');
+          }
+
+          const btnImport = document.getElementById('btnExecuteExcelImport');
+          if (btnImport) {
+            btnImport.disabled = false;
+            btnImport.innerHTML = `<i class="fa-solid fa-file-import"></i> Simpan ${parsedExcelStudents.length} Siswa ke Sistem`;
+          }
+        } catch (err) {
+          alert('Gagal memproses berkas Excel: ' + err.message);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    };
+
+    // Eksekusi Simpan Massal ke Server
+    window.executeExcelStudentsImport = async function() {
+      if (parsedExcelStudents.length === 0) return;
+
+      const btn = document.getElementById('btnExecuteExcelImport');
+      const status = document.getElementById('excelImportStatusText');
+      const overwrite = document.getElementById('excelOptOverwrite')?.checked ?? true;
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Mengimpor ${parsedExcelStudents.length} Siswa...`;
+      if (status) status.innerText = 'Mengunggah data siswa ke server...';
+
+      try {
+        const res = await fetch('/api/v1/master/students/bulk-import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            students: parsedExcelStudents,
+            overwrite: overwrite
+          })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+
+        alert(json.message || `Berhasil mengimpor ${parsedExcelStudents.length} data siswa!`);
+        closeModal('modalImportExcelStudents');
+        
+        // Reset state
+        parsedExcelStudents = [];
+        const fileInput = document.getElementById('excelFileInput');
+        if (fileInput) fileInput.value = '';
+        const previewContainer = document.getElementById('excelPreviewContainer');
+        if (previewContainer) previewContainer.classList.add('hidden');
+        const badge = document.getElementById('excelParsedCountBadge');
+        if (badge) badge.classList.add('hidden');
+        const fileInfo = document.getElementById('excelSelectedFileInfo');
+        if (fileInfo) fileInfo.classList.add('hidden');
+
+        // Refresh tabel siswa & kartu peserta
+        await fetchMasterStudents();
+      } catch (err) {
+        alert('Gagal mengimpor data siswa: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-file-import"></i> Mulai Simpan Data ke Sistem`;
+        if (status) status.innerText = '';
       }
     };
 

@@ -129,6 +129,39 @@ const USERS = [
   },
 ];
 
+// Persistensi Data Master Siswa (students.json)
+const STUDENTS_FILE = path.join(__dirname, 'students.json');
+
+function saveStudentsToFile() {
+  try {
+    const students = USERS.filter(u => u.role === 'student');
+    fs.writeFileSync(STUDENTS_FILE, JSON.stringify(students, null, 2), 'utf8');
+  } catch (e) {
+    console.error('Failed to save students.json:', e.message);
+  }
+}
+
+function loadStudentsFromFile() {
+  try {
+    if (fs.existsSync(STUDENTS_FILE)) {
+      const raw = fs.readFileSync(STUDENTS_FILE, 'utf8');
+      const saved = JSON.parse(raw);
+      if (Array.isArray(saved) && saved.length > 0) {
+        const nonStudents = USERS.filter(u => u.role !== 'student');
+        USERS.length = 0;
+        USERS.push(...nonStudents, ...saved);
+        console.log(`[Master Data] Memuat ${saved.length} siswa dari students.json`);
+        return;
+      }
+    }
+  } catch (e) {
+    console.error('Failed to load students.json:', e.message);
+  }
+  saveStudentsToFile();
+}
+
+loadStudentsFromFile();
+
 // Profile & Konfigurasi Sekolah (Settings & Kop Kartu Peserta)
 const SCHOOL_PROFILE_PATH = path.join(__dirname, 'school_profile.json');
 const DEFAULT_SCHOOL_PROFILE = {
@@ -413,26 +446,23 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     return fs.createReadStream(path.join(WEB_DIR, 'student.html')).pipe(res);
   }
-  if (pathname.startsWith('/static/packages/')) {
-    const filename = path.basename(pathname);
-    const filePath = path.join(STATIC_PKG_DIR, filename);
-    if (fs.existsSync(filePath)) {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      return fs.createReadStream(filePath).pipe(res);
-    }
-  }
-  if (pathname.startsWith('/static/uploads/')) {
-    const filename = path.basename(pathname);
-    const filePath = path.join(STATIC_UPLOADS_DIR, filename);
-    if (fs.existsSync(filePath)) {
+  if (pathname.startsWith('/static/')) {
+    const safeRel = path.normalize(pathname.replace(/^\/static\//, '')).replace(/^(\.\.[\/\\])+/, '');
+    const filePath = path.join(__dirname, 'static', safeRel);
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
       const ext = path.extname(filePath).toLowerCase();
       const mimeTypes = {
+        '.js': 'application/javascript; charset=utf-8',
+        '.css': 'text/css; charset=utf-8',
         '.png': 'image/png',
         '.jpg': 'image/jpeg',
         '.jpeg': 'image/jpeg',
         '.gif': 'image/gif',
         '.svg': 'image/svg+xml',
-        '.webp': 'image/webp'
+        '.webp': 'image/webp',
+        '.json': 'application/json',
+        '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        '.xls': 'application/vnd.ms-excel'
       };
       res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' });
       return fs.createReadStream(filePath).pipe(res);
@@ -677,10 +707,89 @@ const server = http.createServer(async (req, res) => {
       server: body.server || 'SRV-01',
     };
     USERS.push(newStudent);
+    saveStudentsToFile();
     return sendJSON(200, {
       status: 'success',
       message: `Siswa baru ${newStudent.full_name} berhasil ditambahkan!`,
       data: newStudent,
+    });
+  }
+
+  // POST /api/v1/master/students/bulk-import (Import Massal Siswa via Excel)
+  if (pathname === '/api/v1/master/students/bulk-import' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const list = body.students || [];
+    const overwrite = body.overwrite !== false;
+
+    if (!Array.isArray(list) || list.length === 0) {
+      return sendJSON(400, { status: 'error', message: 'Data siswa dari file Excel kosong atau tidak valid!' });
+    }
+
+    let addedCount = 0;
+    let updatedCount = 0;
+    let skippedCount = 0;
+    let maxId = Math.max(...USERS.map(u => u.id || 0), 1000);
+
+    for (const item of list) {
+      const username = (item.username || '').toString().trim();
+      const fullName = (item.full_name || item.name || item.nama || item.student_name || '').toString().trim();
+      if (!username || !fullName) {
+        skippedCount++;
+        continue;
+      }
+
+      const existingIdx = USERS.findIndex(u => u.username === username);
+      if (existingIdx !== -1) {
+        if (overwrite) {
+          USERS[existingIdx] = {
+            ...USERS[existingIdx],
+            full_name: fullName,
+            pass: item.password || item.pass || USERS[existingIdx].pass || 'siswa123',
+            class_name: item.class_name || item.class || USERS[existingIdx].class_name || 'XII IPA 1',
+            nisn: item.nisn || USERS[existingIdx].nisn || '',
+            nis: item.nis || USERS[existingIdx].nis || '',
+            exam_no: item.exam_no || USERS[existingIdx].exam_no || '',
+            gender: item.gender || USERS[existingIdx].gender || 'Laki-laki',
+            room: item.room || item.lab || USERS[existingIdx].room || 'Ruang Lab Komputer 01',
+            session: item.session || USERS[existingIdx].session || 'Sesi 1 (07:30 - 09:30)',
+            server: item.server || USERS[existingIdx].server || 'SRV-01',
+          };
+          updatedCount++;
+        } else {
+          skippedCount++;
+        }
+      } else {
+        maxId++;
+        const newStudent = {
+          id: maxId,
+          username: username,
+          pass: item.password || item.pass || 'siswa123',
+          full_name: fullName,
+          role: 'student',
+          class_name: item.class_name || item.class || 'XII IPA 1',
+          nisn: item.nisn || `007812${maxId}`,
+          nis: item.nis || `2324${maxId}`,
+          exam_no: item.exam_no || `26-01-05-${maxId}`,
+          birth_place_date: item.birth_place_date || 'Jakarta, 01 Januari 2008',
+          gender: item.gender || 'Laki-laki',
+          room: item.room || item.lab || 'Ruang Lab Komputer 01',
+          session: item.session || 'Sesi 1 (07:30 - 09:30)',
+          server: item.server || 'SRV-01',
+        };
+        USERS.push(newStudent);
+        addedCount++;
+      }
+    }
+
+    saveStudentsToFile();
+
+    return sendJSON(200, {
+      status: 'success',
+      message: `Import Excel berhasil! ${addedCount} siswa baru ditambahkan, ${updatedCount} diperbarui, ${skippedCount} dilewati.`,
+      added: addedCount,
+      updated: updatedCount,
+      skipped: skippedCount,
+      total: USERS.filter(u => u.role === 'student').length,
     });
   }
 
@@ -691,6 +800,7 @@ const server = http.createServer(async (req, res) => {
     const idx = USERS.findIndex(u => u.id === studentId);
     if (idx !== -1) {
       const removed = USERS.splice(idx, 1)[0];
+      saveStudentsToFile();
       return sendJSON(200, {
         status: 'success',
         message: `Siswa ${removed.full_name} (${removed.username}) berhasil dihapus!`,

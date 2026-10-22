@@ -50,6 +50,7 @@
       #modalEditSchedule,
       #modalCreateBank,
       #modalExtendTime,
+      #modalBulkResetProctor,
       #modalAddStudent,
       #modalImportExcelStudents,
       .no-print {
@@ -646,7 +647,11 @@
             </h3>
             <p class="text-xs text-slate-400">Pantau status pengerjaan, jawaban tersinkronisasi, dan deteksi perpindahan tab browser siswa.</p>
           </div>
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-3 flex-wrap">
+            <button onclick="openModalBulkResetProctor()" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-amber-500/10" title="Reset Sesi Siswa Secara Massal / Bulk">
+              <i class="fa-solid fa-rotate-left text-sm"></i>
+              <span>Reset Massal (Bulk Reset)</span>
+            </button>
             <button onclick="openModalExtendTime()" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-amber-500/10">
               <i class="fa-solid fa-clock-rotate-left text-sm"></i>
               <span>Tambah Waktu</span>
@@ -662,13 +667,46 @@
           </div>
         </div>
 
+        <!-- Action Bar Saat Ada Sesi Siswa Dipilih di Live Proktor -->
+        <div id="proctorBulkActionBar" class="hidden bg-gradient-to-r from-amber-950/80 via-slate-900 to-indigo-950/80 border border-amber-500/40 rounded-2xl p-3 px-4 flex flex-wrap items-center justify-between gap-3 text-xs transition shadow-lg shadow-amber-950/30">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center font-bold text-sm">
+              <i class="fa-solid fa-users-gear"></i>
+            </span>
+            <div>
+              <span id="proctorSelectedCountText" class="font-bold text-white text-sm">0 Siswa Dipilih</span>
+              <span class="text-slate-400 text-[11px] block sm:inline sm:ml-2">Tindakan massal untuk siswa yang dicentang:</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button onclick="handleBulkResetSelected('login_only')" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold transition flex items-center gap-1.5" title="Siswa dapat login kembali tanpa kehilangan jawaban">
+              <i class="fa-solid fa-rotate-left"></i> Reset Login (<span class="proctorSelectedBadge">0</span>)
+            </button>
+            <button onclick="handleBulkResetSelected('full')" class="px-3.5 py-1.5 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/40 font-bold transition flex items-center gap-1.5" title="Reset total dan kosongkan lembar jawaban siswa">
+              <i class="fa-solid fa-trash-can"></i> Reset Penuh (<span class="proctorSelectedBadge">0</span>)
+            </button>
+            <button onclick="handleBulkForceFinishSelected()" class="px-3.5 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold transition flex items-center gap-1.5" title="Kunci selesai ujian langsung">
+              <i class="fa-solid fa-lock"></i> Kunci Selesai (<span class="proctorSelectedBadge">0</span>)
+            </button>
+            <button onclick="handleBulkExtendTimeSelected()" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold transition flex items-center gap-1.5">
+              <i class="fa-solid fa-clock-rotate-left"></i> +Waktu (<span class="proctorSelectedBadge">0</span>)
+            </button>
+            <button onclick="clearProctorSelection()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium transition">
+              Batal Pilihan
+            </button>
+          </div>
+        </div>
+
         <!-- Tabel Monitoring Siswa -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
           <div class="overflow-x-auto">
             <table class="w-full text-xs text-left">
               <thead class="text-slate-400 bg-slate-950 uppercase text-[10px] tracking-wider">
                 <tr>
-                  <th class="px-4 py-3 rounded-l-lg">NISN / Username</th>
+                  <th class="px-3 py-3 rounded-l-lg w-10 text-center">
+                    <input type="checkbox" id="selectAllProctorCheckbox" onchange="handleSelectAllProctor(this.checked)" class="w-4 h-4 rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-0 cursor-pointer" title="Pilih Semua Siswa di Tabel">
+                  </th>
+                  <th class="px-4 py-3">NISN / Username</th>
                   <th class="px-4 py-3">Nama Siswa</th>
                   <th class="px-4 py-3">Kelas</th>
                   <th class="px-4 py-3">Status</th>
@@ -681,7 +719,7 @@
               <tbody id="proctorSessionsTable" class="divide-y divide-slate-800 text-slate-300">
                 <!-- Data sesi live proktor akan di-render otomatis via JavaScript realtime tanpa refresh -->
                 <tr>
-                  <td colspan="8" class="px-4 py-8 text-center text-slate-400">
+                  <td colspan="9" class="px-4 py-8 text-center text-slate-400">
                     <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Menghubungkan ke monitor live proktor...
                   </td>
                 </tr>
@@ -2080,6 +2118,89 @@
     </div>
   </div>
 
+  <!-- ==================== MODAL: RESET MASSAL PROKTOR ==================== -->
+  <div id="modalBulkResetProctor" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 text-xs">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <h4 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-rotate-left text-amber-400"></i> Reset Sesi Ujian Massal (Bulk Reset)
+        </h4>
+        <button onclick="closeModal('modalBulkResetProctor')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Target Siswa yang Di-reset -->
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1.5">Pilih Target Siswa:</label>
+          <div class="space-y-2">
+            <label id="optTargetSelectedLabel" class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-950 border border-slate-800 cursor-pointer hover:border-amber-500/50 transition">
+              <input type="radio" name="bulkResetTarget" value="selected" id="radioResetSelected" onchange="toggleBulkResetTargetUI()" class="text-amber-500 focus:ring-0">
+              <span class="text-slate-200 font-semibold">Siswa Terpilih di Tabel (<span id="bulkResetSelectedCount" class="text-amber-400 font-bold">0</span> Siswa)</span>
+            </label>
+            <label class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-950 border border-slate-800 cursor-pointer hover:border-amber-500/50 transition">
+              <input type="radio" name="bulkResetTarget" value="class" id="radioResetClass" checked onchange="toggleBulkResetTargetUI()" class="text-amber-500 focus:ring-0">
+              <span class="text-slate-200 font-semibold">Semua Siswa pada Kelas Aktif (<span id="bulkResetActiveClassName" class="text-indigo-400 font-bold">XII IPA 1</span>)</span>
+            </label>
+            <label class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-950 border border-slate-800 cursor-pointer hover:border-amber-500/50 transition">
+              <input type="radio" name="bulkResetTarget" value="all" id="radioResetAll" onchange="toggleBulkResetTargetUI()" class="text-amber-500 focus:ring-0">
+              <span class="text-slate-200 font-semibold">Seluruh Siswa CBT (Semua Kelas)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Filter Status Sesi -->
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1.5">Filter Status Sesi Siswa:</label>
+          <select id="bulkResetStatusFilter" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
+            <option value="all">Semua Status (Mengerjakan, Selesai, Belum Mulai)</option>
+            <option value="submitted">Hanya Siswa Selesai / Terkunci (Submitted)</option>
+            <option value="in_progress">Hanya Siswa Sedang Mengerjakan (In Progress)</option>
+          </select>
+        </div>
+
+        <!-- Jenis Tindakan Reset -->
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1.5">Pilih Tindakan Reset:</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <label class="flex flex-col p-3 rounded-xl bg-slate-950 border-2 border-amber-500/60 cursor-pointer transition hover:bg-slate-900" id="cardResetTypeLogin">
+              <div class="flex items-center gap-2 font-bold text-amber-300">
+                <input type="radio" name="bulkResetType" value="login_only" checked onchange="handleResetTypeChange('login_only')" class="text-amber-500 focus:ring-0">
+                <span>Reset Login Saja</span>
+              </div>
+              <span class="text-[11px] text-slate-400 mt-1 leading-normal">
+                Siswa dapat login & lanjut tes. <strong class="text-emerald-300">Jawaban siswa tetap aman tersimpan</strong> (Rekomendasi saat PC mati / restart).
+              </span>
+            </label>
+            <label class="flex flex-col p-3 rounded-xl bg-slate-950 border-2 border-slate-800 cursor-pointer transition hover:bg-slate-900" id="cardResetTypeFull">
+              <div class="flex items-center gap-2 font-bold text-rose-300">
+                <input type="radio" name="bulkResetType" value="full" onchange="handleResetTypeChange('full')" class="text-rose-500 focus:ring-0">
+                <span>Reset Penuh (Ulang)</span>
+              </div>
+              <span class="text-[11px] text-slate-400 mt-1 leading-normal">
+                Sesi dan <strong class="text-rose-400">seluruh jawaban akan dihapus</strong>. Siswa wajib mengulang tes dari nomor 1.
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Catatan Keamanan -->
+        <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200/90 text-[11px] flex items-start gap-2.5">
+          <i class="fa-solid fa-circle-exclamation text-amber-400 mt-0.5 text-sm"></i>
+          <div>
+            <strong>Catatan Proktor:</strong> Reset massal langsung diterapkan secara instan ke server CBT tanpa perlu restart server.
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+        <button type="button" onclick="closeModal('modalBulkResetProctor')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Batal</button>
+        <button type="button" id="btnExecuteBulkReset" onclick="executeBulkResetProctor()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition flex items-center gap-2 shadow-lg shadow-amber-500/30">
+          <i class="fa-solid fa-rotate-left"></i> Eksekusi Reset Sesi
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== MODAL 7: CETAK KARTU PESERTA UJIAN (A4 FORMAT) ==================== -->
   <div id="modalPrintCards" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 overflow-y-auto p-4 flex justify-center items-start">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-5xl w-full p-6 shadow-2xl my-6 space-y-5">
@@ -2882,8 +3003,12 @@
           ? `<span class="text-rose-400 font-bold font-mono">${s.tab_violations}x Tab Keluar</span>`
           : `<span class="text-slate-400 font-mono">0x</span>`;
 
+        const isChecked = window.selectedProctorUsernames && window.selectedProctorUsernames.has(s.username);
         return `
-          <tr class="hover:bg-slate-800/40 transition">
+          <tr class="hover:bg-slate-800/40 transition proctor-row ${isChecked ? 'bg-amber-950/20' : ''}" id="proctorRow_${s.username}">
+            <td class="px-3 py-3.5 text-center">
+              <input type="checkbox" class="proctor-select-cb w-4 h-4 rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-0 cursor-pointer" value="${s.username}" onchange="handleProctorCheckboxChange()" ${isChecked ? 'checked' : ''}>
+            </td>
             <td class="px-4 py-3.5 font-mono text-slate-400">${s.username}</td>
             <td class="px-4 py-3.5 font-bold text-white">${s.full_name}</td>
             <td class="px-4 py-3.5">${s.class_name || 'XII IPA 1'}</td>
@@ -2895,6 +3020,8 @@
           </tr>
         `;
       }).join('');
+
+      if (typeof updateProctorSelectionUI === 'function') updateProctorSelectionUI();
     }
 
     function renderNilaiTable(students) {
@@ -2945,16 +3072,22 @@
     };
 
     // Reset Sesi Ujian Siswa (Proktor)
-    window.handleResetSession = async function(username) {
-      if (!confirm(`Reset sesi ujian untuk ${username}? Siswa akan diizinkan login dan mengerjakan kembali dari awal.`)) return;
+    window.handleResetSession = async function(username, resetType = 'login_only') {
+      const isLoginOnly = resetType === 'login_only';
+      const promptText = isLoginOnly
+        ? `Reset Login untuk ${username}?\nSiswa diizinkan login kembali dan melanjutkan pengerjaan (jawaban tetap tersimpan).`
+        : `Reset Sesi Ujian Penuh untuk ${username}?\nSesi dan seluruh jawaban akan dihapus agar siswa mulai dari awal.`;
+
+      if (!confirm(promptText)) return;
       try {
         const res = await fetch('/api/v1/cbt/proctor/reset-session', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username })
+          body: JSON.stringify({ username, reset_type: resetType })
         });
         const json = await res.json();
         alert(json.message || 'Sesi berhasil direset!');
+        lastProctorDataHash = '';
         await fetchProctorSessions(); // Langsung update UI tanpa refresh
       } catch (err) {
         alert('Gagal mereset sesi: ' + err.message);
@@ -2972,10 +3105,276 @@
         });
         const json = await res.json();
         alert(json.message || 'Ujian berhasil dikunci selesai!');
+        lastProctorDataHash = '';
         await fetchProctorSessions(); // Langsung update UI tanpa refresh
       } catch (err) {
         alert('Gagal mengunci ujian: ' + err.message);
       }
+    };
+
+    // ==============================================================
+    // SELEKSI & BULK RESET SESI PROKTOR
+    // ==============================================================
+    window.selectedProctorUsernames = new Set();
+
+    window.updateProctorSelectionUI = function() {
+      const cbs = document.querySelectorAll('.proctor-select-cb');
+      const allCb = document.getElementById('selectAllProctorCheckbox');
+      const actionBar = document.getElementById('proctorBulkActionBar');
+      const countText = document.getElementById('proctorSelectedCountText');
+      const badges = document.querySelectorAll('.proctorSelectedBadge');
+      const modalCount = document.getElementById('bulkResetSelectedCount');
+
+      const checkedCount = window.selectedProctorUsernames ? window.selectedProctorUsernames.size : 0;
+
+      if (allCb) {
+        if (cbs.length > 0 && checkedCount === cbs.length) {
+          allCb.checked = true;
+          allCb.indeterminate = false;
+        } else if (checkedCount > 0) {
+          allCb.checked = false;
+          allCb.indeterminate = true;
+        } else {
+          allCb.checked = false;
+          allCb.indeterminate = false;
+        }
+      }
+
+      badges.forEach(b => b.innerText = checkedCount);
+      if (countText) countText.innerText = `${checkedCount} Siswa Dipilih`;
+      if (modalCount) modalCount.innerText = checkedCount;
+
+      if (actionBar) {
+        if (checkedCount > 0) {
+          actionBar.classList.remove('hidden');
+        } else {
+          actionBar.classList.add('hidden');
+        }
+      }
+
+      cbs.forEach(cb => {
+        const row = document.getElementById(`proctorRow_${cb.value}`);
+        if (row) {
+          if (cb.checked) {
+            row.classList.add('bg-amber-950/20');
+          } else {
+            row.classList.remove('bg-amber-950/20');
+          }
+        }
+      });
+    };
+
+    window.handleSelectAllProctor = function(checked) {
+      if (!window.selectedProctorUsernames) window.selectedProctorUsernames = new Set();
+      const cbs = document.querySelectorAll('.proctor-select-cb');
+      cbs.forEach(cb => {
+        cb.checked = checked;
+        if (checked) {
+          window.selectedProctorUsernames.add(cb.value);
+        } else {
+          window.selectedProctorUsernames.delete(cb.value);
+        }
+      });
+      window.updateProctorSelectionUI();
+    };
+
+    window.handleProctorCheckboxChange = function() {
+      if (!window.selectedProctorUsernames) window.selectedProctorUsernames = new Set();
+      const cbs = document.querySelectorAll('.proctor-select-cb');
+      window.selectedProctorUsernames.clear();
+      cbs.forEach(cb => {
+        if (cb.checked) window.selectedProctorUsernames.add(cb.value);
+      });
+      window.updateProctorSelectionUI();
+    };
+
+    window.clearProctorSelection = function() {
+      if (window.selectedProctorUsernames) window.selectedProctorUsernames.clear();
+      const cbs = document.querySelectorAll('.proctor-select-cb');
+      cbs.forEach(cb => cb.checked = false);
+      const allCb = document.getElementById('selectAllProctorCheckbox');
+      if (allCb) {
+        allCb.checked = false;
+        allCb.indeterminate = false;
+      }
+      window.updateProctorSelectionUI();
+    };
+
+    // Buka Modal Reset Massal Proktor
+    window.openModalBulkResetProctor = function() {
+      const selectedCount = window.selectedProctorUsernames ? window.selectedProctorUsernames.size : 0;
+      const countSpan = document.getElementById('bulkResetSelectedCount');
+      if (countSpan) countSpan.innerText = selectedCount;
+
+      const activeFilterClass = document.getElementById('filterClassSelect')?.value || 'XII IPA 1';
+      const classNameSpan = document.getElementById('bulkResetActiveClassName');
+      if (classNameSpan) {
+        classNameSpan.innerText = activeFilterClass === 'all' ? 'Semua Kelas' : activeFilterClass;
+      }
+
+      const radioSelected = document.getElementById('radioResetSelected');
+      const radioClass = document.getElementById('radioResetClass');
+      if (selectedCount > 0) {
+        if (radioSelected) radioSelected.checked = true;
+      } else {
+        if (radioClass) radioClass.checked = true;
+      }
+
+      openModal('modalBulkResetProctor');
+    };
+
+    window.toggleBulkResetTargetUI = function() {
+      // Auto highlight option
+    };
+
+    window.handleResetTypeChange = function(type) {
+      const cardLogin = document.getElementById('cardResetTypeLogin');
+      const cardFull = document.getElementById('cardResetTypeFull');
+      if (type === 'login_only') {
+        if (cardLogin) {
+          cardLogin.classList.add('border-amber-500/60');
+          cardLogin.classList.remove('border-slate-800');
+        }
+        if (cardFull) {
+          cardFull.classList.add('border-slate-800');
+          cardFull.classList.remove('border-rose-500/60');
+        }
+      } else {
+        if (cardLogin) {
+          cardLogin.classList.remove('border-amber-500/60');
+          cardLogin.classList.add('border-slate-800');
+        }
+        if (cardFull) {
+          cardFull.classList.add('border-rose-500/60');
+          cardFull.classList.remove('border-slate-800');
+        }
+      }
+    };
+
+    // Eksekusi Reset Massal dari Modal
+    window.executeBulkResetProctor = async function() {
+      const targetType = document.querySelector('input[name="bulkResetTarget"]:checked')?.value || 'class';
+      const resetType = document.querySelector('input[name="bulkResetType"]:checked')?.value || 'login_only';
+      const statusFilter = document.getElementById('bulkResetStatusFilter')?.value || 'all';
+      const activeFilterClass = document.getElementById('filterClassSelect')?.value || 'XII IPA 1';
+
+      const usernames = window.selectedProctorUsernames ? Array.from(window.selectedProctorUsernames) : [];
+
+      if (targetType === 'selected' && usernames.length === 0) {
+        alert('Tidak ada siswa yang dipilih di tabel. Silakan pilih target kelas atau centang siswa terlebih dahulu.');
+        return;
+      }
+
+      const typeDesc = resetType === 'login_only'
+        ? 'Reset Login (Siswa login kembali, jawaban aman tersimpan)'
+        : 'Reset Penuh (Sesi & SELURUH jawaban siswa akan dihapus)';
+
+      const confirmMsg = `Konfirmasi Eksekusi Reset Sesi Massal:\n\nTarget: ${targetType.toUpperCase()}\nJenis Reset: ${typeDesc}\n\nApakah Anda yakin ingin menjalankan reset sesi massal?`;
+      if (!confirm(confirmMsg)) return;
+
+      const btn = document.getElementById('btnExecuteBulkReset');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Memproses Reset...`;
+      }
+
+      try {
+        const res = await fetch('/api/v1/cbt/proctor/bulk-reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            target_type: targetType,
+            reset_type: resetType,
+            usernames: usernames,
+            class_name: activeFilterClass,
+            status_filter: statusFilter,
+          })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+
+        alert(json.message || 'Reset sesi massal berhasil dieksekusi!');
+        closeModal('modalBulkResetProctor');
+        clearProctorSelection();
+        lastProctorDataHash = '';
+        await fetchProctorSessions();
+      } catch (err) {
+        alert('Gagal mengeksekusi reset massal: ' + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-rotate-left"></i> Eksekusi Reset Sesi`;
+        }
+      }
+    };
+
+    // Aksi Cepat Reset Terpilih dari Floating Action Bar
+    window.handleBulkResetSelected = async function(resetType = 'login_only') {
+      const usernames = window.selectedProctorUsernames ? Array.from(window.selectedProctorUsernames) : [];
+      if (usernames.length === 0) {
+        alert('Pilih minimal 1 siswa di tabel monitoring.');
+        return;
+      }
+
+      const desc = resetType === 'login_only'
+        ? `Reset Login untuk ${usernames.length} siswa terpilih?\n(Siswa dapat login kembali dan melanjutkan pengerjaan dengan jawaban tetap tersimpan)`
+        : `PERINGATAN: Reset Penuh untuk ${usernames.length} siswa terpilih?\n(Sesi dan SELURUH JAWABAN siswa akan dihapus sehingga siswa mengulang dari awal!)`;
+
+      if (!confirm(desc)) return;
+
+      try {
+        const res = await fetch('/api/v1/cbt/proctor/bulk-reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            target_type: 'selected',
+            reset_type: resetType,
+            usernames: usernames,
+          })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+
+        alert(json.message || `Berhasil mereset sesi ${usernames.length} siswa!`);
+        clearProctorSelection();
+        lastProctorDataHash = '';
+        await fetchProctorSessions();
+      } catch (err) {
+        alert('Gagal mereset sesi: ' + err.message);
+      }
+    };
+
+    // Kunci Selesai Massal untuk Siswa Terpilih
+    window.handleBulkForceFinishSelected = async function() {
+      const usernames = window.selectedProctorUsernames ? Array.from(window.selectedProctorUsernames) : [];
+      if (usernames.length === 0) {
+        alert('Pilih minimal 1 siswa di tabel monitoring.');
+        return;
+      }
+
+      if (!confirm(`Kunci selesai ujian untuk ${usernames.length} siswa terpilih? Lembar jawaban mereka akan langsung dikumpulkan permanen.`)) return;
+
+      try {
+        const res = await fetch('/api/v1/cbt/proctor/bulk-force-finish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ usernames: usernames })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+
+        alert(json.message || `Berhasil mengunci selesai ${usernames.length} siswa!`);
+        clearProctorSelection();
+        lastProctorDataHash = '';
+        await fetchProctorSessions();
+      } catch (err) {
+        alert('Gagal mengunci ujian: ' + err.message);
+      }
+    };
+
+    // Tambah Waktu Massal untuk Siswa Terpilih
+    window.handleBulkExtendTimeSelected = function() {
+      openModalExtendTime();
     };
 
     // ==============================================================

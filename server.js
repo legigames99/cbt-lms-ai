@@ -1168,9 +1168,22 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/v1/cbt/proctor/reset-session' && req.method === 'POST') {
     const body = await parseBody(req);
     const studentUsername = body.username || 'siswa_1001';
+    const resetType = body.reset_type || 'full';
     const targetUser = USERS.find((u) => u.username === studentUsername);
     const uid = targetUser ? targetUser.id : 1001;
     const sessionKey = `1_${uid}`;
+
+    if (resetType === 'login_only') {
+      if (studentSessions[sessionKey]) {
+        studentSessions[sessionKey].status = 'in_progress';
+        studentSessions[sessionKey].submitted_at = null;
+      }
+      activeExamStudents.delete(uid);
+      return sendJSON(200, {
+        status: 'success',
+        message: `Reset Login berhasil! Siswa ${studentUsername} diizinkan login kembali (jawaban tersimpan).`,
+      });
+    }
 
     delete studentSessions[sessionKey];
     delete studentAnswersStore[uid];
@@ -1178,7 +1191,121 @@ const server = http.createServer(async (req, res) => {
 
     return sendJSON(200, {
       status: 'success',
-      message: `Sesi ujian untuk ${studentUsername} berhasil direset! Siswa dapat mengerjakan kembali.`,
+      message: `Sesi ujian untuk ${studentUsername} berhasil direset penuh! Siswa dapat mengerjakan kembali dari awal.`,
+    });
+  }
+
+  // POST /api/v1/cbt/proctor/bulk-reset (Reset Sesi Siswa Secara Massal / Bulk)
+  if (pathname === '/api/v1/cbt/proctor/bulk-reset' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const targetType = body.target_type || 'selected'; // 'selected', 'class', 'all'
+    const resetType = body.reset_type || 'full'; // 'login_only' or 'full'
+    const usernames = Array.isArray(body.usernames) ? body.usernames : [];
+    const className = body.class_name;
+    const statusFilter = body.status_filter || 'all'; // 'all', 'submitted', 'in_progress'
+
+    let targetStudents = USERS.filter((u) => u.role === 'student');
+
+    if (targetType === 'selected') {
+      if (usernames.length === 0) {
+        return sendJSON(400, { status: 'error', message: 'Daftar siswa yang dipilih masih kosong!' });
+      }
+      const uSet = new Set(usernames);
+      targetStudents = targetStudents.filter((u) => uSet.has(u.username));
+    } else if (targetType === 'class') {
+      if (className && className !== 'all') {
+        targetStudents = targetStudents.filter((u) => u.class_name === className);
+      }
+    }
+
+    // Filter status jika dipilih
+    if (statusFilter !== 'all') {
+      targetStudents = targetStudents.filter((u) => {
+        const sessionKey = `1_${u.id}`;
+        const sess = studentSessions[sessionKey];
+        const status = sess ? sess.status : 'not_started';
+        return status === statusFilter;
+      });
+    }
+
+    if (targetStudents.length === 0) {
+      return sendJSON(400, {
+        status: 'error',
+        message: 'Tidak ada sesi siswa yang cocok dengan kriteria filter untuk direset.',
+      });
+    }
+
+    let count = 0;
+    for (const st of targetStudents) {
+      const uid = st.id;
+      const sessionKey = `1_${uid}`;
+
+      if (resetType === 'login_only') {
+        if (studentSessions[sessionKey]) {
+          studentSessions[sessionKey].status = 'in_progress';
+          studentSessions[sessionKey].submitted_at = null;
+        } else {
+          studentSessions[sessionKey] = {
+            status: 'in_progress',
+            started_at: new Date().toISOString(),
+            answers: studentAnswersStore[uid] || {},
+          };
+        }
+        activeExamStudents.delete(uid);
+        count++;
+      } else {
+        delete studentSessions[sessionKey];
+        delete studentAnswersStore[uid];
+        activeExamStudents.delete(uid);
+        count++;
+      }
+    }
+
+    const typeDesc = resetType === 'login_only' ? 'Reset Login (Jawaban aman)' : 'Reset Penuh (Ulang dari awal)';
+    return sendJSON(200, {
+      status: 'success',
+      message: `Berhasil mereset ${count} sesi siswa (${typeDesc})!`,
+      reset_count: count,
+      reset_type: resetType,
+    });
+  }
+
+  // POST /api/v1/cbt/proctor/bulk-force-finish (Kunci Selesai Massal oleh Proktor)
+  if (pathname === '/api/v1/cbt/proctor/bulk-force-finish' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const usernames = Array.isArray(body.usernames) ? body.usernames : [];
+    if (usernames.length === 0) {
+      return sendJSON(400, { status: 'error', message: 'Daftar siswa belum ditentukan!' });
+    }
+
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }) + ' ' + now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' WIB';
+
+    let count = 0;
+    for (const u of usernames) {
+      const targetUser = USERS.find((us) => us.username === u);
+      if (targetUser) {
+        const uid = targetUser.id;
+        const sessionKey = `1_${uid}`;
+        studentSessions[sessionKey] = {
+          ...(studentSessions[sessionKey] || {}),
+          status: 'submitted',
+          submitted_at: formattedDate,
+          answers: studentAnswersStore[uid] || {},
+        };
+        activeExamStudents.delete(uid);
+        count++;
+      }
+    }
+
+    return sendJSON(200, {
+      status: 'success',
+      message: `${count} sesi siswa berhasil dikunci selesai oleh proktor!`,
+      count: count,
     });
   }
 

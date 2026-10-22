@@ -582,48 +582,98 @@
       <!-- TAB 3: JADWAL UJIAN (CBT) & ENKRIPSI -->
       <!-- ============================================================== -->
       <section id="tab-jadwal" class="hidden space-y-6">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h3 class="text-lg font-bold text-white">Jadwal Ujian & Kompilasi Paket AES-256</h3>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <span>Manajemen Jadwal Ujian & Paket Enkripsi</span>
+            </h3>
             <p class="text-xs text-slate-400">Atur token sesi, waktu pelaksanaan, dan enkripsi paket soal ke dalam file JSON statis.</p>
           </div>
-          <button onclick="openModal('modalCreateSchedule')" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
+          <button onclick="openModal('modalCreateSchedule')" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-lg shadow-indigo-600/20 transition flex items-center gap-2 shrink-0">
             <i class="fa-solid fa-plus"></i> Tambah Jadwal Ujian
           </button>
         </div>
 
-        <!-- Toolbar Pencarian & Filter Status Jadwal Ujian -->
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900 border border-slate-800 rounded-2xl p-3 px-4 shadow-lg">
-          <div class="relative flex-1 max-w-md">
-            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input type="text" id="schTableSearch" oninput="handleScheduleTableSearch(this.value)" placeholder="Cari nama ujian, mata pelajaran, kode token..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:border-indigo-500">
+        <!-- Halaman / Sub-Tab Navigasi: Jadwal Aktif vs Jadwal Tidak Aktif (Dipisahkan Halaman) -->
+        <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
+          <button onclick="switchScheduleSubPage('active')" id="btnSubPageSchActive" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold transition flex items-center gap-2 shadow-md shadow-emerald-600/20">
+            <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+            <span>Jadwal Ujian Aktif (<span id="schSubCountActive">0</span>)</span>
+          </button>
+          <button onclick="switchScheduleSubPage('inactive')" id="btnSubPageSchInactive" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 text-xs font-bold transition flex items-center gap-2">
+            <i class="fa-solid fa-box-archive text-xs"></i>
+            <span>Arsip Jadwal Tidak Aktif (<span id="schSubCountInactive">0</span>)</span>
+          </button>
+        </div>
+
+        <!-- VIEW 1: HALAMAN JADWAL UJIAN AKTIF -->
+        <div id="subViewScheduleActive" class="space-y-4">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900 border border-slate-800 rounded-2xl p-3 px-4 shadow-lg">
+            <div class="relative flex-1 max-w-md">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="schSearchActive" oninput="handleScheduleSearchActive(this.value)" placeholder="Cari nama ujian aktif, token, kelas..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:border-emerald-500">
+            </div>
+            <div class="text-xs text-slate-400 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span>Menampilkan jadwal ujian yang sedang aktif dan dapat diakses siswa.</span>
+            </div>
           </div>
-          <div class="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-semibold self-start sm:self-auto">
-            <button onclick="setScheduleTableStatusFilter('all')" id="btnFilterSch_all" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white transition">Semua (<span id="schCountTab_all">0</span>)</button>
-            <button onclick="setScheduleTableStatusFilter('active')" id="btnFilterSch_active" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">🟢 Aktif (<span id="schCountTab_active">0</span>)</button>
-            <button onclick="setScheduleTableStatusFilter('inactive')" id="btnFilterSch_inactive" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">⚪ Tidak Aktif (<span id="schCountTab_inactive">0</span>)</button>
+
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-slate-400 bg-slate-950 uppercase text-[10px] tracking-wider">
+                <tr>
+                  <th class="px-4 py-3 rounded-l-lg">ID</th>
+                  <th class="px-4 py-3">Nama Ujian</th>
+                  <th class="px-4 py-3">Status</th>
+                  <th class="px-4 py-3">Bank Soal Terpilih</th>
+                  <th class="px-4 py-3">Waktu Mulai</th>
+                  <th class="px-4 py-3">Durasi</th>
+                  <th class="px-4 py-3">Token</th>
+                  <th class="px-4 py-3">Paket Enkripsi AES-256</th>
+                  <th class="px-4 py-3 rounded-r-lg text-right">Aksi & Monitoring</th>
+                </tr>
+              </thead>
+              <tbody id="schedulesActiveTableBody" class="divide-y divide-slate-800 text-slate-300">
+                <!-- Dynamically populated by renderSchedulesTable() -->
+              </tbody>
+            </table>
           </div>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl overflow-x-auto">
-          <table class="w-full text-xs text-left">
-            <thead class="text-slate-400 bg-slate-950 uppercase text-[10px] tracking-wider">
-              <tr>
-                <th class="px-4 py-3 rounded-l-lg">ID</th>
-                <th class="px-4 py-3">Nama Ujian</th>
-                <th class="px-4 py-3">Status</th>
-                <th class="px-4 py-3">Bank Soal Terpilih</th>
-                <th class="px-4 py-3">Waktu Mulai</th>
-                <th class="px-4 py-3">Durasi</th>
-                <th class="px-4 py-3">Token</th>
-                <th class="px-4 py-3">Paket Enkripsi AES-256</th>
-                <th class="px-4 py-3 rounded-r-lg text-right">Aksi & Monitoring</th>
-              </tr>
-            </thead>
-            <tbody id="schedulesTableBody" class="divide-y divide-slate-800 text-slate-300">
-              <!-- Dynamically populated by renderSchedulesTable() -->
-            </tbody>
-          </table>
+        <!-- VIEW 2: HALAMAN ARSIP JADWAL TIDAK AKTIF (DIPISAHKAN) -->
+        <div id="subViewScheduleInactive" class="hidden space-y-4">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900 border border-slate-800 rounded-2xl p-3 px-4 shadow-lg">
+            <div class="relative flex-1 max-w-md">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="schSearchInactive" oninput="handleScheduleSearchInactive(this.value)" placeholder="Cari arsip jadwal tidak aktif..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:border-slate-500">
+            </div>
+            <div class="text-xs text-slate-400 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+              <span>Jadwal tidak aktif disimpan di halaman arsip ini agar tidak membingungkan proktor saat memantau ujian aktif.</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-slate-400 bg-slate-950 uppercase text-[10px] tracking-wider">
+                <tr>
+                  <th class="px-4 py-3 rounded-l-lg">ID</th>
+                  <th class="px-4 py-3">Nama Ujian</th>
+                  <th class="px-4 py-3">Status</th>
+                  <th class="px-4 py-3">Bank Soal Terpilih</th>
+                  <th class="px-4 py-3">Waktu Mulai</th>
+                  <th class="px-4 py-3">Durasi</th>
+                  <th class="px-4 py-3">Token</th>
+                  <th class="px-4 py-3">Paket Enkripsi AES-256</th>
+                  <th class="px-4 py-3 rounded-r-lg text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="schedulesInactiveTableBody" class="divide-y divide-slate-800 text-slate-300">
+                <!-- Dynamically populated by renderSchedulesTable() -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -2100,16 +2150,21 @@
         </button>
       </div>
 
-      <!-- Toolbar: Pencarian Realtime & Filter Kategori -->
+      <!-- Toolbar: Pencarian Realtime Jadwal Aktif -->
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
         <div class="relative flex-1">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-          <input type="text" id="proctorHubSearchInput" oninput="handleProctorHubSearch(this.value)" placeholder="Cari nama ujian, mata pelajaran, kode token (misal: FISIKA26, KIMIA26)..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:border-indigo-500">
+          <input type="text" id="proctorHubSearchInput" oninput="handleProctorHubSearch(this.value)" placeholder="Cari nama ujian aktif, mata pelajaran, kode token (misal: FISIKA26, KIMIA26)..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:border-indigo-500">
         </div>
-        <div class="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-semibold self-start sm:self-auto shrink-0">
-          <button onclick="setProctorHubFilter('all')" id="btnHubFilter_all" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white transition">Semua (<span id="hubCount_all">0</span>)</button>
-          <button onclick="setProctorHubFilter('active')" id="btnHubFilter_active" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">🟢 Aktif (<span id="hubCount_active">0</span>)</button>
-          <button onclick="setProctorHubFilter('inactive')" id="btnHubFilter_inactive" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">⚪ Tidak Aktif (<span id="hubCount_inactive">0</span>)</button>
+        <div class="flex items-center gap-2 text-xs shrink-0">
+          <span class="px-3 py-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span><span id="hubCount_active">0</span> Jadwal Ujian Aktif</span>
+          </span>
+          <button onclick="closeModal('modalSelectScheduleProctor'); switchTab('jadwal'); switchScheduleSubPage('inactive');" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium transition flex items-center gap-1.5" title="Buka Arsip Jadwal Tidak Aktif">
+            <i class="fa-solid fa-box-archive text-slate-400"></i>
+            <span class="hidden sm:inline">Lihat</span> Arsip Nonaktif &rarr;
+          </button>
         </div>
       </div>
 
@@ -2863,13 +2918,13 @@
     let currentSchedules = [];
     let currentEditingScheduleId = 1;
 
-    // Filter & Search State untuk Tab 3 (Halaman Manajemen Jadwal)
-    let scheduleTableSearchQuery = '';
-    let scheduleTableStatusFilter = 'all'; // 'all', 'active', 'inactive'
+    // Sub-Page State untuk Tab 3: Jadwal Aktif vs Arsip Tidak Aktif
+    window.currentScheduleSubPage = 'active'; // 'active' | 'inactive'
+    let schSearchActiveQuery = '';
+    let schSearchInactiveQuery = '';
 
-    // Filter & Search State untuk Modal Halaman Pemilihan Jadwal (Proktor Hub)
+    // Search Query khusus Live Proctor Hub Modal (HANYA Jadwal Aktif)
     let proctorHubSearchQuery = '';
-    let proctorHubStatusFilter = 'all'; // 'all', 'active', 'inactive'
 
     async function fetchScheduleList() {
       try {
@@ -2890,129 +2945,170 @@
     }
 
     // ==============================================================
-    // TAB 3: RENDER TABEL MANAJEMEN JADWAL UJIAN
+    // TAB 3: PEMISAHAN HALAMAN JADWAL AKTIF & ARSIP TIDAK AKTIF
     // ==============================================================
-    window.handleScheduleTableSearch = function(val) {
-      scheduleTableSearchQuery = (val || '').trim().toLowerCase();
+    window.switchScheduleSubPage = function(subPage) {
+      window.currentScheduleSubPage = subPage;
+      const viewActive = document.getElementById('subViewScheduleActive');
+      const viewInactive = document.getElementById('subViewScheduleInactive');
+      const btnActive = document.getElementById('btnSubPageSchActive');
+      const btnInactive = document.getElementById('btnSubPageSchInactive');
+
+      if (subPage === 'active') {
+        if (viewActive) viewActive.classList.remove('hidden');
+        if (viewInactive) viewInactive.classList.add('hidden');
+        if (btnActive) btnActive.className = 'px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold transition flex items-center gap-2 shadow-md shadow-emerald-600/20';
+        if (btnInactive) btnInactive.className = 'px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 text-xs font-bold transition flex items-center gap-2';
+      } else {
+        if (viewActive) viewActive.classList.add('hidden');
+        if (viewInactive) viewInactive.classList.remove('hidden');
+        if (btnActive) btnActive.className = 'px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 text-xs font-bold transition flex items-center gap-2';
+        if (btnInactive) btnInactive.className = 'px-4 py-2 rounded-xl bg-slate-700 text-white text-xs font-bold transition flex items-center gap-2 shadow-md';
+      }
       renderSchedulesTable(currentSchedules);
     };
 
-    window.setScheduleTableStatusFilter = function(filter) {
-      scheduleTableStatusFilter = filter;
-      const btnAll = document.getElementById('btnFilterSch_all');
-      const btnAct = document.getElementById('btnFilterSch_active');
-      const btnInact = document.getElementById('btnFilterSch_inactive');
+    window.handleScheduleSearchActive = function(val) {
+      schSearchActiveQuery = (val || '').trim().toLowerCase();
+      renderSchedulesTable(currentSchedules);
+    };
 
-      [btnAll, btnAct, btnInact].forEach(b => {
-        if (b) {
-          b.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
-        }
-      });
-
-      if (filter === 'all' && btnAll) btnAll.className = 'px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-bold transition';
-      if (filter === 'active' && btnAct) btnAct.className = 'px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold transition';
-      if (filter === 'inactive' && btnInact) btnInact.className = 'px-3 py-1.5 rounded-lg bg-slate-700 text-white font-bold transition';
-
+    window.handleScheduleSearchInactive = function(val) {
+      schSearchInactiveQuery = (val || '').trim().toLowerCase();
       renderSchedulesTable(currentSchedules);
     };
 
     function renderSchedulesTable(schedules) {
-      const tbody = document.getElementById('schedulesTableBody');
-      if (!tbody) return;
+      const activeTbody = document.getElementById('schedulesActiveTableBody');
+      const inactiveTbody = document.getElementById('schedulesInactiveTableBody');
 
-      const totalAll = schedules.length;
-      const totalActive = schedules.filter(s => s.is_active !== false).length;
-      const totalInactive = schedules.filter(s => s.is_active === false).length;
+      const activeList = schedules.filter(s => s.is_active !== false);
+      const inactiveList = schedules.filter(s => s.is_active === false);
 
-      const cAll = document.getElementById('schCountTab_all');
-      const cAct = document.getElementById('schCountTab_active');
-      const cInact = document.getElementById('schCountTab_inactive');
-      if (cAll) cAll.innerText = totalAll;
-      if (cAct) cAct.innerText = totalActive;
-      if (cInact) cInact.innerText = totalInactive;
+      const subCountAct = document.getElementById('schSubCountActive');
+      const subCountInact = document.getElementById('schSubCountInactive');
+      if (subCountAct) subCountAct.innerText = activeList.length;
+      if (subCountInact) subCountInact.innerText = inactiveList.length;
 
-      let filtered = schedules;
-      if (scheduleTableStatusFilter === 'active') {
-        filtered = filtered.filter(s => s.is_active !== false);
-      } else if (scheduleTableStatusFilter === 'inactive') {
-        filtered = filtered.filter(s => s.is_active === false);
+      // 1. Render Tabel Jadwal Ujian Aktif
+      if (activeTbody) {
+        let filteredActive = activeList;
+        if (schSearchActiveQuery) {
+          filteredActive = filteredActive.filter(s =>
+            (s.title && s.title.toLowerCase().includes(schSearchActiveQuery)) ||
+            (s.token_code && s.token_code.toLowerCase().includes(schSearchActiveQuery)) ||
+            (s.bank_name && s.bank_name.toLowerCase().includes(schSearchActiveQuery))
+          );
+        }
+
+        if (filteredActive.length === 0) {
+          activeTbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-slate-500 font-medium">Tidak ada jadwal ujian aktif yang cocok dengan pencarian.</td></tr>`;
+        } else {
+          activeTbody.innerHTML = filteredActive.map(sch => {
+            const encFile = sch.package_file || `exam_${sch.id}_enc.json`;
+            return `
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="px-4 py-3.5 font-mono text-slate-400 font-bold">#${sch.id}</td>
+                <td class="px-4 py-3.5 font-bold text-white">${sch.title}</td>
+                <td class="px-4 py-3.5">
+                  <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold flex items-center gap-1.5 w-fit">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Aktif
+                  </span>
+                </td>
+                <td class="px-4 py-3.5 text-slate-400">${sch.bank_name || '-'}</td>
+                <td class="px-4 py-3.5 font-mono text-slate-300">${sch.start_time || '-'}</td>
+                <td class="px-4 py-3.5 font-mono">${sch.duration_minutes} Menit</td>
+                <td class="px-4 py-3.5">
+                  <span class="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-bold">${sch.token_code}</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <div class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1 font-mono">
+                    <i class="fa-solid fa-lock"></i> /static/packages/${encFile}
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-right">
+                  <div class="flex items-center justify-end gap-2 flex-wrap">
+                    <button onclick="switchToProctorSchedule(${sch.id})" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-emerald-500/10" title="Pantau peserta ujian jadwal ini di Live Proktor">
+                      <i class="fa-solid fa-desktop text-emerald-400"></i> Pantau di Live Proktor &rarr;
+                    </button>
+                    <button onclick="handleToggleScheduleActive(${sch.id}, event)" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700 text-[11px] font-medium transition" title="Pindahkan ke Halaman Arsip Tidak Aktif">
+                      <i class="fa-solid fa-box-archive mr-1"></i> Nonaktifkan
+                    </button>
+                    <button onclick="openModalEditSchedule(${sch.id})" class="px-2.5 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-[11px] text-indigo-300 border border-indigo-500/30 transition flex items-center gap-1" title="Edit Jadwal">
+                      <i class="fa-solid fa-pen-to-square"></i> Edit
+                    </button>
+                    <button onclick="recompilePackage(${sch.id})" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-200 border border-slate-700 transition" title="Kompilasi ulang paket AES-256">
+                      Kompilasi
+                    </button>
+                    <button onclick="handleDeleteSchedule(${sch.id}, '${sch.title.replace(/'/g, "\\'")}')" class="px-2 py-1 rounded bg-rose-600/20 hover:bg-rose-600/30 text-[11px] text-rose-300 border border-rose-500/30 transition flex items-center gap-1" title="Hapus Jadwal Ujian">
+                      <i class="fa-regular fa-trash-can"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
       }
 
-      if (scheduleTableSearchQuery) {
-        filtered = filtered.filter(s =>
-          (s.title && s.title.toLowerCase().includes(scheduleTableSearchQuery)) ||
-          (s.token_code && s.token_code.toLowerCase().includes(scheduleTableSearchQuery)) ||
-          (s.bank_name && s.bank_name.toLowerCase().includes(scheduleTableSearchQuery)) ||
-          (s.class_target && s.class_target.toLowerCase().includes(scheduleTableSearchQuery))
-        );
+      // 2. Render Tabel Arsip Jadwal Tidak Aktif (Halaman Terpisah)
+      if (inactiveTbody) {
+        let filteredInactive = inactiveList;
+        if (schSearchInactiveQuery) {
+          filteredInactive = filteredInactive.filter(s =>
+            (s.title && s.title.toLowerCase().includes(schSearchInactiveQuery)) ||
+            (s.token_code && s.token_code.toLowerCase().includes(schSearchInactiveQuery)) ||
+            (s.bank_name && s.bank_name.toLowerCase().includes(schSearchInactiveQuery))
+          );
+        }
+
+        if (filteredInactive.length === 0) {
+          inactiveTbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-slate-500 font-medium">Halaman arsip jadwal tidak aktif masih kosong.</td></tr>`;
+        } else {
+          inactiveTbody.innerHTML = filteredInactive.map(sch => {
+            const encFile = sch.package_file || `exam_${sch.id}_enc.json`;
+            return `
+              <tr class="hover:bg-slate-800/40 transition opacity-80 hover:opacity-100">
+                <td class="px-4 py-3.5 font-mono text-slate-500 font-bold">#${sch.id}</td>
+                <td class="px-4 py-3.5 font-bold text-slate-300">${sch.title}</td>
+                <td class="px-4 py-3.5">
+                  <span class="px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-[10px] font-medium w-fit">
+                    Tidak Aktif
+                  </span>
+                </td>
+                <td class="px-4 py-3.5 text-slate-400">${sch.bank_name || '-'}</td>
+                <td class="px-4 py-3.5 font-mono text-slate-400">${sch.start_time || '-'}</td>
+                <td class="px-4 py-3.5 font-mono text-slate-400">${sch.duration_minutes} Menit</td>
+                <td class="px-4 py-3.5">
+                  <span class="px-2 py-1 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 font-mono font-bold">${sch.token_code}</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <div class="text-[11px] text-slate-500 font-semibold flex items-center gap-1 font-mono">
+                    <i class="fa-solid fa-lock"></i> /static/packages/${encFile}
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-right">
+                  <div class="flex items-center justify-end gap-2 flex-wrap">
+                    <button onclick="handleToggleScheduleActive(${sch.id}, event)" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="Aktifkan kembali jadwal ini agar siswa dapat mengerjakan dan dipantau di Live Proktor">
+                      <i class="fa-solid fa-power-off text-emerald-400"></i> Aktifkan Kembali
+                    </button>
+                    <button onclick="openModalEditSchedule(${sch.id})" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 border border-slate-700 transition flex items-center gap-1" title="Edit Jadwal">
+                      <i class="fa-solid fa-pen-to-square"></i> Edit
+                    </button>
+                    <button onclick="handleDeleteSchedule(${sch.id}, '${sch.title.replace(/'/g, "\\'")}')" class="px-2 py-1 rounded bg-rose-600/20 hover:bg-rose-600/30 text-[11px] text-rose-300 border border-rose-500/30 transition flex items-center gap-1" title="Hapus Jadwal Ujian">
+                      <i class="fa-regular fa-trash-can"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
       }
-
-      if (!filtered || filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-slate-500 font-medium">Tidak ada jadwal ujian yang sesuai dengan pencarian atau filter.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = filtered.map(sch => {
-        const encFile = sch.package_file || `exam_${sch.id}_enc.json`;
-        const isActive = sch.is_active !== false;
-
-        const statusBadgeHtml = `
-          <button onclick="handleToggleScheduleActive(${sch.id}, event)" class="px-2.5 py-1 rounded-full ${isActive ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30' : 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700'} text-[11px] font-bold flex items-center gap-1.5 transition cursor-pointer" title="Klik untuk mengubah status aktif/tidak aktif">
-            <span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}"></span>
-            <span>${isActive ? 'Aktif' : 'Tidak Aktif'}</span>
-            <i class="fa-solid ${isActive ? 'fa-toggle-on text-emerald-400 text-sm' : 'fa-toggle-off text-slate-500 text-sm'} ml-0.5"></i>
-          </button>
-        `;
-
-        return `
-          <tr class="hover:bg-slate-800/40 transition">
-            <td class="px-4 py-3.5 font-mono text-slate-400 font-bold">#${sch.id}</td>
-            <td class="px-4 py-3.5 font-bold text-white">
-              <span id="schRowTitle_${sch.id}">${sch.title}</span>
-            </td>
-            <td class="px-4 py-3.5">
-              ${statusBadgeHtml}
-            </td>
-            <td class="px-4 py-3.5 text-slate-400">
-              <span id="schRowBank_${sch.id}">${sch.bank_name || '-'}</span>
-            </td>
-            <td class="px-4 py-3.5 font-mono text-slate-300">
-              <span id="schRowStart_${sch.id}">${sch.start_time || '-'}</span>
-            </td>
-            <td class="px-4 py-3.5">
-              <span id="schRowDuration_${sch.id}">${sch.duration_minutes} Menit</span>
-            </td>
-            <td class="px-4 py-3.5">
-              <span id="schRowToken_${sch.id}" class="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-bold">${sch.token_code}</span>
-            </td>
-            <td class="px-4 py-3.5">
-              <div class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1 font-mono">
-                <i class="fa-solid fa-lock"></i> /static/packages/${encFile}
-              </div>
-            </td>
-            <td class="px-4 py-3.5 text-right">
-              <div class="flex items-center justify-end gap-2 flex-wrap">
-                <button onclick="switchToProctorSchedule(${sch.id})" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-emerald-500/10" title="Pantau peserta ujian jadwal ini di Live Proktor">
-                  <i class="fa-solid fa-desktop text-emerald-400"></i> Pantau di Live Proktor &rarr;
-                </button>
-                <button onclick="openModalEditSchedule(${sch.id})" class="px-2.5 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-[11px] text-indigo-300 border border-indigo-500/30 transition flex items-center gap-1" title="Edit Jadwal & Konfigurasi Ujian">
-                  <i class="fa-solid fa-pen-to-square"></i> Edit
-                </button>
-                <button onclick="recompilePackage(${sch.id})" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-200 border border-slate-700 transition" title="Kompilasi ulang paket soal terenkripsi AES-256">
-                  Kompilasi Ulang
-                </button>
-                <button onclick="handleDeleteSchedule(${sch.id}, '${sch.title.replace(/'/g, "\\'")}')" class="px-2 py-1 rounded bg-rose-600/20 hover:bg-rose-600/30 text-[11px] text-rose-300 border border-rose-500/30 transition flex items-center gap-1" title="Hapus Jadwal Ujian">
-                  <i class="fa-regular fa-trash-can"></i> Hapus
-                </button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('');
     }
 
     // ==============================================================
-    // PROKTOR HUB: MODAL / HALAMAN PEMILIHAN JADWAL UJIAN
+    // PROKTOR HUB: MODAL PEMILIHAN JADWAL UJIAN AKTIF (FOKUS AKTIF ONLY)
     // ==============================================================
     window.openProctorSchedulePicker = function() {
       proctorHubSearchQuery = '';
@@ -3028,47 +3124,17 @@
       renderProctorHubSchedules();
     };
 
-    window.setProctorHubFilter = function(filter) {
-      proctorHubStatusFilter = filter;
-      const btnAll = document.getElementById('btnHubFilter_all');
-      const btnAct = document.getElementById('btnHubFilter_active');
-      const btnInact = document.getElementById('btnHubFilter_inactive');
-
-      [btnAll, btnAct, btnInact].forEach(b => {
-        if (b) {
-          b.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
-        }
-      });
-
-      if (filter === 'all' && btnAll) btnAll.className = 'px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-bold transition';
-      if (filter === 'active' && btnAct) btnAct.className = 'px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold transition';
-      if (filter === 'inactive' && btnInact) btnInact.className = 'px-3 py-1.5 rounded-lg bg-slate-700 text-white font-bold transition';
-
-      renderProctorHubSchedules();
-    };
-
     window.renderProctorHubSchedules = function() {
       const container = document.getElementById('proctorHubCardsContainer');
       if (!container) return;
 
-      const totalAll = currentSchedules.length;
-      const totalActive = currentSchedules.filter(s => s.is_active !== false).length;
-      const totalInactive = currentSchedules.filter(s => s.is_active === false).length;
+      // KHUSUS LIVE PROKTOR: HANYA tampilkan Jadwal yang Sedang AKTIF!
+      const activeSchedules = currentSchedules.filter(s => s.is_active !== false);
 
-      const cAll = document.getElementById('hubCount_all');
       const cAct = document.getElementById('hubCount_active');
-      const cInact = document.getElementById('hubCount_inactive');
-      if (cAll) cAll.innerText = totalAll;
-      if (cAct) cAct.innerText = totalActive;
-      if (cInact) cInact.innerText = totalInactive;
+      if (cAct) cAct.innerText = activeSchedules.length;
 
-      let filtered = currentSchedules;
-      if (proctorHubStatusFilter === 'active') {
-        filtered = filtered.filter(s => s.is_active !== false);
-      } else if (proctorHubStatusFilter === 'inactive') {
-        filtered = filtered.filter(s => s.is_active === false);
-      }
-
+      let filtered = activeSchedules;
       if (proctorHubSearchQuery) {
         filtered = filtered.filter(s =>
           (s.title && s.title.toLowerCase().includes(proctorHubSearchQuery)) ||
@@ -3082,8 +3148,11 @@
         container.innerHTML = `
           <div class="p-8 text-center bg-slate-950/40 border border-dashed border-slate-800 rounded-2xl space-y-2">
             <i class="fa-solid fa-calendar-xmark text-3xl text-slate-600"></i>
-            <p class="text-sm font-semibold text-slate-300">Tidak ada jadwal ujian yang ditemukan</p>
-            <p class="text-xs text-slate-500">Coba kata kunci pencarian lain atau pilih tab filter "Semua".</p>
+            <p class="text-sm font-semibold text-slate-300">Tidak ada jadwal ujian aktif yang cocok</p>
+            <p class="text-xs text-slate-500">Jadwal yang tidak aktif berada di Halaman Arsip pada menu Jadwal Ujian.</p>
+            <button onclick="closeModal('modalSelectScheduleProctor'); switchTab('jadwal');" class="mt-2 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition">
+              Buka Menu Jadwal Ujian &rarr;
+            </button>
           </div>
         `;
         return;
@@ -3092,7 +3161,6 @@
       const currentMonitoredId = getProctorSelectedScheduleId();
 
       container.innerHTML = filtered.map(sch => {
-        const isActive = sch.is_active !== false;
         const isCurrent = Number(sch.id) === Number(currentMonitoredId);
 
         return `
@@ -3107,15 +3175,9 @@
                   <span class="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono text-[10px] font-bold">
                     Token: ${sch.token_code}
                   </span>
-                  ${isActive ? `
-                    <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1">
-                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Aktif
-                    </span>
-                  ` : `
-                    <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-[10px] font-medium">
-                      Tidak Aktif
-                    </span>
-                  `}
+                  <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Aktif
+                  </span>
                   ${isCurrent ? `
                     <span class="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[10px] font-bold">
                       <i class="fa-solid fa-eye text-[9px] mr-1"></i> Sedang Dipantau

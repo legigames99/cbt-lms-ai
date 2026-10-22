@@ -409,6 +409,43 @@ function saveSchedulesToFile() {
   }
 }
 
+// Normalisasi & Validasi Target Kelas Ujian (Bisa Semua Kelas, 1 Kelas, atau Banyak Kelas Hingga 36 Kelas / Tak Terbatas)
+function normalizeClassTarget(target) {
+  if (!target) return 'Semua Kelas';
+  if (Array.isArray(target)) {
+    const cleaned = target.map(c => String(c).trim()).filter(Boolean);
+    if (cleaned.length === 0 || cleaned.includes('Semua Kelas') || cleaned.includes('all')) {
+      return 'Semua Kelas';
+    }
+    return cleaned;
+  }
+  const str = String(target).trim();
+  if (!str || str.toLowerCase() === 'semua kelas' || str.toLowerCase() === 'all') {
+    return 'Semua Kelas';
+  }
+  if (str.includes(',')) {
+    return str.split(',').map(s => s.trim()).filter(Boolean);
+  }
+  return [str];
+}
+
+function formatClassTargetDisplay(target) {
+  const norm = normalizeClassTarget(target);
+  if (norm === 'Semua Kelas') return 'Semua Kelas';
+  if (Array.isArray(norm)) {
+    return norm.join(', ');
+  }
+  return String(norm);
+}
+
+function isClassEligible(scheduleClassTarget, studentClassName) {
+  if (!studentClassName) return true;
+  const norm = normalizeClassTarget(scheduleClassTarget);
+  if (norm === 'Semua Kelas') return true;
+  const sClass = studentClassName.trim().toLowerCase();
+  return norm.some(c => c.trim().toLowerCase() === sClass);
+}
+
 // Generator Token Ujian Acak (6 Karakter Huruf & Angka Bersih, Tanpa Karakter Mirip Seperti O/0, I/1)
 function generateRandomToken(length = 6) {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -481,6 +518,7 @@ function loadSchedulesFromFile() {
           const item = {
             ...s,
             is_active: s.is_active !== undefined ? !!s.is_active : true,
+            class_target: formatClassTargetDisplay(s.class_target),
             token_type: s.token_type || 'static',
             token_interval: [5, 10, 15].includes(parseInt(s.token_interval, 10)) ? parseInt(s.token_interval, 10) : 15,
           };
@@ -979,6 +1017,34 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  // GET /api/v1/master/classes (Daftar Seluruh Kelas Tersedia di Sekolah Termasuk Preset Hingga 36 Kelas)
+  if (pathname === '/api/v1/master/classes' && req.method === 'GET') {
+    const studentClasses = USERS.filter(u => u.role === 'student' && u.class_name).map(u => u.class_name.trim());
+    const scheduleClasses = [];
+    SCHEDULES.forEach(s => {
+      const norm = normalizeClassTarget(s.class_target);
+      if (Array.isArray(norm)) scheduleClasses.push(...norm);
+    });
+
+    // Preset 36 kelas standar (X-1 s/d X-12, XI-1 s/d XI-12, XII-1 s/d XII-12)
+    const presetClasses = [];
+    ['X', 'XI', 'XII'].forEach(lvl => {
+      for (let i = 1; i <= 12; i++) {
+        presetClasses.push(`${lvl}-${i}`);
+      }
+    });
+
+    const combinedSet = new Set([...studentClasses, ...scheduleClasses, ...presetClasses].filter(Boolean));
+    const sortedClasses = Array.from(combinedSet).sort((a, b) => a.localeCompare(b, 'id', { numeric: true }));
+
+    return sendJSON(200, {
+      status: 'success',
+      classes: sortedClasses,
+      total: sortedClasses.length,
+      from_students: Array.from(new Set(studentClasses)),
+    });
+  }
+
   // GET /api/v1/master/students (Daftar Siswa untuk Master Data & Cetak Kartu)
   if (pathname === '/api/v1/master/students' && req.method === 'GET') {
     const classFilter = parsedUrl.searchParams.get('class');
@@ -1222,6 +1288,7 @@ const server = http.createServer(async (req, res) => {
       const tInfo = updateScheduleDynamicToken(s);
       return {
         ...s,
+        class_target: formatClassTargetDisplay(s.class_target),
         token_code: s.token_code,
         token_type: s.token_type || 'static',
         token_interval: s.token_interval || 15,
@@ -1281,7 +1348,7 @@ const server = http.createServer(async (req, res) => {
       token_updated_at: Date.now(),
       shuffle_questions: body.shuffle_questions !== false,
       shuffle_options: body.shuffle_options !== false,
-      class_target: body.class_target || 'Semua Kelas',
+      class_target: formatClassTargetDisplay(body.class_target),
       package_url: `/static/packages/exam_${nextId}_enc.json`,
       is_active: body.is_active !== undefined ? !!body.is_active : true,
     };
@@ -1308,6 +1375,9 @@ const server = http.createServer(async (req, res) => {
     if (body.bank_name) sch.bank_name = body.bank_name.trim();
     if (body.start_time) sch.start_time = body.start_time.trim();
     if (body.duration_minutes) sch.duration_minutes = parseInt(body.duration_minutes, 10) || sch.duration_minutes;
+    if (body.class_target !== undefined) {
+      sch.class_target = formatClassTargetDisplay(body.class_target);
+    }
     if (body.token_type !== undefined) {
       const prevType = sch.token_type;
       sch.token_type = body.token_type === 'dynamic' ? 'dynamic' : 'static';
@@ -1376,8 +1446,37 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/v1/cbt/schedules/active' && req.method === 'GET') {
     const user = getUserFromToken(req);
     const uid = user ? user.uid : 1001;
-    const schId = parseInt(parsedUrl.searchParams.get('schedule_id'), 10) || SCHEDULES[0]?.id || 1;
-    const curSch = SCHEDULES.find(s => s.id === schId) || SCHEDULES[0];
+    const studentObj = USERS.find(u => u.id === uid);
+    const studentClass = studentObj ? studentObj.class_name : (user ? user.class_name : '');
+    const schIdParam = parsedUrl.searchParams.get('schedule_id');
+
+    let curSch = null;
+    if (schIdParam) {
+      curSch = SCHEDULES.find(s => s.id === parseInt(schIdParam, 10));
+    } else {
+      // Prioritaskan jadwal aktif yang cocok dengan target kelas siswa
+      curSch = SCHEDULES.find(s => s.is_active !== false && isClassEligible(s.class_target, studentClass));
+      if (!curSch) {
+        curSch = SCHEDULES.find(s => s.is_active !== false) || SCHEDULES[0];
+      }
+    }
+
+    if (!curSch) {
+      return sendJSON(404, { status: 'error', message: 'Belum ada jadwal ujian aktif di server' });
+    }
+
+    // Validasi apakah kelas siswa berhak mengakses jadwal ini
+    if (!isClassEligible(curSch.class_target, studentClass)) {
+      const targetStr = formatClassTargetDisplay(curSch.class_target);
+      return sendJSON(403, {
+        status: 'error',
+        code: 'CLASS_MISMATCH',
+        message: `Jadwal ujian "${curSch.title}" khusus diperuntukkan bagi kelas: ${targetStr}. Siswa kelas ${studentClass || 'Anda'} tidak memiliki hak akses ke ujian ini.`,
+        class_target: targetStr,
+        student_class: studentClass,
+      });
+    }
+
     const sessionKey = `${curSch.id}_${uid}`;
     const session = studentSessions[sessionKey];
     const totalExtra = (scheduleExtraMinutes[curSch.id] || 0) + (studentExtraMinutes[`${curSch.id}_${uid}`] || 0);
@@ -1395,6 +1494,7 @@ const server = http.createServer(async (req, res) => {
         package_sha256: schKeyInfo.sha256,
         session_status: session ? session.status : 'not_started',
         submitted_at: session ? session.submitted_at : null,
+        class_target: formatClassTargetDisplay(curSch.class_target),
         // Kredensial dekripsi sesi untuk auto-resume saat browser di-refresh
         session_id: isInProgress ? 88400 + uid : null,
         decryption_key_hex: isInProgress ? schKeyInfo.keyHex : null,
@@ -1408,6 +1508,8 @@ const server = http.createServer(async (req, res) => {
     const body = await parseBody(req);
     const user = getUserFromToken(req);
     const uid = user ? user.uid : 1001;
+    const studentObj = USERS.find(u => u.id === uid);
+    const studentClass = studentObj ? studentObj.class_name : (user ? user.class_name : '');
     const parts = pathname.split('/');
     const schId = parseInt(parts[5], 10) || 1;
     const curSch = SCHEDULES.find(s => s.id === schId) || SCHEDULES[0];
@@ -1419,6 +1521,16 @@ const server = http.createServer(async (req, res) => {
         status: 'error',
         code: 'SCHEDULE_INACTIVE',
         message: `Jadwal ujian "${curSch.title}" saat ini berstatus TIDAK AKTIF atau belum dibuka oleh proktor.`,
+      });
+    }
+
+    // Cek apakah siswa berhak berdasarkan kelas target
+    if (!isClassEligible(curSch.class_target, studentClass)) {
+      const targetStr = formatClassTargetDisplay(curSch.class_target);
+      return sendJSON(403, {
+        status: 'error',
+        code: 'CLASS_MISMATCH',
+        message: `Jadwal ujian "${curSch.title}" khusus untuk kelas: ${targetStr}. Siswa kelas ${studentClass || 'Anda'} tidak diizinkan memulai ujian ini.`,
       });
     }
 

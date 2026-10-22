@@ -5,7 +5,7 @@
     "bank_name": "Bank Termodinamika (5 Soal)",
     "start_time": "Hari ini, 07:30 WIB",
     "duration_minutes": 90,
-    "token_code": "YE2AJ9",
+    "token_code": "3D9HTC",
     "shuffle_questions": true,
     "shuffle_options": true,
     "class_target": "Semua Kelas",
@@ -13,9 +13,9 @@
     "is_active": true,
     "token_type": "dynamic",
     "token_interval": 5,
-    "token_updated_at": 1792655399493,
-    "token_prev_code": "NXLNQP",
-    "token_prev_expires_at": 1792655459493
+    "token_updated_at": 1792656226040,
+    "token_prev_code": "CYBDRF",
+    "token_prev_expires_at": 1792656286040
   },
   {
     "id": 2,

@@ -295,6 +295,17 @@
             showAlreadySubmittedScreen(schedule.title, json.submitted_at);
             return;
           }
+          if (json.code === 'CLASS_MISMATCH') {
+            document.getElementById('waitPrefetchStatus').innerHTML = `<span class="text-rose-400 font-bold flex items-center gap-1"><i class="fa-solid fa-ban"></i> ${json.message}</span>`;
+            const tokenInput = document.getElementById('tokenCodeInput');
+            if (tokenInput) {
+              tokenInput.disabled = true;
+              tokenInput.placeholder = 'AKSES KELAS DITOLAK';
+            }
+            const btn = document.getElementById('btnStartExam');
+            if (btn) btn.disabled = true;
+            return;
+          }
           throw new Error(json.message);
         }
 
@@ -400,6 +411,17 @@
         if (!res.ok) {
           if (json.code === 'ALREADY_SUBMITTED') {
             showAlreadySubmittedScreen(schedule.title, json.submitted_at);
+            return;
+          }
+          if (json.code === 'CLASS_MISMATCH') {
+            document.getElementById('waitPrefetchStatus').innerHTML = `<span class="text-rose-400 font-bold flex items-center gap-1"><i class="fa-solid fa-ban"></i> ${json.message}</span>`;
+            const tokenInput = document.getElementById('tokenCodeInput');
+            if (tokenInput) {
+              tokenInput.disabled = true;
+              tokenInput.placeholder = 'AKSES KELAS DITOLAK';
+            }
+            const btn = document.getElementById('btnStartExam');
+            if (btn) btn.disabled = true;
             return;
           }
           throw new Error(json.message);

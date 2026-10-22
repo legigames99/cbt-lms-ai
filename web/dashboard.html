@@ -641,6 +641,7 @@
                   <th class="px-4 py-3 rounded-l-lg">ID</th>
                   <th class="px-4 py-3">Nama Ujian</th>
                   <th class="px-4 py-3">Status</th>
+                  <th class="px-4 py-3">Target Kelas</th>
                   <th class="px-4 py-3">Bank Soal Terpilih</th>
                   <th class="px-4 py-3">Waktu Mulai</th>
                   <th class="px-4 py-3">Durasi</th>
@@ -676,6 +677,7 @@
                   <th class="px-4 py-3 rounded-l-lg">ID</th>
                   <th class="px-4 py-3">Nama Ujian</th>
                   <th class="px-4 py-3">Status</th>
+                  <th class="px-4 py-3">Target Kelas</th>
                   <th class="px-4 py-3">Bank Soal Terpilih</th>
                   <th class="px-4 py-3">Waktu Mulai</th>
                   <th class="px-4 py-3">Durasi</th>
@@ -2137,7 +2139,7 @@
 
   <!-- ==================== MODAL 4: BUAT JADWAL UJIAN ==================== -->
   <div id="modalCreateSchedule" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 text-xs">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 text-xs max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between pb-3 border-b border-slate-800">
         <h4 class="text-sm font-bold text-white flex items-center gap-2">
           <i class="fa-regular fa-calendar-plus text-indigo-400"></i> Buat Jadwal Ujian Baru (CBT)
@@ -2158,6 +2160,58 @@
             <option value="Bank Bahasa Indonesia Teks Narasi (10 Butir Soal)">Bank Bahasa Indonesia Teks Narasi (10 Butir Soal)</option>
           </select>
         </div>
+
+        <!-- Target Kelas Peserta Ujian (Semua Kelas vs Pilih 1, 2, hingga 36 Kelas / Bebas) -->
+        <div class="pt-1 border-t border-slate-800/80">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block font-semibold text-slate-300">Target Kelas Peserta Ujian</label>
+            <span id="schClassSummaryBadge_create" class="text-[10px] text-indigo-400 font-bold bg-indigo-950/60 border border-indigo-800/50 px-2 py-0.5 rounded-full">Semua Kelas</span>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2 mb-2">
+            <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 cursor-pointer text-slate-300 transition">
+              <input type="radio" name="schClassMode_create" value="all" checked onchange="toggleScheduleClassMode('create')" class="text-indigo-600 focus:ring-0">
+              <span class="font-medium text-[11px]"><i class="fa-solid fa-users text-indigo-400 mr-1"></i> Semua Kelas</span>
+            </label>
+            <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 cursor-pointer text-slate-300 transition">
+              <input type="radio" name="schClassMode_create" value="specific" onchange="toggleScheduleClassMode('create')" class="text-indigo-600 focus:ring-0">
+              <span class="font-medium text-[11px]"><i class="fa-solid fa-list-check text-cyan-400 mr-1"></i> Pilih Kelas Tertentu</span>
+            </label>
+          </div>
+
+          <!-- Container Pemilihan Kelas Spesifik (Bisa 1, 2, hingga 36 kelas / tak terbatas) -->
+          <div id="schClassSelectorContainer_create" class="hidden bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <div class="relative flex-1">
+                <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-[10px]"></i>
+                <input type="text" id="schClassSearch_create" placeholder="Cari nama kelas..." oninput="filterScheduleClassGrid('create')" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-7 pr-2.5 py-1 text-white text-[11px] focus:outline-none focus:border-indigo-500">
+              </div>
+              <div class="flex items-center gap-1 shrink-0 text-[10px]">
+                <button type="button" onclick="selectAllScheduleClasses('create', true)" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 font-semibold transition">Pilih Semua</button>
+                <button type="button" onclick="selectAllScheduleClasses('create', false)" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 border border-slate-700 font-semibold transition">Kosongkan</button>
+              </div>
+            </div>
+
+            <!-- Scrollable Checkbox Grid (Mendukung 36 kelas / tak terbatas) -->
+            <div id="schClassGrid_create" class="max-h-36 overflow-y-auto pr-1 space-y-1 custom-scrollbar grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+              <!-- Dynamically rendered via renderScheduleClassGrid() -->
+            </div>
+
+            <!-- Input Tambah Kelas Kustom Cepat -->
+            <div class="pt-2 border-t border-slate-800 flex items-center gap-2">
+              <input type="text" id="schClassCustomInput_create" placeholder="+ Tambah kelas baru (misal: XII TKJ 1)" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-white text-[11px] focus:outline-none focus:border-indigo-500" onkeydown="if(event.key==='Enter'){event.preventDefault(); addCustomClassToGrid('create');}">
+              <button type="button" onclick="addCustomClassToGrid('create')" class="px-2.5 py-1 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 text-[11px] font-bold transition">
+                + Tambah
+              </button>
+            </div>
+
+            <div class="text-[11px] flex items-center justify-between pt-0.5">
+              <span id="schClassSelectedCount_create" class="text-amber-400 font-semibold">0 kelas dipilih</span>
+              <span class="text-[10px] text-slate-500">*Bisa pilih 1, 2, atau sebanyak apa pun kelas</span>
+            </div>
+          </div>
+        </div>
+
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block font-semibold text-slate-300 mb-1">Durasi (Menit)</label>
@@ -2210,7 +2264,7 @@
 
   <!-- ==================== MODAL: EDIT JADWAL UJIAN ==================== -->
   <div id="modalEditSchedule" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 text-xs">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 text-xs max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between pb-3 border-b border-slate-800">
         <h4 class="text-sm font-bold text-white flex items-center gap-2">
           <i class="fa-solid fa-pen-to-square text-indigo-400"></i> Edit Jadwal Ujian & Paket CBT
@@ -2231,6 +2285,58 @@
             <option value="Bank Listrik Dinamis (15 Soal)">Bank Listrik Dinamis (15 Butir Soal)</option>
           </select>
         </div>
+
+        <!-- Target Kelas Peserta Ujian (Semua Kelas vs Pilih 1, 2, hingga 36 Kelas / Bebas) -->
+        <div class="pt-1 border-t border-slate-800/80">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block font-semibold text-slate-300">Target Kelas Peserta Ujian</label>
+            <span id="editSchClassSummaryBadge" class="text-[10px] text-indigo-400 font-bold bg-indigo-950/60 border border-indigo-800/50 px-2 py-0.5 rounded-full">Semua Kelas</span>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2 mb-2">
+            <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 cursor-pointer text-slate-300 transition">
+              <input type="radio" name="editSchClassMode" value="all" checked onchange="toggleScheduleClassMode('edit')" class="text-indigo-600 focus:ring-0">
+              <span class="font-medium text-[11px]"><i class="fa-solid fa-users text-indigo-400 mr-1"></i> Semua Kelas</span>
+            </label>
+            <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 cursor-pointer text-slate-300 transition">
+              <input type="radio" name="editSchClassMode" value="specific" onchange="toggleScheduleClassMode('edit')" class="text-indigo-600 focus:ring-0">
+              <span class="font-medium text-[11px]"><i class="fa-solid fa-list-check text-cyan-400 mr-1"></i> Pilih Kelas Tertentu</span>
+            </label>
+          </div>
+
+          <!-- Container Pemilihan Kelas Spesifik (Bisa 1, 2, hingga 36 kelas / tak terbatas) -->
+          <div id="editSchClassSelectorContainer" class="hidden bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <div class="relative flex-1">
+                <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-[10px]"></i>
+                <input type="text" id="editSchClassSearch" placeholder="Cari nama kelas..." oninput="filterScheduleClassGrid('edit')" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-7 pr-2.5 py-1 text-white text-[11px] focus:outline-none focus:border-indigo-500">
+              </div>
+              <div class="flex items-center gap-1 shrink-0 text-[10px]">
+                <button type="button" onclick="selectAllScheduleClasses('edit', true)" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 font-semibold transition">Pilih Semua</button>
+                <button type="button" onclick="selectAllScheduleClasses('edit', false)" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 border border-slate-700 font-semibold transition">Kosongkan</button>
+              </div>
+            </div>
+
+            <!-- Scrollable Checkbox Grid (Mendukung 36 kelas / tak terbatas) -->
+            <div id="schClassGrid_edit" class="max-h-36 overflow-y-auto pr-1 space-y-1 custom-scrollbar grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+              <!-- Dynamically rendered via renderScheduleClassGrid() -->
+            </div>
+
+            <!-- Input Tambah Kelas Kustom Cepat -->
+            <div class="pt-2 border-t border-slate-800 flex items-center gap-2">
+              <input type="text" id="editSchClassCustomInput" placeholder="+ Tambah kelas baru (misal: XII TKJ 1)" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-white text-[11px] focus:outline-none focus:border-indigo-500" onkeydown="if(event.key==='Enter'){event.preventDefault(); addCustomClassToGrid('edit');}">
+              <button type="button" onclick="addCustomClassToGrid('edit')" class="px-2.5 py-1 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 text-[11px] font-bold transition">
+                + Tambah
+              </button>
+            </div>
+
+            <div class="text-[11px] flex items-center justify-between pt-0.5">
+              <span id="schClassSelectedCount_edit" class="text-amber-400 font-semibold">0 kelas dipilih</span>
+              <span class="text-[10px] text-slate-500">*Bisa pilih 1, 2, atau sebanyak apa pun kelas</span>
+            </div>
+          </div>
+        </div>
+
         <div>
           <label class="block font-semibold text-slate-300 mb-1">Waktu Mulai Pelaksanaan</label>
           <input type="text" id="editSchStartTime" value="Hari ini, 07:30 WIB" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-mono">
@@ -2950,7 +3056,13 @@
     };
 
     // Modal Helpers
-    window.openModal = function(id) { document.getElementById(id).classList.remove('hidden'); };
+    window.openModal = function(id) {
+      document.getElementById(id).classList.remove('hidden');
+      if (id === 'modalCreateSchedule') {
+        if (typeof initAvailableClassPool === 'function') initAvailableClassPool();
+        if (typeof toggleScheduleClassMode === 'function') toggleScheduleClassMode('create');
+      }
+    };
     window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); };
 
     // Fetch Metrics
@@ -3218,10 +3330,25 @@
         }
 
         if (filteredActive.length === 0) {
-          activeTbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-slate-500 font-medium">Tidak ada jadwal ujian aktif yang cocok dengan pencarian.</td></tr>`;
+          activeTbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-slate-500 font-medium">Tidak ada jadwal ujian aktif yang cocok dengan pencarian.</td></tr>`;
         } else {
           activeTbody.innerHTML = filteredActive.map(sch => {
             const encFile = sch.package_file || `exam_${sch.id}_enc.json`;
+            const targetClasses = (sch.class_target || 'Semua Kelas').split(',').map(c => c.trim()).filter(Boolean);
+            const isAll = targetClasses.length === 0 || sch.class_target === 'Semua Kelas';
+            const targetBadge = isAll ? `
+              <span class="px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[10px] font-bold flex items-center gap-1.5 w-fit">
+                <i class="fa-solid fa-users text-[9px]"></i> Semua Kelas
+              </span>
+            ` : (targetClasses.length === 1 ? `
+              <span class="px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[10px] font-bold flex items-center gap-1.5 w-fit">
+                <i class="fa-solid fa-user-tag text-[9px]"></i> ${targetClasses[0]}
+              </span>
+            ` : `
+              <span class="px-2.5 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/40 text-[10px] font-bold flex items-center gap-1.5 w-fit cursor-help" title="${sch.class_target}">
+                <i class="fa-solid fa-layer-group text-[9px]"></i> ${targetClasses.length} Kelas (${targetClasses.slice(0, 2).join(', ')}${targetClasses.length > 2 ? '...' : ''})
+              </span>
+            `);
             return `
               <tr class="hover:bg-slate-800/40 transition">
                 <td class="px-4 py-3.5 font-mono text-slate-400 font-bold">#${sch.id}</td>
@@ -3231,6 +3358,7 @@
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Aktif
                   </span>
                 </td>
+                <td class="px-4 py-3.5">${targetBadge}</td>
                 <td class="px-4 py-3.5 text-slate-400">${sch.bank_name || '-'}</td>
                 <td class="px-4 py-3.5 font-mono text-slate-300">${sch.start_time || '-'}</td>
                 <td class="px-4 py-3.5 font-mono">${sch.duration_minutes} Menit</td>
@@ -3298,10 +3426,25 @@
         }
 
         if (filteredInactive.length === 0) {
-          inactiveTbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-slate-500 font-medium">Halaman arsip jadwal tidak aktif masih kosong.</td></tr>`;
+          inactiveTbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-slate-500 font-medium">Halaman arsip jadwal tidak aktif masih kosong.</td></tr>`;
         } else {
           inactiveTbody.innerHTML = filteredInactive.map(sch => {
             const encFile = sch.package_file || `exam_${sch.id}_enc.json`;
+            const targetClasses = (sch.class_target || 'Semua Kelas').split(',').map(c => c.trim()).filter(Boolean);
+            const isAll = targetClasses.length === 0 || sch.class_target === 'Semua Kelas';
+            const targetBadge = isAll ? `
+              <span class="px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-[10px] font-medium flex items-center gap-1.5 w-fit">
+                <i class="fa-solid fa-users text-[9px]"></i> Semua Kelas
+              </span>
+            ` : (targetClasses.length === 1 ? `
+              <span class="px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 text-[10px] font-medium flex items-center gap-1.5 w-fit">
+                <i class="fa-solid fa-user-tag text-[9px]"></i> ${targetClasses[0]}
+              </span>
+            ` : `
+              <span class="px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 text-[10px] font-medium flex items-center gap-1.5 w-fit cursor-help" title="${sch.class_target}">
+                <i class="fa-solid fa-layer-group text-[9px]"></i> ${targetClasses.length} Kelas (${targetClasses.slice(0, 2).join(', ')}${targetClasses.length > 2 ? '...' : ''})
+              </span>
+            `);
             return `
               <tr class="hover:bg-slate-800/40 transition opacity-80 hover:opacity-100">
                 <td class="px-4 py-3.5 font-mono text-slate-500 font-bold">#${sch.id}</td>
@@ -3311,6 +3454,7 @@
                     Tidak Aktif
                   </span>
                 </td>
+                <td class="px-4 py-3.5">${targetBadge}</td>
                 <td class="px-4 py-3.5 text-slate-400">${sch.bank_name || '-'}</td>
                 <td class="px-4 py-3.5 font-mono text-slate-400">${sch.start_time || '-'}</td>
                 <td class="px-4 py-3.5 font-mono text-slate-400">${sch.duration_minutes} Menit</td>
@@ -3611,6 +3755,206 @@
       });
     }, 1000);
 
+    // ==============================================================
+    // MANAJEMEN TARGET KELAS UJIAN (1 KELAS, 2 KELAS, S/D 36 KELAS / TAK TERBATAS)
+    // ==============================================================
+    window.availableClassPool = new Set();
+
+    window.initAvailableClassPool = function() {
+      // 1. Preset 36 kelas standar sekolah (X-1 s/d X-12, XI-1 s/d XI-12, XII-1 s/d XII-12)
+      ['X', 'XI', 'XII'].forEach(lvl => {
+        for (let i = 1; i <= 12; i++) {
+          window.availableClassPool.add(`${lvl}-${i}`);
+        }
+      });
+      // 2. Tambah kelas dari master data siswa jika sudah terload
+      if (Array.isArray(masterStudentsList)) {
+        masterStudentsList.forEach(s => {
+          if (s.class_name) window.availableClassPool.add(s.class_name.trim());
+        });
+      }
+      // 3. Tambah kelas dari jadwal ujian yang sudah ada
+      if (Array.isArray(currentSchedules)) {
+        currentSchedules.forEach(s => {
+          if (s.class_target && s.class_target !== 'Semua Kelas') {
+            s.class_target.split(',').forEach(c => window.availableClassPool.add(c.trim()));
+          }
+        });
+      }
+    };
+
+    window.toggleScheduleClassMode = function(mode) {
+      window.initAvailableClassPool();
+      const radioName = mode === 'create' ? 'schClassMode_create' : 'editSchClassMode';
+      const isSpecific = document.querySelector(`input[name="${radioName}"][value="specific"]`)?.checked;
+      const container = document.getElementById(mode === 'create' ? 'schClassSelectorContainer_create' : 'editSchClassSelectorContainer');
+      const badge = document.getElementById(mode === 'create' ? 'schClassSummaryBadge_create' : 'editSchClassSummaryBadge');
+
+      if (isSpecific) {
+        if (container) container.classList.remove('hidden');
+        renderScheduleClassGrid(mode);
+        updateSelectedClassCount(mode);
+      } else {
+        if (container) container.classList.add('hidden');
+        if (badge) {
+          badge.className = 'text-[10px] text-indigo-400 font-bold bg-indigo-950/60 border border-indigo-800/50 px-2 py-0.5 rounded-full';
+          badge.innerText = 'Semua Kelas';
+        }
+      }
+    };
+
+    window.renderScheduleClassGrid = function(mode, selectedList = null) {
+      window.initAvailableClassPool();
+      const container = document.getElementById(mode === 'create' ? 'schClassGrid_create' : 'schClassGrid_edit');
+      if (!container) return;
+
+      let currentChecked = new Set();
+      if (selectedList === null) {
+        container.querySelectorAll('.sch-class-cb:checked').forEach(cb => currentChecked.add(cb.value.toLowerCase()));
+      } else {
+        selectedList.forEach(c => currentChecked.add(c.trim().toLowerCase()));
+      }
+
+      const classes = Array.from(window.availableClassPool).filter(Boolean).sort((a, b) => a.localeCompare(b, 'id', { numeric: true }));
+
+      container.innerHTML = classes.map(cls => {
+        const isChecked = currentChecked.has(cls.toLowerCase());
+        return `
+          <label class="sch-class-item flex items-center gap-1.5 p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border ${isChecked ? 'border-indigo-500/60 bg-indigo-950/30 text-white' : 'border-slate-800 text-slate-300'} text-[11px] cursor-pointer select-none transition" data-class-name="${cls.toLowerCase()}">
+            <input type="checkbox" value="${cls}" ${isChecked ? 'checked' : ''} onchange="handleClassCheckboxChange(this, '${mode}')" class="sch-class-cb rounded border-slate-700 bg-slate-950 text-indigo-600 focus:ring-0">
+            <span class="truncate font-medium" title="${cls}">${cls}</span>
+          </label>
+        `;
+      }).join('');
+
+      updateSelectedClassCount(mode);
+    };
+
+    window.handleClassCheckboxChange = function(cb, mode) {
+      const parent = cb.closest('.sch-class-item');
+      if (parent) {
+        if (cb.checked) {
+          parent.classList.add('border-indigo-500/60', 'bg-indigo-950/30', 'text-white');
+          parent.classList.remove('border-slate-800', 'text-slate-300');
+        } else {
+          parent.classList.remove('border-indigo-500/60', 'bg-indigo-950/30', 'text-white');
+          parent.classList.add('border-slate-800', 'text-slate-300');
+        }
+      }
+      updateSelectedClassCount(mode);
+    };
+
+    window.selectAllScheduleClasses = function(mode, selectAll) {
+      const container = document.getElementById(mode === 'create' ? 'schClassGrid_create' : 'schClassGrid_edit');
+      if (!container) return;
+      container.querySelectorAll('.sch-class-item').forEach(item => {
+        if (!item.classList.contains('hidden')) {
+          const cb = item.querySelector('.sch-class-cb');
+          if (cb) {
+            cb.checked = !!selectAll;
+            if (cb.checked) {
+              item.classList.add('border-indigo-500/60', 'bg-indigo-950/30', 'text-white');
+              item.classList.remove('border-slate-800', 'text-slate-300');
+            } else {
+              item.classList.remove('border-indigo-500/60', 'bg-indigo-950/30', 'text-white');
+              item.classList.add('border-slate-800', 'text-slate-300');
+            }
+          }
+        }
+      });
+      updateSelectedClassCount(mode);
+    };
+
+    window.filterScheduleClassGrid = function(mode) {
+      const q = (document.getElementById(mode === 'create' ? 'schClassSearch_create' : 'editSchClassSearch')?.value || '').trim().toLowerCase();
+      const container = document.getElementById(mode === 'create' ? 'schClassGrid_create' : 'schClassGrid_edit');
+      if (!container) return;
+      container.querySelectorAll('.sch-class-item').forEach(item => {
+        const clsName = item.dataset.className || '';
+        if (!q || clsName.includes(q)) {
+          item.classList.remove('hidden');
+        } else {
+          item.classList.add('hidden');
+        }
+      });
+    };
+
+    window.addCustomClassToGrid = function(mode) {
+      const input = document.getElementById(mode === 'create' ? 'schClassCustomInput_create' : 'editSchClassCustomInput');
+      if (!input) return;
+      const newCls = input.value.trim().toUpperCase();
+      if (!newCls) return;
+      window.availableClassPool.add(newCls);
+
+      const container = document.getElementById(mode === 'create' ? 'schClassGrid_create' : 'schClassGrid_edit');
+      const checked = [];
+      if (container) {
+        container.querySelectorAll('.sch-class-cb:checked').forEach(cb => checked.push(cb.value));
+      }
+      if (!checked.includes(newCls)) checked.push(newCls);
+      renderScheduleClassGrid(mode, checked);
+      input.value = '';
+    };
+
+    window.updateSelectedClassCount = function(mode) {
+      const container = document.getElementById(mode === 'create' ? 'schClassGrid_create' : 'schClassGrid_edit');
+      const countEl = document.getElementById(mode === 'create' ? 'schClassSelectedCount_create' : 'schClassSelectedCount_edit');
+      const badge = document.getElementById(mode === 'create' ? 'schClassSummaryBadge_create' : 'editSchClassSummaryBadge');
+      const radioName = mode === 'create' ? 'schClassMode_create' : 'editSchClassMode';
+      const isSpecific = document.querySelector(`input[name="${radioName}"][value="specific"]`)?.checked;
+
+      if (!isSpecific) {
+        if (badge) {
+          badge.className = 'text-[10px] text-indigo-400 font-bold bg-indigo-950/60 border border-indigo-800/50 px-2 py-0.5 rounded-full';
+          badge.innerText = 'Semua Kelas';
+        }
+        return;
+      }
+
+      let count = 0;
+      const checkedClasses = [];
+      if (container) {
+        container.querySelectorAll('.sch-class-cb:checked').forEach(cb => {
+          count++;
+          checkedClasses.push(cb.value);
+        });
+      }
+
+      if (countEl) {
+        countEl.innerText = `${count} kelas dipilih`;
+      }
+
+      if (badge) {
+        if (count === 0) {
+          badge.className = 'text-[10px] text-rose-400 font-bold bg-rose-950/60 border border-rose-800/50 px-2 py-0.5 rounded-full';
+          badge.innerText = 'Belum Ada Kelas Dipilih';
+        } else if (count === 1) {
+          badge.className = 'text-[10px] text-cyan-400 font-bold bg-cyan-950/60 border border-cyan-800/50 px-2 py-0.5 rounded-full';
+          badge.innerText = checkedClasses[0];
+        } else {
+          badge.className = 'text-[10px] text-sky-400 font-bold bg-sky-950/60 border border-sky-800/50 px-2 py-0.5 rounded-full';
+          badge.innerText = `${count} Kelas Terpilih`;
+        }
+      }
+    };
+
+    window.getSelectedTargetClasses = function(mode) {
+      const radioName = mode === 'create' ? 'schClassMode_create' : 'editSchClassMode';
+      const isSpecific = document.querySelector(`input[name="${radioName}"][value="specific"]`)?.checked;
+      if (!isSpecific) return 'Semua Kelas';
+
+      const container = document.getElementById(mode === 'create' ? 'schClassGrid_create' : 'schClassGrid_edit');
+      const selected = [];
+      if (container) {
+        container.querySelectorAll('.sch-class-cb:checked').forEach(cb => selected.push(cb.value.trim()));
+      }
+
+      if (selected.length === 0) {
+        return null;
+      }
+      return selected.join(', ');
+    };
+
     // Buat Jadwal Baru
     window.handleSaveSchedule = async function() {
       const title = document.getElementById('schTitle')?.value.trim() || 'Ujian Baru CBT';
@@ -3623,6 +3967,12 @@
       const shuffleQ = document.getElementById('schShuffleQ')?.checked ?? true;
       const shuffleOpt = document.getElementById('schShuffleOpt')?.checked ?? true;
       const isActive = document.getElementById('schIsActive')?.checked ?? true;
+
+      const classTarget = getSelectedTargetClasses('create');
+      if (classTarget === null) {
+        alert('Anda memilih opsi "Pilih Kelas Tertentu", silakan centang minimal 1 kelas atau pilih opsi "Semua Kelas"!');
+        return;
+      }
 
       try {
         const res = await fetch('/api/v1/cbt/schedules/create', {
@@ -3638,6 +3988,7 @@
             token_interval: tokenInterval,
             shuffle_questions: shuffleQ,
             shuffle_options: shuffleOpt,
+            class_target: classTarget,
             is_active: isActive,
           }),
         });
@@ -3678,6 +4029,23 @@
             document.getElementById('editSchShuffleOpt').checked = !!sch.shuffle_options;
             const cbActive = document.getElementById('editSchIsActive');
             if (cbActive) cbActive.checked = sch.is_active !== false;
+
+            // Target Kelas
+            const classTarget = sch.class_target || 'Semua Kelas';
+            const isAllClass = !classTarget || classTarget === 'Semua Kelas';
+            const radioAll = document.querySelector('input[name="editSchClassMode"][value="all"]');
+            const radioSpec = document.querySelector('input[name="editSchClassMode"][value="specific"]');
+
+            if (isAllClass) {
+              if (radioAll) radioAll.checked = true;
+              toggleScheduleClassMode('edit');
+            } else {
+              if (radioSpec) radioSpec.checked = true;
+              const classes = classTarget.split(',').map(c => c.trim()).filter(Boolean);
+              classes.forEach(c => window.availableClassPool.add(c));
+              toggleScheduleClassMode('edit');
+              renderScheduleClassGrid('edit', classes);
+            }
           }
         }
       } catch (e) {}
@@ -3698,6 +4066,12 @@
       const shuffleOpt = document.getElementById('editSchShuffleOpt').checked;
       const isActive = document.getElementById('editSchIsActive')?.checked ?? true;
 
+      const classTarget = getSelectedTargetClasses('edit');
+      if (classTarget === null) {
+        alert('Anda memilih opsi "Pilih Kelas Tertentu", silakan centang minimal 1 kelas atau pilih opsi "Semua Kelas"!');
+        return;
+      }
+
       try {
         const res = await fetch(`/api/v1/cbt/schedules/${scheduleId}/update`, {
           method: 'POST',
@@ -3712,6 +4086,7 @@
             token_interval: tokenInterval,
             shuffle_questions: shuffleQ,
             shuffle_options: shuffleOpt,
+            class_target: classTarget,
             is_active: isActive,
           }),
         });

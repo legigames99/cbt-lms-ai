@@ -592,43 +592,22 @@
           </button>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl overflow-x-auto">
           <table class="w-full text-xs text-left">
             <thead class="text-slate-400 bg-slate-950 uppercase text-[10px] tracking-wider">
               <tr>
-                <th class="px-4 py-3 rounded-l-lg">Nama Ujian</th>
+                <th class="px-4 py-3 rounded-l-lg">ID</th>
+                <th class="px-4 py-3">Nama Ujian</th>
                 <th class="px-4 py-3">Bank Soal Terpilih</th>
                 <th class="px-4 py-3">Waktu Mulai</th>
                 <th class="px-4 py-3">Durasi</th>
                 <th class="px-4 py-3">Token</th>
                 <th class="px-4 py-3">Paket Enkripsi AES-256</th>
-                <th class="px-4 py-3 rounded-r-lg">Aksi</th>
+                <th class="px-4 py-3 rounded-r-lg text-right">Aksi & Monitoring</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-800 text-slate-300">
-              <tr>
-                <td class="px-4 py-3.5 font-bold text-white"><span id="schRowTitle_1">UAS Fisika Peminatan XII</span></td>
-                <td class="px-4 py-3.5 text-slate-400"><span id="schRowBank_1">Bank Termodinamika (5 Soal)</span></td>
-                <td class="px-4 py-3.5 font-mono text-slate-300"><span id="schRowStart_1">Hari ini, 07:30 WIB</span></td>
-                <td class="px-4 py-3.5"><span id="schRowDuration_1">90 Menit</span></td>
-                <td class="px-4 py-3.5"><span id="schRowToken_1" class="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-bold">FISIKA26</span></td>
-                <td class="px-4 py-3.5">
-                  <div class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
-                    <i class="fa-solid fa-lock"></i> /static/packages/exam_1_enc.json
-                  </div>
-                </td>
-                <td class="px-4 py-3.5 flex items-center gap-2">
-                  <button onclick="openModalEditSchedule(1)" class="px-2.5 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-[11px] text-indigo-300 border border-indigo-500/30 transition flex items-center gap-1" title="Edit Jadwal & Konfigurasi Ujian">
-                    <i class="fa-solid fa-pen-to-square"></i> Edit
-                  </button>
-                  <button onclick="recompilePackage(1)" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-200 border border-slate-700 transition">
-                    Kompilasi Ulang
-                  </button>
-                  <button onclick="handleDeleteRow(this, 'Jadwal Ujian')" class="px-2.5 py-1 rounded-lg bg-rose-600/20 hover:bg-rose-600/30 text-[11px] text-rose-300 border border-rose-500/30 transition flex items-center gap-1">
-                    <i class="fa-regular fa-trash-can"></i> Hapus
-                  </button>
-                </td>
-              </tr>
+            <tbody id="schedulesTableBody" class="divide-y divide-slate-800 text-slate-300">
+              <!-- Dynamically populated by renderSchedulesTable() -->
             </tbody>
           </table>
         </div>
@@ -648,14 +627,17 @@
             <p class="text-xs text-slate-400">Pantau status pengerjaan, jawaban tersinkronisasi, dan deteksi perpindahan tab browser siswa.</p>
           </div>
           <div class="flex items-center gap-3 flex-wrap">
-            <button onclick="openModalBulkResetProctor()" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-amber-500/10" title="Reset Sesi Siswa Secara Massal / Bulk">
-              <i class="fa-solid fa-rotate-left text-sm"></i>
-              <span>Reset Massal (Bulk Reset)</span>
-            </button>
-            <button onclick="openModalExtendTime()" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-amber-500/10">
-              <i class="fa-solid fa-clock-rotate-left text-sm"></i>
-              <span>Tambah Waktu</span>
-            </button>
+            <div class="flex items-center gap-2 bg-slate-950/60 border border-indigo-500/40 rounded-xl px-3 py-1">
+              <span class="text-xs text-indigo-300 font-semibold flex items-center gap-1.5">
+                <i class="fa-solid fa-calendar-check text-indigo-400"></i>
+                <span class="hidden md:inline">Pilih</span> Jadwal:
+              </span>
+              <select id="proctorScheduleFilter" onchange="handleProctorScheduleChange(this.value)" class="bg-transparent text-xs text-white font-bold py-1 focus:outline-none cursor-pointer">
+                <option value="1">1. UAS Fisika Peminatan XII (FISIKA26)</option>
+                <option value="2">2. UTS Matematika Wajib XII (MTK2026)</option>
+                <option value="3">3. Simulasi CBT Bahasa Indonesia (BINDO12)</option>
+              </select>
+            </div>
             <div class="flex items-center gap-2">
               <span class="text-xs text-slate-400">Filter Kelas:</span>
               <select id="filterClassSelect" onchange="lastProctorDataHash=''; fetchProctorSessions();" class="bg-slate-900 border border-slate-800 text-xs text-white rounded-xl px-3 py-1.5 focus:outline-none">
@@ -664,6 +646,43 @@
                 <option value="XII IPA 2">XII IPA 2 (36 Siswa)</option>
               </select>
             </div>
+            <button onclick="openModalBulkResetProctor()" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-amber-500/10" title="Reset Sesi Siswa Secara Massal / Bulk">
+              <i class="fa-solid fa-rotate-left text-sm"></i>
+              <span>Reset Massal</span>
+            </button>
+            <button onclick="openModalExtendTime()" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-amber-500/10">
+              <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+              <span>+Waktu</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Banner Info Jadwal Aktif yang Sedang Dipantau -->
+        <div id="proctorActiveScheduleBanner" class="bg-gradient-to-r from-indigo-950/60 via-slate-900 to-slate-900/90 border border-indigo-500/30 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs shadow-lg">
+          <div class="flex items-center gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-lg shrink-0">
+              <i class="fa-solid fa-file-shield"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span id="proctorActiveScheduleTitle" class="font-bold text-white text-sm">UAS Fisika Peminatan XII</span>
+                <span id="proctorActiveScheduleTokenBadge" class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono text-[10px] font-bold">Token: FISIKA26</span>
+                <span id="proctorActiveScheduleStatusBadge" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-medium flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Sedang Dipantau
+                </span>
+              </div>
+              <p class="text-slate-400 text-[11px] mt-0.5">
+                <span id="proctorActiveScheduleBank">Bank Soal: Bank Termodinamika & Kalor (5 Butir Soal)</span> •
+                <span id="proctorActiveScheduleDuration">Durasi: 90 Menit</span> •
+                <span id="proctorActiveSchedulePackage" class="font-mono text-indigo-300">/static/packages/exam_1_enc.json</span>
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="text-slate-400 text-[11px]">Sesi Ujian terisolasi per jadwal:</span>
+            <span class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-[11px] font-mono">
+              <i class="fa-solid fa-lock text-emerald-400 mr-1"></i>Jadwal ID: <span id="proctorActiveScheduleId">1</span>
+            </span>
           </div>
         </div>
 
@@ -734,14 +753,27 @@
       <!-- TAB 5: HASIL & ANALISIS NILAI -->
       <!-- ============================================================== -->
       <section id="tab-nilai" class="hidden space-y-6">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h3 class="text-lg font-bold text-white">Hasil Ujian & Buku Nilai Terpadu</h3>
             <p class="text-xs text-slate-400">Rekap nilai ujian CBT otomatis dihitung dan dapat diekspor ke format Excel/CSV.</p>
           </div>
-          <button onclick="exportNilaiCSV()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition flex items-center gap-2 shadow-lg shadow-emerald-600/20">
-            <i class="fa-solid fa-file-excel"></i> Ekspor Nilai Excel
-          </button>
+          <div class="flex items-center gap-3 flex-wrap">
+            <div class="flex items-center gap-2 bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-1">
+              <span class="text-xs text-slate-400 flex items-center gap-1.5">
+                <i class="fa-solid fa-calendar-check text-indigo-400"></i>
+                <span>Jadwal:</span>
+              </span>
+              <select id="nilaiScheduleFilter" onchange="syncNilaiScheduleChange(this.value)" class="bg-transparent text-xs text-white font-bold py-1 focus:outline-none cursor-pointer">
+                <option value="1">1. UAS Fisika Peminatan XII</option>
+                <option value="2">2. UTS Matematika Wajib XII</option>
+                <option value="3">3. Simulasi CBT Bahasa Indonesia</option>
+              </select>
+            </div>
+            <button onclick="exportNilaiCSV()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition flex items-center gap-2 shadow-lg shadow-emerald-600/20">
+              <i class="fa-solid fa-file-excel"></i> Ekspor Nilai Excel
+            </button>
+          </div>
         </div>
 
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
@@ -1930,8 +1962,10 @@
         </div>
         <div>
           <label class="block font-semibold text-slate-300 mb-1">Pilih Bank Soal</label>
-          <select class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
-            <option>Bank Soal Termodinamika & Kalor (5 Butir Soal)</option>
+          <select id="schBank" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
+            <option value="Bank Termodinamika & Kalor (5 Butir Soal)">Bank Termodinamika & Kalor (5 Butir Soal)</option>
+            <option value="Bank Matematika Aljabar & Turunan (10 Butir Soal)">Bank Matematika Aljabar & Turunan (10 Butir Soal)</option>
+            <option value="Bank Bahasa Indonesia Teks Narasi (10 Butir Soal)">Bank Bahasa Indonesia Teks Narasi (10 Butir Soal)</option>
           </select>
         </div>
         <div class="grid grid-cols-2 gap-3">
@@ -1941,16 +1975,16 @@
           </div>
           <div>
             <label class="block font-semibold text-slate-300 mb-1">Kode Token Ujian</label>
-            <input type="text" id="schToken" value="FISIKA26" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-mono font-bold uppercase text-center text-amber-400">
+            <input type="text" id="schToken" value="CBT2026" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-mono font-bold uppercase text-center text-amber-400">
           </div>
         </div>
         <div class="space-y-1.5 pt-1">
           <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
-            <input type="checkbox" checked class="rounded border-slate-800 bg-slate-950 text-indigo-600 focus:ring-0">
+            <input type="checkbox" id="schShuffleQ" checked class="rounded border-slate-800 bg-slate-950 text-indigo-600 focus:ring-0">
             <span>Acak urutan nomor soal untuk setiap siswa (Seeded Shuffle)</span>
           </label>
           <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
-            <input type="checkbox" checked class="rounded border-slate-800 bg-slate-950 text-indigo-600 focus:ring-0">
+            <input type="checkbox" id="schShuffleOpt" checked class="rounded border-slate-800 bg-slate-950 text-indigo-600 focus:ring-0">
             <span>Acak urutan pilihan opsi jawaban A, B, C, D, E</span>
           </label>
         </div>
@@ -2014,7 +2048,7 @@
 
       <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
         <button onclick="closeModal('modalEditSchedule')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Batal</button>
-        <button onclick="handleSaveEditSchedule(1)" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/30">
+        <button onclick="handleSaveEditSchedule()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/30">
           <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan & Kompilasi Ulang
         </button>
       </div>
@@ -2746,54 +2780,204 @@
       }
     };
 
-    // Buat Jadwal
+    // ==============================================================
+    // JADWAL UJIAN (CBT) & ENKRIPSI AES-256-GCM DYNAMIC CONTROLLER
+    // ==============================================================
+    let currentSchedules = [];
+    let currentEditingScheduleId = 1;
+
+    async function fetchScheduleList() {
+      try {
+        const res = await fetch('/api/v1/cbt/schedules');
+        if (!res.ok) return;
+        const json = await res.json();
+        if (json.data && Array.isArray(json.data)) {
+          currentSchedules = json.data;
+          renderSchedulesTable(json.data);
+          updateProctorScheduleDropdown(json.data);
+        }
+      } catch (e) {
+        console.warn('Gagal memuat jadwal ujian:', e);
+      }
+    }
+
+    function renderSchedulesTable(schedules) {
+      const tbody = document.getElementById('schedulesTableBody');
+      if (!tbody) return;
+
+      if (!schedules || schedules.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-500">Belum ada jadwal ujian. Silakan klik "Tambah Jadwal Ujian".</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = schedules.map(sch => {
+        const encFile = sch.package_file || `exam_${sch.id}_enc.json`;
+        return `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="px-4 py-3.5 font-mono text-slate-400 font-bold">#${sch.id}</td>
+            <td class="px-4 py-3.5 font-bold text-white">
+              <span id="schRowTitle_${sch.id}">${sch.title}</span>
+            </td>
+            <td class="px-4 py-3.5 text-slate-400">
+              <span id="schRowBank_${sch.id}">${sch.bank_name || '-'}</span>
+            </td>
+            <td class="px-4 py-3.5 font-mono text-slate-300">
+              <span id="schRowStart_${sch.id}">${sch.start_time || '-'}</span>
+            </td>
+            <td class="px-4 py-3.5">
+              <span id="schRowDuration_${sch.id}">${sch.duration_minutes} Menit</span>
+            </td>
+            <td class="px-4 py-3.5">
+              <span id="schRowToken_${sch.id}" class="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-bold">${sch.token_code}</span>
+            </td>
+            <td class="px-4 py-3.5">
+              <div class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1 font-mono">
+                <i class="fa-solid fa-lock"></i> /static/packages/${encFile}
+              </div>
+            </td>
+            <td class="px-4 py-3.5 text-right">
+              <div class="flex items-center justify-end gap-2 flex-wrap">
+                <button onclick="switchToProctorSchedule(${sch.id})" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-emerald-500/10" title="Pantau peserta ujian jadwal ini di Live Proktor">
+                  <i class="fa-solid fa-desktop text-emerald-400"></i> Pantau di Live Proktor &rarr;
+                </button>
+                <button onclick="openModalEditSchedule(${sch.id})" class="px-2.5 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-[11px] text-indigo-300 border border-indigo-500/30 transition flex items-center gap-1" title="Edit Jadwal & Konfigurasi Ujian">
+                  <i class="fa-solid fa-pen-to-square"></i> Edit
+                </button>
+                <button onclick="recompilePackage(${sch.id})" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-200 border border-slate-700 transition" title="Kompilasi ulang paket soal terenkripsi AES-256">
+                  Kompilasi Ulang
+                </button>
+                <button onclick="handleDeleteSchedule(${sch.id}, '${sch.title.replace(/'/g, "\\'")}')" class="px-2 py-1 rounded bg-rose-600/20 hover:bg-rose-600/30 text-[11px] text-rose-300 border border-rose-500/30 transition flex items-center gap-1" title="Hapus Jadwal Ujian">
+                  <i class="fa-regular fa-trash-can"></i> Hapus
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function updateProctorScheduleDropdown(schedules) {
+      if (!Array.isArray(schedules)) return;
+
+      const pSelect = document.getElementById('proctorScheduleFilter');
+      const nSelect = document.getElementById('nilaiScheduleFilter');
+
+      const buildOpts = () => schedules.map(sch => `<option value="${sch.id}">Jadwal #${sch.id}: ${sch.title} (${sch.token_code})</option>`).join('');
+
+      if (pSelect) {
+        const curP = pSelect.value;
+        pSelect.innerHTML = buildOpts();
+        if (schedules.some(s => String(s.id) === String(curP))) {
+          pSelect.value = curP;
+        } else if (schedules.length > 0) {
+          pSelect.value = String(schedules[0].id);
+        }
+      }
+
+      if (nSelect) {
+        const curN = nSelect.value;
+        nSelect.innerHTML = buildOpts();
+        if (schedules.some(s => String(s.id) === String(curN))) {
+          nSelect.value = curN;
+        } else if (schedules.length > 0) {
+          nSelect.value = String(schedules[0].id);
+        }
+      }
+    }
+
+    window.switchToProctorSchedule = function(scheduleId) {
+      const pSelect = document.getElementById('proctorScheduleFilter');
+      if (pSelect) {
+        pSelect.value = String(scheduleId);
+      }
+      const nSelect = document.getElementById('nilaiScheduleFilter');
+      if (nSelect) {
+        nSelect.value = String(scheduleId);
+      }
+      switchTab('monitoring');
+      handleProctorScheduleChange(scheduleId);
+    };
+
+    window.handleProctorScheduleChange = function(newScheduleId) {
+      const nSelect = document.getElementById('nilaiScheduleFilter');
+      if (nSelect && nSelect.value !== String(newScheduleId)) {
+        nSelect.value = String(newScheduleId);
+      }
+      if (typeof clearProctorSelection === 'function') clearProctorSelection();
+      lastProctorDataHash = '';
+      fetchProctorSessions();
+    };
+
+    window.syncNilaiScheduleChange = function(newScheduleId) {
+      const pSelect = document.getElementById('proctorScheduleFilter');
+      if (pSelect && pSelect.value !== String(newScheduleId)) {
+        pSelect.value = String(newScheduleId);
+      }
+      handleProctorScheduleChange(newScheduleId);
+    };
+
+    function getProctorSelectedScheduleId() {
+      const schedSelect = document.getElementById('proctorScheduleFilter');
+      return parseInt(schedSelect?.value, 10) || 1;
+    }
+
+    // Buat Jadwal Baru
     window.handleSaveSchedule = async function() {
-      const title = document.getElementById('schTitle')?.value || 'UAS Fisika Peminatan XII';
+      const title = document.getElementById('schTitle')?.value.trim() || 'Ujian Baru CBT';
+      const bank = document.getElementById('schBank')?.value || 'Bank Termodinamika & Kalor (5 Butir Soal)';
       const duration = parseInt(document.getElementById('schDuration')?.value, 10) || 90;
-      const tokenCode = (document.getElementById('schToken')?.value || 'FISIKA26').trim().toUpperCase();
+      const tokenCode = (document.getElementById('schToken')?.value || 'CBT2026').trim().toUpperCase();
+      const shuffleQ = document.getElementById('schShuffleQ')?.checked ?? true;
+      const shuffleOpt = document.getElementById('schShuffleOpt')?.checked ?? true;
 
       try {
-        const res = await fetch('/api/v1/cbt/schedules/1/update', {
+        const res = await fetch('/api/v1/cbt/schedules/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             title: title,
+            bank_name: bank,
+            start_time: 'Hari ini, 07:30 WIB',
             duration_minutes: duration,
             token_code: tokenCode,
+            shuffle_questions: shuffleQ,
+            shuffle_options: shuffleOpt,
           }),
         });
         const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
         closeModal('modalCreateSchedule');
-        alert(json.message || 'Jadwal ujian baru berhasil disimpan dan paket soal telah dienkripsi AES-256-GCM!');
+        alert(json.message || 'Jadwal ujian baru berhasil dibuat dan paket AES-256-GCM telah dikompilasi!');
         await fetchScheduleList();
       } catch (err) {
-        closeModal('modalCreateSchedule');
-        alert('Jadwal ujian berhasil disimpan!');
+        alert('Gagal membuat jadwal: ' + err.message);
       }
     };
 
     // Edit Jadwal Ujian (CBT)
     window.openModalEditSchedule = async function(scheduleId = 1) {
+      window.currentEditingScheduleId = scheduleId;
       try {
         const res = await fetch('/api/v1/cbt/schedules');
         if (res.ok) {
           const json = await res.json();
-          const sch = json.data && json.data[0];
+          const sch = (json.data || []).find(s => s.id === scheduleId) || (json.data && json.data[0]);
           if (sch) {
             document.getElementById('editSchTitle').value = sch.title;
             document.getElementById('editSchBank').value = sch.bank_name;
             document.getElementById('editSchStartTime').value = sch.start_time;
             document.getElementById('editSchDuration').value = sch.duration_minutes;
             document.getElementById('editSchToken').value = sch.token_code;
-            document.getElementById('editSchShuffleQ').checked = sch.shuffle_questions;
-            document.getElementById('editSchShuffleOpt').checked = sch.shuffle_options;
+            document.getElementById('editSchShuffleQ').checked = !!sch.shuffle_questions;
+            document.getElementById('editSchShuffleOpt').checked = !!sch.shuffle_options;
           }
         }
       } catch (e) {}
       openModal('modalEditSchedule');
     };
 
-    window.handleSaveEditSchedule = async function(scheduleId = 1) {
+    window.handleSaveEditSchedule = async function() {
+      const scheduleId = window.currentEditingScheduleId || 1;
       const title = document.getElementById('editSchTitle').value.trim();
       const bank = document.getElementById('editSchBank').value;
       const startTime = document.getElementById('editSchStartTime').value.trim();
@@ -2820,47 +3004,50 @@
         const json = await res.json();
         if (!res.ok) throw new Error(json.message);
 
-        // Update DOM tabel jadwal langsung tanpa perlu refresh
-        const rowTitle = document.getElementById('schRowTitle_1');
-        const rowBank = document.getElementById('schRowBank_1');
-        const rowStart = document.getElementById('schRowStart_1');
-        const rowDuration = document.getElementById('schRowDuration_1');
-        const rowToken = document.getElementById('schRowToken_1');
-
-        if (rowTitle) rowTitle.innerText = title;
-        if (rowBank) rowBank.innerText = bank;
-        if (rowStart) rowStart.innerText = startTime;
-        if (rowDuration) rowDuration.innerText = `${duration} Menit`;
-        if (rowToken) rowToken.innerText = tokenCode;
-
         closeModal('modalEditSchedule');
         alert(json.message || 'Jadwal ujian berhasil diperbarui dan dipaket ulang!');
+        await fetchScheduleList();
+        lastProctorDataHash = '';
+        await fetchProctorSessions();
       } catch (err) {
         alert('Gagal mengedit jadwal: ' + err.message);
       }
     };
 
-    async function fetchScheduleList() {
-      try {
-        const res = await fetch('/api/v1/cbt/schedules');
-        if (!res.ok) return;
-        const json = await res.json();
-        const sch = json.data && json.data[0];
-        if (sch) {
-          const rowTitle = document.getElementById('schRowTitle_1');
-          const rowBank = document.getElementById('schRowBank_1');
-          const rowStart = document.getElementById('schRowStart_1');
-          const rowDuration = document.getElementById('schRowDuration_1');
-          const rowToken = document.getElementById('schRowToken_1');
+    window.handleDeleteSchedule = async function(scheduleId, scheduleTitle) {
+      if (!confirm(`Hapus jadwal ujian #${scheduleId} "${scheduleTitle}"?\nPerhatian: Sesi pengerjaan siswa pada jadwal ini juga akan terhapus.`)) return;
 
-          if (rowTitle) rowTitle.innerText = sch.title;
-          if (rowBank) rowBank.innerText = sch.bank_name;
-          if (rowStart) rowStart.innerText = sch.start_time;
-          if (rowDuration) rowDuration.innerText = `${sch.duration_minutes} Menit`;
-          if (rowToken) rowToken.innerText = sch.token_code;
-        }
-      } catch (e) {}
-    }
+      try {
+        const res = await fetch(`/api/v1/cbt/schedules/${scheduleId}/delete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+
+        alert(json.message || 'Jadwal berhasil dihapus!');
+        await fetchScheduleList();
+        lastProctorDataHash = '';
+        await fetchProctorSessions();
+      } catch (err) {
+        alert('Gagal menghapus jadwal: ' + err.message);
+      }
+    };
+
+    window.recompilePackage = async function(scheduleId = 1) {
+      try {
+        const res = await fetch(`/api/v1/cbt/schedules/${scheduleId}/publish-package`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+        alert(json.message || `Paket ujian #${scheduleId} berhasil dikompilasi ulang dengan enkripsi AES-256-GCM!`);
+        await fetchScheduleList();
+      } catch (err) {
+        alert('Gagal mengompilasi paket: ' + err.message);
+      }
+    };
 
     // Buat Bank Soal
     window.handleCreateBankSubmit = function() {
@@ -2887,18 +3074,50 @@
       if (document.hidden) return; // Tab browser sedang tidak dilihat, hemat CPU & bandwidth
 
       try {
+        const selectedScheduleId = getProctorSelectedScheduleId();
         const filterSelect = document.getElementById('filterClassSelect');
         const selectedClass = filterSelect ? filterSelect.value : '';
-        const url = (selectedClass && selectedClass !== 'all')
-          ? `/api/v1/cbt/proctor/live-sessions?class=${encodeURIComponent(selectedClass)}`
-          : '/api/v1/cbt/proctor/live-sessions';
+
+        const params = new URLSearchParams();
+        if (selectedScheduleId) params.append('schedule_id', selectedScheduleId);
+        if (selectedClass && selectedClass !== 'all') params.append('class', selectedClass);
+
+        const url = `/api/v1/cbt/proctor/live-sessions?${params.toString()}`;
 
         const res = await fetch(url);
         if (!res.ok) return;
         const json = await res.json();
+
+        // Update banner active schedule info
+        if (json.schedule) {
+          const sch = json.schedule;
+          const bannerTitle = document.getElementById('proctorActiveScheduleTitle');
+          const bannerToken = document.getElementById('proctorActiveScheduleTokenBadge');
+          const bannerBank = document.getElementById('proctorActiveScheduleBank');
+          const bannerDuration = document.getElementById('proctorActiveScheduleDuration');
+          const bannerPkg = document.getElementById('proctorActiveSchedulePackage');
+          const bannerId = document.getElementById('proctorActiveScheduleId');
+
+          if (bannerTitle) bannerTitle.innerText = sch.title;
+          if (bannerToken) bannerToken.innerText = `Token: ${sch.token_code}`;
+          if (bannerBank) bannerBank.innerText = `Bank Soal: ${sch.bank_name || '-'}`;
+          if (bannerDuration) bannerDuration.innerText = `Durasi: ${sch.duration_minutes} Menit`;
+          if (bannerPkg) bannerPkg.innerText = `/static/packages/exam_${sch.id}_enc.json`;
+          if (bannerId) bannerId.innerText = sch.id;
+        }
+
+        // Sync dropdown list if available
+        if (json.schedules && Array.isArray(json.schedules)) {
+          const schedSelect = document.getElementById('proctorScheduleFilter');
+          if (schedSelect && schedSelect.options.length !== json.schedules.length) {
+            updateProctorScheduleDropdown(json.schedules);
+            if (schedSelect) schedSelect.value = String(selectedScheduleId);
+          }
+        }
+
         if (json.data && Array.isArray(json.data)) {
           // 2. Smart Diffing: Jika data tidak berubah, lewati rendering DOM (0% CPU cost)
-          const currentHash = JSON.stringify(json.data);
+          const currentHash = `${selectedScheduleId}_${selectedClass}_` + JSON.stringify(json.data);
           if (currentHash === lastProctorDataHash) {
             return;
           }
@@ -3058,14 +3277,16 @@
 
     // Ekspor CSV
     window.exportNilaiCSV = function() {
-      let csvContent = "data:text/csv;charset=utf-8,Peringkat,NISN,Nama Siswa,Kelas,Benar,Salah,Nilai Akhir,Status\n";
+      const schedSelect = document.getElementById('proctorScheduleFilter');
+      const schedText = schedSelect ? schedSelect.options[schedSelect.selectedIndex]?.text || 'Jadwal CBT' : 'Jadwal CBT';
+      let csvContent = `data:text/csv;charset=utf-8,Jadwal Ujian: "${schedText}"\nPeringkat,NISN,Nama Siswa,Kelas,Benar,Salah,Nilai Akhir,Status\n`;
       lastProctorSessionsData.forEach((s, idx) => {
         csvContent += `#${idx + 1},${s.username},"${s.full_name}",${s.class_name || 'XII IPA 1'},${s.correct_count},${s.wrong_count},${s.score.toFixed(2)},${s.is_passed ? 'TUNTAS' : 'REMIDIAL'}\n`;
       });
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "rekap_nilai_cbt.csv");
+      link.setAttribute("download", `rekap_nilai_cbt_jadwal_${schedSelect ? schedSelect.value : '1'}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -3073,17 +3294,18 @@
 
     // Reset Sesi Ujian Siswa (Proktor)
     window.handleResetSession = async function(username, resetType = 'login_only') {
+      const schId = getProctorSelectedScheduleId();
       const isLoginOnly = resetType === 'login_only';
       const promptText = isLoginOnly
-        ? `Reset Login untuk ${username}?\nSiswa diizinkan login kembali dan melanjutkan pengerjaan (jawaban tetap tersimpan).`
-        : `Reset Sesi Ujian Penuh untuk ${username}?\nSesi dan seluruh jawaban akan dihapus agar siswa mulai dari awal.`;
+        ? `Reset Login untuk ${username} pada Jadwal #${schId}?\nSiswa diizinkan login kembali dan melanjutkan pengerjaan (jawaban tetap tersimpan).`
+        : `Reset Sesi Ujian Penuh untuk ${username} pada Jadwal #${schId}?\nSesi dan seluruh jawaban pada jadwal ini akan dihapus agar siswa mulai dari awal.`;
 
       if (!confirm(promptText)) return;
       try {
         const res = await fetch('/api/v1/cbt/proctor/reset-session', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, reset_type: resetType })
+          body: JSON.stringify({ username, reset_type: resetType, schedule_id: schId })
         });
         const json = await res.json();
         alert(json.message || 'Sesi berhasil direset!');
@@ -3096,12 +3318,13 @@
 
     // Kunci Selesai Secara Paksa oleh Proktor
     window.handleForceFinish = async function(username) {
-      if (!confirm(`Kunci selesai ujian untuk ${username} sekarang? Lembar jawaban siswa akan langsung dikumpulkan.`)) return;
+      const schId = getProctorSelectedScheduleId();
+      if (!confirm(`Kunci selesai ujian untuk ${username} pada Jadwal #${schId} sekarang? Lembar jawaban siswa akan langsung dikumpulkan.`)) return;
       try {
         const res = await fetch('/api/v1/cbt/proctor/force-finish', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username })
+          body: JSON.stringify({ username, schedule_id: schId })
         });
         const json = await res.json();
         alert(json.message || 'Ujian berhasil dikunci selesai!');
@@ -3253,6 +3476,7 @@
 
     // Eksekusi Reset Massal dari Modal
     window.executeBulkResetProctor = async function() {
+      const schId = getProctorSelectedScheduleId();
       const targetType = document.querySelector('input[name="bulkResetTarget"]:checked')?.value || 'class';
       const resetType = document.querySelector('input[name="bulkResetType"]:checked')?.value || 'login_only';
       const statusFilter = document.getElementById('bulkResetStatusFilter')?.value || 'all';
@@ -3267,9 +3491,9 @@
 
       const typeDesc = resetType === 'login_only'
         ? 'Reset Login (Siswa login kembali, jawaban aman tersimpan)'
-        : 'Reset Penuh (Sesi & SELURUH jawaban siswa akan dihapus)';
+        : 'Reset Penuh (Sesi & SELURUH jawaban siswa pada jadwal ini akan dihapus)';
 
-      const confirmMsg = `Konfirmasi Eksekusi Reset Sesi Massal:\n\nTarget: ${targetType.toUpperCase()}\nJenis Reset: ${typeDesc}\n\nApakah Anda yakin ingin menjalankan reset sesi massal?`;
+      const confirmMsg = `Konfirmasi Eksekusi Reset Sesi Massal:\n\nJadwal Ujian ID: #${schId}\nTarget: ${targetType.toUpperCase()}\nJenis Reset: ${typeDesc}\n\nApakah Anda yakin ingin menjalankan reset sesi massal?`;
       if (!confirm(confirmMsg)) return;
 
       const btn = document.getElementById('btnExecuteBulkReset');
@@ -3283,6 +3507,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            schedule_id: schId,
             target_type: targetType,
             reset_type: resetType,
             usernames: usernames,
@@ -3310,6 +3535,7 @@
 
     // Aksi Cepat Reset Terpilih dari Floating Action Bar
     window.handleBulkResetSelected = async function(resetType = 'login_only') {
+      const schId = getProctorSelectedScheduleId();
       const usernames = window.selectedProctorUsernames ? Array.from(window.selectedProctorUsernames) : [];
       if (usernames.length === 0) {
         alert('Pilih minimal 1 siswa di tabel monitoring.');
@@ -3317,8 +3543,8 @@
       }
 
       const desc = resetType === 'login_only'
-        ? `Reset Login untuk ${usernames.length} siswa terpilih?\n(Siswa dapat login kembali dan melanjutkan pengerjaan dengan jawaban tetap tersimpan)`
-        : `PERINGATAN: Reset Penuh untuk ${usernames.length} siswa terpilih?\n(Sesi dan SELURUH JAWABAN siswa akan dihapus sehingga siswa mengulang dari awal!)`;
+        ? `Reset Login untuk ${usernames.length} siswa terpilih pada Jadwal #${schId}?\n(Siswa dapat login kembali dan melanjutkan pengerjaan dengan jawaban tetap tersimpan)`
+        : `PERINGATAN: Reset Penuh untuk ${usernames.length} siswa terpilih pada Jadwal #${schId}?\n(Sesi dan SELURUH JAWABAN siswa akan dihapus sehingga siswa mengulang dari awal!)`;
 
       if (!confirm(desc)) return;
 
@@ -3327,6 +3553,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            schedule_id: schId,
             target_type: 'selected',
             reset_type: resetType,
             usernames: usernames,
@@ -3346,19 +3573,20 @@
 
     // Kunci Selesai Massal untuk Siswa Terpilih
     window.handleBulkForceFinishSelected = async function() {
+      const schId = getProctorSelectedScheduleId();
       const usernames = window.selectedProctorUsernames ? Array.from(window.selectedProctorUsernames) : [];
       if (usernames.length === 0) {
         alert('Pilih minimal 1 siswa di tabel monitoring.');
         return;
       }
 
-      if (!confirm(`Kunci selesai ujian untuk ${usernames.length} siswa terpilih? Lembar jawaban mereka akan langsung dikumpulkan permanen.`)) return;
+      if (!confirm(`Kunci selesai ujian untuk ${usernames.length} siswa terpilih pada Jadwal #${schId}? Lembar jawaban mereka akan langsung dikumpulkan permanen.`)) return;
 
       try {
         const res = await fetch('/api/v1/cbt/proctor/bulk-force-finish', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ usernames: usernames })
+          body: JSON.stringify({ usernames: usernames, schedule_id: schId })
         });
         const json = await res.json();
         if (!res.ok) throw new Error(json.message);
@@ -3409,13 +3637,14 @@
     };
 
     window.handleApplyExtendTime = async function() {
+      const schId = getProctorSelectedScheduleId();
       const isSingle = document.querySelector('input[name="extendTargetType"]:checked')?.value === 'single';
       const username = document.getElementById('extendStudentUsername')?.value || 'siswa_1001';
       const minutes = parseInt(document.getElementById('customExtendMinutes')?.value, 10) || 15;
       const reason = document.getElementById('extendReasonSelect')?.value || 'Dispensasi Proktor';
 
       const payload = {
-        schedule_id: 1,
+        schedule_id: schId,
         target: isSingle ? 'single' : 'all',
         username: isSingle ? username : null,
         minutes: minutes,

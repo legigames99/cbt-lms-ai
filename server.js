@@ -289,87 +289,164 @@ const QUESTIONS = [
   },
 ];
 
-// Jadwal Ujian Aktif & Paket AES-256-GCM
+// Jadwal Ujian (Multi-Jadwal CBT) & Paket AES-256-GCM
+const SCHEDULES_FILE = path.join(__dirname, 'schedules.json');
+
+const DEFAULT_SCHEDULES = [
+  {
+    id: 1,
+    title: 'UAS Fisika Peminatan XII',
+    bank_name: 'Bank Termodinamika (5 Soal)',
+    start_time: 'Hari ini, 07:30 WIB',
+    duration_minutes: 90,
+    token_code: 'FISIKA26',
+    shuffle_questions: true,
+    shuffle_options: true,
+    class_target: 'Semua Kelas',
+    package_url: '/static/packages/exam_1_enc.json',
+  },
+  {
+    id: 2,
+    title: 'Penilaian Akhir Matematika Wajib XII',
+    bank_name: 'Bank Aljabar & Matriks (5 Soal)',
+    start_time: 'Hari ini, 10:00 WIB',
+    duration_minutes: 120,
+    token_code: 'MTK2026',
+    shuffle_questions: true,
+    shuffle_options: true,
+    class_target: 'Semua Kelas',
+    package_url: '/static/packages/exam_2_enc.json',
+  },
+  {
+    id: 3,
+    title: 'Asesmen Bahasa Indonesia XII',
+    bank_name: 'Bank Teks Editorial & Puisi (5 Soal)',
+    start_time: 'Hari ini, 13:00 WIB',
+    duration_minutes: 90,
+    token_code: 'BIND2026',
+    shuffle_questions: true,
+    shuffle_options: true,
+    class_target: 'Semua Kelas',
+    package_url: '/static/packages/exam_3_enc.json',
+  },
+];
+
+let SCHEDULES = [...DEFAULT_SCHEDULES];
+
+function saveSchedulesToFile() {
+  try {
+    fs.writeFileSync(SCHEDULES_FILE, JSON.stringify(SCHEDULES, null, 2), 'utf8');
+  } catch (e) {
+    console.error('Failed to save schedules.json:', e.message);
+  }
+}
+
+function loadSchedulesFromFile() {
+  try {
+    if (fs.existsSync(SCHEDULES_FILE)) {
+      const raw = fs.readFileSync(SCHEDULES_FILE, 'utf8');
+      const saved = JSON.parse(raw);
+      if (Array.isArray(saved) && saved.length > 0) {
+        SCHEDULES = saved;
+        console.log(`[Jadwal Ujian] Memuat ${saved.length} jadwal dari schedules.json`);
+        return;
+      }
+    }
+  } catch (e) {
+    console.error('Failed to load schedules.json:', e.message);
+  }
+  saveSchedulesToFile();
+}
+
+loadSchedulesFromFile();
+
+let activeSchedule = SCHEDULES[0] || DEFAULT_SCHEDULES[0];
 let currentAESKeyHex = '';
 let currentPackageSHA256 = '';
+const scheduleKeys = {};
 
-let activeSchedule = {
-  id: 1,
-  title: 'UAS Fisika Peminatan XII',
-  bank_name: 'Bank Termodinamika (5 Soal)',
-  start_time: 'Hari ini, 07:30 WIB',
-  duration_minutes: 90,
-  token_code: 'FISIKA26',
-  shuffle_questions: true,
-  shuffle_options: true,
-};
+function compileAndEncryptPackage(targetScheduleId = null) {
+  const targetList = targetScheduleId
+    ? SCHEDULES.filter(s => s.id === targetScheduleId)
+    : SCHEDULES;
 
-function compileAndEncryptPackage() {
-  const key = crypto.randomBytes(32);
-  const nonce = crypto.randomBytes(12);
+  for (const sch of targetList) {
+    const key = crypto.randomBytes(32);
+    const nonce = crypto.randomBytes(12);
 
-  const payload = JSON.stringify({
-    schedule_id: activeSchedule.id,
-    title: activeSchedule.title,
-    duration_minutes: activeSchedule.duration_minutes,
-    shuffle_questions: activeSchedule.shuffle_questions,
-    shuffle_options: activeSchedule.shuffle_options,
-    questions: QUESTIONS,
-  });
+    const payload = JSON.stringify({
+      schedule_id: sch.id,
+      title: sch.title,
+      duration_minutes: sch.duration_minutes,
+      shuffle_questions: sch.shuffle_questions,
+      shuffle_options: sch.shuffle_options,
+      questions: QUESTIONS,
+    });
 
-  const cipher = crypto.createCipheriv('aes-256-gcm', key, nonce);
-  let encrypted = cipher.update(payload, 'utf8', 'hex');
-  encrypted += cipher.final('hex');
-  const tag = cipher.getAuthTag().toString('hex');
+    const cipher = crypto.createCipheriv('aes-256-gcm', key, nonce);
+    let encrypted = cipher.update(payload, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    const tag = cipher.getAuthTag().toString('hex');
+    const fullCipherHex = encrypted + tag;
 
-  // Format GCM: ciphertext + auth_tag
-  const fullCipherHex = encrypted + tag;
+    const pkgObj = {
+      schedule_id: sch.id,
+      title: sch.title,
+      nonce: nonce.toString('hex'),
+      ciphertext: fullCipherHex,
+    };
 
-  const pkgObj = {
-    schedule_id: activeSchedule.id,
-    title: activeSchedule.title,
-    nonce: nonce.toString('hex'),
-    ciphertext: fullCipherHex,
-  };
+    const fileData = JSON.stringify(pkgObj);
+    const filename = `exam_${sch.id}_enc.json`;
+    const targetPath = path.join(STATIC_PKG_DIR, filename);
+    fs.writeFileSync(targetPath, fileData);
 
-  const fileData = JSON.stringify(pkgObj);
-  const targetPath = path.join(STATIC_PKG_DIR, 'exam_1_enc.json');
-  fs.writeFileSync(targetPath, fileData);
+    const keyHex = key.toString('hex');
+    const sha256 = crypto.createHash('sha256').update(fileData).digest('hex');
+    scheduleKeys[sch.id] = { keyHex, sha256, packageUrl: `/static/packages/${filename}` };
+    sch.package_url = `/static/packages/${filename}`;
+  }
 
-  currentAESKeyHex = key.toString('hex');
-  currentPackageSHA256 = crypto.createHash('sha256').update(fileData).digest('hex');
-
-  console.log('[CBT Packager] Paket soal berhasil dienkripsi AES-256-GCM');
-  console.log('   File     :', targetPath);
-  console.log('   AES Key  :', currentAESKeyHex);
-  console.log('   SHA256   :', currentPackageSHA256);
+  if (scheduleKeys[activeSchedule.id]) {
+    currentAESKeyHex = scheduleKeys[activeSchedule.id].keyHex;
+    currentPackageSHA256 = scheduleKeys[activeSchedule.id].sha256;
+  }
+  console.log(`[CBT Packager] Berhasil mengompilasi ${targetList.length} paket soal terenkripsi AES-256-GCM`);
 }
 
 compileAndEncryptPackage();
 
-// In-Memory Session & Answer Store
+// In-Memory Session & Answer Store (Multi-Jadwal: {schedule_id}_{student_id})
 const studentAnswersStore = {
-  1001: { 1: { a: 'C', d: 0 }, 2: { a: 'B', d: 0 }, 3: { a: 'C', d: 0 }, 4: { a: 'B', d: 0 }, 5: { a: 'C', d: 0 } },
-  1002: { 1: { a: 'A', d: 1 }, 2: { a: 'B', d: 0 }, 3: { a: 'C', d: 0 } },
-  1003: {},
+  // Jadwal 1 (UAS Fisika Peminatan XII)
+  '1_1001': { 1: { a: 'C', d: 0 }, 2: { a: 'B', d: 0 }, 3: { a: 'C', d: 0 }, 4: { a: 'B', d: 0 }, 5: { a: 'C', d: 0 } },
+  '1_1002': { 1: { a: 'A', d: 1 }, 2: { a: 'B', d: 0 }, 3: { a: 'C', d: 0 } },
+  // Jadwal 2 (Penilaian Akhir Matematika Wajib XII)
+  '2_1001': { 1: { a: 'B', d: 0 }, 2: { a: 'B', d: 0 }, 3: { a: 'B', d: 0 } },
+  '2_1002': { 1: { a: 'C', d: 0 }, 2: { a: 'C', d: 0 }, 3: { a: 'C', d: 0 }, 4: { a: 'C', d: 0 }, 5: { a: 'C', d: 0 } },
+  '2_1003': { 1: { a: 'A', d: 1 }, 2: { a: 'D', d: 0 } },
+  // Jadwal 3 (Asesmen Bahasa Indonesia XII)
+  '3_1001': { 1: { a: 'C', d: 0 }, 2: { a: 'B', d: 0 }, 3: { a: 'A', d: 0 }, 4: { a: 'D', d: 0 }, 5: { a: 'B', d: 0 } },
+  '3_1003': { 1: { a: 'C', d: 0 }, 2: { a: 'C', d: 0 } },
 };
 
 const studentSessions = {
+  // Jadwal 1 (UAS Fisika Peminatan XII)
   '1_1001': {
     status: 'submitted',
-    started_at: '21 Okt 2026 10.30.00 WIB',
-    submitted_at: '21 Okt 2026 11.42.15 WIB',
+    started_at: '21 Okt 2026 07.30.00 WIB',
+    submitted_at: '21 Okt 2026 08.45.15 WIB',
     tab_violations: 0,
     ip_address: '192.168.1.102',
-    answers: studentAnswersStore[1001],
+    answers: studentAnswersStore['1_1001'],
   },
   '1_1002': {
     status: 'in_progress',
-    started_at: '21 Okt 2026 10.35.00 WIB',
+    started_at: '21 Okt 2026 07.35.00 WIB',
     submitted_at: null,
     tab_violations: 2,
     ip_address: '192.168.1.105',
-    answers: studentAnswersStore[1002],
+    answers: studentAnswersStore['1_1002'],
   },
   '1_1003': {
     status: 'not_started',
@@ -379,11 +456,53 @@ const studentSessions = {
     ip_address: '192.168.1.108',
     answers: {},
   },
+  // Jadwal 2 (Penilaian Akhir Matematika Wajib XII)
+  '2_1001': {
+    status: 'in_progress',
+    started_at: '21 Okt 2026 10.05.00 WIB',
+    submitted_at: null,
+    tab_violations: 0,
+    ip_address: '192.168.1.102',
+    answers: studentAnswersStore['2_1001'],
+  },
+  '2_1002': {
+    status: 'submitted',
+    started_at: '21 Okt 2026 10.00.00 WIB',
+    submitted_at: '21 Okt 2026 11.20.10 WIB',
+    tab_violations: 1,
+    ip_address: '192.168.1.105',
+    answers: studentAnswersStore['2_1002'],
+  },
+  '2_1003': {
+    status: 'in_progress',
+    started_at: '21 Okt 2026 10.15.00 WIB',
+    submitted_at: null,
+    tab_violations: 0,
+    ip_address: '192.168.1.108',
+    answers: studentAnswersStore['2_1003'],
+  },
+  // Jadwal 3 (Asesmen Bahasa Indonesia XII)
+  '3_1001': {
+    status: 'submitted',
+    started_at: '21 Okt 2026 13.00.00 WIB',
+    submitted_at: '21 Okt 2026 14.15.00 WIB',
+    tab_violations: 0,
+    ip_address: '192.168.1.102',
+    answers: studentAnswersStore['3_1001'],
+  },
+  '3_1003': {
+    status: 'in_progress',
+    started_at: '21 Okt 2026 13.10.00 WIB',
+    submitted_at: null,
+    tab_violations: 0,
+    ip_address: '192.168.1.108',
+    answers: studentAnswersStore['3_1003'],
+  },
 };
 
 // Penambahan Waktu Ujian (Dispensasi Proktor)
-let scheduleExtraMinutes = 0;
-const studentExtraMinutes = {}; // { [studentId]: extraMinutes }
+const scheduleExtraMinutes = {};
+const studentExtraMinutes = {};
 
 // Helper Extract User from Bearer Token
 function getUserFromToken(req) {
@@ -872,72 +991,111 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
-  // GET /api/v1/cbt/schedules (Daftar Jadwal Ujian untuk Dashboard)
+  // GET /api/v1/cbt/schedules (Daftar Semua Jadwal Ujian untuk Dashboard)
   if (pathname === '/api/v1/cbt/schedules' && req.method === 'GET') {
     return sendJSON(200, {
       status: 'success',
-      data: [
-        {
-          id: activeSchedule.id,
-          title: activeSchedule.title,
-          bank_name: activeSchedule.bank_name,
-          start_time: activeSchedule.start_time,
-          duration_minutes: activeSchedule.duration_minutes,
-          token_code: activeSchedule.token_code,
-          shuffle_questions: activeSchedule.shuffle_questions,
-          shuffle_options: activeSchedule.shuffle_options,
-          package_url: '/static/packages/exam_1_enc.json',
-          package_sha256: currentPackageSHA256,
-        },
-      ],
+      data: SCHEDULES,
+      total: SCHEDULES.length,
+    });
+  }
+
+  // POST /api/v1/cbt/schedules/create (Tambah Jadwal Ujian Baru)
+  if ((pathname === '/api/v1/cbt/schedules/create' || pathname === '/api/v1/cbt/schedules/add') && req.method === 'POST') {
+    const body = await parseBody(req);
+    const nextId = Math.max(...SCHEDULES.map(s => s.id || 0), 0) + 1;
+    const newSch = {
+      id: nextId,
+      title: body.title?.trim() || `Jadwal Ujian #${nextId}`,
+      bank_name: body.bank_name?.trim() || 'Bank Termodinamika (5 Soal)',
+      start_time: body.start_time?.trim() || 'Hari ini, 08:00 WIB',
+      duration_minutes: parseInt(body.duration_minutes, 10) || 90,
+      token_code: (body.token_code || `TOKEN${nextId}`).trim().toUpperCase(),
+      shuffle_questions: body.shuffle_questions !== false,
+      shuffle_options: body.shuffle_options !== false,
+      class_target: body.class_target || 'Semua Kelas',
+      package_url: `/static/packages/exam_${nextId}_enc.json`,
+    };
+    SCHEDULES.push(newSch);
+    compileAndEncryptPackage(nextId);
+    saveSchedulesToFile();
+    return sendJSON(200, {
+      status: 'success',
+      message: `Jadwal ujian "${newSch.title}" berhasil dibuat dan paket soal telah dienkripsi!`,
+      data: newSch,
     });
   }
 
   // POST /api/v1/cbt/schedules/:id/update (Edit & Perbarui Jadwal Ujian)
   if ((pathname.endsWith('/update') || req.method === 'PUT') && pathname.includes('/api/v1/cbt/schedules/')) {
+    const parts = pathname.split('/');
+    const schId = parseInt(parts[pathname.endsWith('/update') ? parts.length - 2 : parts.length - 1], 10) || 1;
+    const sch = SCHEDULES.find(s => s.id === schId);
+    if (!sch) {
+      return sendJSON(404, { status: 'error', message: 'Jadwal ujian tidak ditemukan' });
+    }
     const body = await parseBody(req);
-    if (body.title) activeSchedule.title = body.title.trim();
-    if (body.bank_name) activeSchedule.bank_name = body.bank_name.trim();
-    if (body.start_time) activeSchedule.start_time = body.start_time.trim();
-    if (body.duration_minutes) activeSchedule.duration_minutes = parseInt(body.duration_minutes, 10) || activeSchedule.duration_minutes;
-    if (body.token_code) activeSchedule.token_code = body.token_code.trim().toUpperCase();
-    if (body.shuffle_questions !== undefined) activeSchedule.shuffle_questions = !!body.shuffle_questions;
-    if (body.shuffle_options !== undefined) activeSchedule.shuffle_options = !!body.shuffle_options;
+    if (body.title) sch.title = body.title.trim();
+    if (body.bank_name) sch.bank_name = body.bank_name.trim();
+    if (body.start_time) sch.start_time = body.start_time.trim();
+    if (body.duration_minutes) sch.duration_minutes = parseInt(body.duration_minutes, 10) || sch.duration_minutes;
+    if (body.token_code) sch.token_code = body.token_code.trim().toUpperCase();
+    if (body.shuffle_questions !== undefined) sch.shuffle_questions = !!body.shuffle_questions;
+    if (body.shuffle_options !== undefined) sch.shuffle_options = !!body.shuffle_options;
 
-    // Enkripsi ulang paket soal dengan konfigurasi terbaru
-    compileAndEncryptPackage();
+    compileAndEncryptPackage(schId);
+    saveSchedulesToFile();
 
     return sendJSON(200, {
       status: 'success',
-      message: 'Jadwal ujian berhasil diperbarui dan paket soal telah dienkripsi ulang!',
-      data: activeSchedule,
+      message: `Jadwal ujian "${sch.title}" berhasil diperbarui dan paket soal telah dienkripsi ulang!`,
+      data: sch,
     });
+  }
+
+  // POST /api/v1/cbt/schedules/:id/delete (Hapus Jadwal Ujian)
+  if ((pathname.endsWith('/delete') || req.method === 'DELETE') && pathname.includes('/api/v1/cbt/schedules/')) {
+    const parts = pathname.split('/');
+    const schId = parseInt(parts[pathname.endsWith('/delete') ? parts.length - 2 : parts.length - 1], 10);
+    const idx = SCHEDULES.findIndex(s => s.id === schId);
+    if (idx !== -1) {
+      const removed = SCHEDULES.splice(idx, 1)[0];
+      saveSchedulesToFile();
+      return sendJSON(200, {
+        status: 'success',
+        message: `Jadwal ujian "${removed.title}" berhasil dihapus!`,
+      });
+    }
+    return sendJSON(404, { status: 'error', message: 'Jadwal ujian tidak ditemukan' });
   }
 
   // GET /api/v1/cbt/schedules/active
   if (pathname === '/api/v1/cbt/schedules/active' && req.method === 'GET') {
     const user = getUserFromToken(req);
     const uid = user ? user.uid : 1001;
-    const sessionKey = `1_${uid}`;
+    const schId = parseInt(parsedUrl.searchParams.get('schedule_id'), 10) || SCHEDULES[0]?.id || 1;
+    const curSch = SCHEDULES.find(s => s.id === schId) || SCHEDULES[0];
+    const sessionKey = `${curSch.id}_${uid}`;
     const session = studentSessions[sessionKey];
-    const totalExtra = scheduleExtraMinutes + (studentExtraMinutes[uid] || 0);
+    const totalExtra = (scheduleExtraMinutes[curSch.id] || 0) + (studentExtraMinutes[`${curSch.id}_${uid}`] || 0);
     const isInProgress = session && session.status === 'in_progress';
+    const schKeyInfo = scheduleKeys[curSch.id] || { keyHex: currentAESKeyHex, sha256: currentPackageSHA256, packageUrl: `/static/packages/exam_${curSch.id}_enc.json` };
 
     return sendJSON(200, {
       status: 'success',
       data: {
-        schedule_id: activeSchedule.id,
-        title: activeSchedule.title,
-        duration_minutes: activeSchedule.duration_minutes + totalExtra,
+        schedule_id: curSch.id,
+        title: curSch.title,
+        duration_minutes: curSch.duration_minutes + totalExtra,
         extra_minutes: totalExtra,
-        package_url: '/static/packages/exam_1_enc.json',
-        package_sha256: currentPackageSHA256,
+        package_url: schKeyInfo.packageUrl || curSch.package_url,
+        package_sha256: schKeyInfo.sha256,
         session_status: session ? session.status : 'not_started',
         submitted_at: session ? session.submitted_at : null,
         // Kredensial dekripsi sesi untuk auto-resume saat browser di-refresh
         session_id: isInProgress ? 88400 + uid : null,
-        decryption_key_hex: isInProgress ? currentAESKeyHex : null,
-        saved_answers: isInProgress ? (studentAnswersStore[uid] || session.answers || {}) : {},
+        decryption_key_hex: isInProgress ? schKeyInfo.keyHex : null,
+        saved_answers: isInProgress ? (studentAnswersStore[sessionKey] || session.answers || {}) : {},
       },
     });
   }
@@ -947,7 +1105,10 @@ const server = http.createServer(async (req, res) => {
     const body = await parseBody(req);
     const user = getUserFromToken(req);
     const uid = user ? user.uid : 1001;
-    const sessionKey = `1_${uid}`;
+    const parts = pathname.split('/');
+    const schId = parseInt(parts[5], 10) || 1;
+    const curSch = SCHEDULES.find(s => s.id === schId) || SCHEDULES[0];
+    const sessionKey = `${curSch.id}_${uid}`;
 
     // Cek apakah siswa sudah mengumpulkan lembar jawaban
     if (studentSessions[sessionKey] && studentSessions[sessionKey].status === 'submitted') {
@@ -959,15 +1120,17 @@ const server = http.createServer(async (req, res) => {
       });
     }
 
-    if (body.token_code !== activeSchedule.token_code) {
-      return sendJSON(403, { status: 'error', message: `Token ujian salah! Gunakan: ${activeSchedule.token_code}` });
+    if (body.token_code !== curSch.token_code) {
+      return sendJSON(403, { status: 'error', message: `Token ujian salah! Gunakan: ${curSch.token_code}` });
     }
+
+    const schKeyInfo = scheduleKeys[curSch.id] || { keyHex: currentAESKeyHex };
 
     // Tandai status sesi ujian siswa: in_progress
     studentSessions[sessionKey] = {
       status: 'in_progress',
       started_at: new Date().toISOString(),
-      answers: studentAnswersStore[uid] || {},
+      answers: studentAnswersStore[sessionKey] || studentAnswersStore[uid] || {},
     };
 
     activeExamStudents.add(uid);
@@ -975,9 +1138,9 @@ const server = http.createServer(async (req, res) => {
       status: 'success',
       data: {
         session_id: 88400 + uid,
-        decryption_key_hex: currentAESKeyHex,
+        decryption_key_hex: schKeyInfo.keyHex || currentAESKeyHex,
         server_time: Math.floor(Date.now() / 1000),
-        saved_answers: studentAnswersStore[uid] || {},
+        saved_answers: studentSessions[sessionKey].answers,
       },
     });
   }
@@ -987,21 +1150,24 @@ const server = http.createServer(async (req, res) => {
     const body = await parseBody(req);
     const user = getUserFromToken(req);
     const uid = user ? user.uid : 1001;
-    const sessionKey = `1_${uid}`;
+    const parts = pathname.split('/');
+    const schId = parseInt(parts[5], 10) || 1;
+    const curSch = SCHEDULES.find(s => s.id === schId) || SCHEDULES[0];
+    const sessionKey = `${curSch.id}_${uid}`;
 
     if (studentSessions[sessionKey] && studentSessions[sessionKey].status === 'submitted') {
       return sendJSON(403, { status: 'error', message: 'Sesi ujian telah dikunci (submitted)' });
     }
 
     if (body.answers) {
-      if (!studentAnswersStore[uid]) studentAnswersStore[uid] = {};
-      Object.assign(studentAnswersStore[uid], body.answers);
+      if (!studentAnswersStore[sessionKey]) studentAnswersStore[sessionKey] = {};
+      Object.assign(studentAnswersStore[sessionKey], body.answers);
       if (studentSessions[sessionKey]) {
-        studentSessions[sessionKey].answers = studentAnswersStore[uid];
+        studentSessions[sessionKey].answers = studentAnswersStore[sessionKey];
       }
       dirtySessionCount++;
     }
-    const totalExtra = scheduleExtraMinutes + (studentExtraMinutes[uid] || 0);
+    const totalExtra = (scheduleExtraMinutes[curSch.id] || 0) + (studentExtraMinutes[sessionKey] || 0);
     return sendJSON(200, {
       ack: true,
       synced_count: Object.keys(body.answers || {}).length,
@@ -1015,11 +1181,14 @@ const server = http.createServer(async (req, res) => {
     const body = await parseBody(req);
     const user = getUserFromToken(req);
     const uid = user ? user.uid : 1001;
-    const sessionKey = `1_${uid}`;
+    const parts = pathname.split('/');
+    const schId = parseInt(parts[5], 10) || 1;
+    const curSch = SCHEDULES.find(s => s.id === schId) || SCHEDULES[0];
+    const sessionKey = `${curSch.id}_${uid}`;
 
     if (body.answers) {
-      if (!studentAnswersStore[uid]) studentAnswersStore[uid] = {};
-      Object.assign(studentAnswersStore[uid], body.answers);
+      if (!studentAnswersStore[sessionKey]) studentAnswersStore[sessionKey] = {};
+      Object.assign(studentAnswersStore[sessionKey], body.answers);
     }
 
     const now = new Date();
@@ -1032,7 +1201,7 @@ const server = http.createServer(async (req, res) => {
     studentSessions[sessionKey] = {
       status: 'submitted',
       submitted_at: formattedDate,
-      answers: studentAnswersStore[uid] || {},
+      answers: studentAnswersStore[sessionKey] || {},
     };
 
     activeExamStudents.delete(uid);
@@ -1049,13 +1218,16 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/v1/cbt/proctor/live-sessions' && req.method === 'GET') {
     const answerKeys = { 1: 'C', 2: 'B', 3: 'C', 4: 'B', 5: 'C' };
     const classFilter = parsedUrl.searchParams.get('class');
+    const scheduleId = parseInt(parsedUrl.searchParams.get('schedule_id'), 10) || SCHEDULES[0]?.id || 1;
+    const curSchedule = SCHEDULES.find((s) => s.id === scheduleId) || SCHEDULES[0];
+
     let students = USERS.filter((u) => u.role === 'student');
     if (classFilter && classFilter !== 'all') {
       students = students.filter((u) => u.class_name === classFilter);
     }
 
     const result = students.map((st) => {
-      const sessionKey = `1_${st.id}`;
+      const sessionKey = `${curSchedule.id}_${st.id}`;
       const sess = studentSessions[sessionKey] || {
         status: 'not_started',
         answers: {},
@@ -1063,7 +1235,7 @@ const server = http.createServer(async (req, res) => {
         ip_address: `192.168.1.${100 + (st.id % 100)}`,
       };
 
-      const userAnswers = studentAnswersStore[st.id] || sess.answers || {};
+      const userAnswers = studentAnswersStore[sessionKey] || studentAnswersStore[st.id] || sess.answers || {};
       const answeredKeys = Object.keys(userAnswers);
       const answeredCount = answeredKeys.filter((k) => userAnswers[k] && userAnswers[k].a).length;
       const isDoubt = answeredKeys.some((k) => userAnswers[k] && userAnswers[k].d === 1);
@@ -1075,6 +1247,9 @@ const server = http.createServer(async (req, res) => {
         }
       }
       const score = Math.round((correctCount / QUESTIONS.length) * 100);
+      const extraMinutesKey = `${curSchedule.id}_${st.id}`;
+      const schExtra = scheduleExtraMinutes[curSchedule.id] || 0;
+      const stExtra = studentExtraMinutes[extraMinutesKey] || studentExtraMinutes[st.id] || 0;
 
       return {
         id: st.id,
@@ -1093,13 +1268,28 @@ const server = http.createServer(async (req, res) => {
         correct_count: correctCount,
         wrong_count: QUESTIONS.length - correctCount,
         is_passed: score >= 75,
-        extra_minutes: scheduleExtraMinutes + (studentExtraMinutes[st.id] || 0),
+        extra_minutes: schExtra + stExtra,
       };
     });
 
     return sendJSON(200, {
       status: 'success',
       data: result,
+      schedule: {
+        id: curSchedule.id,
+        title: curSchedule.title,
+        bank_name: curSchedule.bank_name,
+        duration_minutes: curSchedule.duration_minutes,
+        token_code: curSchedule.token_code,
+        start_time: curSchedule.start_time,
+      },
+      schedules: SCHEDULES.map((s) => ({
+        id: s.id,
+        title: s.title,
+        token_code: s.token_code,
+        duration_minutes: s.duration_minutes,
+        bank_name: s.bank_name,
+      })),
       server_time: new Date().toISOString(),
     });
   }
@@ -1111,24 +1301,27 @@ const server = http.createServer(async (req, res) => {
     const target = body.target || 'all';
     const username = body.username;
     const reason = body.reason || 'Dispensasi Proktor';
+    const schId = parseInt(body.schedule_id, 10) || 1;
+    const curSch = SCHEDULES.find((s) => s.id === schId) || SCHEDULES[0];
 
     if (target === 'all') {
-      scheduleExtraMinutes += minutes;
+      scheduleExtraMinutes[curSch.id] = (scheduleExtraMinutes[curSch.id] || 0) + minutes;
       return sendJSON(200, {
         status: 'success',
-        message: `Waktu ujian seluruh siswa berhasil ditambah +${minutes} menit! (${reason})`,
-        extra_minutes: scheduleExtraMinutes,
+        message: `Waktu ujian ${curSch.title} untuk seluruh siswa berhasil ditambah +${minutes} menit! (${reason})`,
+        extra_minutes: scheduleExtraMinutes[curSch.id],
         target: 'all',
       });
     } else {
       const targetUser = USERS.find((u) => u.username === username);
       const uid = targetUser ? targetUser.id : 1001;
-      studentExtraMinutes[uid] = (studentExtraMinutes[uid] || 0) + minutes;
+      const key = `${curSch.id}_${uid}`;
+      studentExtraMinutes[key] = (studentExtraMinutes[key] || 0) + minutes;
 
       return sendJSON(200, {
         status: 'success',
-        message: `Waktu ujian untuk ${username} (${targetUser?.full_name || 'Siswa'}) berhasil ditambah +${minutes} menit! (${reason})`,
-        extra_minutes: scheduleExtraMinutes + studentExtraMinutes[uid],
+        message: `Waktu ujian untuk ${username} (${targetUser?.full_name || 'Siswa'}) pada ${curSch.title} berhasil ditambah +${minutes} menit! (${reason})`,
+        extra_minutes: (scheduleExtraMinutes[curSch.id] || 0) + studentExtraMinutes[key],
         target: username,
       });
     }
@@ -1140,7 +1333,9 @@ const server = http.createServer(async (req, res) => {
     const studentUsername = body.username || 'siswa_1001';
     const targetUser = USERS.find((u) => u.username === studentUsername);
     const uid = targetUser ? targetUser.id : 1001;
-    const sessionKey = `1_${uid}`;
+    const schId = parseInt(body.schedule_id, 10) || 1;
+    const curSch = SCHEDULES.find((s) => s.id === schId) || SCHEDULES[0];
+    const sessionKey = `${curSch.id}_${uid}`;
 
     const now = new Date();
     const formattedDate = now.toLocaleDateString('id-ID', {
@@ -1153,13 +1348,13 @@ const server = http.createServer(async (req, res) => {
       ...(studentSessions[sessionKey] || {}),
       status: 'submitted',
       submitted_at: formattedDate,
-      answers: studentAnswersStore[uid] || {},
+      answers: studentAnswersStore[sessionKey] || studentAnswersStore[uid] || {},
     };
     activeExamStudents.delete(uid);
 
     return sendJSON(200, {
       status: 'success',
-      message: `Ujian ${studentUsername} telah dikunci permanen oleh proktor!`,
+      message: `Ujian ${studentUsername} pada jadwal "${curSch.title}" telah dikunci permanen oleh proktor!`,
       submitted_at: formattedDate,
     });
   }
@@ -1169,9 +1364,11 @@ const server = http.createServer(async (req, res) => {
     const body = await parseBody(req);
     const studentUsername = body.username || 'siswa_1001';
     const resetType = body.reset_type || 'full';
+    const schId = parseInt(body.schedule_id, 10) || 1;
+    const curSch = SCHEDULES.find((s) => s.id === schId) || SCHEDULES[0];
     const targetUser = USERS.find((u) => u.username === studentUsername);
     const uid = targetUser ? targetUser.id : 1001;
-    const sessionKey = `1_${uid}`;
+    const sessionKey = `${curSch.id}_${uid}`;
 
     if (resetType === 'login_only') {
       if (studentSessions[sessionKey]) {
@@ -1181,17 +1378,17 @@ const server = http.createServer(async (req, res) => {
       activeExamStudents.delete(uid);
       return sendJSON(200, {
         status: 'success',
-        message: `Reset Login berhasil! Siswa ${studentUsername} diizinkan login kembali (jawaban tersimpan).`,
+        message: `Reset Login berhasil! Siswa ${studentUsername} diizinkan login kembali pada "${curSch.title}" (jawaban tersimpan).`,
       });
     }
 
     delete studentSessions[sessionKey];
-    delete studentAnswersStore[uid];
+    delete studentAnswersStore[sessionKey];
     activeExamStudents.delete(uid);
 
     return sendJSON(200, {
       status: 'success',
-      message: `Sesi ujian untuk ${studentUsername} berhasil direset penuh! Siswa dapat mengerjakan kembali dari awal.`,
+      message: `Sesi ujian ${studentUsername} pada "${curSch.title}" berhasil direset penuh! Siswa dapat mengerjakan kembali dari awal.`,
     });
   }
 
@@ -1203,6 +1400,8 @@ const server = http.createServer(async (req, res) => {
     const usernames = Array.isArray(body.usernames) ? body.usernames : [];
     const className = body.class_name;
     const statusFilter = body.status_filter || 'all'; // 'all', 'submitted', 'in_progress'
+    const schId = parseInt(body.schedule_id, 10) || 1;
+    const curSch = SCHEDULES.find((s) => s.id === schId) || SCHEDULES[0];
 
     let targetStudents = USERS.filter((u) => u.role === 'student');
 
@@ -1221,7 +1420,7 @@ const server = http.createServer(async (req, res) => {
     // Filter status jika dipilih
     if (statusFilter !== 'all') {
       targetStudents = targetStudents.filter((u) => {
-        const sessionKey = `1_${u.id}`;
+        const sessionKey = `${curSch.id}_${u.id}`;
         const sess = studentSessions[sessionKey];
         const status = sess ? sess.status : 'not_started';
         return status === statusFilter;
@@ -1238,7 +1437,7 @@ const server = http.createServer(async (req, res) => {
     let count = 0;
     for (const st of targetStudents) {
       const uid = st.id;
-      const sessionKey = `1_${uid}`;
+      const sessionKey = `${curSch.id}_${uid}`;
 
       if (resetType === 'login_only') {
         if (studentSessions[sessionKey]) {
@@ -1248,14 +1447,14 @@ const server = http.createServer(async (req, res) => {
           studentSessions[sessionKey] = {
             status: 'in_progress',
             started_at: new Date().toISOString(),
-            answers: studentAnswersStore[uid] || {},
+            answers: studentAnswersStore[sessionKey] || studentAnswersStore[uid] || {},
           };
         }
         activeExamStudents.delete(uid);
         count++;
       } else {
         delete studentSessions[sessionKey];
-        delete studentAnswersStore[uid];
+        delete studentAnswersStore[sessionKey];
         activeExamStudents.delete(uid);
         count++;
       }
@@ -1264,9 +1463,10 @@ const server = http.createServer(async (req, res) => {
     const typeDesc = resetType === 'login_only' ? 'Reset Login (Jawaban aman)' : 'Reset Penuh (Ulang dari awal)';
     return sendJSON(200, {
       status: 'success',
-      message: `Berhasil mereset ${count} sesi siswa (${typeDesc})!`,
+      message: `Berhasil mereset ${count} sesi siswa pada "${curSch.title}" (${typeDesc})!`,
       reset_count: count,
       reset_type: resetType,
+      schedule_title: curSch.title,
     });
   }
 
@@ -1274,6 +1474,9 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/v1/cbt/proctor/bulk-force-finish' && req.method === 'POST') {
     const body = await parseBody(req);
     const usernames = Array.isArray(body.usernames) ? body.usernames : [];
+    const schId = parseInt(body.schedule_id, 10) || 1;
+    const curSch = SCHEDULES.find((s) => s.id === schId) || SCHEDULES[0];
+
     if (usernames.length === 0) {
       return sendJSON(400, { status: 'error', message: 'Daftar siswa belum ditentukan!' });
     }
@@ -1290,12 +1493,12 @@ const server = http.createServer(async (req, res) => {
       const targetUser = USERS.find((us) => us.username === u);
       if (targetUser) {
         const uid = targetUser.id;
-        const sessionKey = `1_${uid}`;
+        const sessionKey = `${curSch.id}_${uid}`;
         studentSessions[sessionKey] = {
           ...(studentSessions[sessionKey] || {}),
           status: 'submitted',
           submitted_at: formattedDate,
-          answers: studentAnswersStore[uid] || {},
+          answers: studentAnswersStore[sessionKey] || studentAnswersStore[uid] || {},
         };
         activeExamStudents.delete(uid);
         count++;
@@ -1304,8 +1507,9 @@ const server = http.createServer(async (req, res) => {
 
     return sendJSON(200, {
       status: 'success',
-      message: `${count} sesi siswa berhasil dikunci selesai oleh proktor!`,
+      message: `${count} sesi siswa pada "${curSch.title}" berhasil dikunci selesai oleh proktor!`,
       count: count,
+      schedule_title: curSch.title,
     });
   }
 

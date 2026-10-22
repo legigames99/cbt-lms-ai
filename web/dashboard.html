@@ -17,6 +17,21 @@
     .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 
+    /* Native Select & Dropdown High-Contrast Dark Theme (Fix White Popup Issue) */
+    select {
+      color-scheme: dark !important;
+    }
+    select option {
+      background-color: #0b1120 !important;
+      color: #ffffff !important;
+      font-weight: 600;
+      padding: 8px 12px;
+    }
+    select option:hover, select option:focus, select option:checked {
+      background-color: #1e293b !important;
+      color: #38bdf8 !important;
+    }
+
     /* Print Preview & Page Setup (Multi-Page A4 Pagination) */
     @media print {
       * {
@@ -699,9 +714,11 @@
                 Ganti <i class="fa-solid fa-chevron-down text-[9px]"></i>
               </span>
             </button>
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-slate-400">Filter Kelas:</span>
-              <select id="filterClassSelect" onchange="lastProctorDataHash=''; fetchProctorSessions();" class="bg-slate-900 border border-slate-800 text-xs text-white rounded-xl px-3 py-1.5 focus:outline-none cursor-pointer">
+            <div class="flex items-center gap-2 bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-1.5 shadow-sm">
+              <span class="text-xs text-slate-200 font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-filter text-indigo-400"></i> Kelas:
+              </span>
+              <select id="filterClassSelect" onchange="lastProctorDataHash=''; fetchProctorSessions();" class="bg-slate-950 border border-slate-700 text-xs text-white font-bold rounded-lg px-2.5 py-1 focus:outline-none focus:border-indigo-500 cursor-pointer">
                 <option value="all">Semua Kelas</option>
               </select>
             </div>
@@ -837,9 +854,11 @@
             </button>
 
             <!-- Filter Kelas -->
-            <div class="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5">
-              <span class="text-xs text-slate-400">Kelas:</span>
-              <select id="filterClassNilaiSelect" onchange="handleNilaiFilterChange()" class="bg-transparent text-xs text-white font-medium focus:outline-none cursor-pointer">
+            <div class="flex items-center gap-2 bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-1.5 shadow-sm">
+              <span class="text-xs text-slate-200 font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-filter text-indigo-400"></i> Kelas:
+              </span>
+              <select id="filterClassNilaiSelect" onchange="handleNilaiFilterChange()" class="bg-slate-950 border border-slate-700 text-xs text-white font-bold rounded-lg px-2.5 py-1 focus:outline-none focus:border-indigo-500 cursor-pointer">
                 <option value="all">Semua Kelas</option>
               </select>
             </div>
@@ -3684,8 +3703,8 @@
             const countsHash = JSON.stringify(json.class_counts);
             if (proctorClassSelect.dataset.renderedHash !== countsHash) {
               const totalAll = json.total_students || Object.values(json.class_counts).reduce((a, b) => a + b, 0);
-              proctorClassSelect.innerHTML = `<option value="all">Semua Kelas (${totalAll} Siswa)</option>` +
-                json.classes.map(c => `<option value="${c}">${c} (${json.class_counts[c] || 0} Siswa)</option>`).join('');
+              proctorClassSelect.innerHTML = `<option class="bg-slate-900 text-white font-semibold" value="all">Semua Kelas (${totalAll} Siswa)</option>` +
+                json.classes.map(c => `<option class="bg-slate-900 text-white font-semibold" value="${c}">${c} (${json.class_counts[c] || 0} Siswa)</option>`).join('');
               proctorClassSelect.dataset.renderedHash = countsHash;
               if (json.classes.includes(currentVal) || currentVal === 'all') {
                 proctorClassSelect.value = currentVal;
@@ -3809,7 +3828,7 @@
             </td>
             <td class="px-4 py-3.5 font-mono text-slate-400">${s.username}</td>
             <td class="px-4 py-3.5 font-bold text-white">${s.full_name}</td>
-            <td class="px-4 py-3.5">${s.class_name || 'XII IPA 1'}</td>
+            <td class="px-4 py-3.5"><span class="px-2.5 py-1 rounded-lg bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 font-bold text-xs inline-block shadow-sm">${s.class_name || 'XII IPA 1'}</span></td>
             <td class="px-4 py-3.5">${statusBadge}</td>
             <td class="px-4 py-3.5">${progressHtml}</td>
             <td class="px-4 py-3.5">${violationHtml}</td>
@@ -4047,8 +4066,8 @@
             const countsHash = JSON.stringify(json.class_counts);
             if (nilaiClassSelect.dataset.renderedHash !== countsHash) {
               const totalAll = json.total_students || Object.values(json.class_counts).reduce((a, b) => a + b, 0);
-              nilaiClassSelect.innerHTML = `<option value="all">Semua Kelas (${totalAll} Siswa)</option>` +
-                json.classes.map(c => `<option value="${c}">${c} (${json.class_counts[c] || 0} Siswa)</option>`).join('');
+              nilaiClassSelect.innerHTML = `<option class="bg-slate-900 text-white font-semibold" value="all">Semua Kelas (${totalAll} Siswa)</option>` +
+                json.classes.map(c => `<option class="bg-slate-900 text-white font-semibold" value="${c}">${c} (${json.class_counts[c] || 0} Siswa)</option>`).join('');
               nilaiClassSelect.dataset.renderedHash = countsHash;
               if (json.classes.includes(currentVal) || currentVal === 'all') {
                 nilaiClassSelect.value = currentVal;
@@ -4145,7 +4164,7 @@
             <td class="px-4 py-3.5 text-center">${rankBadge}</td>
             <td class="px-4 py-3.5 font-mono text-slate-400">${s.nisn || s.username}</td>
             <td class="px-4 py-3.5 font-bold text-white">${s.full_name}</td>
-            <td class="px-4 py-3.5">${s.class_name || 'XII IPA 1'}</td>
+            <td class="px-4 py-3.5"><span class="px-2.5 py-1 rounded-lg bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 font-bold text-xs inline-block shadow-sm">${s.class_name || 'XII IPA 1'}</span></td>
             <td class="px-4 py-3.5 text-center text-emerald-400 font-bold">${s.correct_count}</td>
             <td class="px-4 py-3.5 text-center text-rose-400 font-bold">${s.wrong_count}</td>
             <td class="px-4 py-3.5 text-center font-mono text-base font-bold ${scoreColor}">${(s.score || 0).toFixed(2)}</td>
@@ -6261,8 +6280,8 @@
           const el = document.getElementById(elemId);
           if (!el) return;
           const currentVal = el.value || 'all';
-          const optsHtml = `<option value="all">Semua Kelas (${totalAll} Siswa)</option>` +
-            classes.map(c => `<option value="${c}">${c} (${classCounts[c] || 0} Siswa)</option>`).join('');
+          const optsHtml = `<option class="bg-slate-900 text-white font-semibold" value="all">Semua Kelas (${totalAll} Siswa)</option>` +
+            classes.map(c => `<option class="bg-slate-900 text-white font-semibold" value="${c}">${c} (${classCounts[c] || 0} Siswa)</option>`).join('');
           el.innerHTML = optsHtml;
           if (classes.includes(currentVal) || currentVal === 'all') {
             el.value = currentVal;

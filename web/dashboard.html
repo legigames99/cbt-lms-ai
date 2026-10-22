@@ -4331,282 +4331,488 @@
         year: 'numeric'
       });
 
-      // RENDER HTML SPREADSHEET
-      let html = `
-        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-        <head>
-          <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-          <!--[if gte mso 9]>
-          <xml>
-            <x:ExcelWorkbook>
-              <x:ExcelWorksheets>
-                <x:ExcelWorksheet>
-                  <x:Name>Analisis Butir Soal CBT</x:Name>
-                  <x:WorksheetOptions>
-                    <x:DisplayGridlines/>
-                  </x:WorksheetOptions>
-                </x:ExcelWorksheet>
-              </x:ExcelWorksheets>
-            </x:ExcelWorkbook>
-          </xml>
-          <![endif]-->
-          <style>
-            body { font-family: Calibri, 'Segoe UI', Arial, sans-serif; font-size: 10pt; color: #1e293b; }
-            table { border-collapse: collapse; width: 100%; margin-bottom: 22px; }
-            th, td { border: 1px solid #cbd5e1; padding: 6px 8px; vertical-align: middle; }
-            .kop-dinas { font-size: 11pt; font-weight: bold; text-align: center; }
-            .kop-sekolah { font-size: 14pt; font-weight: bold; text-align: center; color: #1e3a8a; }
-            .kop-alamat { font-size: 9pt; text-align: center; color: #475569; }
-            .title-doc { font-size: 13pt; font-weight: bold; text-align: center; padding-top: 10px; }
-            .sec-header { background-color: #1e293b; color: #ffffff; font-weight: bold; font-size: 10.5pt; text-align: left; padding: 7px 10px; }
-            .th-main { background-color: #2563eb; color: #ffffff; font-weight: bold; text-align: center; font-size: 9.5pt; }
-            .th-sub { background-color: #e2e8f0; color: #0f172a; font-weight: bold; text-align: center; font-size: 9pt; }
-            .text-center { text-align: center; }
-            .text-right { text-align: right; }
-            .font-bold { font-weight: bold; }
-            .bg-light { background-color: #f8fafc; }
-            .badge-pass { background-color: #dcfce7; color: #15803d; font-weight: bold; text-align: center; }
-            .badge-fail { background-color: #fee2e2; color: #b91c1c; font-weight: bold; text-align: center; }
-            .badge-key { background-color: #fef08a; font-weight: bold; text-align: center; }
-            .cat-mudah { background-color: #dcfce7; color: #166534; font-weight: bold; text-align: center; }
-            .cat-sedang { background-color: #fef3c7; color: #92400e; font-weight: bold; text-align: center; }
-            .cat-sukar { background-color: #fee2e2; color: #991b1b; font-weight: bold; text-align: center; }
-            .disc-sangat-baik { background-color: #dcfce7; color: #166534; font-weight: bold; text-align: center; }
-            .disc-baik { background-color: #d1fae5; color: #065f46; font-weight: bold; text-align: center; }
-            .disc-cukup { background-color: #fef3c7; color: #92400e; font-weight: bold; text-align: center; }
-            .disc-buruk { background-color: #fee2e2; color: #991b1b; font-weight: bold; text-align: center; }
-          </style>
-        </head>
-        <body>
-          <!-- KOP SURAT RESMI -->
-          <table>
-            <tr><td colspan="12" class="kop-dinas" style="border:none;">${(profile.dinas || 'PEMERINTAH PROVINSI DAERAH KHUSUS IBUKOTA JAKARTA<br>DINAS PENDIDIKAN').replace(/\n/g, '<br>')}</td></tr>
-            <tr><td colspan="12" class="kop-sekolah" style="border:none;">${profile.name || 'SMK NEGERI 5 JAKARTA'}</td></tr>
-            <tr><td colspan="12" class="kop-alamat" style="border:none;">${profile.address || 'Jl. Pisangan Baru Timur VII No. 6, Matraman, Jakarta Timur'} • NPSN: ${profile.npsn || '20102551'}</td></tr>
-            <tr><td colspan="12" style="border-bottom: 3px double #000; border-top:none; border-left:none; border-right:none; height: 4px;"></td></tr>
-            <tr><td colspan="12" class="title-doc" style="border:none;">LAPORAN REKAPITULASI HASIL UJIAN & ANALISIS BUTIR SOAL</td></tr>
-            <tr><td colspan="12" class="text-center" style="border:none; color:#475569; font-size:9.5pt;">Jadwal: <strong>${sch.title}</strong> • Token: <strong>${sch.token_code}</strong> • Bank Soal: <strong>${sch.bank_name || '-'}</strong></td></tr>
-          </table>
+      function escapeXml(unsafe) {
+        if (unsafe === null || unsafe === undefined) return '';
+        return String(unsafe)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&apos;');
+      }
 
-          <!-- BAGIAN 1: STATISTIK EVALUASI HASIL ASESMEN -->
-          <table>
-            <thead>
-              <tr><th colspan="4" class="sec-header">BAGIAN I: IDENTITAS & STATISTIK EVALUASI HASIL UJIAN</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="bg-light font-bold" style="width:25%;">Mata Pelajaran / Jadwal</td>
-                <td style="width:25%;">${sch.title} (${sch.token_code})</td>
-                <td class="bg-light font-bold" style="width:25%;">Jumlah Siswa Terdaftar / Peserta</td>
-                <td style="width:25%;">${totalStudents} Siswa (${passedStudents.length + failedStudents.length} Mengikuti)</td>
-              </tr>
-              <tr>
-                <td class="bg-light font-bold">Bank Soal & Jumlah Butir</td>
-                <td>${sch.bank_name || '-'} (${totalQuestions} Butir Soal)</td>
-                <td class="bg-light font-bold">Nilai Rata-rata Ujian (Mean)</td>
-                <td class="font-bold text-blue-600">${avgScore.toFixed(2)} / 100.00</td>
-              </tr>
-              <tr>
-                <td class="bg-light font-bold">Durasi Ujian CBT</td>
-                <td>${sch.duration_minutes} Menit</td>
-                <td class="bg-light font-bold">Nilai Tertinggi / Terendah</td>
-                <td>Max: <strong>${maxScore.toFixed(2)}</strong> | Min: <strong>${minScore.toFixed(2)}</strong></td>
-              </tr>
-              <tr>
-                <td class="bg-light font-bold">Kriteria Ketuntasan (KKM)</td>
-                <td><strong>75.00</strong></td>
-                <td class="bg-light font-bold">Standar Deviasi (Simpangan Baku)</td>
-                <td>${stdDev.toFixed(2)}</td>
-              </tr>
-              <tr>
-                <td class="bg-light font-bold">Tingkat Ketuntasan Kelas</td>
-                <td class="${passRate >= 75 ? 'badge-pass' : 'badge-fail'}">${passRate.toFixed(1)}% (${passedStudents.length} Tuntas, ${failedStudents.length} Remedial)</td>
-                <td class="bg-light font-bold">Reliabilitas Tes (KR-20)</td>
-                <td><strong>${kr20.toFixed(3)}</strong> (${kr20 >= 0.70 ? 'Tinggi / Sangat Baik' : 'Cukup'})</td>
-              </tr>
-            </tbody>
-          </table>
+      // RENDER MULTI-SHEET SPREADSHEET (SHEET 1: NILAI SISWA, SHEET 2: ANALISIS BUTIR SOAL)
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+  <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+    <Author>CBT and LMS AI</Author>
+    <LastAuthor>CBT and LMS AI</LastAuthor>
+    <Created>2026-10-22T00:00:00Z</Created>
+    <Company>${escapeXml(profile.name)}</Company>
+    <Version>16.00</Version>
+  </DocumentProperties>
+  <Styles>
+    <Style ss:ID="Default" ss:Name="Normal">
+      <Alignment ss:Vertical="Center"/>
+      <Borders/>
+      <Font ss:FontName="Calibri" ss:Size="10" ss:Color="#1E293B"/>
+      <Interior/>
+      <NumberFormat/>
+      <Protection/>
+    </Style>
+    <Style ss:ID="KopDinas">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#1E293B"/>
+    </Style>
+    <Style ss:ID="KopSekolah">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Font ss:FontName="Calibri" ss:Size="14" ss:Bold="1" ss:Color="#1E3A8A"/>
+    </Style>
+    <Style ss:ID="KopAlamat">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Font ss:FontName="Calibri" ss:Size="9" ss:Color="#475569"/>
+    </Style>
+    <Style ss:ID="TitleDoc">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Font ss:FontName="Calibri" ss:Size="13" ss:Bold="1" ss:Color="#0F172A"/>
+    </Style>
+    <Style ss:ID="SubDoc">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Font ss:FontName="Calibri" ss:Size="9.5" ss:Color="#475569"/>
+    </Style>
+    <Style ss:ID="SecHeader">
+      <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#0F172A"/>
+      </Borders>
+      <Font ss:FontName="Calibri" ss:Size="10.5" ss:Bold="1" ss:Color="#FFFFFF"/>
+      <Interior ss:Color="#1E293B" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="ThMain">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#94A3B8"/>
+        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#94A3B8"/>
+        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#94A3B8"/>
+        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#94A3B8"/>
+      </Borders>
+      <Font ss:FontName="Calibri" ss:Size="9.5" ss:Bold="1" ss:Color="#FFFFFF"/>
+      <Interior ss:Color="#2563EB" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="ThSub">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+      </Borders>
+      <Font ss:FontName="Calibri" ss:Size="9" ss:Bold="1" ss:Color="#0F172A"/>
+      <Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="TdText">
+      <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+      </Borders>
+      <Font ss:FontName="Calibri" ss:Size="9.5"/>
+    </Style>
+    <Style ss:ID="TdTextBold">
+      <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+      </Borders>
+      <Font ss:FontName="Calibri" ss:Size="9.5" ss:Bold="1"/>
+    </Style>
+    <Style ss:ID="TdCenter">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+      </Borders>
+      <Font ss:FontName="Calibri" ss:Size="9.5"/>
+    </Style>
+    <Style ss:ID="TdCenterBold">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+      </Borders>
+      <Font ss:FontName="Calibri" ss:Size="9.5" ss:Bold="1"/>
+    </Style>
+    <Style ss:ID="TdNumber">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+      </Borders>
+      <Font ss:FontName="Calibri" ss:Size="10" ss:Bold="1"/>
+      <NumberFormat ss:Format="0.00"/>
+    </Style>
+    <Style ss:ID="BadgePass">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+      </Borders>
+      <Font ss:FontName="Calibri" ss:Size="9.5" ss:Bold="1" ss:Color="#15803D"/>
+      <Interior ss:Color="#DCFCE7" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="BadgeFail">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+      </Borders>
+      <Font ss:FontName="Calibri" ss:Size="9.5" ss:Bold="1" ss:Color="#B91C1C"/>
+      <Interior ss:Color="#FEE2E2" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="BadgeKey">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+      </Borders>
+      <Font ss:FontName="Calibri" ss:Size="10" ss:Bold="1" ss:Color="#713F12"/>
+      <Interior ss:Color="#FEF08A" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="CatMudah">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/></Borders>
+      <Font ss:FontName="Calibri" ss:Size="9.5" ss:Bold="1" ss:Color="#166534"/>
+      <Interior ss:Color="#DCFCE7" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="CatSedang">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/></Borders>
+      <Font ss:FontName="Calibri" ss:Size="9.5" ss:Bold="1" ss:Color="#92400E"/>
+      <Interior ss:Color="#FEF3C7" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="CatSukar">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/></Borders>
+      <Font ss:FontName="Calibri" ss:Size="9.5" ss:Bold="1" ss:Color="#991B1B"/>
+      <Interior ss:Color="#FEE2E2" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="DiscGood">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/></Borders>
+      <Font ss:FontName="Calibri" ss:Size="9.5" ss:Bold="1" ss:Color="#166534"/>
+      <Interior ss:Color="#DCFCE7" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="DiscFair">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/></Borders>
+      <Font ss:FontName="Calibri" ss:Size="9.5" ss:Bold="1" ss:Color="#92400E"/>
+      <Interior ss:Color="#FEF3C7" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="DiscPoor">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/></Borders>
+      <Font ss:FontName="Calibri" ss:Size="9.5" ss:Bold="1" ss:Color="#991B1B"/>
+      <Interior ss:Color="#FEE2E2" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="StatLabel">
+      <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+      <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/></Borders>
+      <Font ss:FontName="Calibri" ss:Size="9.5" ss:Bold="1" ss:Color="#334155"/>
+      <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="StatVal">
+      <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+      <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/></Borders>
+      <Font ss:FontName="Calibri" ss:Size="9.5"/>
+    </Style>
+    <Style ss:ID="SignName">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Font ss:FontName="Calibri" ss:Size="10.5" ss:Bold="1" ss:Underline="Single" ss:Color="#0F172A"/>
+    </Style>
+    <Style ss:ID="SignNip">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Font ss:FontName="Calibri" ss:Size="9" ss:Color="#475569"/>
+    </Style>
+  </Styles>
 
-          <!-- BAGIAN 2: DAFTAR REKAPITULASI NILAI SISWA -->
-          <table>
-            <thead>
-              <tr><th colspan="9" class="sec-header">BAGIAN II: DAFTAR REKAPITULASI NILAI SISWA (PERINGKAT HASIL BELAJAR)</th></tr>
-              <tr>
-                <th class="th-main" style="width:60px;">Peringkat</th>
-                <th class="th-main" style="width:110px;">NISN</th>
-                <th class="th-main" style="width:90px;">NIS</th>
-                <th class="th-main">Nama Lengkap Siswa</th>
-                <th class="th-main" style="width:90px;">Kelas</th>
-                <th class="th-main" style="width:60px;">Benar</th>
-                <th class="th-main" style="width:60px;">Salah</th>
-                <th class="th-main" style="width:90px;">Nilai Akhir</th>
-                <th class="th-main" style="width:100px;">Status KKM</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${students.map((st, idx) => `
-                <tr>
-                  <td class="text-center font-bold">#${idx + 1}</td>
-                  <td class="text-center" style="mso-number-format:'\\@';">${st.nisn || st.username}</td>
-                  <td class="text-center" style="mso-number-format:'\\@';">${st.nis || '-'}</td>
-                  <td class="font-bold">${st.full_name}</td>
-                  <td class="text-center">${st.class_name || 'XII IPA 1'}</td>
-                  <td class="text-center font-bold" style="color:#16a34a;">${st.correct_count}</td>
-                  <td class="text-center font-bold" style="color:#dc2626;">${st.wrong_count}</td>
-                  <td class="text-center font-bold" style="font-size:10.5pt; color:${(st.score || 0) >= 75 ? '#15803d' : '#b91c1c'};">${(st.score || 0).toFixed(2)}</td>
-                  <td class="${(st.score || 0) >= 75 ? 'badge-pass' : 'badge-fail'}">${(st.score || 0) >= 75 ? 'TUNTAS' : 'REMIDIAL'}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
+  <!-- ======================================================== -->
+  <!-- SHEET 1: REKAP NILAI SISWA (HANYA BERUPA NILAI & HASIL)  -->
+  <!-- ======================================================== -->
+  <Worksheet ss:Name="Rekap Nilai Siswa">
+    <Table ss:DefaultRowHeight="20">
+      <Column ss:Width="50"/>
+      <Column ss:Width="95"/>
+      <Column ss:Width="85"/>
+      <Column ss:Width="110"/>
+      <Column ss:Width="200"/>
+      <Column ss:Width="90"/>
+      <Column ss:Width="65"/>
+      <Column ss:Width="65"/>
+      <Column ss:Width="85"/>
+      <Column ss:Width="100"/>
 
-          <!-- BAGIAN 3: MATRIKS RESPON SISWA PER BUTIR SOAL -->
-          <table>
-            <thead>
-              <tr><th colspan="${4 + totalQuestions + 2}" class="sec-header">BAGIAN III: MATRIKS POLA RESPON SISWA PER BUTIR SOAL (1..${totalQuestions})</th></tr>
-              <tr>
-                <th class="th-main" rowspan="2" style="width:40px;">No</th>
-                <th class="th-main" rowspan="2" style="width:180px;">Nama Siswa</th>
-                <th class="th-main" rowspan="2" style="width:70px;">Kelas</th>
-                <th class="th-main" colspan="${totalQuestions}">Respon Butir Soal (Pilihan Jawaban & Skor)</th>
-                <th class="th-main" rowspan="2" style="width:65px;">Total Benar</th>
-                <th class="th-main" rowspan="2" style="width:70px;">Nilai</th>
-              </tr>
-              <tr>
-                ${qIds.map((qId, qIdx) => `<th class="th-sub" style="width:50px;">S.${qIdx + 1}</th>`).join('')}
-              </tr>
-              <tr style="background-color:#fef08a;">
-                <td colspan="3" class="text-center font-bold" style="background-color:#fef9c3;">KUNCI JAWABAN RESMI</td>
-                ${qIds.map(qId => `<td class="text-center font-bold badge-key">${answerKeys[qId] || 'C'}</td>`).join('')}
-                <td class="text-center font-bold badge-key">${totalQuestions}</td>
-                <td class="text-center font-bold badge-key">100.00</td>
-              </tr>
-            </thead>
-            <tbody>
-              ${students.map((st, idx) => `
-                <tr>
-                  <td class="text-center font-bold">${idx + 1}</td>
-                  <td>${st.full_name}</td>
-                  <td class="text-center">${st.class_name || 'XII IPA 1'}</td>
-                  ${qIds.map(qId => {
-                    const key = answerKeys[qId] || 'C';
-                    const ans = (st.answers && st.answers[qId] && st.answers[qId].a) ? st.answers[qId].a.toUpperCase() : '-';
-                    const isRight = ans === key;
-                    return `<td class="text-center" style="background-color:${isRight ? '#f0fdf4' : '#fef2f2'}; font-weight:${isRight ? 'bold' : 'normal'}; color:${isRight ? '#15803d' : '#b91c1c'};">${ans} (${isRight ? '1' : '0'})</td>`;
-                  }).join('')}
-                  <td class="text-center font-bold">${st.correct_count}</td>
-                  <td class="text-center font-bold">${(st.score || 0).toFixed(2)}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
+      <!-- KOP RESMI -->
+      <Row ss:Height="22"><Cell ss:MergeAcross="9" ss:StyleID="KopDinas"><Data ss:Type="String">${escapeXml((profile.dinas || 'PEMERINTAH PROVINSI DAERAH KHUSUS IBUKOTA JAKARTA - DINAS PENDIDIKAN').replace(/\n/g, ' - '))}</Data></Cell></Row>
+      <Row ss:Height="26"><Cell ss:MergeAcross="9" ss:StyleID="KopSekolah"><Data ss:Type="String">${escapeXml(profile.name || 'SMK NEGERI 5 JAKARTA')}</Data></Cell></Row>
+      <Row ss:Height="18"><Cell ss:MergeAcross="9" ss:StyleID="KopAlamat"><Data ss:Type="String">${escapeXml(profile.address || '')} • NPSN: ${escapeXml(profile.npsn || '20102551')}</Data></Cell></Row>
+      <Row ss:Height="10"/>
+      <Row ss:Height="24"><Cell ss:MergeAcross="9" ss:StyleID="TitleDoc"><Data ss:Type="String">DAFTAR REKAPITULASI NILAI UJIAN CBT</Data></Cell></Row>
+      <Row ss:Height="18"><Cell ss:MergeAcross="9" ss:StyleID="SubDoc"><Data ss:Type="String">Jadwal: ${escapeXml(sch.title)} • Token: ${escapeXml(sch.token_code)} • Bank Soal: ${escapeXml(sch.bank_name || '-')}</Data></Cell></Row>
+      <Row ss:Height="10"/>
 
-          <!-- BAGIAN 4: TABEL ANALISIS BUTIR SOAL LENGKAP -->
-          <table>
-            <thead>
-              <tr><th colspan="17" class="sec-header">BAGIAN IV: TABEL ANALISIS BUTIR SOAL LENGKAP (TINGKAT KESUKARAN, DAYA PEMBEDA, & PENGECOH)</th></tr>
-              <tr>
-                <th class="th-main" rowspan="2" style="width:35px;">No</th>
-                <th class="th-main" rowspan="2" style="width:50px;">Kunci</th>
-                <th class="th-main" colspan="5">Distribusi Pilihan Siswa</th>
-                <th class="th-main" rowspan="2" style="width:50px;">Benar (B)</th>
-                <th class="th-main" rowspan="2" style="width:50px;">Salah (S)</th>
-                <th class="th-main" colspan="2">Tingkat Kesukaran (P)</th>
-                <th class="th-main" colspan="3">Daya Pembeda (D)</th>
-                <th class="th-main" rowspan="2" style="width:190px;">Efektivitas Pengecoh</th>
-                <th class="th-main" rowspan="2" style="width:180px;">Rekomendasi Butir</th>
-              </tr>
-              <tr>
-                <th class="th-sub" style="width:35px;">A</th>
-                <th class="th-sub" style="width:35px;">B</th>
-                <th class="th-sub" style="width:35px;">C</th>
-                <th class="th-sub" style="width:35px;">D</th>
-                <th class="th-sub" style="width:35px;">E</th>
-                <th class="th-sub" style="width:60px;">Nilai P</th>
-                <th class="th-sub" style="width:75px;">Kategori</th>
-                <th class="th-sub" style="width:40px;">BA</th>
-                <th class="th-sub" style="width:40px;">BB</th>
-                <th class="th-sub" style="width:75px;">Indeks D</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${itemAnalysis.map(it => `
-                <tr>
-                  <td class="text-center font-bold">#${it.qNum}</td>
-                  <td class="text-center badge-key font-bold">${it.key}</td>
-                  <td class="text-center ${it.key === 'A' ? 'font-bold bg-amber-100' : ''}">${it.optCounts.A} (${(it.optCounts.A / totalStudents * 100).toFixed(0)}%)</td>
-                  <td class="text-center ${it.key === 'B' ? 'font-bold bg-amber-100' : ''}">${it.optCounts.B} (${(it.optCounts.B / totalStudents * 100).toFixed(0)}%)</td>
-                  <td class="text-center ${it.key === 'C' ? 'font-bold bg-amber-100' : ''}">${it.optCounts.C} (${(it.optCounts.C / totalStudents * 100).toFixed(0)}%)</td>
-                  <td class="text-center ${it.key === 'D' ? 'font-bold bg-amber-100' : ''}">${it.optCounts.D} (${(it.optCounts.D / totalStudents * 100).toFixed(0)}%)</td>
-                  <td class="text-center ${it.key === 'E' ? 'font-bold bg-amber-100' : ''}">${it.optCounts.E} (${(it.optCounts.E / totalStudents * 100).toFixed(0)}%)</td>
-                  <td class="text-center font-bold" style="color:#16a34a;">${it.correctCount}</td>
-                  <td class="text-center font-bold" style="color:#dc2626;">${it.wrongCount}</td>
-                  <td class="text-center font-bold">${it.pVal.toFixed(2)}</td>
-                  <td class="${it.pClass}">${it.pCategory}</td>
-                  <td class="text-center">${it.correctUpper}</td>
-                  <td class="text-center">${it.correctLower}</td>
-                  <td class="${it.dClass}">${it.dVal.toFixed(2)} (${it.dCategory})</td>
-                  <td style="font-size:9pt;">${it.distractorSummary}</td>
-                  <td class="font-bold" style="font-size:9pt;">${it.recommendation}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
+      <!-- STATISTIK RINGKAS NILAI KELAS -->
+      <Row><Cell ss:MergeAcross="9" ss:StyleID="SecHeader"><Data ss:Type="String">RINGKASAN STATISTIK EVALUASI NILAI KELAS</Data></Cell></Row>
+      <Row>
+        <Cell ss:MergeAcross="1" ss:StyleID="StatLabel"><Data ss:Type="String">Jumlah Peserta</Data></Cell>
+        <Cell ss:MergeAcross="2" ss:StyleID="StatVal"><Data ss:Type="String">${totalStudents} Siswa Terdaftar</Data></Cell>
+        <Cell ss:MergeAcross="1" ss:StyleID="StatLabel"><Data ss:Type="String">Nilai Rata-rata (Mean)</Data></Cell>
+        <Cell ss:MergeAcross="2" ss:StyleID="StatVal"><Data ss:Type="String">${avgScore.toFixed(2)} (Skala 100)</Data></Cell>
+      </Row>
+      <Row>
+        <Cell ss:MergeAcross="1" ss:StyleID="StatLabel"><Data ss:Type="String">KKM (Kriteria Ketuntasan)</Data></Cell>
+        <Cell ss:MergeAcross="2" ss:StyleID="StatVal"><Data ss:Type="String">75.00</Data></Cell>
+        <Cell ss:MergeAcross="1" ss:StyleID="StatLabel"><Data ss:Type="String">Nilai Tertinggi / Terendah</Data></Cell>
+        <Cell ss:MergeAcross="2" ss:StyleID="StatVal"><Data ss:Type="String">Max: ${maxScore.toFixed(2)} | Min: ${minScore.toFixed(2)}</Data></Cell>
+      </Row>
+      <Row>
+        <Cell ss:MergeAcross="1" ss:StyleID="StatLabel"><Data ss:Type="String">Tingkat Ketuntasan</Data></Cell>
+        <Cell ss:MergeAcross="2" ss:StyleID="StatVal"><Data ss:Type="String">${passRate.toFixed(1)}% (${passedStudents.length} Tuntas, ${failedStudents.length} Remedial)</Data></Cell>
+        <Cell ss:MergeAcross="1" ss:StyleID="StatLabel"><Data ss:Type="String">Standar Deviasi</Data></Cell>
+        <Cell ss:MergeAcross="2" ss:StyleID="StatVal"><Data ss:Type="String">${stdDev.toFixed(2)}</Data></Cell>
+      </Row>
+      <Row ss:Height="14"/>
 
-          <!-- KETERANGAN KLASIFIKASI KEMENDIKBUDRISTEK -->
-          <table>
-            <thead>
-              <tr><th colspan="2" class="sec-header">PEDOMAN INTERPRETASI ANALISIS BUTIR SOAL RESMI:</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="width:50%; vertical-align:top; font-size:9pt;">
-                  <strong>Tingkat Kesukaran (P = B / N):</strong><br>
-                  • P &gt; 0.70 : Kategori <strong>Mudah</strong><br>
-                  • 0.30 ≤ P ≤ 0.70 : Kategori <strong>Sedang (Ideal)</strong><br>
-                  • P &lt; 0.30 : Kategori <strong>Sukar</strong>
-                </td>
-                <td style="width:50%; vertical-align:top; font-size:9pt;">
-                  <strong>Daya Pembeda (D = (BA - BB) / n):</strong><br>
-                  • D ≥ 0.40 : Kategori <strong>Sangat Baik</strong> (Diterima)<br>
-                  • 0.30 ≤ D &lt; 0.40 : Kategori <strong>Baik</strong> (Diterima)<br>
-                  • 0.20 ≤ D &lt; 0.30 : Kategori <strong>Cukup</strong> (Revisi Minor)<br>
-                  • D &lt; 0.20 : Kategori <strong>Buruk / Dibuang</strong> (Perlu Ganti Soal)
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- TABEL DAFTAR NILAI & PERINGKAT SISWA -->
+      <Row><Cell ss:MergeAcross="9" ss:StyleID="SecHeader"><Data ss:Type="String">DAFTAR NILAI &amp; PERINGKAT SISWA</Data></Cell></Row>
+      <Row ss:Height="24">
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Peringkat</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">NISN</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">NIS</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">No. Peserta</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Nama Lengkap Siswa</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Kelas</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Benar</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Salah</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Nilai CBT</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Kelulusan</Data></Cell>
+      </Row>
+      ${students.map((st, idx) => `
+      <Row>
+        <Cell ss:StyleID="TdCenterBold"><Data ss:Type="String">#${idx + 1}</Data></Cell>
+        <Cell ss:StyleID="TdCenter"><Data ss:Type="String">${escapeXml(st.nisn || st.username)}</Data></Cell>
+        <Cell ss:StyleID="TdCenter"><Data ss:Type="String">${escapeXml(st.nis || '-')}</Data></Cell>
+        <Cell ss:StyleID="TdCenter"><Data ss:Type="String">${escapeXml(st.exam_no || '-')}</Data></Cell>
+        <Cell ss:StyleID="TdTextBold"><Data ss:Type="String">${escapeXml(st.full_name)}</Data></Cell>
+        <Cell ss:StyleID="TdCenter"><Data ss:Type="String">${escapeXml(st.class_name || 'XII IPA 1')}</Data></Cell>
+        <Cell ss:StyleID="TdCenterBold"><Data ss:Type="Number">${st.correct_count}</Data></Cell>
+        <Cell ss:StyleID="TdCenter"><Data ss:Type="Number">${st.wrong_count}</Data></Cell>
+        <Cell ss:StyleID="TdNumber"><Data ss:Type="Number">${(st.score || 0).toFixed(2)}</Data></Cell>
+        <Cell ss:StyleID="${(st.score || 0) >= 75 ? 'BadgePass' : 'BadgeFail'}"><Data ss:Type="String">${(st.score || 0) >= 75 ? 'TUNTAS' : 'REMIDIAL'}</Data></Cell>
+      </Row>
+      `).join('')}
 
-          <!-- LEMBAR PENGESAHAN & TANDA TANGAN -->
-          <table>
-            <tr>
-              <td colspan="6" style="border:none;"></td>
-              <td colspan="6" class="text-center" style="border:none; font-size:10pt;">${profile.city || 'Jakarta'}, ${currentDate}</td>
-            </tr>
-            <tr>
-              <td colspan="6" class="text-center" style="border:none; font-size:10pt;">Mengetahui,<br>Kepala Sekolah</td>
-              <td colspan="6" class="text-center" style="border:none; font-size:10pt;">Guru Mata Pelajaran / Proktor</td>
-            </tr>
-            <tr><td colspan="12" style="border:none; height:45px;"></td></tr>
-            <tr>
-              <td colspan="6" class="text-center font-bold" style="border:none; font-size:10.5pt; text-decoration:underline;">${profile.headmaster_name || 'Drs. H. Ahmad Fauzi, M.Pd.'}</td>
-              <td colspan="6" class="text-center font-bold" style="border:none; font-size:10.5pt; text-decoration:underline;">Drs. Budi Pratama, M.Pd.</td>
-            </tr>
-            <tr>
-              <td colspan="6" class="text-center" style="border:none; font-size:9pt; color:#475569;">NIP. ${profile.headmaster_nip || '19710815 199802 1 003'}</td>
-              <td colspan="6" class="text-center" style="border:none; font-size:9pt; color:#475569;">NIP. 19800512 200501 1 008</td>
-            </tr>
-          </table>
-        </body>
-        </html>
-      `;
+      <Row ss:Height="25"/>
+      <!-- TANDA TANGAN SHEET 1 -->
+      <Row>
+        <Cell ss:MergeAcross="4"/>
+        <Cell ss:MergeAcross="4" ss:StyleID="SubDoc"><Data ss:Type="String">${escapeXml(profile.city || 'Jakarta')}, ${currentDate}</Data></Cell>
+      </Row>
+      <Row>
+        <Cell ss:MergeAcross="4" ss:StyleID="SubDoc"><Data ss:Type="String">Mengetahui,&#10;Kepala Sekolah</Data></Cell>
+        <Cell ss:MergeAcross="4" ss:StyleID="SubDoc"><Data ss:Type="String">Guru Mata Pelajaran / Proktor</Data></Cell>
+      </Row>
+      <Row ss:Height="40"/>
+      <Row>
+        <Cell ss:MergeAcross="4" ss:StyleID="SignName"><Data ss:Type="String">${escapeXml(profile.headmaster_name || 'Drs. H. Ahmad Fauzi, M.Pd.')}</Data></Cell>
+        <Cell ss:MergeAcross="4" ss:StyleID="SignName"><Data ss:Type="String">Drs. Budi Pratama, M.Pd.</Data></Cell>
+      </Row>
+      <Row>
+        <Cell ss:MergeAcross="4" ss:StyleID="SignNip"><Data ss:Type="String">NIP. ${escapeXml(profile.headmaster_nip || '19710815 199802 1 003')}</Data></Cell>
+        <Cell ss:MergeAcross="4" ss:StyleID="SignNip"><Data ss:Type="String">NIP. 19800512 200501 1 008</Data></Cell>
+      </Row>
+    </Table>
+  </Worksheet>
 
-      const blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+  <!-- ========================================================== -->
+  <!-- SHEET 2: ANALISIS BUTIR SOAL (ITEM ANALYSIS & MATRIKS)     -->
+  <!-- ========================================================== -->
+  <Worksheet ss:Name="Analisis Butir Soal">
+    <Table ss:DefaultRowHeight="20">
+      <Column ss:Width="45"/>
+      <Column ss:Width="50"/>
+      <Column ss:Width="60"/>
+      <Column ss:Width="60"/>
+      <Column ss:Width="60"/>
+      <Column ss:Width="60"/>
+      <Column ss:Width="60"/>
+      <Column ss:Width="60"/>
+      <Column ss:Width="60"/>
+      <Column ss:Width="65"/>
+      <Column ss:Width="80"/>
+      <Column ss:Width="50"/>
+      <Column ss:Width="50"/>
+      <Column ss:Width="110"/>
+      <Column ss:Width="210"/>
+      <Column ss:Width="200"/>
+
+      <!-- KOP RESMI ANALISIS -->
+      <Row ss:Height="22"><Cell ss:MergeAcross="15" ss:StyleID="KopDinas"><Data ss:Type="String">${escapeXml((profile.dinas || 'PEMERINTAH PROVINSI DAERAH KHUSUS IBUKOTA JAKARTA - DINAS PENDIDIKAN').replace(/\n/g, ' - '))}</Data></Cell></Row>
+      <Row ss:Height="26"><Cell ss:MergeAcross="15" ss:StyleID="KopSekolah"><Data ss:Type="String">${escapeXml(profile.name || 'SMK NEGERI 5 JAKARTA')}</Data></Cell></Row>
+      <Row ss:Height="18"><Cell ss:MergeAcross="15" ss:StyleID="KopAlamat"><Data ss:Type="String">${escapeXml(profile.address || '')} • NPSN: ${escapeXml(profile.npsn || '20102551')}</Data></Cell></Row>
+      <Row ss:Height="10"/>
+      <Row ss:Height="24"><Cell ss:MergeAcross="15" ss:StyleID="TitleDoc"><Data ss:Type="String">LAPORAN ANALISIS BUTIR SOAL &amp; EVALUASI ASESMEN</Data></Cell></Row>
+      <Row ss:Height="18"><Cell ss:MergeAcross="15" ss:StyleID="SubDoc"><Data ss:Type="String">Jadwal: ${escapeXml(sch.title)} • Token: ${escapeXml(sch.token_code)} • Bank Soal: ${escapeXml(sch.bank_name || '-')}</Data></Cell></Row>
+      <Row ss:Height="10"/>
+
+      <!-- PARAMETER PSIKOMETRIK ASESMEN -->
+      <Row><Cell ss:MergeAcross="15" ss:StyleID="SecHeader"><Data ss:Type="String">RINGKASAN PARAMETER PSIKOMETRIK ASESMEN</Data></Cell></Row>
+      <Row>
+        <Cell ss:MergeAcross="2" ss:StyleID="StatLabel"><Data ss:Type="String">Jumlah Butir Soal (k)</Data></Cell>
+        <Cell ss:MergeAcross="4" ss:StyleID="StatVal"><Data ss:Type="String">${totalQuestions} Butir Pilihan Ganda</Data></Cell>
+        <Cell ss:MergeAcross="2" ss:StyleID="StatLabel"><Data ss:Type="String">Reliabilitas Tes (KR-20)</Data></Cell>
+        <Cell ss:MergeAcross="5" ss:StyleID="StatVal"><Data ss:Type="String">${kr20.toFixed(3)} (${kr20 >= 0.70 ? 'Sangat Tinggi / Reliabel' : 'Cukup'})</Data></Cell>
+      </Row>
+      <Row>
+        <Cell ss:MergeAcross="2" ss:StyleID="StatLabel"><Data ss:Type="String">Jumlah Sampel Siswa (N)</Data></Cell>
+        <Cell ss:MergeAcross="4" ss:StyleID="StatVal"><Data ss:Type="String">${totalStudents} Siswa Peserta</Data></Cell>
+        <Cell ss:MergeAcross="2" ss:StyleID="StatLabel"><Data ss:Type="String">Ukuran Kelompok Atas/Bawah (n)</Data></Cell>
+        <Cell ss:MergeAcross="5" ss:StyleID="StatVal"><Data ss:Type="String">${groupSize} Siswa (50% Upper vs 50% Lower)</Data></Cell>
+      </Row>
+      <Row ss:Height="14"/>
+
+      <!-- TABEL ANALISIS BUTIR SOAL RESMI -->
+      <Row><Cell ss:MergeAcross="15" ss:StyleID="SecHeader"><Data ss:Type="String">TABEL ANALISIS BUTIR SOAL RESMI (TINGKAT KESUKARAN, DAYA PEMBEDA, &amp; PENGECOH)</Data></Cell></Row>
+      <Row ss:Height="24">
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">No</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Kunci</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Opsi A</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Opsi B</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Opsi C</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Opsi D</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Opsi E</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Benar (B)</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Salah (S)</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Indeks P</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Kategori P</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">BA</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">BB</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Indeks D</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Efektivitas Pengecoh</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Rekomendasi Butir</Data></Cell>
+      </Row>
+      ${itemAnalysis.map(it => `
+      <Row>
+        <Cell ss:StyleID="TdCenterBold"><Data ss:Type="String">#${it.qNum}</Data></Cell>
+        <Cell ss:StyleID="BadgeKey"><Data ss:Type="String">${it.key}</Data></Cell>
+        <Cell ss:StyleID="TdCenter"><Data ss:Type="String">${it.optCounts.A} (${(it.optCounts.A / totalStudents * 100).toFixed(0)}%)</Data></Cell>
+        <Cell ss:StyleID="TdCenter"><Data ss:Type="String">${it.optCounts.B} (${(it.optCounts.B / totalStudents * 100).toFixed(0)}%)</Data></Cell>
+        <Cell ss:StyleID="TdCenter"><Data ss:Type="String">${it.optCounts.C} (${(it.optCounts.C / totalStudents * 100).toFixed(0)}%)</Data></Cell>
+        <Cell ss:StyleID="TdCenter"><Data ss:Type="String">${it.optCounts.D} (${(it.optCounts.D / totalStudents * 100).toFixed(0)}%)</Data></Cell>
+        <Cell ss:StyleID="TdCenter"><Data ss:Type="String">${it.optCounts.E} (${(it.optCounts.E / totalStudents * 100).toFixed(0)}%)</Data></Cell>
+        <Cell ss:StyleID="TdCenterBold"><Data ss:Type="Number">${it.correctCount}</Data></Cell>
+        <Cell ss:StyleID="TdCenter"><Data ss:Type="Number">${it.wrongCount}</Data></Cell>
+        <Cell ss:StyleID="TdNumber"><Data ss:Type="Number">${it.pVal.toFixed(2)}</Data></Cell>
+        <Cell ss:StyleID="${it.pStyle}"><Data ss:Type="String">${it.pCategory}</Data></Cell>
+        <Cell ss:StyleID="TdCenter"><Data ss:Type="Number">${it.correctUpper}</Data></Cell>
+        <Cell ss:StyleID="TdCenter"><Data ss:Type="Number">${it.correctLower}</Data></Cell>
+        <Cell ss:StyleID="${it.dStyle}"><Data ss:Type="String">${it.dVal.toFixed(2)} (${it.dCategory})</Data></Cell>
+        <Cell ss:StyleID="TdText"><Data ss:Type="String">${escapeXml(it.distractorSummary)}</Data></Cell>
+        <Cell ss:StyleID="TdTextBold"><Data ss:Type="String">${escapeXml(it.recommendation)}</Data></Cell>
+      </Row>
+      `).join('')}
+
+      <Row ss:Height="14"/>
+      <!-- PEDOMAN INTERPRETASI KEMENDIKBUDRISTEK -->
+      <Row><Cell ss:MergeAcross="15" ss:StyleID="SecHeader"><Data ss:Type="String">PEDOMAN INTERPRETASI ANALISIS BUTIR SOAL RESMI</Data></Cell></Row>
+      <Row>
+        <Cell ss:MergeAcross="7" ss:StyleID="StatLabel"><Data ss:Type="String">Tingkat Kesukaran (P = B / N):&#10;• P &gt; 0.70 : Kategori Mudah&#10;• 0.30 &lt;= P &lt;= 0.70 : Kategori Sedang (Ideal)&#10;• P &lt; 0.30 : Kategori Sukar</Data></Cell>
+        <Cell ss:MergeAcross="7" ss:StyleID="StatLabel"><Data ss:Type="String">Daya Pembeda (D = (BA - BB) / n):&#10;• D &gt;= 0.40 : Sangat Baik (Diterima)&#10;• 0.30 &lt;= D &lt; 0.40 : Baik (Diterima)&#10;• 0.20 &lt;= D &lt; 0.30 : Cukup (Revisi Minor)&#10;• D &lt; 0.20 : Buruk / Ganti Soal</Data></Cell>
+      </Row>
+
+      <Row ss:Height="14"/>
+      <!-- MATRIKS RESPON SISWA PER BUTIR SOAL -->
+      <Row><Cell ss:MergeAcross="15" ss:StyleID="SecHeader"><Data ss:Type="String">MATRIKS RESPON SISWA PER BUTIR SOAL (RESPON HURUF &amp; SKOR)</Data></Cell></Row>
+      <Row ss:Height="22">
+        <Cell ss:StyleID="ThSub"><Data ss:Type="String">No</Data></Cell>
+        <Cell ss:MergeAcross="2" ss:StyleID="ThSub"><Data ss:Type="String">Nama Lengkap Siswa</Data></Cell>
+        <Cell ss:StyleID="ThSub"><Data ss:Type="String">Kelas</Data></Cell>
+        ${qIds.map((qId, qIdx) => `<Cell ss:StyleID="ThSub"><Data ss:Type="String">S.${qIdx + 1}</Data></Cell>`).join('')}
+        <Cell ss:StyleID="ThSub"><Data ss:Type="String">Total Benar</Data></Cell>
+        <Cell ss:StyleID="ThSub"><Data ss:Type="String">Nilai Akhir</Data></Cell>
+      </Row>
+      <Row ss:Height="20">
+        <Cell ss:MergeAcross="3" ss:StyleID="BadgeKey"><Data ss:Type="String">KUNCI JAWABAN RESMI</Data></Cell>
+        <Cell ss:StyleID="BadgeKey"><Data ss:Type="String">-</Data></Cell>
+        ${qIds.map(qId => `<Cell ss:StyleID="BadgeKey"><Data ss:Type="String">${answerKeys[qId] || 'C'}</Data></Cell>`).join('')}
+        <Cell ss:StyleID="BadgeKey"><Data ss:Type="Number">${totalQuestions}</Data></Cell>
+        <Cell ss:StyleID="BadgeKey"><Data ss:Type="Number">100</Data></Cell>
+      </Row>
+      ${students.map((st, idx) => `
+      <Row>
+        <Cell ss:StyleID="TdCenterBold"><Data ss:Type="Number">${idx + 1}</Data></Cell>
+        <Cell ss:MergeAcross="2" ss:StyleID="TdTextBold"><Data ss:Type="String">${escapeXml(st.full_name)}</Data></Cell>
+        <Cell ss:StyleID="TdCenter"><Data ss:Type="String">${escapeXml(st.class_name || 'XII IPA 1')}</Data></Cell>
+        ${qIds.map(qId => {
+          const key = answerKeys[qId] || 'C';
+          const ans = (st.answers && st.answers[qId] && st.answers[qId].a) ? st.answers[qId].a.toUpperCase() : '-';
+          const isRight = ans === key;
+          return `<Cell ss:StyleID="${isRight ? 'BadgePass' : 'BadgeFail'}"><Data ss:Type="String">${ans} (${isRight ? '1' : '0'})</Data></Cell>`;
+        }).join('')}
+        <Cell ss:StyleID="TdCenterBold"><Data ss:Type="Number">${st.correct_count}</Data></Cell>
+        <Cell ss:StyleID="TdNumber"><Data ss:Type="Number">${(st.score || 0).toFixed(2)}</Data></Cell>
+      </Row>
+      `).join('')}
+
+      <Row ss:Height="25"/>
+      <!-- TANDA TANGAN SHEET 2 -->
+      <Row>
+        <Cell ss:MergeAcross="7"/>
+        <Cell ss:MergeAcross="7" ss:StyleID="SubDoc"><Data ss:Type="String">${escapeXml(profile.city || 'Jakarta')}, ${currentDate}</Data></Cell>
+      </Row>
+      <Row>
+        <Cell ss:MergeAcross="7" ss:StyleID="SubDoc"><Data ss:Type="String">Mengetahui,&#10;Kepala Sekolah</Data></Cell>
+        <Cell ss:MergeAcross="7" ss:StyleID="SubDoc"><Data ss:Type="String">Guru Mata Pelajaran / Proktor</Data></Cell>
+      </Row>
+      <Row ss:Height="40"/>
+      <Row>
+        <Cell ss:MergeAcross="7" ss:StyleID="SignName"><Data ss:Type="String">${escapeXml(profile.headmaster_name || 'Drs. H. Ahmad Fauzi, M.Pd.')}</Data></Cell>
+        <Cell ss:MergeAcross="7" ss:StyleID="SignName"><Data ss:Type="String">Drs. Budi Pratama, M.Pd.</Data></Cell>
+      </Row>
+      <Row>
+        <Cell ss:MergeAcross="7" ss:StyleID="SignNip"><Data ss:Type="String">NIP. ${escapeXml(profile.headmaster_nip || '19710815 199802 1 003')}</Data></Cell>
+        <Cell ss:MergeAcross="7" ss:StyleID="SignNip"><Data ss:Type="String">NIP. 19800512 200501 1 008</Data></Cell>
+      </Row>
+    </Table>
+  </Worksheet>
+</Workbook>`;
+
+      const blob = new Blob(['\ufeff' + xml], { type: 'application/vnd.ms-excel;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       const safeTitle = (sch.title || 'Ujian_CBT').replace(/[^a-zA-Z0-9_\-]/g, '_');
       a.href = url;
-      a.download = `Analisis_Butir_Soal_Jadwal_${sch.id}_${safeTitle}.xls`;
+      a.download = `Rekap_Nilai_dan_Analisis_Jadwal_${sch.id}_${safeTitle}.xls`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

@@ -409,16 +409,84 @@ function saveSchedulesToFile() {
   }
 }
 
+// Generator Token Ujian Acak (6 Karakter Huruf & Angka Bersih, Tanpa Karakter Mirip Seperti O/0, I/1)
+function generateRandomToken(length = 6) {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let token = '';
+  for (let i = 0; i < length; i++) {
+    token += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return token;
+}
+
+// Pengelolaan Token Dinamis & Statis (Berubah Otomatis Tiap 5m, 10m, 15m)
+function updateScheduleDynamicToken(sch, forceNew = false) {
+  if (!sch) return null;
+  const isDynamic = sch.token_type === 'dynamic';
+  const intervalMinutes = [5, 10, 15].includes(parseInt(sch.token_interval, 10)) ? parseInt(sch.token_interval, 10) : 15;
+  const intervalMs = intervalMinutes * 60 * 1000;
+  const now = Date.now();
+
+  if (!isDynamic) {
+    sch.token_type = 'static';
+    return {
+      token_code: sch.token_code,
+      token_type: 'static',
+      token_interval: 0,
+      seconds_left: null,
+    };
+  }
+
+  sch.token_type = 'dynamic';
+  sch.token_interval = intervalMinutes;
+
+  if (!sch.token_updated_at) {
+    sch.token_updated_at = now;
+  }
+
+  const elapsed = now - sch.token_updated_at;
+  let changed = false;
+
+  if (forceNew || elapsed >= intervalMs) {
+    sch.token_prev_code = sch.token_code;
+    sch.token_prev_expires_at = now + (60 * 1000); // 60 detik toleransi transisi
+    sch.token_code = generateRandomToken(6);
+    sch.token_updated_at = now;
+    changed = true;
+  }
+
+  if (changed) {
+    saveSchedulesToFile();
+  }
+
+  const remainingMs = Math.max(0, intervalMs - (Date.now() - sch.token_updated_at));
+  const secondsLeft = Math.ceil(remainingMs / 1000);
+
+  return {
+    token_code: sch.token_code,
+    token_type: 'dynamic',
+    token_interval: intervalMinutes,
+    token_updated_at: sch.token_updated_at,
+    seconds_left: secondsLeft,
+  };
+}
+
 function loadSchedulesFromFile() {
   try {
     if (fs.existsSync(SCHEDULES_FILE)) {
       const raw = fs.readFileSync(SCHEDULES_FILE, 'utf8');
       const saved = JSON.parse(raw);
       if (Array.isArray(saved) && saved.length > 0) {
-        SCHEDULES = saved.map(s => ({
-          ...s,
-          is_active: s.is_active !== undefined ? !!s.is_active : true,
-        }));
+        SCHEDULES = saved.map(s => {
+          const item = {
+            ...s,
+            is_active: s.is_active !== undefined ? !!s.is_active : true,
+            token_type: s.token_type || 'static',
+            token_interval: [5, 10, 15].includes(parseInt(s.token_interval, 10)) ? parseInt(s.token_interval, 10) : 15,
+          };
+          updateScheduleDynamicToken(item);
+          return item;
+        });
         console.log(`[Jadwal Ujian] Memuat ${SCHEDULES.length} jadwal dari schedules.json`);
         return;
       }
@@ -431,6 +499,15 @@ function loadSchedulesFromFile() {
 }
 
 loadSchedulesFromFile();
+
+// Interval pemeriksaan token dinamis otomatis di latar belakang setiap 10 detik
+setInterval(() => {
+  SCHEDULES.forEach(s => {
+    if (s.is_active !== false && s.token_type === 'dynamic') {
+      updateScheduleDynamicToken(s);
+    }
+  });
+}, 10000);
 
 let activeSchedule = SCHEDULES[0] || DEFAULT_SCHEDULES[0];
 let currentAESKeyHex = '';
@@ -1141,10 +1218,21 @@ const server = http.createServer(async (req, res) => {
       inactive: SCHEDULES.filter(s => s.is_active === false).length,
     };
 
+    const mappedList = list.map(s => {
+      const tInfo = updateScheduleDynamicToken(s);
+      return {
+        ...s,
+        token_code: s.token_code,
+        token_type: s.token_type || 'static',
+        token_interval: s.token_interval || 15,
+        seconds_left: tInfo ? tInfo.seconds_left : null,
+      };
+    });
+
     return sendJSON(200, {
       status: 'success',
-      data: list,
-      total: list.length,
+      data: mappedList,
+      total: mappedList.length,
       counts: counts,
     });
   }
@@ -1175,17 +1263,27 @@ const server = http.createServer(async (req, res) => {
   if ((pathname === '/api/v1/cbt/schedules/create' || pathname === '/api/v1/cbt/schedules/add') && req.method === 'POST') {
     const body = await parseBody(req);
     const nextId = Math.max(...SCHEDULES.map(s => s.id || 0), 0) + 1;
+    const tokenType = body.token_type === 'dynamic' ? 'dynamic' : 'static';
+    const tokenInterval = [5, 10, 15].includes(parseInt(body.token_interval, 10)) ? parseInt(body.token_interval, 10) : 15;
+    let tokenCode = (body.token_code || '').trim().toUpperCase();
+    if (!tokenCode) {
+      tokenCode = tokenType === 'dynamic' ? generateRandomToken(6) : `TOKEN${nextId}`;
+    }
     const newSch = {
       id: nextId,
       title: body.title?.trim() || `Jadwal Ujian #${nextId}`,
       bank_name: body.bank_name?.trim() || 'Bank Termodinamika (5 Soal)',
       start_time: body.start_time?.trim() || 'Hari ini, 08:00 WIB',
       duration_minutes: parseInt(body.duration_minutes, 10) || 90,
-      token_code: (body.token_code || `TOKEN${nextId}`).trim().toUpperCase(),
+      token_code: tokenCode,
+      token_type: tokenType,
+      token_interval: tokenInterval,
+      token_updated_at: Date.now(),
       shuffle_questions: body.shuffle_questions !== false,
       shuffle_options: body.shuffle_options !== false,
       class_target: body.class_target || 'Semua Kelas',
       package_url: `/static/packages/exam_${nextId}_enc.json`,
+      is_active: body.is_active !== undefined ? !!body.is_active : true,
     };
     SCHEDULES.push(newSch);
     compileAndEncryptPackage(nextId);
@@ -1210,6 +1308,17 @@ const server = http.createServer(async (req, res) => {
     if (body.bank_name) sch.bank_name = body.bank_name.trim();
     if (body.start_time) sch.start_time = body.start_time.trim();
     if (body.duration_minutes) sch.duration_minutes = parseInt(body.duration_minutes, 10) || sch.duration_minutes;
+    if (body.token_type !== undefined) {
+      const prevType = sch.token_type;
+      sch.token_type = body.token_type === 'dynamic' ? 'dynamic' : 'static';
+      if (prevType !== 'dynamic' && sch.token_type === 'dynamic') {
+        sch.token_updated_at = Date.now();
+        if (!body.token_code) sch.token_code = generateRandomToken(6);
+      }
+    }
+    if (body.token_interval !== undefined) {
+      sch.token_interval = [5, 10, 15].includes(parseInt(body.token_interval, 10)) ? parseInt(body.token_interval, 10) : 15;
+    }
     if (body.token_code) sch.token_code = body.token_code.trim().toUpperCase();
     if (body.shuffle_questions !== undefined) sch.shuffle_questions = !!body.shuffle_questions;
     if (body.shuffle_options !== undefined) sch.shuffle_options = !!body.shuffle_options;
@@ -1222,6 +1331,28 @@ const server = http.createServer(async (req, res) => {
       status: 'success',
       message: `Jadwal ujian "${sch.title}" berhasil diperbarui dan paket soal telah dienkripsi ulang!`,
       data: sch,
+    });
+  }
+
+  // POST /api/v1/cbt/schedules/:id/refresh-token (Rilis Token Baru Manual)
+  if (pathname.includes('/api/v1/cbt/schedules/') && pathname.endsWith('/refresh-token') && req.method === 'POST') {
+    const parts = pathname.split('/');
+    const schId = parseInt(parts[parts.length - 2], 10);
+    const sch = SCHEDULES.find(s => s.id === schId);
+    if (!sch) {
+      return sendJSON(404, { status: 'error', message: 'Jadwal ujian tidak ditemukan' });
+    }
+    const tokenInfo = updateScheduleDynamicToken(sch, true);
+    return sendJSON(200, {
+      status: 'success',
+      message: `Token baru untuk "${sch.title}" berhasil dirilis: ${sch.token_code}`,
+      data: {
+        id: sch.id,
+        token_code: sch.token_code,
+        token_type: sch.token_type,
+        token_interval: sch.token_interval,
+        seconds_left: tokenInfo ? tokenInfo.seconds_left : (sch.token_interval || 15) * 60,
+      }
     });
   }
 
@@ -1301,8 +1432,18 @@ const server = http.createServer(async (req, res) => {
       });
     }
 
-    if (body.token_code !== curSch.token_code) {
-      return sendJSON(403, { status: 'error', message: `Token ujian salah! Gunakan: ${curSch.token_code}` });
+    updateScheduleDynamicToken(curSch);
+    const inputToken = (body.token_code || '').trim().toUpperCase();
+    const curToken = (curSch.token_code || '').toUpperCase();
+    const prevToken = (curSch.token_prev_code || '').toUpperCase();
+    const isGraceValid = curSch.token_type === 'dynamic' &&
+      prevToken &&
+      inputToken === prevToken &&
+      curSch.token_prev_expires_at &&
+      Date.now() <= curSch.token_prev_expires_at;
+
+    if (inputToken !== curToken && !isGraceValid) {
+      return sendJSON(403, { status: 'error', message: `Token ujian salah atau telah berganti! Masukkan token aktif saat ini: ${curSch.token_code}` });
     }
 
     const schKeyInfo = scheduleKeys[curSch.id] || { keyHex: currentAESKeyHex };
@@ -1466,6 +1607,9 @@ const server = http.createServer(async (req, res) => {
         bank_name: curSchedule.bank_name,
         duration_minutes: curSchedule.duration_minutes,
         token_code: curSchedule.token_code,
+        token_type: curSchedule.token_type || 'static',
+        token_interval: curSchedule.token_interval || 15,
+        seconds_left: updateScheduleDynamicToken(curSchedule)?.seconds_left ?? null,
         start_time: curSchedule.start_time,
         class_target: curSchedule.class_target,
         is_active: curSchedule.is_active !== false,
@@ -1479,16 +1623,22 @@ const server = http.createServer(async (req, res) => {
       })),
       answer_keys: answerKeys,
       school_profile: schoolProfile,
-      schedules: SCHEDULES.map((s) => ({
-        id: s.id,
-        title: s.title,
-        token_code: s.token_code,
-        duration_minutes: s.duration_minutes,
-        bank_name: s.bank_name,
-        is_active: s.is_active !== false,
-        start_time: s.start_time,
-        class_target: s.class_target,
-      })),
+      schedules: SCHEDULES.map((s) => {
+        const tInfo = updateScheduleDynamicToken(s);
+        return {
+          id: s.id,
+          title: s.title,
+          token_code: s.token_code,
+          token_type: s.token_type || 'static',
+          token_interval: s.token_interval || 15,
+          seconds_left: tInfo ? tInfo.seconds_left : null,
+          duration_minutes: s.duration_minutes,
+          bank_name: s.bank_name,
+          is_active: s.is_active !== false,
+          start_time: s.start_time,
+          class_target: s.class_target,
+        };
+      }),
       classes: Array.from(new Set(USERS.filter(u => u.role === 'student').map(u => u.class_name || 'Tanpa Kelas'))),
       class_counts: USERS.filter(u => u.role === 'student').reduce((acc, u) => {
         const c = u.class_name || 'Tanpa Kelas';

@@ -5,12 +5,17 @@
     "bank_name": "Bank Termodinamika (5 Soal)",
     "start_time": "Hari ini, 07:30 WIB",
     "duration_minutes": 90,
-    "token_code": "FISIKA26",
+    "token_code": "YE2AJ9",
     "shuffle_questions": true,
     "shuffle_options": true,
     "class_target": "Semua Kelas",
     "package_url": "/static/packages/exam_1_enc.json",
-    "is_active": true
+    "is_active": true,
+    "token_type": "dynamic",
+    "token_interval": 5,
+    "token_updated_at": 1792655399493,
+    "token_prev_code": "NXLNQP",
+    "token_prev_expires_at": 1792655459493
   },
   {
     "id": 2,
@@ -23,7 +28,9 @@
     "shuffle_options": true,
     "class_target": "Semua Kelas",
     "package_url": "/static/packages/exam_2_enc.json",
-    "is_active": true
+    "is_active": true,
+    "token_type": "static",
+    "token_interval": 15
   },
   {
     "id": 3,
@@ -36,7 +43,9 @@
     "shuffle_options": true,
     "class_target": "Semua Kelas",
     "package_url": "/static/packages/exam_3_enc.json",
-    "is_active": true
+    "is_active": true,
+    "token_type": "static",
+    "token_interval": 15
   },
   {
     "id": 4,
@@ -49,7 +58,9 @@
     "shuffle_options": true,
     "class_target": "XII IPA 1",
     "package_url": "/static/packages/exam_4_enc.json",
-    "is_active": true
+    "is_active": true,
+    "token_type": "static",
+    "token_interval": 15
   },
   {
     "id": 5,
@@ -62,7 +73,9 @@
     "shuffle_options": true,
     "class_target": "XII IPA 2",
     "package_url": "/static/packages/exam_5_enc.json",
-    "is_active": true
+    "is_active": true,
+    "token_type": "static",
+    "token_interval": 15
   },
   {
     "id": 6,
@@ -75,7 +88,9 @@
     "shuffle_options": true,
     "class_target": "Semua Kelas",
     "package_url": "/static/packages/exam_6_enc.json",
-    "is_active": true
+    "is_active": true,
+    "token_type": "static",
+    "token_interval": 15
   },
   {
     "id": 7,
@@ -88,7 +103,9 @@
     "shuffle_options": true,
     "class_target": "Semua Kelas",
     "package_url": "/static/packages/exam_7_enc.json",
-    "is_active": true
+    "is_active": true,
+    "token_type": "static",
+    "token_interval": 15
   },
   {
     "id": 8,
@@ -101,6 +118,8 @@
     "shuffle_options": true,
     "class_target": "Semua Kelas",
     "package_url": "/static/packages/exam_8_enc.json",
-    "is_active": true
+    "is_active": true,
+    "token_type": "static",
+    "token_interval": 15
   }
 ]

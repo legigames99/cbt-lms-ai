@@ -2164,9 +2164,26 @@
             <input type="number" id="schDuration" value="90" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-mono">
           </div>
           <div>
-            <label class="block font-semibold text-slate-300 mb-1">Kode Token Ujian</label>
-            <input type="text" id="schToken" value="CBT2026" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-mono font-bold uppercase text-center text-amber-400">
+            <label class="block font-semibold text-slate-300 mb-1">Kode Token Awal</label>
+            <div class="relative">
+              <input type="text" id="schToken" value="CBT2026" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 pr-9 text-white font-mono font-bold uppercase text-center text-amber-400">
+              <button type="button" onclick="generateRandomTokenInput('schToken')" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-amber-400 p-1" title="Generate Token Acak">
+                <i class="fa-solid fa-dice text-sm"></i>
+              </button>
+            </div>
           </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Tipe & Siklus Perubahan Token</label>
+          <select id="schTokenType" onchange="handleTokenTypeChange('create')" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white cursor-pointer font-medium">
+            <option value="static">Token Statis (Tetap / Tidak Berubah)</option>
+            <option value="dynamic_5">Token Dinamis (Berubah Otomatis Tiap 5 Menit Sekali)</option>
+            <option value="dynamic_10">Token Dinamis (Berubah Otomatis Tiap 10 Menit Sekali)</option>
+            <option value="dynamic_15">Token Dinamis (Berubah Otomatis Tiap 15 Menit Sekali)</option>
+          </select>
+          <p id="schTokenHint" class="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5">
+            <i class="fa-solid fa-lock text-slate-500"></i> Token bersifat tetap selama sesi ujian berlangsung.
+          </p>
         </div>
         <div class="space-y-1.5 pt-1">
           <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
@@ -2225,8 +2242,25 @@
           </div>
           <div>
             <label class="block font-semibold text-slate-300 mb-1">Kode Token Ujian</label>
-            <input type="text" id="editSchToken" value="FISIKA26" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-mono font-bold uppercase text-center text-amber-400">
+            <div class="relative">
+              <input type="text" id="editSchToken" value="FISIKA26" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 pr-9 text-white font-mono font-bold uppercase text-center text-amber-400">
+              <button type="button" onclick="generateRandomTokenInput('editSchToken')" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-amber-400 p-1" title="Generate Token Acak">
+                <i class="fa-solid fa-dice text-sm"></i>
+              </button>
+            </div>
           </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Tipe & Siklus Perubahan Token</label>
+          <select id="editSchTokenType" onchange="handleTokenTypeChange('edit')" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white cursor-pointer font-medium">
+            <option value="static">Token Statis (Tetap / Tidak Berubah)</option>
+            <option value="dynamic_5">Token Dinamis (Berubah Otomatis Tiap 5 Menit Sekali)</option>
+            <option value="dynamic_10">Token Dinamis (Berubah Otomatis Tiap 10 Menit Sekali)</option>
+            <option value="dynamic_15">Token Dinamis (Berubah Otomatis Tiap 15 Menit Sekali)</option>
+          </select>
+          <p id="editSchTokenHint" class="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5">
+            <i class="fa-solid fa-lock text-slate-500"></i> Token bersifat tetap selama sesi ujian berlangsung.
+          </p>
         </div>
         <div class="space-y-1.5 pt-1">
           <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
@@ -3201,7 +3235,26 @@
                 <td class="px-4 py-3.5 font-mono text-slate-300">${sch.start_time || '-'}</td>
                 <td class="px-4 py-3.5 font-mono">${sch.duration_minutes} Menit</td>
                 <td class="px-4 py-3.5">
-                  <span class="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-bold">${sch.token_code}</span>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-bold tracking-wider text-xs">${sch.token_code}</span>
+                    ${sch.token_type === 'dynamic' ? `
+                      <span class="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[10px] font-bold flex items-center gap-1" title="Token Dinamis: Berganti otomatis setiap ${sch.token_interval || 15} menit">
+                        <i class="fa-solid fa-arrows-rotate text-[9px] animate-spin-slow"></i> Dinamis (${sch.token_interval || 15}m)
+                      </span>
+                      <button onclick="handleManualRefreshToken(${sch.id}, event)" class="p-1 px-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-[10px] font-bold transition flex items-center gap-1" title="Rilis token baru sekarang (manual)">
+                        <i class="fa-solid fa-rotate text-[9px]"></i> Rilis
+                      </button>
+                    ` : `
+                      <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-[10px] font-medium" title="Token Statis (Tetap / Tidak Berubah)">
+                        Statis
+                      </span>
+                    `}
+                  </div>
+                  ${sch.token_type === 'dynamic' && sch.seconds_left !== undefined && sch.seconds_left !== null ? `
+                    <div class="text-[10px] text-amber-400/90 mt-1 font-mono flex items-center gap-1">
+                      <i class="fa-regular fa-clock text-[9px]"></i> Sisa: <span class="dynamic-token-timer font-bold" data-sch-id="${sch.id}" data-seconds="${sch.seconds_left}">${formatSecondsToTimer(sch.seconds_left)}</span>
+                    </div>
+                  ` : ''}
                 </td>
                 <td class="px-4 py-3.5">
                   <div class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1 font-mono">
@@ -3262,7 +3315,12 @@
                 <td class="px-4 py-3.5 font-mono text-slate-400">${sch.start_time || '-'}</td>
                 <td class="px-4 py-3.5 font-mono text-slate-400">${sch.duration_minutes} Menit</td>
                 <td class="px-4 py-3.5">
-                  <span class="px-2 py-1 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 font-mono font-bold">${sch.token_code}</span>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="px-2 py-1 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 font-mono font-bold text-xs">${sch.token_code}</span>
+                    <span class="px-1.5 py-0.5 rounded bg-slate-800/80 text-slate-500 border border-slate-700 text-[10px]">
+                      ${sch.token_type === 'dynamic' ? `Dinamis (${sch.token_interval || 15}m)` : 'Statis'}
+                    </span>
+                  </div>
                 </td>
                 <td class="px-4 py-3.5">
                   <div class="text-[11px] text-slate-500 font-semibold flex items-center gap-1 font-mono">
@@ -3486,12 +3544,82 @@
       return parseInt(schedSelect?.value, 10) || 1;
     }
 
+    // Helper Generator Token Acak & Mode Dinamis (5m, 10m, 15m)
+    window.generateRandomTokenInput = function(targetInputId) {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let tok = '';
+      for (let i = 0; i < 6; i++) {
+        tok += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      const el = document.getElementById(targetInputId);
+      if (el) el.value = tok;
+    };
+
+    window.handleTokenTypeChange = function(modalType) {
+      const prefix = modalType === 'create' ? 'sch' : 'editSch';
+      const selectEl = document.getElementById(`${prefix}TokenType`);
+      const hintEl = document.getElementById(`${prefix}TokenHint`);
+      const tokenInput = document.getElementById(`${prefix}Token`);
+      if (!selectEl) return;
+      const val = selectEl.value;
+      if (val === 'static') {
+        if (hintEl) hintEl.innerHTML = '<i class="fa-solid fa-lock text-slate-400"></i> Token bersifat tetap / statis selama sesi ujian berlangsung.';
+      } else {
+        const mins = val.split('_')[1] || '15';
+        if (hintEl) hintEl.innerHTML = `<i class="fa-solid fa-arrows-rotate text-cyan-400 animate-spin-slow"></i> Token akan <strong class="text-cyan-300">berganti otomatis setiap ${mins} menit sekali</strong>. Sistem memiliki toleransi 60 detik bagi siswa yang sedang mengetik token sebelumnya.`;
+        if (modalType === 'create' && tokenInput && tokenInput.value === 'CBT2026') {
+          generateRandomTokenInput(`${prefix}Token`);
+        }
+      }
+    };
+
+    window.handleManualRefreshToken = async function(schId, evt) {
+      if (evt) evt.stopPropagation();
+      if (!confirm('Apakah Anda yakin ingin merilis token baru untuk jadwal ini sekarang?')) return;
+      try {
+        const res = await fetch(`/api/v1/cbt/schedules/${schId}/refresh-token`, { method: 'POST' });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+        alert(json.message || 'Token baru berhasil dirilis!');
+        await fetchScheduleList();
+        lastProctorDataHash = '';
+        await fetchProctorSessions();
+      } catch (err) {
+        alert('Gagal merilis token baru: ' + err.message);
+      }
+    };
+
+    function formatSecondsToTimer(sec) {
+      if (sec === null || sec === undefined || isNaN(sec)) return '-';
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    // Timer Ticker Interval di Client (Countdown Sisa Waktu Token Dinamis)
+    setInterval(() => {
+      document.querySelectorAll('.dynamic-token-timer').forEach(el => {
+        let sec = parseInt(el.dataset.seconds, 10);
+        if (!isNaN(sec) && sec > 0) {
+          sec--;
+          el.dataset.seconds = sec;
+          el.innerText = formatSecondsToTimer(sec);
+          if (sec === 0) {
+            fetchScheduleList();
+          }
+        }
+      });
+    }, 1000);
+
     // Buat Jadwal Baru
     window.handleSaveSchedule = async function() {
       const title = document.getElementById('schTitle')?.value.trim() || 'Ujian Baru CBT';
       const bank = document.getElementById('schBank')?.value || 'Bank Termodinamika & Kalor (5 Butir Soal)';
       const duration = parseInt(document.getElementById('schDuration')?.value, 10) || 90;
       const tokenCode = (document.getElementById('schToken')?.value || 'CBT2026').trim().toUpperCase();
+      const rawTokenType = document.getElementById('schTokenType')?.value || 'static';
+      const tokenType = rawTokenType.startsWith('dynamic') ? 'dynamic' : 'static';
+      const tokenInterval = rawTokenType.startsWith('dynamic') ? parseInt(rawTokenType.split('_')[1], 10) || 15 : 15;
       const shuffleQ = document.getElementById('schShuffleQ')?.checked ?? true;
       const shuffleOpt = document.getElementById('schShuffleOpt')?.checked ?? true;
       const isActive = document.getElementById('schIsActive')?.checked ?? true;
@@ -3506,6 +3634,8 @@
             start_time: 'Hari ini, 07:30 WIB',
             duration_minutes: duration,
             token_code: tokenCode,
+            token_type: tokenType,
+            token_interval: tokenInterval,
             shuffle_questions: shuffleQ,
             shuffle_options: shuffleOpt,
             is_active: isActive,
@@ -3535,6 +3665,15 @@
             document.getElementById('editSchStartTime').value = sch.start_time;
             document.getElementById('editSchDuration').value = sch.duration_minutes;
             document.getElementById('editSchToken').value = sch.token_code;
+            const typeSelect = document.getElementById('editSchTokenType');
+            if (typeSelect) {
+              if (sch.token_type === 'dynamic') {
+                typeSelect.value = `dynamic_${sch.token_interval || 15}`;
+              } else {
+                typeSelect.value = 'static';
+              }
+              handleTokenTypeChange('edit');
+            }
             document.getElementById('editSchShuffleQ').checked = !!sch.shuffle_questions;
             document.getElementById('editSchShuffleOpt').checked = !!sch.shuffle_options;
             const cbActive = document.getElementById('editSchIsActive');
@@ -3552,6 +3691,9 @@
       const startTime = document.getElementById('editSchStartTime').value.trim();
       const duration = parseInt(document.getElementById('editSchDuration').value, 10) || 90;
       const tokenCode = document.getElementById('editSchToken').value.trim().toUpperCase();
+      const rawTokenType = document.getElementById('editSchTokenType')?.value || 'static';
+      const tokenType = rawTokenType.startsWith('dynamic') ? 'dynamic' : 'static';
+      const tokenInterval = rawTokenType.startsWith('dynamic') ? parseInt(rawTokenType.split('_')[1], 10) || 15 : 15;
       const shuffleQ = document.getElementById('editSchShuffleQ').checked;
       const shuffleOpt = document.getElementById('editSchShuffleOpt').checked;
       const isActive = document.getElementById('editSchIsActive')?.checked ?? true;
@@ -3566,6 +3708,8 @@
             start_time: startTime,
             duration_minutes: duration,
             token_code: tokenCode,
+            token_type: tokenType,
+            token_interval: tokenInterval,
             shuffle_questions: shuffleQ,
             shuffle_options: shuffleOpt,
             is_active: isActive,
@@ -3674,7 +3818,14 @@
           const statusText = document.getElementById('proctorActiveScheduleStatusText');
 
           if (bannerTitle) bannerTitle.innerText = sch.title;
-          if (bannerToken) bannerToken.innerText = `Token: ${sch.token_code}`;
+          if (bannerToken) {
+            if (sch.token_type === 'dynamic') {
+              const timerTxt = sch.seconds_left ? ` <span class="font-mono text-amber-300">(${formatSecondsToTimer(sch.seconds_left)})</span>` : '';
+              bannerToken.innerHTML = `Token: <span class="text-amber-300 font-mono font-bold">${sch.token_code}</span> <span class="text-cyan-300 text-[10px] font-bold">[Dinamis ${sch.token_interval || 15}m${timerTxt}]</span> <button onclick="handleManualRefreshToken(${sch.id}, event)" class="ml-1 text-slate-300 hover:text-white" title="Rilis token baru sekarang"><i class="fa-solid fa-arrows-rotate text-[10px]"></i></button>`;
+            } else {
+              bannerToken.innerHTML = `Token: <span class="text-amber-300 font-mono font-bold">${sch.token_code}</span> <span class="text-slate-400 text-[10px] font-medium">[Statis]</span>`;
+            }
+          }
           if (bannerBank) bannerBank.innerText = `Bank Soal: ${sch.bank_name || '-'}`;
           if (bannerDuration) bannerDuration.innerText = `Durasi: ${sch.duration_minutes} Menit`;
           if (bannerPkg) bannerPkg.innerText = `/static/packages/exam_${sch.id}_enc.json`;
@@ -4037,7 +4188,14 @@
           const sText = document.getElementById('nilaiActiveScheduleStatusText');
 
           if (bTitle) bTitle.innerText = sch.title;
-          if (bToken) bToken.innerText = `Token: ${sch.token_code}`;
+          if (bToken) {
+            if (sch.token_type === 'dynamic') {
+              const timerTxt = sch.seconds_left ? ` <span class="font-mono text-amber-300">(${formatSecondsToTimer(sch.seconds_left)})</span>` : '';
+              bToken.innerHTML = `Token: <span class="text-amber-300 font-mono font-bold">${sch.token_code}</span> <span class="text-cyan-300 text-[10px] font-bold">[Dinamis ${sch.token_interval || 15}m${timerTxt}]</span> <button onclick="handleManualRefreshToken(${sch.id}, event)" class="ml-1 text-slate-300 hover:text-white" title="Rilis token baru sekarang"><i class="fa-solid fa-arrows-rotate text-[10px]"></i></button>`;
+            } else {
+              bToken.innerHTML = `Token: <span class="text-amber-300 font-mono font-bold">${sch.token_code}</span> <span class="text-slate-400 text-[10px] font-medium">[Statis]</span>`;
+            }
+          }
           if (bBank) bBank.innerText = `Bank Soal: ${sch.bank_name || '-'}`;
           if (bDuration) bDuration.innerText = `Durasi: ${sch.duration_minutes} Menit`;
           if (bTarget) bTarget.innerText = `Target: ${sch.class_target || 'Semua Kelas'}`;

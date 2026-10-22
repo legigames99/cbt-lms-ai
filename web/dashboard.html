@@ -4236,12 +4236,15 @@
 
         let pCategory = 'Sedang';
         let pClass = 'cat-sedang';
+        let pStyle = 'CatSedang';
         if (pVal > 0.70) {
           pCategory = 'Mudah';
           pClass = 'cat-mudah';
+          pStyle = 'CatMudah';
         } else if (pVal < 0.30) {
           pCategory = 'Sukar';
           pClass = 'cat-sukar';
+          pStyle = 'CatSukar';
         }
 
         let correctUpper = 0;
@@ -4259,27 +4262,33 @@
 
         let dCategory = 'Cukup';
         let dClass = 'disc-cukup';
+        let dStyle = 'DiscFair';
         let recommendation = 'Diterima (Perlu Sedikit Revisi)';
 
         if (dVal >= 0.40) {
           dCategory = 'Sangat Baik';
           dClass = 'disc-sangat-baik';
+          dStyle = 'DiscGood';
           recommendation = 'Diterima (Sangat Baik / Masuk Bank Soal)';
         } else if (dVal >= 0.30) {
           dCategory = 'Baik';
           dClass = 'disc-baik';
+          dStyle = 'DiscGood';
           recommendation = 'Diterima (Baik)';
         } else if (dVal >= 0.20) {
           dCategory = 'Cukup';
           dClass = 'disc-cukup';
+          dStyle = 'DiscFair';
           recommendation = 'Diterima (Revisi Minor Pengecoh)';
         } else if (dVal >= 0.00) {
           dCategory = 'Buruk';
           dClass = 'disc-buruk';
+          dStyle = 'DiscPoor';
           recommendation = 'Perlu Revisi Total Butir Soal';
         } else {
           dCategory = 'Sangat Buruk';
           dClass = 'disc-buruk';
+          dStyle = 'DiscPoor';
           recommendation = 'Ditolak / Kunci Jawaban Tertukar';
         }
 
@@ -4307,11 +4316,13 @@
           pVal: pVal,
           pCategory: pCategory,
           pClass: pClass,
+          pStyle: pStyle,
           correctUpper: correctUpper,
           correctLower: correctLower,
           dVal: dVal,
           dCategory: dCategory,
           dClass: dClass,
+          dStyle: dStyle,
           distractorSummary: distractorSummary,
           recommendation: recommendation
         };
@@ -4691,13 +4702,13 @@
         <Cell ss:MergeAcross="2" ss:StyleID="StatLabel"><Data ss:Type="String">Jumlah Butir Soal (k)</Data></Cell>
         <Cell ss:MergeAcross="4" ss:StyleID="StatVal"><Data ss:Type="String">${totalQuestions} Butir Pilihan Ganda</Data></Cell>
         <Cell ss:MergeAcross="2" ss:StyleID="StatLabel"><Data ss:Type="String">Reliabilitas Tes (KR-20)</Data></Cell>
-        <Cell ss:MergeAcross="5" ss:StyleID="StatVal"><Data ss:Type="String">${kr20.toFixed(3)} (${kr20 >= 0.70 ? 'Sangat Tinggi / Reliabel' : 'Cukup'})</Data></Cell>
+        <Cell ss:MergeAcross="4" ss:StyleID="StatVal"><Data ss:Type="String">${kr20.toFixed(3)} (${kr20 >= 0.70 ? 'Sangat Tinggi / Reliabel' : 'Cukup'})</Data></Cell>
       </Row>
       <Row>
         <Cell ss:MergeAcross="2" ss:StyleID="StatLabel"><Data ss:Type="String">Jumlah Sampel Siswa (N)</Data></Cell>
         <Cell ss:MergeAcross="4" ss:StyleID="StatVal"><Data ss:Type="String">${totalStudents} Siswa Peserta</Data></Cell>
         <Cell ss:MergeAcross="2" ss:StyleID="StatLabel"><Data ss:Type="String">Ukuran Kelompok Atas/Bawah (n)</Data></Cell>
-        <Cell ss:MergeAcross="5" ss:StyleID="StatVal"><Data ss:Type="String">${groupSize} Siswa (50% Upper vs 50% Lower)</Data></Cell>
+        <Cell ss:MergeAcross="4" ss:StyleID="StatVal"><Data ss:Type="String">${groupSize} Siswa (50% Upper vs 50% Lower)</Data></Cell>
       </Row>
       <Row ss:Height="14"/>
 
@@ -4733,10 +4744,10 @@
         <Cell ss:StyleID="TdCenterBold"><Data ss:Type="Number">${it.correctCount}</Data></Cell>
         <Cell ss:StyleID="TdCenter"><Data ss:Type="Number">${it.wrongCount}</Data></Cell>
         <Cell ss:StyleID="TdNumber"><Data ss:Type="Number">${it.pVal.toFixed(2)}</Data></Cell>
-        <Cell ss:StyleID="${it.pStyle}"><Data ss:Type="String">${it.pCategory}</Data></Cell>
+        <Cell ss:StyleID="${it.pStyle || 'CatSedang'}"><Data ss:Type="String">${it.pCategory}</Data></Cell>
         <Cell ss:StyleID="TdCenter"><Data ss:Type="Number">${it.correctUpper}</Data></Cell>
         <Cell ss:StyleID="TdCenter"><Data ss:Type="Number">${it.correctLower}</Data></Cell>
-        <Cell ss:StyleID="${it.dStyle}"><Data ss:Type="String">${it.dVal.toFixed(2)} (${it.dCategory})</Data></Cell>
+        <Cell ss:StyleID="${it.dStyle || 'DiscFair'}"><Data ss:Type="String">${it.dVal.toFixed(2)} (${it.dCategory})</Data></Cell>
         <Cell ss:StyleID="TdText"><Data ss:Type="String">${escapeXml(it.distractorSummary)}</Data></Cell>
         <Cell ss:StyleID="TdTextBold"><Data ss:Type="String">${escapeXml(it.recommendation)}</Data></Cell>
       </Row>

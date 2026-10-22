@@ -969,7 +969,7 @@
             <table class="w-full text-xs text-left">
               <thead class="text-slate-400 bg-slate-950 uppercase text-[10px] tracking-wider">
                 <tr>
-                  <th class="px-4 py-3 rounded-l-lg text-center w-20">Peringkat</th>
+                  <th class="px-4 py-3 rounded-l-lg text-center w-14">No</th>
                   <th class="px-4 py-3">NISN</th>
                   <th class="px-4 py-3">Nama Siswa</th>
                   <th class="px-4 py-3">Kelas</th>
@@ -4139,8 +4139,8 @@
         return;
       }
 
-      // Sort by score descending
-      list.sort((a, b) => (b.score || 0) - (a.score || 0));
+      // Urutkan siswa secara alfabetis berdasarkan abjad (A - Z nama lengkap)
+      list.sort((a, b) => (a.full_name || '').localeCompare(b.full_name || '', 'id', { sensitivity: 'base' }));
 
       tbody.innerHTML = list.map((s, idx) => {
         const isPassed = (s.score || 0) >= 75;
@@ -4148,20 +4148,11 @@
           ? `<span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-[10px] border border-emerald-500/30">TUNTAS</span>`
           : `<span class="px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 font-bold text-[10px] border border-rose-500/30">REMIDIAL</span>`;
 
-        let rankBadge = `<span class="font-bold text-slate-400 font-mono">#${idx + 1}</span>`;
-        if (idx === 0) {
-          rankBadge = `<span class="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-bold font-mono border border-amber-500/30">🥇 #1</span>`;
-        } else if (idx === 1) {
-          rankBadge = `<span class="px-2 py-0.5 rounded-lg bg-slate-300/20 text-slate-200 font-bold font-mono border border-slate-300/30">🥈 #2</span>`;
-        } else if (idx === 2) {
-          rankBadge = `<span class="px-2 py-0.5 rounded-lg bg-amber-700/20 text-amber-500 font-bold font-mono border border-amber-700/30">🥉 #3</span>`;
-        }
-
         const scoreColor = (s.score || 0) >= 75 ? 'text-emerald-400' : 'text-rose-400';
 
         return `
           <tr class="hover:bg-slate-800/40 transition">
-            <td class="px-4 py-3.5 text-center">${rankBadge}</td>
+            <td class="px-4 py-3.5 text-center font-bold text-slate-300 font-mono">${idx + 1}</td>
             <td class="px-4 py-3.5 font-mono text-slate-400">${s.nisn || s.username}</td>
             <td class="px-4 py-3.5 font-bold text-white">${s.full_name}</td>
             <td class="px-4 py-3.5"><span class="px-2.5 py-1 rounded-lg bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 font-bold text-xs inline-block shadow-sm">${s.class_name || 'XII IPA 1'}</span></td>
@@ -4239,11 +4230,9 @@
       const totalQuestions = qIds.length;
       const totalStudents = students.length;
 
-      // Urutkan siswa berdasarkan skor descending
-      students.sort((a, b) => (b.score || 0) - (a.score || 0));
-
-      // 1. STATISTIK DESKRIPTIF
-      const scores = students.map(s => s.score || 0);
+      // 1. STATISTIK DESKRIPTIF & PEMBAGIAN KELOMPOK (Menggunakan urutan skor)
+      const sortedByScore = [...students].sort((a, b) => (b.score || 0) - (a.score || 0));
+      const scores = sortedByScore.map(s => s.score || 0);
       const sumScore = scores.reduce((acc, v) => acc + v, 0);
       const avgScore = totalStudents > 0 ? (sumScore / totalStudents) : 0;
       const maxScore = Math.max(...scores);
@@ -4254,14 +4243,17 @@
         : 0;
       const stdDev = Math.sqrt(variance);
 
-      const passedStudents = students.filter(s => (s.score || 0) >= 75);
-      const failedStudents = students.filter(s => (s.score || 0) < 75);
+      const passedStudents = sortedByScore.filter(s => (s.score || 0) >= 75);
+      const failedStudents = sortedByScore.filter(s => (s.score || 0) < 75);
       const passRate = totalStudents > 0 ? (passedStudents.length / totalStudents * 100) : 0;
 
       // 2. PEMBAGIAN KELOMPOK ATAS & BAWAH UNTUK DAYA PEMBEDA (D)
       const groupSize = Math.max(1, Math.round(totalStudents * 0.50));
-      const upperGroup = students.slice(0, groupSize);
-      const lowerGroup = students.slice(-groupSize);
+      const upperGroup = sortedByScore.slice(0, groupSize);
+      const lowerGroup = sortedByScore.slice(-groupSize);
+
+      // Urutkan siswa untuk tampilan rekap & matriks secara alfabetis (A - Z nama lengkap)
+      students.sort((a, b) => (a.full_name || '').localeCompare(b.full_name || '', 'id', { sensitivity: 'base' }));
 
       // 3. ANALISIS BUTIR SOAL
       let sumPq = 0;
@@ -4665,10 +4657,10 @@
       </Row>
       <Row ss:Height="14"/>
 
-      <!-- TABEL DAFTAR NILAI & PERINGKAT SISWA -->
-      <Row><Cell ss:MergeAcross="9" ss:StyleID="SecHeader"><Data ss:Type="String">DAFTAR NILAI &amp; PERINGKAT SISWA</Data></Cell></Row>
+      <!-- TABEL DAFTAR NILAI SISWA (BERDASARKAN ABJAD) -->
+      <Row><Cell ss:MergeAcross="9" ss:StyleID="SecHeader"><Data ss:Type="String">DAFTAR NILAI SISWA (BERDASARKAN ABJAD)</Data></Cell></Row>
       <Row ss:Height="24">
-        <Cell ss:StyleID="ThMain"><Data ss:Type="String">Peringkat</Data></Cell>
+        <Cell ss:StyleID="ThMain"><Data ss:Type="String">No</Data></Cell>
         <Cell ss:StyleID="ThMain"><Data ss:Type="String">NISN</Data></Cell>
         <Cell ss:StyleID="ThMain"><Data ss:Type="String">NIS</Data></Cell>
         <Cell ss:StyleID="ThMain"><Data ss:Type="String">No. Peserta</Data></Cell>
@@ -4681,7 +4673,7 @@
       </Row>
       ${students.map((st, idx) => `
       <Row>
-        <Cell ss:StyleID="TdCenterBold"><Data ss:Type="String">#${idx + 1}</Data></Cell>
+        <Cell ss:StyleID="TdCenterBold"><Data ss:Type="Number">${idx + 1}</Data></Cell>
         <Cell ss:StyleID="TdCenter"><Data ss:Type="String">${escapeXml(st.nisn || st.username)}</Data></Cell>
         <Cell ss:StyleID="TdCenter"><Data ss:Type="String">${escapeXml(st.nis || '-')}</Data></Cell>
         <Cell ss:StyleID="TdCenter"><Data ss:Type="String">${escapeXml(st.exam_no || '-')}</Data></Cell>
@@ -4885,9 +4877,11 @@
     window.exportNilaiCSV = function() {
       const schId = getNilaiSelectedScheduleId();
       const sch = lastNilaiScheduleInfo || { id: schId, title: 'Jadwal CBT' };
-      let csvContent = `data:text/csv;charset=utf-8,Jadwal Ujian: "${sch.title}"\nPeringkat,NISN,Nama Siswa,Kelas,Benar,Salah,Nilai Akhir,Status\n`;
-      (lastNilaiSessionsData || []).forEach((s, idx) => {
-        csvContent += `#${idx + 1},${s.nisn || s.username},"${s.full_name}",${s.class_name || 'XII IPA 1'},${s.correct_count},${s.wrong_count},${(s.score || 0).toFixed(2)},${(s.score || 0) >= 75 ? 'TUNTAS' : 'REMIDIAL'}\n`;
+      const list = [...(lastNilaiSessionsData || [])];
+      list.sort((a, b) => (a.full_name || '').localeCompare(b.full_name || '', 'id', { sensitivity: 'base' }));
+      let csvContent = `data:text/csv;charset=utf-8,Jadwal Ujian: "${sch.title}"\nNo,NISN,Nama Siswa,Kelas,Benar,Salah,Nilai Akhir,Status\n`;
+      list.forEach((s, idx) => {
+        csvContent += `${idx + 1},${s.nisn || s.username},"${s.full_name}",${s.class_name || 'XII IPA 1'},${s.correct_count},${s.wrong_count},${(s.score || 0).toFixed(2)},${(s.score || 0) >= 75 ? 'TUNTAS' : 'REMIDIAL'}\n`;
       });
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");

@@ -156,12 +156,28 @@
         padding: 2mm 3mm !important;
       }
 
-      /* Layout 8 Kartu per Lembar (2 x 4) - Maksimal Hemat Kertas & Presisi */
+      /* Layout 8 Kartu per Lembar (2 x 4) - Hemat Kertas */
       .grid-cards-8 {
         gap: 1.8mm !important;
       }
       .grid-cards-8 .exam-card-paper {
         padding: 1.5mm 2.2mm !important;
+      }
+
+      /* Layout 10 Kartu per Lembar (2 x 5) - Sangat Hemat Kertas */
+      .grid-cards-10 {
+        gap: 1.4mm !important;
+      }
+      .grid-cards-10 .exam-card-paper {
+        padding: 1.2mm 2mm !important;
+      }
+
+      /* Layout 12 Kartu per Lembar (2 x 6) - Maksimal Padat */
+      .grid-cards-12 {
+        gap: 1.2mm !important;
+      }
+      .grid-cards-12 .exam-card-paper {
+        padding: 1mm 1.8mm !important;
       }
 
       /* Pengaturan Setiap Kartu: Aliran Rapat Sesuai Pratinjau (Tanpa Jarak Kosong, Tanpa Terpotong) */
@@ -1631,7 +1647,9 @@
                   </label>
                   <select id="settingCardsPerPage" onchange="handleCardsPerPageChange(this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold">
                     <option value="6" selected>6 Kartu per Halaman (2 × 3 - Rekomendasi Efisien)</option>
-                    <option value="8">8 Kartu per Halaman (2 × 4 - Maksimal Hemat Kertas)</option>
+                    <option value="8">8 Kartu per Halaman (2 × 4 - Hemat Kertas)</option>
+                    <option value="10">10 Kartu per Halaman (2 × 5 - Sangat Hemat Kertas)</option>
+                    <option value="12">12 Kartu per Halaman (2 × 6 - Maksimal Padat)</option>
                     <option value="4">4 Kartu per Halaman (2 × 2 - Format Standar Besar)</option>
                   </select>
                 </div>
@@ -2080,6 +2098,8 @@
             <select id="printCardsPerPage" onchange="handleCardsPerPageChange(this.value)" class="bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-white font-semibold">
               <option value="6" selected>6 Kartu / Lembar (2×3)</option>
               <option value="8">8 Kartu / Lembar (2×4)</option>
+              <option value="10">10 Kartu / Lembar (2×5)</option>
+              <option value="12">12 Kartu / Lembar (2×6)</option>
               <option value="4">4 Kartu / Lembar (2×2)</option>
             </select>
           </div>
@@ -3104,8 +3124,12 @@
       setVal('printCardsPerPage', perPage);
       const summaryText = document.getElementById('printLayoutSummaryText');
       if (summaryText) {
-        if (perPage === 8) {
-          summaryText.innerText = 'Format cetak: 8 kartu per lembar A4 (2 kolom × 4 baris, hemat kertas maksimal).';
+        if (perPage === 12) {
+          summaryText.innerText = 'Format cetak: 12 kartu per lembar A4 (2 kolom × 6 baris, maksimal padat).';
+        } else if (perPage === 10) {
+          summaryText.innerText = 'Format cetak: 10 kartu per lembar A4 (2 kolom × 5 baris, sangat hemat kertas).';
+        } else if (perPage === 8) {
+          summaryText.innerText = 'Format cetak: 8 kartu per lembar A4 (2 kolom × 4 baris, hemat kertas).';
         } else if (perPage === 6) {
           summaryText.innerText = 'Format cetak: 6 kartu per lembar A4 (2 kolom × 3 baris, efisien).';
         } else {
@@ -3128,8 +3152,12 @@
 
       const summaryText = document.getElementById('printLayoutSummaryText');
       if (summaryText) {
-        if (perPage === 8) {
-          summaryText.innerText = 'Format cetak: 8 kartu per lembar A4 (2 kolom × 4 baris, hemat kertas maksimal).';
+        if (perPage === 12) {
+          summaryText.innerText = 'Format cetak: 12 kartu per lembar A4 (2 kolom × 6 baris, maksimal padat).';
+        } else if (perPage === 10) {
+          summaryText.innerText = 'Format cetak: 10 kartu per lembar A4 (2 kolom × 5 baris, sangat hemat kertas).';
+        } else if (perPage === 8) {
+          summaryText.innerText = 'Format cetak: 8 kartu per lembar A4 (2 kolom × 4 baris, hemat kertas).';
         } else if (perPage === 6) {
           summaryText.innerText = 'Format cetak: 6 kartu per lembar A4 (2 kolom × 3 baris, efisien).';
         } else {
@@ -4112,53 +4140,57 @@
       const is4 = cardsPerPage === 4;
       const is6 = cardsPerPage === 6;
       const is8 = cardsPerPage === 8;
+      const is10 = cardsPerPage === 10;
+      const is12 = cardsPerPage === 12;
 
-      // Skala ukuran elemen berdasarkan kapasitas per lembar A4 (4, 6, atau 8 kartu)
+      // Skala ukuran elemen berdasarkan kapasitas per lembar A4 (4, 6, 8, 10, atau 12 kartu)
       let scale = 0.70;
       if (is4) scale = 0.95;
       else if (is8) scale = 0.48;
+      else if (is10) scale = 0.40;
+      else if (is12) scale = 0.34;
 
-      const isCompact = is6 || is8;
-      const isUltra = is8;
+      const isCompact = cardsPerPage >= 6;
+      const isUltra = cardsPerPage >= 8;
 
       // Logo styling
-      const logoBoxClass = isUltra ? 'w-6 h-6' : (isCompact ? 'w-8 h-8' : 'w-10 h-10');
+      const logoBoxClass = is12 ? 'w-4 h-4' : (is10 ? 'w-5 h-5' : (is8 ? 'w-6 h-6' : (isCompact ? 'w-8 h-8' : 'w-10 h-10')));
       // Dinas & Kop text
-      const dinasTextClass = isUltra ? 'text-[5.5px] leading-[1.05]' : (isCompact ? 'text-[7px] leading-tight' : 'text-[8px] leading-tight');
-      const schoolNameClass = isUltra ? 'text-[8px] font-black leading-tight' : (isCompact ? 'text-[10px] font-black leading-tight' : 'text-[11.5px] font-black leading-tight');
-      const addressTextClass = isUltra ? 'text-[5px] leading-[1.05]' : (isCompact ? 'text-[6px] leading-tight' : 'text-[7.5px] leading-tight');
+      const dinasTextClass = is12 ? 'text-[4.5px] leading-[1.02]' : (is10 ? 'text-[5px] leading-[1.05]' : (is8 ? 'text-[5.5px] leading-[1.05]' : (isCompact ? 'text-[7px] leading-tight' : 'text-[8px] leading-tight')));
+      const schoolNameClass = is12 ? 'text-[6.5px] font-black leading-tight' : (is10 ? 'text-[7.2px] font-black leading-tight' : (is8 ? 'text-[8px] font-black leading-tight' : (isCompact ? 'text-[10px] font-black leading-tight' : 'text-[11.5px] font-black leading-tight')));
+      const addressTextClass = is12 ? 'text-[4px] leading-[1.02]' : (is10 ? 'text-[4.5px] leading-[1.02]' : (is8 ? 'text-[5px] leading-[1.05]' : (isCompact ? 'text-[6px] leading-tight' : 'text-[7.5px] leading-tight')));
 
       // Judul
-      const title1Class = isUltra ? 'text-[7px] font-bold leading-tight' : (isCompact ? 'text-[8px] font-bold leading-tight' : 'text-[9.5px] font-extrabold leading-tight');
-      const title2Class = isUltra ? 'text-[7.5px] font-black leading-tight text-indigo-950' : (isCompact ? 'text-[8.5px] font-black leading-tight text-indigo-950' : 'text-[10px] font-black leading-tight text-indigo-950');
-      const subTitleClass = isUltra ? 'text-[5.5px] leading-tight' : (isCompact ? 'text-[6.5px] leading-tight' : 'text-[7.5px] leading-tight');
+      const title1Class = is12 ? 'text-[5.8px] font-bold leading-tight' : (is10 ? 'text-[6.5px] font-bold leading-tight' : (is8 ? 'text-[7px] font-bold leading-tight' : (isCompact ? 'text-[8px] font-bold leading-tight' : 'text-[9.5px] font-extrabold leading-tight')));
+      const title2Class = is12 ? 'text-[6.2px] font-black leading-tight text-indigo-950' : (is10 ? 'text-[6.8px] font-black leading-tight text-indigo-950' : (is8 ? 'text-[7.5px] font-black leading-tight text-indigo-950' : (isCompact ? 'text-[8.5px] font-black leading-tight text-indigo-950' : 'text-[10px] font-black leading-tight text-indigo-950')));
+      const subTitleClass = is12 ? 'text-[4.5px] leading-tight' : (is10 ? 'text-[5px] leading-tight' : (is8 ? 'text-[5.5px] leading-tight' : (isCompact ? 'text-[6.5px] leading-tight' : 'text-[7.5px] leading-tight')));
 
       // Pasfoto (jika ditampilkan)
-      const photoBoxClass = isUltra ? 'w-9 h-12' : (isCompact ? 'w-11 h-15' : 'w-14 h-18');
-      const photoTextClass = isUltra ? 'text-[5px]' : (isCompact ? 'text-[6px]' : 'text-[7px]');
+      const photoBoxClass = is12 ? 'w-7 h-9' : (is10 ? 'w-8 h-10' : (is8 ? 'w-9 h-12' : (isCompact ? 'w-11 h-15' : 'w-14 h-18')));
+      const photoTextClass = is12 ? 'text-[4px]' : (is10 ? 'text-[4.5px]' : (is8 ? 'text-[5px]' : (isCompact ? 'text-[6px]' : 'text-[7px]')));
 
       // Detail Siswa
-      const detailTextClass = isUltra ? 'text-[6.8px] leading-[1.15]' : (isCompact ? 'text-[7.8px] leading-tight' : 'text-[8.5px] leading-tight');
-      const credBoxClass = isUltra ? 'py-0.5 px-1 text-[6.5px]' : (isCompact ? 'py-0.5 px-1.5 text-[7.5px]' : 'py-1 px-1.5 text-[8.5px]');
+      const detailTextClass = is12 ? 'text-[5.5px] leading-[1.08]' : (is10 ? 'text-[6px] leading-[1.12]' : (is8 ? 'text-[6.8px] leading-[1.15]' : (isCompact ? 'text-[7.8px] leading-tight' : 'text-[8.5px] leading-tight')));
+      const credBoxClass = is12 ? 'py-0.5 px-0.5 text-[5.2px]' : (is10 ? 'py-0.5 px-1 text-[5.8px]' : (is8 ? 'py-0.5 px-1 text-[6.5px]' : (isCompact ? 'py-0.5 px-1.5 text-[7.5px]' : 'py-1 px-1.5 text-[8.5px]')));
 
       // Pengesahan / TTD
-      const sigDateClass = isUltra ? 'text-[6px] leading-tight' : (isCompact ? 'text-[6.8px] leading-tight' : 'text-[7.5px] leading-tight');
-      const sigTitleClass = isUltra ? 'text-[6px] font-semibold leading-tight' : (isCompact ? 'text-[6.8px] font-semibold leading-tight' : 'text-[7.5px] font-semibold leading-tight');
-      const hmNameClass = isUltra ? 'text-[6.8px] font-bold underline leading-tight' : (isCompact ? 'text-[8px] font-bold underline leading-tight' : 'text-[9px] font-bold underline leading-tight');
-      const hmNipClass = isUltra ? 'text-[5.5px] font-mono leading-tight' : (isCompact ? 'text-[6.2px] font-mono leading-tight' : 'text-[7px] font-mono leading-tight');
-      const sigWidthClass = isUltra ? 'w-36' : (isCompact ? 'w-44' : 'w-52');
-      const sigAreaWidthClass = isUltra ? 'w-32' : (isCompact ? 'w-40' : 'w-48');
+      const sigDateClass = is12 ? 'text-[4.8px] leading-tight' : (is10 ? 'text-[5.5px] leading-tight' : (is8 ? 'text-[6px] leading-tight' : (isCompact ? 'text-[6.8px] leading-tight' : 'text-[7.5px] leading-tight')));
+      const sigTitleClass = is12 ? 'text-[4.8px] font-semibold leading-tight' : (is10 ? 'text-[5.5px] font-semibold leading-tight' : (is8 ? 'text-[6px] font-semibold leading-tight' : (isCompact ? 'text-[6.8px] font-semibold leading-tight' : 'text-[7.5px] font-semibold leading-tight')));
+      const hmNameClass = is12 ? 'text-[5.8px] font-bold underline leading-tight' : (is10 ? 'text-[6.2px] font-bold underline leading-tight' : (is8 ? 'text-[6.8px] font-bold underline leading-tight' : (isCompact ? 'text-[8px] font-bold underline leading-tight' : 'text-[9px] font-bold underline leading-tight')));
+      const hmNipClass = is12 ? 'text-[4.5px] font-mono leading-tight' : (is10 ? 'text-[5px] font-mono leading-tight' : (is8 ? 'text-[5.5px] font-mono leading-tight' : (isCompact ? 'text-[6.2px] font-mono leading-tight' : 'text-[7px] font-mono leading-tight')));
+      const sigWidthClass = is12 ? 'w-28' : (is10 ? 'w-32' : (is8 ? 'w-36' : (isCompact ? 'w-44' : 'w-52')));
+      const sigAreaWidthClass = is12 ? 'w-24' : (is10 ? 'w-28' : (is8 ? 'w-32' : (isCompact ? 'w-40' : 'w-48')));
 
       // Tata tertib text class
-      const rulesTextClass = isUltra ? 'text-[5.5px] leading-tight' : (isCompact ? 'text-[6.5px] leading-tight' : 'text-[7.5px] leading-tight');
+      const rulesTextClass = is12 ? 'text-[4.5px] leading-tight' : (is10 ? 'text-[5px] leading-tight' : (is8 ? 'text-[5.5px] leading-tight' : (isCompact ? 'text-[6.5px] leading-tight' : 'text-[7.5px] leading-tight')));
 
       const baseSig = opts.sigSize || p.signature_size || 110;
       const baseStamp = opts.stampSize || p.stamp_size || 60;
       const baseX = opts.stampX !== undefined ? opts.stampX : (p.stamp_offset_x !== undefined ? p.stamp_offset_x : 10);
       const baseY = opts.stampY !== undefined ? opts.stampY : (p.stamp_offset_y !== undefined ? p.stamp_offset_y : -5);
 
-      const sigSize = Math.max(28, Math.round(baseSig * scale));
-      const stampSize = Math.max(20, Math.round(baseStamp * scale));
+      const sigSize = Math.max(is12 ? 20 : (is10 ? 24 : 28), Math.round(baseSig * scale));
+      const stampSize = Math.max(is12 ? 14 : (is10 ? 17 : 20), Math.round(baseStamp * scale));
       const stampX = Math.round(baseX * scale);
       const stampY = Math.round(baseY * scale);
 
@@ -4186,7 +4218,7 @@
         capContent = `<img src="${p.stamp_url}" class="w-full h-full object-contain" alt="Cap Stempel">`;
       }
 
-      const sigAreaMinHeight = Math.max(isUltra ? 18 : (isCompact ? 28 : 42), Math.round(sigSize * 0.42));
+      const sigAreaMinHeight = Math.max(is12 ? 12 : (is10 ? 15 : (is8 ? 18 : (is6 ? 28 : 42))), Math.round(sigSize * (is12 ? 0.32 : (is10 ? 0.36 : 0.42))));
 
       const signaturesHtml = showSignatures ? `
         <div class="mt-1 pt-0.5 ${sigDateClass} flex justify-end">
@@ -4220,7 +4252,7 @@
       ` : '';
 
       return `
-        <div class="exam-card-paper bg-white text-slate-900 border border-dashed border-slate-400 p-2 sm:p-2.5 rounded-lg relative shadow-sm">
+        <div class="exam-card-paper bg-white text-slate-900 border border-dashed border-slate-400 ${is12 ? 'p-1.5' : (is10 ? 'p-1.5 sm:p-2' : 'p-2 sm:p-2.5')} rounded-lg relative shadow-sm">
           <div class="no-print absolute -top-3 right-4 bg-slate-900 text-slate-300 border border-slate-700 rounded-full px-2 py-0.5 text-[8px] font-mono flex items-center gap-1 shadow">
             <i class="fa-solid fa-scissors"></i> Potong Kartu
           </div>

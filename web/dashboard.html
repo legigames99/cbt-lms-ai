@@ -106,8 +106,8 @@
       .a4-page-sheet {
         display: block !important;
         width: 200mm !important;
-        height: 287mm !important;
-        max-height: 287mm !important;
+        height: auto !important;
+        min-height: 0 !important;
         page-break-after: always !important;
         break-after: page !important;
         page-break-inside: avoid !important;
@@ -127,74 +127,51 @@
         margin-bottom: 0 !important;
       }
 
-      /* Layout 4 Kartu per Lembar (2 x 2) */
-      .grid-cards-4 {
+      /* Grid Kartu pada Lembar Cetak A4 (2 Kolom Presisi) */
+      .page-cards-grid {
         display: grid !important;
-        grid-template-columns: repeat(2, 97.5mm) !important;
-        grid-auto-rows: 138mm !important;
-        gap: 4mm !important;
-        width: 200mm !important;
-        height: 280mm !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        width: 100% !important;
+        height: auto !important;
         box-sizing: border-box !important;
         background: #ffffff !important;
         border: none !important;
         margin: 0 auto !important;
         padding: 0 !important;
       }
+
+      /* Layout 4 Kartu per Lembar (2 x 2) */
+      .grid-cards-4 {
+        gap: 4mm !important;
+      }
       .grid-cards-4 .exam-card-paper {
-        width: 97.5mm !important;
-        height: 138mm !important;
-        max-height: 138mm !important;
-        padding: 3.5mm 4.5mm !important;
+        padding: 3mm 4mm !important;
       }
 
       /* Layout 6 Kartu per Lembar (2 x 3) - Standar Efisien */
       .grid-cards-6 {
-        display: grid !important;
-        grid-template-columns: repeat(2, 97.5mm) !important;
-        grid-auto-rows: 91mm !important;
-        gap: 3.5mm !important;
-        width: 200mm !important;
-        height: 280mm !important;
-        box-sizing: border-box !important;
-        background: #ffffff !important;
-        border: none !important;
-        margin: 0 auto !important;
-        padding: 0 !important;
+        gap: 2.5mm !important;
       }
       .grid-cards-6 .exam-card-paper {
-        width: 97.5mm !important;
-        height: 91mm !important;
-        max-height: 91mm !important;
-        padding: 2.5mm 3.5mm !important;
-      }
-
-      /* Layout 8 Kartu per Lembar (2 x 4) - Maksimal Hemat Kertas */
-      .grid-cards-8 {
-        display: grid !important;
-        grid-template-columns: repeat(2, 97.5mm) !important;
-        grid-auto-rows: 68mm !important;
-        gap: 2.5mm !important;
-        width: 200mm !important;
-        height: 280mm !important;
-        box-sizing: border-box !important;
-        background: #ffffff !important;
-        border: none !important;
-        margin: 0 auto !important;
-        padding: 0 !important;
-      }
-      .grid-cards-8 .exam-card-paper {
-        width: 97.5mm !important;
-        height: 68mm !important;
-        max-height: 68mm !important;
         padding: 2mm 3mm !important;
       }
 
-      /* Pengaturan Setiap Kartu: Mencegah Terpotong di Tengah Lembar */
+      /* Layout 8 Kartu per Lembar (2 x 4) - Maksimal Hemat Kertas & Presisi */
+      .grid-cards-8 {
+        gap: 1.8mm !important;
+      }
+      .grid-cards-8 .exam-card-paper {
+        padding: 1.5mm 2.2mm !important;
+      }
+
+      /* Pengaturan Setiap Kartu: Aliran Rapat Sesuai Pratinjau (Tanpa Jarak Kosong, Tanpa Terpotong) */
       .exam-card-paper {
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: space-between !important;
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
         border: 1px dashed #64748b !important;
@@ -203,7 +180,6 @@
         box-shadow: none !important;
         box-sizing: border-box !important;
         border-radius: 4px !important;
-        overflow: hidden !important;
         margin: 0 !important;
       }
 
@@ -4133,54 +4109,63 @@
       const showRules = opts.showRules !== false;
       const cardsPerPage = opts.cardsPerPage || 6;
 
-      // Skala ukuran elemen berdasarkan kapasitas per lembar A4 (4, 6, atau 8 kartu)
-      let scale = 1.0;
-      if (cardsPerPage === 6) scale = 0.74;
-      else if (cardsPerPage === 8) scale = 0.56;
+      const is4 = cardsPerPage === 4;
+      const is6 = cardsPerPage === 6;
+      const is8 = cardsPerPage === 8;
 
-      const isCompact = cardsPerPage >= 6;
-      const isUltra = cardsPerPage === 8;
+      // Skala ukuran elemen berdasarkan kapasitas per lembar A4 (4, 6, atau 8 kartu)
+      let scale = 0.70;
+      if (is4) scale = 0.95;
+      else if (is8) scale = 0.48;
+
+      const isCompact = is6 || is8;
+      const isUltra = is8;
 
       // Logo styling
-      const logoBoxClass = isUltra ? 'w-7 h-7' : (isCompact ? 'w-9 h-9' : 'w-11 h-11');
+      const logoBoxClass = isUltra ? 'w-6 h-6' : (isCompact ? 'w-8 h-8' : 'w-10 h-10');
       // Dinas & Kop text
-      const dinasTextClass = isUltra ? 'text-[6.5px]' : (isCompact ? 'text-[7.5px]' : 'text-[8px]');
-      const schoolNameClass = isUltra ? 'text-[9px] font-black' : (isCompact ? 'text-[10.5px] font-black' : 'text-[11.5px] font-black');
-      const addressTextClass = isUltra ? 'text-[5.5px]' : (isCompact ? 'text-[6.5px]' : 'text-[7.5px]');
+      const dinasTextClass = isUltra ? 'text-[5.5px] leading-[1.05]' : (isCompact ? 'text-[7px] leading-tight' : 'text-[8px] leading-tight');
+      const schoolNameClass = isUltra ? 'text-[8px] font-black leading-tight' : (isCompact ? 'text-[10px] font-black leading-tight' : 'text-[11.5px] font-black leading-tight');
+      const addressTextClass = isUltra ? 'text-[5px] leading-[1.05]' : (isCompact ? 'text-[6px] leading-tight' : 'text-[7.5px] leading-tight');
 
       // Judul
-      const title1Class = isUltra ? 'text-[7.5px] font-bold' : (isCompact ? 'text-[8.5px] font-bold' : 'text-[9.5px] font-extrabold');
-      const title2Class = isUltra ? 'text-[8px] font-black' : (isCompact ? 'text-[9px] font-black' : 'text-[9.5px] font-black');
-      const subTitleClass = isUltra ? 'text-[6px]' : (isCompact ? 'text-[7px]' : 'text-[7.5px]');
+      const title1Class = isUltra ? 'text-[7px] font-bold leading-tight' : (isCompact ? 'text-[8px] font-bold leading-tight' : 'text-[9.5px] font-extrabold leading-tight');
+      const title2Class = isUltra ? 'text-[7.5px] font-black leading-tight text-indigo-950' : (isCompact ? 'text-[8.5px] font-black leading-tight text-indigo-950' : 'text-[10px] font-black leading-tight text-indigo-950');
+      const subTitleClass = isUltra ? 'text-[5.5px] leading-tight' : (isCompact ? 'text-[6.5px] leading-tight' : 'text-[7.5px] leading-tight');
 
-      // Pasfoto
-      const photoBoxClass = isUltra ? 'w-10 h-13' : (isCompact ? 'w-12 h-16' : 'w-14 h-18');
-      const photoTextClass = isUltra ? 'text-[5.5px]' : (isCompact ? 'text-[6.5px]' : 'text-[7px]');
+      // Pasfoto (jika ditampilkan)
+      const photoBoxClass = isUltra ? 'w-9 h-12' : (isCompact ? 'w-11 h-15' : 'w-14 h-18');
+      const photoTextClass = isUltra ? 'text-[5px]' : (isCompact ? 'text-[6px]' : 'text-[7px]');
 
       // Detail Siswa
-      const detailTextClass = isUltra ? 'text-[7.5px]' : (isCompact ? 'text-[8px]' : 'text-[8.5px]');
-      const credBoxClass = isUltra ? 'py-0.5 px-1 text-[7px]' : (isCompact ? 'py-0.5 px-1.5 text-[8px]' : 'py-1 px-1.5 text-[8.5px]');
+      const detailTextClass = isUltra ? 'text-[6.8px] leading-[1.15]' : (isCompact ? 'text-[7.8px] leading-tight' : 'text-[8.5px] leading-tight');
+      const credBoxClass = isUltra ? 'py-0.5 px-1 text-[6.5px]' : (isCompact ? 'py-0.5 px-1.5 text-[7.5px]' : 'py-1 px-1.5 text-[8.5px]');
 
       // Pengesahan / TTD
-      const sigDateClass = isUltra ? 'text-[6.5px]' : (isCompact ? 'text-[7px]' : 'text-[7.5px]');
-      const sigTitleClass = isUltra ? 'text-[6.5px]' : (isCompact ? 'text-[7px]' : 'text-[7.5px]');
-      const hmNameClass = isUltra ? 'text-[7.5px]' : (isCompact ? 'text-[8.5px]' : 'text-[9px]');
-      const hmNipClass = isUltra ? 'text-[6px]' : (isCompact ? 'text-[6.5px]' : 'text-[7px]');
+      const sigDateClass = isUltra ? 'text-[6px] leading-tight' : (isCompact ? 'text-[6.8px] leading-tight' : 'text-[7.5px] leading-tight');
+      const sigTitleClass = isUltra ? 'text-[6px] font-semibold leading-tight' : (isCompact ? 'text-[6.8px] font-semibold leading-tight' : 'text-[7.5px] font-semibold leading-tight');
+      const hmNameClass = isUltra ? 'text-[6.8px] font-bold underline leading-tight' : (isCompact ? 'text-[8px] font-bold underline leading-tight' : 'text-[9px] font-bold underline leading-tight');
+      const hmNipClass = isUltra ? 'text-[5.5px] font-mono leading-tight' : (isCompact ? 'text-[6.2px] font-mono leading-tight' : 'text-[7px] font-mono leading-tight');
+      const sigWidthClass = isUltra ? 'w-36' : (isCompact ? 'w-44' : 'w-52');
+      const sigAreaWidthClass = isUltra ? 'w-32' : (isCompact ? 'w-40' : 'w-48');
+
+      // Tata tertib text class
+      const rulesTextClass = isUltra ? 'text-[5.5px] leading-tight' : (isCompact ? 'text-[6.5px] leading-tight' : 'text-[7.5px] leading-tight');
 
       const baseSig = opts.sigSize || p.signature_size || 110;
       const baseStamp = opts.stampSize || p.stamp_size || 60;
       const baseX = opts.stampX !== undefined ? opts.stampX : (p.stamp_offset_x !== undefined ? p.stamp_offset_x : 10);
       const baseY = opts.stampY !== undefined ? opts.stampY : (p.stamp_offset_y !== undefined ? p.stamp_offset_y : -5);
 
-      const sigSize = Math.max(36, Math.round(baseSig * scale));
-      const stampSize = Math.max(26, Math.round(baseStamp * scale));
+      const sigSize = Math.max(28, Math.round(baseSig * scale));
+      const stampSize = Math.max(20, Math.round(baseStamp * scale));
       const stampX = Math.round(baseX * scale);
       const stampY = Math.round(baseY * scale);
 
       const photoHtml = showPhoto ? `
         <div class="col-span-3 flex flex-col items-center justify-start">
           <div class="${photoBoxClass} border border-slate-400 bg-slate-50 rounded flex flex-col items-center justify-center p-0.5 text-slate-400">
-            <i class="fa-solid fa-user ${isUltra ? 'text-xs mb-0.5' : (isCompact ? 'text-sm mb-0.5' : 'text-xl mb-0.5')} text-slate-300"></i>
+            <i class="fa-solid fa-user ${isUltra ? 'text-[10px] mb-0.5' : (isCompact ? 'text-xs mb-0.5' : 'text-lg mb-0.5')} text-slate-300"></i>
             <span class="${photoTextClass} font-bold text-slate-600">3 x 4 cm</span>
           </div>
           <span class="mt-0.5 ${photoTextClass} font-mono text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-1 rounded">TERVERIFIKASI</span>
@@ -4192,25 +4177,25 @@
       // Konten Tanda Tangan Kepala Sekolah
       let ttdContent = `<span class="font-serif italic text-slate-500 ${sigDateClass}">ttd. digital</span>`;
       if (p.signature_url) {
-        ttdContent = `<img src="${p.signature_url}" style="max-width: ${sigSize}px; max-height: ${Math.round(sigSize * 0.52)}px;" class="object-contain" alt="Tanda Tangan">`;
+        ttdContent = `<img src="${p.signature_url}" style="max-width: ${sigSize}px; max-height: ${Math.round(sigSize * 0.48)}px;" class="object-contain" alt="Tanda Tangan">`;
       }
 
       // Konten Cap Stempel Sekolah (Dicetak menimpa di atas Tanda Tangan)
-      let capContent = `<div class="w-full h-full rounded-full border-2 border-indigo-600/40 text-indigo-600/60 flex items-center justify-center font-bold rotate-12" style="font-size: ${Math.max(6, Math.round(stampSize * 0.17))}px;">CAP</div>`;
+      let capContent = `<div class="w-full h-full rounded-full border-2 border-indigo-600/40 text-indigo-600/60 flex items-center justify-center font-bold rotate-12" style="font-size: ${Math.max(5, Math.round(stampSize * 0.16))}px;">CAP</div>`;
       if (p.stamp_url) {
         capContent = `<img src="${p.stamp_url}" class="w-full h-full object-contain" alt="Cap Stempel">`;
       }
 
-      const sigAreaMinHeight = Math.max(isUltra ? 24 : (isCompact ? 34 : 46), Math.round(sigSize * 0.5));
+      const sigAreaMinHeight = Math.max(isUltra ? 18 : (isCompact ? 28 : 42), Math.round(sigSize * 0.42));
 
       const signaturesHtml = showSignatures ? `
-        <div class="pt-1 border-t border-slate-300 ${sigDateClass} flex justify-end">
-          <div class="w-44 text-center leading-tight flex flex-col items-center">
-            <div class="text-slate-700">${p.signature_place || 'Kota Bandung'}, ${p.signature_date || '21 Oktober 2026'}</div>
+        <div class="mt-1 pt-1 border-t border-slate-200 ${sigDateClass} flex justify-end">
+          <div class="${sigWidthClass} text-center leading-tight flex flex-col items-center">
+            <div class="text-slate-600">${p.signature_place || 'Jakarta'}, ${p.signature_date || '21 Oktober 2026'}</div>
             <div class="text-slate-800 font-semibold mt-0.5 ${sigTitleClass}">Kepala Sekolah,</div>
             
             <!-- Area Bertumpuk: Cap di atas Tanda Tangan (Ukuran & Posisi Dinamis Sesuai Skala) -->
-            <div class="relative w-40 my-0.5 flex items-center justify-center select-none overflow-visible" style="min-height: ${sigAreaMinHeight}px;">
+            <div class="relative ${sigAreaWidthClass} my-0.5 flex items-center justify-center select-none overflow-visible" style="min-height: ${sigAreaMinHeight}px;">
               <!-- Layer TTD (Dasar) -->
               <div class="w-full h-full flex items-center justify-center z-0">
                 ${ttdContent}
@@ -4221,92 +4206,86 @@
               </div>
             </div>
 
-            <div class="font-bold underline text-black ${hmNameClass}">${p.headmaster_name}</div>
-            <div class="font-mono text-slate-700 mt-0.5 ${hmNipClass}">NIP. ${p.headmaster_nip}</div>
+            <div class="text-slate-900 ${hmNameClass}">${p.headmaster_name}</div>
+            <div class="text-slate-600 mt-0.5 ${hmNipClass}">NIP. ${p.headmaster_nip}</div>
           </div>
         </div>
       ` : '';
 
       const rulesBlockHtml = (showRules && rulesHtml) ? `
-        <div class="pt-0.5 border-t border-slate-200 ${rulesTextClass} text-slate-600 space-y-0.5 leading-tight">
-          <div class="font-bold text-slate-800">Tata Tertib Singkat:</div>
+        <div class="mt-1 pt-1 border-t border-slate-200 ${rulesTextClass} text-slate-600 space-y-0.5 leading-tight">
+          <div class="font-bold text-slate-800">Catatan & Tata Tertib:</div>
           <div>${rulesHtml}</div>
         </div>
       ` : '';
 
       return `
-        <div class="exam-card-paper bg-white text-slate-900 border border-dashed border-slate-400 p-2.5 sm:p-3 rounded-lg relative shadow-sm flex flex-col justify-between">
+        <div class="exam-card-paper bg-white text-slate-900 border border-dashed border-slate-400 p-2 sm:p-2.5 rounded-lg relative shadow-sm">
           <div class="no-print absolute -top-3 right-4 bg-slate-900 text-slate-300 border border-slate-700 rounded-full px-2 py-0.5 text-[8px] font-mono flex items-center gap-1 shadow">
             <i class="fa-solid fa-scissors"></i> Potong Kartu
           </div>
 
-          <!-- Bagian Atas: Kop, Judul & Data Siswa -->
-          <div class="space-y-1">
-            <!-- Kop Kartu -->
-            <div class="flex items-center gap-2 pb-1 border-b-2 border-slate-950">
-              <div class="${logoBoxClass} shrink-0 flex items-center justify-center">
-                ${logoSvg}
-              </div>
-              <div class="flex-1 text-center">
-                <div class="${dinasTextClass} font-bold uppercase tracking-wider text-slate-800 leading-tight">${dinasLines}</div>
-                <div class="${schoolNameClass} uppercase tracking-wide text-black mt-0.5 leading-tight">${p.name}</div>
-                <div class="${addressTextClass} text-slate-700 leading-tight mt-0.5">${p.address} • NPSN: ${p.npsn}</div>
-              </div>
+          <!-- Kop Kartu -->
+          <div class="flex items-center gap-2 pb-1 border-b-2 border-slate-950">
+            <div class="${logoBoxClass} shrink-0 flex items-center justify-center">
+              ${logoSvg}
             </div>
-            <div class="border-b border-slate-950 -mt-1 mb-1"></div>
-
-            <!-- Judul Dokumen -->
-            <div class="text-center mb-1">
-              <div class="${title1Class} uppercase tracking-wider text-black leading-tight">${p.exam_title_1}</div>
-              <div class="${title2Class} uppercase text-indigo-950 leading-tight">${p.exam_title_2}</div>
-              <div class="${subTitleClass} text-slate-700 font-semibold leading-tight">Tahun Pelajaran ${p.academic_year} (Semester ${p.semester})</div>
+            <div class="flex-1 text-center">
+              <div class="${dinasTextClass} font-bold uppercase tracking-wider text-slate-800 leading-tight">${dinasLines}</div>
+              <div class="${schoolNameClass} uppercase tracking-wide text-black mt-0.5 leading-tight">${p.name}</div>
+              <div class="${addressTextClass} text-slate-700 leading-tight mt-0.5">${p.address} • NPSN: ${p.npsn}</div>
             </div>
+          </div>
+          <div class="border-b border-slate-950 -mt-0.5 mb-1"></div>
 
-            <!-- Badan Kartu: Foto & Data Siswa -->
-            <div class="grid grid-cols-12 gap-2 items-start">
-              ${photoHtml}
+          <!-- Judul Dokumen -->
+          <div class="text-center ${isUltra ? 'mb-0.5' : 'mb-1'}">
+            <div class="${title1Class} uppercase tracking-wider text-black leading-tight">${p.exam_title_1}</div>
+            <div class="${title2Class} uppercase text-indigo-950 leading-tight">${p.exam_title_2}</div>
+            <div class="${subTitleClass} text-slate-700 font-semibold leading-tight">Tahun Pelajaran ${p.academic_year} (Semester ${p.semester})</div>
+          </div>
 
-              <!-- Detail Siswa -->
-              <div class="${detailCols} ${detailTextClass} leading-tight space-y-0.5">
-                <div class="grid grid-cols-12 gap-1 pb-0.5 border-b border-slate-200">
-                  <span class="col-span-4 text-slate-600 font-semibold">No. Peserta</span>
-                  <span class="col-span-8 font-mono font-bold text-black">: ${st.exam_no || '26-01-05-' + st.id}</span>
-                </div>
-                <div class="grid grid-cols-12 gap-1 pb-0.5 border-b border-slate-200">
-                  <span class="col-span-4 text-slate-600 font-semibold">Nama Lengkap</span>
-                  <span class="col-span-8 font-bold text-black uppercase truncate">: ${st.full_name}</span>
-                </div>
-                <div class="grid grid-cols-12 gap-1 pb-0.5 border-b border-slate-200">
-                  <span class="col-span-4 text-slate-600 font-semibold">NISN / NIS</span>
-                  <span class="col-span-8 font-mono text-black">: ${st.nisn || '-'} / ${st.nis || '-'}</span>
-                </div>
-                <div class="grid grid-cols-12 gap-1 pb-0.5 border-b border-slate-200">
-                  <span class="col-span-4 text-slate-600 font-semibold">Kelas / Rombel</span>
-                  <span class="col-span-8 font-bold text-black">: ${st.class_name}</span>
-                </div>
-                <div class="grid grid-cols-12 gap-1 pb-0.5 border-b border-slate-200">
-                  <span class="col-span-4 text-slate-600 font-semibold">Ruang & Sesi</span>
-                  <span class="col-span-8 text-black">: ${st.room || 'Lab Komputer 01'} (${st.session || 'Sesi 1'})</span>
-                </div>
-                <!-- Kredensial CBT Siswa -->
-                <div class="grid grid-cols-12 gap-0.5 pt-0.5 bg-slate-100 ${credBoxClass} rounded border border-slate-300">
-                  <span class="col-span-4 text-slate-800 font-bold">Username</span>
-                  <span class="col-span-8 font-mono font-bold text-black">: ${st.username}</span>
-                  <span class="col-span-4 text-slate-800 font-bold">Password CBT</span>
-                  <span class="col-span-8 font-mono font-bold text-black">: ${st.pass || 'siswa123'}</span>
-                </div>
+          <!-- Badan Kartu: Foto & Data Siswa -->
+          <div class="grid grid-cols-12 gap-2 items-start">
+            ${photoHtml}
+
+            <!-- Detail Siswa -->
+            <div class="${detailCols} ${detailTextClass} leading-tight space-y-0.5">
+              <div class="grid grid-cols-12 gap-1 pb-0.5 border-b border-slate-200">
+                <span class="col-span-4 text-slate-500 font-semibold">No. Peserta</span>
+                <span class="col-span-8 font-mono font-bold text-black">: ${st.exam_no || '26-01-05-' + st.id}</span>
+              </div>
+              <div class="grid grid-cols-12 gap-1 pb-0.5 border-b border-slate-200">
+                <span class="col-span-4 text-slate-500 font-semibold">Nama Lengkap</span>
+                <span class="col-span-8 font-bold text-black uppercase truncate">: ${st.full_name}</span>
+              </div>
+              <div class="grid grid-cols-12 gap-1 pb-0.5 border-b border-slate-200">
+                <span class="col-span-4 text-slate-500 font-semibold">NISN / NIS</span>
+                <span class="col-span-8 font-mono text-black">: ${st.nisn || '-'} / ${st.nis || '-'}</span>
+              </div>
+              <div class="grid grid-cols-12 gap-1 pb-0.5 border-b border-slate-200">
+                <span class="col-span-4 text-slate-500 font-semibold">Kelas / Rombel</span>
+                <span class="col-span-8 font-bold text-black">: ${st.class_name}</span>
+              </div>
+              <div class="grid grid-cols-12 gap-1 pb-0.5 border-b border-slate-200">
+                <span class="col-span-4 text-slate-500 font-semibold">Ruang & Sesi</span>
+                <span class="col-span-8 text-black">: ${st.room || 'Lab Komputer 01'} (${st.session || 'Sesi 1'})</span>
+              </div>
+              <!-- Kredensial CBT Siswa (Format Rapat & Menawan sesuai Pratinjau) -->
+              <div class="grid grid-cols-12 gap-0.5 pt-0.5 bg-indigo-50/80 ${credBoxClass} rounded border border-indigo-200 text-indigo-900">
+                <span class="col-span-4 font-bold">Username</span>
+                <span class="col-span-8 font-mono font-bold">: ${st.username}</span>
+                <span class="col-span-4 font-bold">Password CBT</span>
+                <span class="col-span-8 font-mono font-bold">: ${st.pass || 'siswa123'}</span>
               </div>
             </div>
           </div>
 
-          <!-- Bagian Bawah: TTD Kepsek & Tata Tertib (Tertambat Rapi di Bagian Bawah) -->
-          <div class="mt-auto space-y-0.5">
-            <!-- TTD, QR, & Pengesahan -->
-            ${signaturesHtml}
+          <!-- Bagian Bawah: TTD Kepsek Mengalir Rapat Langsung di Bawah Data -->
+          ${signaturesHtml}
 
-            <!-- Tata Tertib Mini -->
-            ${rulesBlockHtml}
-          </div>
+          <!-- Tata Tertib Mini -->
+          ${rulesBlockHtml}
         </div>
       `;
     }

@@ -31,5 +31,6 @@
   "exam_rules": "1. Membawa Kartu Peserta Ujian ini selama berlangsungnya tes.\n2. Hadir di ruang ujian 15 menit sebelum ujian dimulai.\n3. Dilarang membawa HP / catatan ke dalam ruang ujian.",
   "show_student_photo": false,
   "show_signatures": true,
-  "show_exam_rules": false
+  "show_exam_rules": false,
+  "cards_per_page": 8
 }

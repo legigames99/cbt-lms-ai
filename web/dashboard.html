@@ -1586,7 +1586,7 @@
                 </div>
 
                 <!-- Bagian Bawah: Pengesahan & Tanda Tangan Kepala Sekolah + Cap Bertumpuk -->
-                <div id="previewSignatureSection" class="pt-2 border-t border-slate-200 text-[8px] flex justify-end">
+                <div id="previewSignatureSection" class="pt-1.5 text-[8px] flex justify-end">
                   <div class="w-52 text-center leading-tight flex flex-col items-center">
                     <div class="text-slate-600"><span id="previewSignaturePlace">Jakarta</span>, <span id="previewSignatureDate">21 Oktober 2026</span></div>
                     <div class="text-slate-800 font-semibold mt-0.5">Kepala Sekolah,</div>
@@ -1610,7 +1610,7 @@
                 </div>
 
                 <!-- Ringkasan Tata Tertib Mini -->
-                <div id="previewRulesSection" class="mt-2.5 pt-1.5 border-t border-slate-200 text-[7px] text-slate-500 space-y-0.5">
+                <div id="previewRulesSection" class="mt-2 text-[7px] text-slate-500 space-y-0.5">
                   <div class="font-bold text-slate-700">Catatan & Tata Tertib:</div>
                   <div id="previewRulesSummary" class="leading-normal">
                     1. Wajib membawa kartu ujian ini saat tes berlangsung.<br>
@@ -4189,7 +4189,7 @@
       const sigAreaMinHeight = Math.max(isUltra ? 18 : (isCompact ? 28 : 42), Math.round(sigSize * 0.42));
 
       const signaturesHtml = showSignatures ? `
-        <div class="mt-1 pt-1 border-t border-slate-200 ${sigDateClass} flex justify-end">
+        <div class="mt-1 pt-0.5 ${sigDateClass} flex justify-end">
           <div class="${sigWidthClass} text-center leading-tight flex flex-col items-center">
             <div class="text-slate-600">${p.signature_place || 'Jakarta'}, ${p.signature_date || '21 Oktober 2026'}</div>
             <div class="text-slate-800 font-semibold mt-0.5 ${sigTitleClass}">Kepala Sekolah,</div>
@@ -4213,7 +4213,7 @@
       ` : '';
 
       const rulesBlockHtml = (showRules && rulesHtml) ? `
-        <div class="mt-1 pt-1 border-t border-slate-200 ${rulesTextClass} text-slate-600 space-y-0.5 leading-tight">
+        <div class="mt-1 pt-0.5 ${rulesTextClass} text-slate-600 space-y-0.5 leading-tight">
           <div class="font-bold text-slate-800">Catatan & Tata Tertib:</div>
           <div>${rulesHtml}</div>
         </div>

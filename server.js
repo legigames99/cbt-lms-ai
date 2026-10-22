@@ -27,7 +27,7 @@ let activeExamStudents = new Set();
 let dirtySessionCount = 0;
 
 // Master Users (Bcrypt hash mock: password123 / siswa123 / guru123 / admin123)
-const USERS = [
+let USERS = [
   { id: 1, username: 'admin', pass: 'admin123', full_name: 'Administrator Sekolah', role: 'admin' },
   { id: 2, username: 'guru', pass: 'guru123', full_name: 'Drs. Budi Pratama, M.Pd.', role: 'teacher' },
   { id: 3, username: 'proktor', pass: 'proktor123', full_name: 'Proktor Lab 1', role: 'proctor' },
@@ -146,7 +146,7 @@ function loadStudentsFromFile() {
     if (fs.existsSync(STUDENTS_FILE)) {
       const raw = fs.readFileSync(STUDENTS_FILE, 'utf8');
       const saved = JSON.parse(raw);
-      if (Array.isArray(saved) && saved.length > 0) {
+      if (Array.isArray(saved)) {
         const nonStudents = USERS.filter(u => u.role !== 'student');
         USERS.length = 0;
         USERS.push(...nonStudents, ...saved);
@@ -791,6 +791,44 @@ const server = http.createServer(async (req, res) => {
       skipped: skippedCount,
       total: USERS.filter(u => u.role === 'student').length,
     });
+  }
+
+  // POST /api/v1/master/students/bulk-delete (Hapus Beberapa Siswa atau Semua Siswa Sekaligus)
+  if (pathname === '/api/v1/master/students/bulk-delete' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const deleteAll = body.all === true || body.delete_all === true || body.ids === 'all';
+    const ids = Array.isArray(body.ids) ? body.ids.map(Number) : [];
+
+    if (!deleteAll && ids.length === 0) {
+      return sendJSON(400, { status: 'error', message: 'Daftar ID siswa yang ingin dihapus belum dipilih!' });
+    }
+
+    const currentStudents = USERS.filter(u => u.role === 'student');
+    const initialCount = currentStudents.length;
+
+    if (deleteAll) {
+      USERS = USERS.filter(u => u.role !== 'student');
+      saveStudentsToFile();
+      return sendJSON(200, {
+        status: 'success',
+        message: `Berhasil menghapus seluruh data siswa (${initialCount} siswa) dari sistem!`,
+        deleted_count: initialCount,
+        remaining_count: 0
+      });
+    } else {
+      const targetIds = new Set(ids);
+      const beforeTotal = USERS.length;
+      USERS = USERS.filter(u => !(u.role === 'student' && targetIds.has(Number(u.id))));
+      const deletedCount = beforeTotal - USERS.length;
+      saveStudentsToFile();
+      const remainingCount = USERS.filter(u => u.role === 'student').length;
+      return sendJSON(200, {
+        status: 'success',
+        message: `Berhasil menghapus ${deletedCount} data siswa terpilih!`,
+        deleted_count: deletedCount,
+        remaining_count: remainingCount
+      });
+    }
   }
 
   // POST /api/v1/master/students/:id/delete atau DELETE

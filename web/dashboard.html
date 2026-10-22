@@ -793,6 +793,9 @@
             <button onclick="openModal('modalAddStudent')" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition flex items-center gap-2 shadow-lg shadow-indigo-600/30">
               <i class="fa-solid fa-user-plus"></i> Tambah Siswa Baru
             </button>
+            <button onclick="handleDeleteAllStudents()" class="px-3.5 py-2.5 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/40 text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-rose-950/20" title="Hapus seluruh data siswa dari sistem">
+              <i class="fa-solid fa-trash-can"></i> Hapus Semua Siswa
+            </button>
           </div>
         </div>
 
@@ -816,11 +819,38 @@
           </div>
         </div>
 
+        <!-- Action Bar Saat Ada Siswa Dipilih -->
+        <div id="studentBulkActionBar" class="hidden bg-gradient-to-r from-rose-950/80 via-slate-900 to-indigo-950/80 border border-rose-500/40 rounded-2xl p-3 px-4 flex flex-wrap items-center justify-between gap-3 text-xs transition shadow-lg shadow-rose-950/30">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/40 flex items-center justify-center font-bold text-sm">
+              <i class="fa-solid fa-check-double"></i>
+            </span>
+            <div>
+              <span id="studentSelectedCountText" class="font-bold text-white text-sm">0 Siswa Dipilih</span>
+              <span class="text-slate-400 text-[11px] block sm:inline sm:ml-2">Tindakan massal untuk siswa yang dicentang:</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button onclick="handlePrintSelectedStudents()" class="px-3.5 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 font-bold transition flex items-center gap-1.5">
+              <i class="fa-solid fa-print"></i> Cetak Kartu (<span class="selectedCountBadge">0</span>)
+            </button>
+            <button onclick="handleDeleteSelectedStudents()" class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold transition flex items-center gap-1.5 shadow-lg shadow-rose-600/30">
+              <i class="fa-solid fa-trash-can"></i> Hapus (<span class="selectedCountBadge">0</span>) Siswa Terpilih
+            </button>
+            <button onclick="clearStudentSelection()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium transition">
+              Batal Pilihan
+            </button>
+          </div>
+        </div>
+
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl overflow-x-auto">
           <table class="w-full text-xs text-left">
             <thead class="text-slate-400 bg-slate-950 uppercase text-[10px] tracking-wider">
               <tr>
-                <th class="px-4 py-3 rounded-l-lg">ID</th>
+                <th class="px-4 py-3 rounded-l-lg w-10 text-center">
+                  <input type="checkbox" id="selectAllStudentsCheckbox" onchange="handleSelectAllStudents(this.checked)" class="w-4 h-4 rounded border-slate-700 bg-slate-900 text-rose-600 focus:ring-0 cursor-pointer" title="Pilih Semua Siswa">
+                </th>
+                <th class="px-3 py-3">ID</th>
                 <th class="px-4 py-3">No. Peserta / NISN</th>
                 <th class="px-4 py-3">Nama Lengkap & Username</th>
                 <th class="px-4 py-3">Kelas / Rombel</th>
@@ -833,7 +863,7 @@
             <tbody id="masterStudentsTableBody" class="divide-y divide-slate-800 text-slate-300">
               <!-- Rendered dynamically by fetchMasterStudents() -->
               <tr>
-                <td colspan="8" class="text-center py-6 text-slate-500">Memuat data siswa...</td>
+                <td colspan="9" class="text-center py-6 text-slate-500">Memuat data siswa...</td>
               </tr>
             </tbody>
           </table>
@@ -4031,6 +4061,13 @@
           tabSessionSelect.innerHTML = '<option value="all">Semua Sesi</option>' + sessions.map(s => `<option value="${s}">${s}</option>`).join('');
         }
 
+        if (typeof selectedStudentIds !== 'undefined') {
+          const existingIdSet = new Set(masterStudentsList.map(s => s.id));
+          for (const id of selectedStudentIds) {
+            if (!existingIdSet.has(id)) selectedStudentIds.delete(id);
+          }
+        }
+
         renderStudentsTable(masterStudentsList);
       } catch (err) {
         console.error('Gagal mengambil data siswa:', err);
@@ -4043,13 +4080,19 @@
       if (!tbody) return;
 
       if (!students || students.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-500">Tidak ada data siswa ditemukan</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-slate-500">Tidak ada data siswa ditemukan</td></tr>`;
+        if (typeof updateStudentSelectionUI === 'function') updateStudentSelectionUI();
         return;
       }
 
-      tbody.innerHTML = students.map(st => `
-        <tr class="hover:bg-slate-800/40 transition">
-          <td class="px-4 py-3 font-mono text-slate-500">${st.id}</td>
+      tbody.innerHTML = students.map(st => {
+        const isChecked = typeof selectedStudentIds !== 'undefined' && selectedStudentIds.has(st.id);
+        return `
+        <tr class="hover:bg-slate-800/40 transition student-row ${isChecked ? 'bg-rose-950/20' : ''}" id="studentRow_${st.id}">
+          <td class="px-4 py-3 text-center">
+            <input type="checkbox" class="student-select-cb w-4 h-4 rounded border-slate-700 bg-slate-900 text-rose-600 focus:ring-0 cursor-pointer" value="${st.id}" data-name="${st.full_name}" onchange="handleStudentCheckboxChange()" ${isChecked ? 'checked' : ''}>
+          </td>
+          <td class="px-3 py-3 font-mono text-slate-500">${st.id}</td>
           <td class="px-4 py-3">
             <div class="font-mono font-bold text-white">${st.exam_no || '26-01-05-' + st.id}</div>
             <div class="text-[10px] text-slate-400 font-mono">NISN: ${st.nisn || '-'}</div>
@@ -4084,7 +4127,10 @@
             </div>
           </td>
         </tr>
-      `).join('');
+      `;
+      }).join('');
+
+      if (typeof updateStudentSelectionUI === 'function') updateStudentSelectionUI();
     };
 
     window.filterStudentsTable = function() {
@@ -4141,7 +4187,9 @@
       const sessionFilter = document.getElementById('printFilterSession')?.value || 'all';
 
       let list = masterStudentsList;
-      if (singleStudentPrintFilter) {
+      if (Array.isArray(singleStudentPrintFilter)) {
+        list = list.filter(s => singleStudentPrintFilter.includes(s.id));
+      } else if (singleStudentPrintFilter) {
         list = list.filter(s => s.id === singleStudentPrintFilter);
       } else {
         if (classFilter !== 'all') {
@@ -4485,10 +4533,169 @@
         if (!res.ok) throw new Error(json.message);
 
         alert(json.message);
+        if (window.selectedStudentIds) window.selectedStudentIds.delete(id);
         await fetchMasterStudents();
       } catch (err) {
         alert('Gagal menghapus siswa: ' + err.message);
       }
+    };
+
+    // ==================== SELECTION & BULK DELETE SISWA ====================
+    window.selectedStudentIds = new Set();
+
+    window.updateStudentSelectionUI = function() {
+      const cbs = document.querySelectorAll('.student-select-cb');
+      const allCb = document.getElementById('selectAllStudentsCheckbox');
+      const actionBar = document.getElementById('studentBulkActionBar');
+      const countText = document.getElementById('studentSelectedCountText');
+      const badges = document.querySelectorAll('.selectedCountBadge');
+
+      const checkedCount = window.selectedStudentIds.size;
+
+      // Update master checkbox state
+      if (allCb) {
+        if (cbs.length > 0 && checkedCount === cbs.length) {
+          allCb.checked = true;
+          allCb.indeterminate = false;
+        } else if (checkedCount > 0) {
+          allCb.checked = false;
+          allCb.indeterminate = true;
+        } else {
+          allCb.checked = false;
+          allCb.indeterminate = false;
+        }
+      }
+
+      // Update badges & action bar
+      badges.forEach(b => b.innerText = checkedCount);
+      if (countText) countText.innerText = `${checkedCount} Siswa Dipilih`;
+
+      if (actionBar) {
+        if (checkedCount > 0) {
+          actionBar.classList.remove('hidden');
+        } else {
+          actionBar.classList.add('hidden');
+        }
+      }
+
+      // Update row active state
+      cbs.forEach(cb => {
+        const row = document.getElementById(`studentRow_${cb.value}`);
+        if (row) {
+          if (cb.checked) {
+            row.classList.add('bg-rose-950/20');
+          } else {
+            row.classList.remove('bg-rose-950/20');
+          }
+        }
+      });
+    };
+
+    window.handleSelectAllStudents = function(checked) {
+      const cbs = document.querySelectorAll('.student-select-cb');
+      cbs.forEach(cb => {
+        cb.checked = checked;
+        const id = parseInt(cb.value, 10);
+        if (checked) {
+          window.selectedStudentIds.add(id);
+        } else {
+          window.selectedStudentIds.delete(id);
+        }
+      });
+      window.updateStudentSelectionUI();
+    };
+
+    window.handleStudentCheckboxChange = function() {
+      const cbs = document.querySelectorAll('.student-select-cb');
+      window.selectedStudentIds.clear();
+      cbs.forEach(cb => {
+        if (cb.checked) window.selectedStudentIds.add(parseInt(cb.value, 10));
+      });
+      window.updateStudentSelectionUI();
+    };
+
+    window.clearStudentSelection = function() {
+      window.selectedStudentIds.clear();
+      const cbs = document.querySelectorAll('.student-select-cb');
+      cbs.forEach(cb => cb.checked = false);
+      const allCb = document.getElementById('selectAllStudentsCheckbox');
+      if (allCb) {
+        allCb.checked = false;
+        allCb.indeterminate = false;
+      }
+      window.updateStudentSelectionUI();
+    };
+
+    // Hapus Siswa Terpilih (Beberapa Siswa Sekaligus)
+    window.handleDeleteSelectedStudents = async function() {
+      const ids = Array.from(window.selectedStudentIds);
+      if (ids.length === 0) {
+        alert('Silakan pilih minimal 1 siswa yang ingin dihapus dengan mencentang kotak di tabel.');
+        return;
+      }
+
+      const confirmMsg = `Konfirmasi Penghapusan:\nApakah Anda yakin ingin menghapus ${ids.length} data siswa yang dipilih?\n\nTindakan ini permanen dan tidak dapat dibatalkan.`;
+      if (!confirm(confirmMsg)) return;
+
+      try {
+        const res = await fetch('/api/v1/master/students/bulk-delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ids: ids })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+
+        alert(json.message || `Berhasil menghapus ${ids.length} siswa!`);
+        window.clearStudentSelection();
+        await fetchMasterStudents();
+      } catch (err) {
+        alert('Gagal menghapus siswa terpilih: ' + err.message);
+      }
+    };
+
+    // Hapus SEMUA Data Siswa Sekaligus (Purge All Students)
+    window.handleDeleteAllStudents = async function() {
+      if (!masterStudentsList || masterStudentsList.length === 0) {
+        alert('Tidak ada data siswa yang tersimpan di sistem.');
+        return;
+      }
+
+      const totalCount = masterStudentsList.length;
+      const confirm1 = confirm(`⚠️ PERINGATAN BESAR:\nAnda akan menghapus SEMUA data siswa (${totalCount} siswa) dari sistem!\n\nSeluruh akun siswa dan kartu peserta akan dihapus secara permanen.\n\nApakah Anda benar-benar yakin ingin melanjutkan?`);
+      if (!confirm1) return;
+
+      const userInput = prompt(`Untuk menghindari kesalahan, silakan ketik kata 'HAPUS' (huruf besar) untuk mengonfirmasi penghapusan seluruh data siswa:`);
+      if (!userInput || userInput.trim().toUpperCase() !== 'HAPUS') {
+        alert('Penghapusan seluruh data siswa dibatalkan karena teks konfirmasi tidak sesuai.');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/v1/master/students/bulk-delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ all: true })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+
+        alert(json.message || `Semua data siswa berhasil dihapus!`);
+        window.clearStudentSelection();
+        await fetchMasterStudents();
+      } catch (err) {
+        alert('Gagal menghapus seluruh data siswa: ' + err.message);
+      }
+    };
+
+    // Cetak Kartu Siswa Terpilih
+    window.handlePrintSelectedStudents = function() {
+      const ids = Array.from(window.selectedStudentIds);
+      if (ids.length === 0) {
+        alert('Pilih minimal 1 siswa terlebih dahulu.');
+        return;
+      }
+      openPrintCardsModal(ids);
     };
 
     // ==================== EXCEL IMPORT & TEMPLATE LOGIC ====================

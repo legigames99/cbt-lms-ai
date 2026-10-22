@@ -459,6 +459,14 @@ function generateRandomToken(length = 6) {
 // Pengelolaan Token Dinamis & Statis (Berubah Otomatis Tiap 5m, 10m, 15m)
 function updateScheduleDynamicToken(sch, forceNew = false) {
   if (!sch) return null;
+  if (sch.token_type === 'none') {
+    return {
+      token_code: 'TANPA TOKEN',
+      token_type: 'none',
+      token_interval: 0,
+      seconds_left: null,
+    };
+  }
   const isDynamic = sch.token_type === 'dynamic';
   const intervalMinutes = [5, 10, 15].includes(parseInt(sch.token_interval, 10)) ? parseInt(sch.token_interval, 10) : 15;
   const intervalMs = intervalMinutes * 60 * 1000;
@@ -519,7 +527,8 @@ function loadSchedulesFromFile() {
             ...s,
             is_active: s.is_active !== undefined ? !!s.is_active : true,
             class_target: formatClassTargetDisplay(s.class_target),
-            token_type: s.token_type || 'static',
+            token_type: ['none', 'static', 'dynamic'].includes(s.token_type) ? s.token_type : (s.token_type || 'static'),
+            token_code: s.token_type === 'none' ? 'TANPA TOKEN' : (s.token_code || 'TOKEN'),
             token_interval: [5, 10, 15].includes(parseInt(s.token_interval, 10)) ? parseInt(s.token_interval, 10) : 15,
           };
           updateScheduleDynamicToken(item);
@@ -1289,7 +1298,7 @@ const server = http.createServer(async (req, res) => {
       return {
         ...s,
         class_target: formatClassTargetDisplay(s.class_target),
-        token_code: s.token_code,
+        token_code: s.token_type === 'none' ? 'TANPA TOKEN' : s.token_code,
         token_type: s.token_type || 'static',
         token_interval: s.token_interval || 15,
         seconds_left: tInfo ? tInfo.seconds_left : null,
@@ -1330,10 +1339,12 @@ const server = http.createServer(async (req, res) => {
   if ((pathname === '/api/v1/cbt/schedules/create' || pathname === '/api/v1/cbt/schedules/add') && req.method === 'POST') {
     const body = await parseBody(req);
     const nextId = Math.max(...SCHEDULES.map(s => s.id || 0), 0) + 1;
-    const tokenType = body.token_type === 'dynamic' ? 'dynamic' : 'static';
+    const tokenType = ['none', 'dynamic'].includes(body.token_type) ? body.token_type : 'static';
     const tokenInterval = [5, 10, 15].includes(parseInt(body.token_interval, 10)) ? parseInt(body.token_interval, 10) : 15;
     let tokenCode = (body.token_code || '').trim().toUpperCase();
-    if (!tokenCode) {
+    if (tokenType === 'none') {
+      tokenCode = 'TANPA TOKEN';
+    } else if (!tokenCode) {
       tokenCode = tokenType === 'dynamic' ? generateRandomToken(6) : `TOKEN${nextId}`;
     }
     const newSch = {
@@ -1380,16 +1391,20 @@ const server = http.createServer(async (req, res) => {
     }
     if (body.token_type !== undefined) {
       const prevType = sch.token_type;
-      sch.token_type = body.token_type === 'dynamic' ? 'dynamic' : 'static';
-      if (prevType !== 'dynamic' && sch.token_type === 'dynamic') {
+      sch.token_type = ['none', 'dynamic'].includes(body.token_type) ? body.token_type : 'static';
+      if (sch.token_type === 'none') {
+        sch.token_code = 'TANPA TOKEN';
+      } else if (prevType !== 'dynamic' && sch.token_type === 'dynamic') {
         sch.token_updated_at = Date.now();
-        if (!body.token_code) sch.token_code = generateRandomToken(6);
+        if (!body.token_code || body.token_code === 'TANPA TOKEN') sch.token_code = generateRandomToken(6);
+      } else if (body.token_code && body.token_code !== 'TANPA TOKEN') {
+        sch.token_code = body.token_code.trim().toUpperCase();
       }
     }
     if (body.token_interval !== undefined) {
       sch.token_interval = [5, 10, 15].includes(parseInt(body.token_interval, 10)) ? parseInt(body.token_interval, 10) : 15;
     }
-    if (body.token_code) sch.token_code = body.token_code.trim().toUpperCase();
+    if (body.token_code && sch.token_type !== 'none') sch.token_code = body.token_code.trim().toUpperCase();
     if (body.shuffle_questions !== undefined) sch.shuffle_questions = !!body.shuffle_questions;
     if (body.shuffle_options !== undefined) sch.shuffle_options = !!body.shuffle_options;
     if (body.is_active !== undefined) sch.is_active = !!body.is_active;
@@ -1495,6 +1510,8 @@ const server = http.createServer(async (req, res) => {
         session_status: session ? session.status : 'not_started',
         submitted_at: session ? session.submitted_at : null,
         class_target: formatClassTargetDisplay(curSch.class_target),
+        token_type: curSch.token_type || 'static',
+        has_token: curSch.token_type !== 'none',
         // Kredensial dekripsi sesi untuk auto-resume saat browser di-refresh
         session_id: isInProgress ? 88400 + uid : null,
         decryption_key_hex: isInProgress ? schKeyInfo.keyHex : null,
@@ -1544,18 +1561,20 @@ const server = http.createServer(async (req, res) => {
       });
     }
 
-    updateScheduleDynamicToken(curSch);
-    const inputToken = (body.token_code || '').trim().toUpperCase();
-    const curToken = (curSch.token_code || '').toUpperCase();
-    const prevToken = (curSch.token_prev_code || '').toUpperCase();
-    const isGraceValid = curSch.token_type === 'dynamic' &&
-      prevToken &&
-      inputToken === prevToken &&
-      curSch.token_prev_expires_at &&
-      Date.now() <= curSch.token_prev_expires_at;
+    if (curSch.token_type !== 'none') {
+      updateScheduleDynamicToken(curSch);
+      const inputToken = (body.token_code || '').trim().toUpperCase();
+      const curToken = (curSch.token_code || '').toUpperCase();
+      const prevToken = (curSch.token_prev_code || '').toUpperCase();
+      const isGraceValid = curSch.token_type === 'dynamic' &&
+        prevToken &&
+        inputToken === prevToken &&
+        curSch.token_prev_expires_at &&
+        Date.now() <= curSch.token_prev_expires_at;
 
-    if (inputToken !== curToken && !isGraceValid) {
-      return sendJSON(403, { status: 'error', message: `Token ujian salah atau telah berganti! Masukkan token aktif saat ini: ${curSch.token_code}` });
+      if (inputToken !== curToken && !isGraceValid) {
+        return sendJSON(403, { status: 'error', message: `Token ujian salah atau telah berganti! Masukkan token aktif saat ini: ${curSch.token_code}` });
+      }
     }
 
     const schKeyInfo = scheduleKeys[curSch.id] || { keyHex: currentAESKeyHex };

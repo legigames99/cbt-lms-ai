@@ -2228,9 +2228,10 @@
           </div>
         </div>
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Tipe & Siklus Perubahan Token</label>
+          <label class="block font-semibold text-slate-300 mb-1">Tipe & Siklus Penggunaan Token</label>
           <select id="schTokenType" onchange="handleTokenTypeChange('create')" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white cursor-pointer font-medium">
-            <option value="static">Token Statis (Tetap / Tidak Berubah)</option>
+            <option value="none">Tanpa Token (Bebas / Siswa Langsung Mulai Ujian)</option>
+            <option value="static" selected>Token Statis (Tetap / Tidak Berubah Otomatis)</option>
             <option value="dynamic_5">Token Dinamis (Berubah Otomatis Tiap 5 Menit Sekali)</option>
             <option value="dynamic_10">Token Dinamis (Berubah Otomatis Tiap 10 Menit Sekali)</option>
             <option value="dynamic_15">Token Dinamis (Berubah Otomatis Tiap 15 Menit Sekali)</option>
@@ -2357,9 +2358,10 @@
           </div>
         </div>
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Tipe & Siklus Perubahan Token</label>
+          <label class="block font-semibold text-slate-300 mb-1">Tipe & Siklus Penggunaan Token</label>
           <select id="editSchTokenType" onchange="handleTokenTypeChange('edit')" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white cursor-pointer font-medium">
-            <option value="static">Token Statis (Tetap / Tidak Berubah)</option>
+            <option value="none">Tanpa Token (Bebas / Siswa Langsung Mulai Ujian)</option>
+            <option value="static">Token Statis (Tetap / Tidak Berubah Otomatis)</option>
             <option value="dynamic_5">Token Dinamis (Berubah Otomatis Tiap 5 Menit Sekali)</option>
             <option value="dynamic_10">Token Dinamis (Berubah Otomatis Tiap 10 Menit Sekali)</option>
             <option value="dynamic_15">Token Dinamis (Berubah Otomatis Tiap 15 Menit Sekali)</option>
@@ -3363,26 +3365,32 @@
                 <td class="px-4 py-3.5 font-mono text-slate-300">${sch.start_time || '-'}</td>
                 <td class="px-4 py-3.5 font-mono">${sch.duration_minutes} Menit</td>
                 <td class="px-4 py-3.5">
-                  <div class="flex items-center gap-1.5 flex-wrap">
-                    <span class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-bold tracking-wider text-xs">${sch.token_code}</span>
-                    ${sch.token_type === 'dynamic' ? `
-                      <span class="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[10px] font-bold flex items-center gap-1" title="Token Dinamis: Berganti otomatis setiap ${sch.token_interval || 15} menit">
-                        <i class="fa-solid fa-arrows-rotate text-[9px] animate-spin-slow"></i> Dinamis (${sch.token_interval || 15}m)
-                      </span>
-                      <button onclick="handleManualRefreshToken(${sch.id}, event)" class="p-1 px-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-[10px] font-bold transition flex items-center gap-1" title="Rilis token baru sekarang (manual)">
-                        <i class="fa-solid fa-rotate text-[9px]"></i> Rilis
-                      </button>
-                    ` : `
-                      <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-[10px] font-medium" title="Token Statis (Tetap / Tidak Berubah)">
-                        Statis
-                      </span>
-                    `}
-                  </div>
-                  ${sch.token_type === 'dynamic' && sch.seconds_left !== undefined && sch.seconds_left !== null ? `
-                    <div class="text-[10px] text-amber-400/90 mt-1 font-mono flex items-center gap-1">
-                      <i class="fa-regular fa-clock text-[9px]"></i> Sisa: <span class="dynamic-token-timer font-bold" data-sch-id="${sch.id}" data-seconds="${sch.seconds_left}">${formatSecondsToTimer(sch.seconds_left)}</span>
+                  ${sch.token_type === 'none' ? `
+                    <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold flex items-center gap-1.5 w-fit" title="Ujian tanpa token: Siswa dapat langsung mulai tanpa diminta kode token">
+                      <i class="fa-solid fa-unlock-keyhole text-[9px] text-emerald-400"></i> Tanpa Token
+                    </span>
+                  ` : `
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-bold tracking-wider text-xs">${sch.token_code}</span>
+                      ${sch.token_type === 'dynamic' ? `
+                        <span class="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[10px] font-bold flex items-center gap-1" title="Token Dinamis: Berganti otomatis setiap ${sch.token_interval || 15} menit">
+                          <i class="fa-solid fa-arrows-rotate text-[9px] animate-spin-slow"></i> Dinamis (${sch.token_interval || 15}m)
+                        </span>
+                        <button onclick="handleManualRefreshToken(${sch.id}, event)" class="p-1 px-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-[10px] font-bold transition flex items-center gap-1" title="Rilis token baru sekarang (manual)">
+                          <i class="fa-solid fa-rotate text-[9px]"></i> Rilis
+                        </button>
+                      ` : `
+                        <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-[10px] font-medium" title="Token Statis (Tetap / Tidak Berubah)">
+                          Statis
+                        </span>
+                      `}
                     </div>
-                  ` : ''}
+                    ${sch.token_type === 'dynamic' && sch.seconds_left !== undefined && sch.seconds_left !== null ? `
+                      <div class="text-[10px] text-amber-400/90 mt-1 font-mono flex items-center gap-1">
+                        <i class="fa-regular fa-clock text-[9px]"></i> Sisa: <span class="dynamic-token-timer font-bold" data-sch-id="${sch.id}" data-seconds="${sch.seconds_left}">${formatSecondsToTimer(sch.seconds_left)}</span>
+                      </div>
+                    ` : ''}
+                  `}
                 </td>
                 <td class="px-4 py-3.5">
                   <div class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1 font-mono">
@@ -3459,12 +3467,18 @@
                 <td class="px-4 py-3.5 font-mono text-slate-400">${sch.start_time || '-'}</td>
                 <td class="px-4 py-3.5 font-mono text-slate-400">${sch.duration_minutes} Menit</td>
                 <td class="px-4 py-3.5">
-                  <div class="flex items-center gap-1.5 flex-wrap">
-                    <span class="px-2 py-1 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 font-mono font-bold text-xs">${sch.token_code}</span>
-                    <span class="px-1.5 py-0.5 rounded bg-slate-800/80 text-slate-500 border border-slate-700 text-[10px]">
-                      ${sch.token_type === 'dynamic' ? `Dinamis (${sch.token_interval || 15}m)` : 'Statis'}
+                  ${sch.token_type === 'none' ? `
+                    <span class="px-2 py-1 rounded bg-slate-800 text-slate-400 border border-slate-700 text-[10px] font-medium flex items-center gap-1 w-fit">
+                      <i class="fa-solid fa-unlock-keyhole text-[9px]"></i> Tanpa Token
                     </span>
-                  </div>
+                  ` : `
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="px-2 py-1 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 font-mono font-bold text-xs">${sch.token_code}</span>
+                      <span class="px-1.5 py-0.5 rounded bg-slate-800/80 text-slate-500 border border-slate-700 text-[10px]">
+                        ${sch.token_type === 'dynamic' ? `Dinamis (${sch.token_interval || 15}m)` : 'Statis'}
+                      </span>
+                    </div>
+                  `}
                 </td>
                 <td class="px-4 py-3.5">
                   <div class="text-[11px] text-slate-500 font-semibold flex items-center gap-1 font-mono">
@@ -3706,10 +3720,32 @@
       const tokenInput = document.getElementById(`${prefix}Token`);
       if (!selectEl) return;
       const val = selectEl.value;
-      if (val === 'static') {
+
+      if (val === 'none') {
+        if (tokenInput) {
+          tokenInput.value = 'TANPA TOKEN';
+          tokenInput.disabled = true;
+          tokenInput.classList.add('opacity-40');
+        }
+        if (hintEl) {
+          hintEl.innerHTML = '<i class="fa-solid fa-unlock-keyhole text-emerald-400"></i> <span class="text-emerald-400 font-medium">Ujian Bebas Token: Siswa dapat langsung mulai tanpa diminta memasukkan kode token.</span>';
+        }
+      } else if (val === 'static') {
+        if (tokenInput) {
+          tokenInput.disabled = false;
+          tokenInput.classList.remove('opacity-40');
+          if (tokenInput.value === 'TANPA TOKEN') tokenInput.value = (modalType === 'create' ? 'CBT2026' : 'TOKEN');
+        }
         if (hintEl) hintEl.innerHTML = '<i class="fa-solid fa-lock text-slate-400"></i> Token bersifat tetap / statis selama sesi ujian berlangsung.';
       } else {
         const mins = val.split('_')[1] || '15';
+        if (tokenInput) {
+          tokenInput.disabled = false;
+          tokenInput.classList.remove('opacity-40');
+          if (tokenInput.value === 'TANPA TOKEN') {
+            generateRandomTokenInput(`${prefix}Token`);
+          }
+        }
         if (hintEl) hintEl.innerHTML = `<i class="fa-solid fa-arrows-rotate text-cyan-400 animate-spin-slow"></i> Token akan <strong class="text-cyan-300">berganti otomatis setiap ${mins} menit sekali</strong>. Sistem memiliki toleransi 60 detik bagi siswa yang sedang mengetik token sebelumnya.`;
         if (modalType === 'create' && tokenInput && tokenInput.value === 'CBT2026') {
           generateRandomTokenInput(`${prefix}Token`);
@@ -3960,10 +3996,10 @@
       const title = document.getElementById('schTitle')?.value.trim() || 'Ujian Baru CBT';
       const bank = document.getElementById('schBank')?.value || 'Bank Termodinamika & Kalor (5 Butir Soal)';
       const duration = parseInt(document.getElementById('schDuration')?.value, 10) || 90;
-      const tokenCode = (document.getElementById('schToken')?.value || 'CBT2026').trim().toUpperCase();
       const rawTokenType = document.getElementById('schTokenType')?.value || 'static';
-      const tokenType = rawTokenType.startsWith('dynamic') ? 'dynamic' : 'static';
+      const tokenType = rawTokenType === 'none' ? 'none' : (rawTokenType.startsWith('dynamic') ? 'dynamic' : 'static');
       const tokenInterval = rawTokenType.startsWith('dynamic') ? parseInt(rawTokenType.split('_')[1], 10) || 15 : 15;
+      const tokenCode = tokenType === 'none' ? 'TANPA TOKEN' : (document.getElementById('schToken')?.value || 'CBT2026').trim().toUpperCase();
       const shuffleQ = document.getElementById('schShuffleQ')?.checked ?? true;
       const shuffleOpt = document.getElementById('schShuffleOpt')?.checked ?? true;
       const isActive = document.getElementById('schIsActive')?.checked ?? true;
@@ -4018,7 +4054,9 @@
             document.getElementById('editSchToken').value = sch.token_code;
             const typeSelect = document.getElementById('editSchTokenType');
             if (typeSelect) {
-              if (sch.token_type === 'dynamic') {
+              if (sch.token_type === 'none') {
+                typeSelect.value = 'none';
+              } else if (sch.token_type === 'dynamic') {
                 typeSelect.value = `dynamic_${sch.token_interval || 15}`;
               } else {
                 typeSelect.value = 'static';
@@ -4058,10 +4096,10 @@
       const bank = document.getElementById('editSchBank').value;
       const startTime = document.getElementById('editSchStartTime').value.trim();
       const duration = parseInt(document.getElementById('editSchDuration').value, 10) || 90;
-      const tokenCode = document.getElementById('editSchToken').value.trim().toUpperCase();
       const rawTokenType = document.getElementById('editSchTokenType')?.value || 'static';
-      const tokenType = rawTokenType.startsWith('dynamic') ? 'dynamic' : 'static';
+      const tokenType = rawTokenType === 'none' ? 'none' : (rawTokenType.startsWith('dynamic') ? 'dynamic' : 'static');
       const tokenInterval = rawTokenType.startsWith('dynamic') ? parseInt(rawTokenType.split('_')[1], 10) || 15 : 15;
+      const tokenCode = tokenType === 'none' ? 'TANPA TOKEN' : document.getElementById('editSchToken').value.trim().toUpperCase();
       const shuffleQ = document.getElementById('editSchShuffleQ').checked;
       const shuffleOpt = document.getElementById('editSchShuffleOpt').checked;
       const isActive = document.getElementById('editSchIsActive')?.checked ?? true;
@@ -4194,10 +4232,15 @@
 
           if (bannerTitle) bannerTitle.innerText = sch.title;
           if (bannerToken) {
-            if (sch.token_type === 'dynamic') {
+            if (sch.token_type === 'none') {
+              bannerToken.className = "px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1";
+              bannerToken.innerHTML = `<i class="fa-solid fa-unlock-keyhole text-[9px] text-emerald-400"></i> Tanpa Token`;
+            } else if (sch.token_type === 'dynamic') {
+              bannerToken.className = "px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono text-[10px] font-bold";
               const timerTxt = sch.seconds_left ? ` <span class="font-mono text-amber-300">(${formatSecondsToTimer(sch.seconds_left)})</span>` : '';
               bannerToken.innerHTML = `Token: <span class="text-amber-300 font-mono font-bold">${sch.token_code}</span> <span class="text-cyan-300 text-[10px] font-bold">[Dinamis ${sch.token_interval || 15}m${timerTxt}]</span> <button onclick="handleManualRefreshToken(${sch.id}, event)" class="ml-1 text-slate-300 hover:text-white" title="Rilis token baru sekarang"><i class="fa-solid fa-arrows-rotate text-[10px]"></i></button>`;
             } else {
+              bannerToken.className = "px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono text-[10px] font-bold";
               bannerToken.innerHTML = `Token: <span class="text-amber-300 font-mono font-bold">${sch.token_code}</span> <span class="text-slate-400 text-[10px] font-medium">[Statis]</span>`;
             }
           }
@@ -4564,10 +4607,15 @@
 
           if (bTitle) bTitle.innerText = sch.title;
           if (bToken) {
-            if (sch.token_type === 'dynamic') {
+            if (sch.token_type === 'none') {
+              bToken.className = "px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1";
+              bToken.innerHTML = `<i class="fa-solid fa-unlock-keyhole text-[9px] text-emerald-400"></i> Tanpa Token`;
+            } else if (sch.token_type === 'dynamic') {
+              bToken.className = "px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono text-[10px] font-bold";
               const timerTxt = sch.seconds_left ? ` <span class="font-mono text-amber-300">(${formatSecondsToTimer(sch.seconds_left)})</span>` : '';
               bToken.innerHTML = `Token: <span class="text-amber-300 font-mono font-bold">${sch.token_code}</span> <span class="text-cyan-300 text-[10px] font-bold">[Dinamis ${sch.token_interval || 15}m${timerTxt}]</span> <button onclick="handleManualRefreshToken(${sch.id}, event)" class="ml-1 text-slate-300 hover:text-white" title="Rilis token baru sekarang"><i class="fa-solid fa-arrows-rotate text-[10px]"></i></button>`;
             } else {
+              bToken.className = "px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono text-[10px] font-bold";
               bToken.innerHTML = `Token: <span class="text-amber-300 font-mono font-bold">${sch.token_code}</span> <span class="text-slate-400 text-[10px] font-medium">[Statis]</span>`;
             }
           }

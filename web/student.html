@@ -102,10 +102,15 @@
       </div>
 
       <div class="space-y-4">
-        <div>
+        <div id="tokenInputContainer">
           <label class="block text-xs font-semibold text-slate-300 text-left mb-1">KODE TOKEN UJIAN DARI PENGAWAS</label>
           <input type="text" id="tokenCodeInput" placeholder="KODE TOKEN" maxlength="12" uppercase autocomplete="off"
             class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center text-lg font-mono font-bold tracking-widest text-indigo-300 uppercase focus:outline-none focus:border-indigo-500 placeholder:text-slate-600 placeholder:font-normal placeholder:tracking-normal placeholder:text-sm">
+        </div>
+
+        <div id="noTokenNoticeContainer" class="hidden bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3.5 text-center text-xs text-emerald-300 font-medium flex items-center justify-center gap-2">
+          <i class="fa-solid fa-unlock-keyhole text-emerald-400 text-sm"></i>
+          <span>Ujian ini <strong>bebas token</strong>. Silakan klik tombol di bawah untuk langsung mulai.</span>
         </div>
 
         <button id="btnStartExam" onclick="handleStartExam()" disabled
@@ -314,6 +319,19 @@
         document.getElementById('waitTitle').innerText = schedule.title;
         document.getElementById('waitDuration').innerText = `${schedule.duration_minutes} Menit`;
 
+        // Tampilkan atau sembunyikan input token sesuai mode ujian
+        const tokenInputGroup = document.getElementById('tokenInputContainer');
+        const noTokenNotice = document.getElementById('noTokenNoticeContainer');
+        if (schedule.token_type === 'none' || schedule.has_token === false) {
+          if (tokenInputGroup) tokenInputGroup.classList.add('hidden');
+          if (noTokenNotice) noTokenNotice.classList.remove('hidden');
+          const tokenInput = document.getElementById('tokenCodeInput');
+          if (tokenInput) tokenInput.value = '';
+        } else {
+          if (tokenInputGroup) tokenInputGroup.classList.remove('hidden');
+          if (noTokenNotice) noTokenNotice.classList.add('hidden');
+        }
+
         // CEK APAKAH SISWA SUDAH MENYELESAIKAN UJIAN INI
         if (schedule.session_status === 'submitted') {
           showAlreadySubmittedScreen(schedule.title, schedule.submitted_at);
@@ -393,6 +411,11 @@
       const tokenCode = document.getElementById('tokenCodeInput').value.trim();
       const token = localStorage.getItem('cbt_token');
       const btn = document.getElementById('btnStartExam');
+
+      if (schedule && schedule.token_type !== 'none' && schedule.has_token !== false && !tokenCode) {
+        alert('Silakan masukkan kode token ujian terlebih dahulu!');
+        return;
+      }
 
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Mendekripsi Soal...';

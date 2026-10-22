@@ -701,10 +701,8 @@
             </button>
             <div class="flex items-center gap-2">
               <span class="text-xs text-slate-400">Filter Kelas:</span>
-              <select id="filterClassSelect" onchange="lastProctorDataHash=''; fetchProctorSessions();" class="bg-slate-900 border border-slate-800 text-xs text-white rounded-xl px-3 py-1.5 focus:outline-none">
-                <option value="all">Semua Kelas (1.700 Siswa)</option>
-                <option value="XII IPA 1" selected>XII IPA 1 (36 Siswa)</option>
-                <option value="XII IPA 2">XII IPA 2 (36 Siswa)</option>
+              <select id="filterClassSelect" onchange="lastProctorDataHash=''; fetchProctorSessions();" class="bg-slate-900 border border-slate-800 text-xs text-white rounded-xl px-3 py-1.5 focus:outline-none cursor-pointer">
+                <option value="all">Semua Kelas</option>
               </select>
             </div>
             <button onclick="openModalBulkResetProctor()" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-amber-500/10" title="Reset Sesi Siswa Secara Massal / Bulk">
@@ -843,8 +841,6 @@
               <span class="text-xs text-slate-400">Kelas:</span>
               <select id="filterClassNilaiSelect" onchange="handleNilaiFilterChange()" class="bg-transparent text-xs text-white font-medium focus:outline-none cursor-pointer">
                 <option value="all">Semua Kelas</option>
-                <option value="XII IPA 1">XII IPA 1</option>
-                <option value="XII IPA 2">XII IPA 2</option>
               </select>
             </div>
 
@@ -3680,6 +3676,24 @@
           }
         }
 
+        // Update opsi dropdown filter kelas secara dinamis & akurat sesuai data riil
+        if (json.classes && json.class_counts) {
+          const proctorClassSelect = document.getElementById('filterClassSelect');
+          if (proctorClassSelect) {
+            const currentVal = proctorClassSelect.value || 'all';
+            const countsHash = JSON.stringify(json.class_counts);
+            if (proctorClassSelect.dataset.renderedHash !== countsHash) {
+              const totalAll = json.total_students || Object.values(json.class_counts).reduce((a, b) => a + b, 0);
+              proctorClassSelect.innerHTML = `<option value="all">Semua Kelas (${totalAll} Siswa)</option>` +
+                json.classes.map(c => `<option value="${c}">${c} (${json.class_counts[c] || 0} Siswa)</option>`).join('');
+              proctorClassSelect.dataset.renderedHash = countsHash;
+              if (json.classes.includes(currentVal) || currentVal === 'all') {
+                proctorClassSelect.value = currentVal;
+              }
+            }
+          }
+        }
+
         if (json.data && Array.isArray(json.data)) {
           // 2. Smart Diffing: Jika data tidak berubah, lewati rendering DOM (0% CPU cost)
           const currentHash = `${selectedScheduleId}_${selectedClass}_` + JSON.stringify(json.data);
@@ -4021,6 +4035,24 @@
               sBadge.className = "px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-[10px] font-medium flex items-center gap-1.5";
               if (sDot) sDot.className = "w-1.5 h-1.5 rounded-full bg-slate-500";
               if (sText) sText.innerText = "Arsip Nonaktif";
+            }
+          }
+        }
+
+        // Update opsi dropdown filter kelas nilai secara dinamis & akurat
+        if (json.classes && json.class_counts) {
+          const nilaiClassSelect = document.getElementById('filterClassNilaiSelect');
+          if (nilaiClassSelect) {
+            const currentVal = nilaiClassSelect.value || 'all';
+            const countsHash = JSON.stringify(json.class_counts);
+            if (nilaiClassSelect.dataset.renderedHash !== countsHash) {
+              const totalAll = json.total_students || Object.values(json.class_counts).reduce((a, b) => a + b, 0);
+              nilaiClassSelect.innerHTML = `<option value="all">Semua Kelas (${totalAll} Siswa)</option>` +
+                json.classes.map(c => `<option value="${c}">${c} (${json.class_counts[c] || 0} Siswa)</option>`).join('');
+              nilaiClassSelect.dataset.renderedHash = countsHash;
+              if (json.classes.includes(currentVal) || currentVal === 'all') {
+                nilaiClassSelect.value = currentVal;
+              }
             }
           }
         }
@@ -6217,26 +6249,35 @@
         const classes = json.classes || [];
         const sessions = json.sessions || [];
 
-        const classSelect = document.getElementById('studentClassFilter');
-        if (classSelect) {
-          const currentVal = classSelect.value;
-          classSelect.innerHTML = '<option value="all">Semua Kelas</option>' + classes.map(c => `<option value="${c}">${c}</option>`).join('');
-          if (classes.includes(currentVal)) classSelect.value = currentVal;
-        }
+        // Hitung jumlah riil siswa per kelas & total
+        const classCounts = {};
+        masterStudentsList.forEach(s => {
+          const c = s.class_name || 'Tanpa Kelas';
+          classCounts[c] = (classCounts[c] || 0) + 1;
+        });
+        const totalAll = masterStudentsList.length;
 
-        const printClassSelect = document.getElementById('printFilterClass');
-        if (printClassSelect) {
-          printClassSelect.innerHTML = '<option value="all">Semua Kelas</option>' + classes.map(c => `<option value="${c}">${c}</option>`).join('');
-        }
+        const populateClassOptions = (elemId) => {
+          const el = document.getElementById(elemId);
+          if (!el) return;
+          const currentVal = el.value || 'all';
+          const optsHtml = `<option value="all">Semua Kelas (${totalAll} Siswa)</option>` +
+            classes.map(c => `<option value="${c}">${c} (${classCounts[c] || 0} Siswa)</option>`).join('');
+          el.innerHTML = optsHtml;
+          if (classes.includes(currentVal) || currentVal === 'all') {
+            el.value = currentVal;
+          }
+        };
+
+        populateClassOptions('filterClassSelect');
+        populateClassOptions('filterClassNilaiSelect');
+        populateClassOptions('studentClassFilter');
+        populateClassOptions('printFilterClass');
+        populateClassOptions('tabCardFilterClass');
 
         const printSessionSelect = document.getElementById('printFilterSession');
         if (printSessionSelect) {
           printSessionSelect.innerHTML = '<option value="all">Semua Sesi</option>' + sessions.map(s => `<option value="${s}">${s}</option>`).join('');
-        }
-
-        const tabClassSelect = document.getElementById('tabCardFilterClass');
-        if (tabClassSelect) {
-          tabClassSelect.innerHTML = '<option value="all">Semua Kelas</option>' + classes.map(c => `<option value="${c}">${c}</option>`).join('');
         }
 
         const tabSessionSelect = document.getElementById('tabCardFilterSession');

@@ -1489,6 +1489,13 @@ const server = http.createServer(async (req, res) => {
         start_time: s.start_time,
         class_target: s.class_target,
       })),
+      classes: Array.from(new Set(USERS.filter(u => u.role === 'student').map(u => u.class_name || 'Tanpa Kelas'))),
+      class_counts: USERS.filter(u => u.role === 'student').reduce((acc, u) => {
+        const c = u.class_name || 'Tanpa Kelas';
+        acc[c] = (acc[c] || 0) + 1;
+        return acc;
+      }, {}),
+      total_students: USERS.filter(u => u.role === 'student').length,
       server_time: new Date().toISOString(),
     });
   }

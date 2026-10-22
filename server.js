@@ -304,6 +304,7 @@ const DEFAULT_SCHEDULES = [
     shuffle_options: true,
     class_target: 'Semua Kelas',
     package_url: '/static/packages/exam_1_enc.json',
+    is_active: true,
   },
   {
     id: 2,
@@ -316,6 +317,7 @@ const DEFAULT_SCHEDULES = [
     shuffle_options: true,
     class_target: 'Semua Kelas',
     package_url: '/static/packages/exam_2_enc.json',
+    is_active: true,
   },
   {
     id: 3,
@@ -328,6 +330,72 @@ const DEFAULT_SCHEDULES = [
     shuffle_options: true,
     class_target: 'Semua Kelas',
     package_url: '/static/packages/exam_3_enc.json',
+    is_active: true,
+  },
+  {
+    id: 4,
+    title: 'Penilaian Harian Kimia Organik XII',
+    bank_name: 'Bank Senyawa Karbon & Benzena (5 Soal)',
+    start_time: 'Hari ini, 14:30 WIB',
+    duration_minutes: 90,
+    token_code: 'KIMIA26',
+    shuffle_questions: true,
+    shuffle_options: true,
+    class_target: 'XII IPA 1',
+    package_url: '/static/packages/exam_4_enc.json',
+    is_active: true,
+  },
+  {
+    id: 5,
+    title: 'Ujian Biologi Genetika & Mutasi XII',
+    bank_name: 'Bank Substansi Genetika (5 Soal)',
+    start_time: 'Besok, 07:30 WIB',
+    duration_minutes: 75,
+    token_code: 'BIOL2026',
+    shuffle_questions: true,
+    shuffle_options: true,
+    class_target: 'XII IPA 2',
+    package_url: '/static/packages/exam_5_enc.json',
+    is_active: false,
+  },
+  {
+    id: 6,
+    title: 'Asesmen Bahasa Inggris XII (Listening & Reading)',
+    bank_name: 'Bank Narrative & Discussion (5 Soal)',
+    start_time: 'Besok, 10:00 WIB',
+    duration_minutes: 90,
+    token_code: 'ENG2026',
+    shuffle_questions: true,
+    shuffle_options: true,
+    class_target: 'Semua Kelas',
+    package_url: '/static/packages/exam_6_enc.json',
+    is_active: true,
+  },
+  {
+    id: 7,
+    title: 'Ujian Sekolah Sejarah Indonesia XII',
+    bank_name: 'Bank Pergerakan Nasional & Kemerdekaan (5 Soal)',
+    start_time: 'Lusa, 08:00 WIB',
+    duration_minutes: 60,
+    token_code: 'SEJ2026',
+    shuffle_questions: true,
+    shuffle_options: true,
+    class_target: 'Semua Kelas',
+    package_url: '/static/packages/exam_7_enc.json',
+    is_active: false,
+  },
+  {
+    id: 8,
+    title: 'Tryout Mandiri UTBK TPS XII',
+    bank_name: 'Bank Penalaran Matematika & Literasi (5 Soal)',
+    start_time: 'Lusa, 13:00 WIB',
+    duration_minutes: 105,
+    token_code: 'TPS2026',
+    shuffle_questions: true,
+    shuffle_options: true,
+    class_target: 'Semua Kelas',
+    package_url: '/static/packages/exam_8_enc.json',
+    is_active: false,
   },
 ];
 
@@ -347,14 +415,18 @@ function loadSchedulesFromFile() {
       const raw = fs.readFileSync(SCHEDULES_FILE, 'utf8');
       const saved = JSON.parse(raw);
       if (Array.isArray(saved) && saved.length > 0) {
-        SCHEDULES = saved;
-        console.log(`[Jadwal Ujian] Memuat ${saved.length} jadwal dari schedules.json`);
+        SCHEDULES = saved.map(s => ({
+          ...s,
+          is_active: s.is_active !== undefined ? !!s.is_active : true,
+        }));
+        console.log(`[Jadwal Ujian] Memuat ${SCHEDULES.length} jadwal dari schedules.json`);
         return;
       }
     }
   } catch (e) {
     console.error('Failed to load schedules.json:', e.message);
   }
+  SCHEDULES = [...DEFAULT_SCHEDULES];
   saveSchedulesToFile();
 }
 
@@ -991,12 +1063,60 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
-  // GET /api/v1/cbt/schedules (Daftar Semua Jadwal Ujian untuk Dashboard)
+  // GET /api/v1/cbt/schedules (Daftar Semua Jadwal Ujian dengan Filter Status & Pencarian)
   if (pathname === '/api/v1/cbt/schedules' && req.method === 'GET') {
+    const statusFilter = parsedUrl.searchParams.get('status') || 'all';
+    const searchQuery = (parsedUrl.searchParams.get('search') || '').trim().toLowerCase();
+
+    let list = SCHEDULES;
+    if (statusFilter === 'active') {
+      list = list.filter(s => s.is_active !== false);
+    } else if (statusFilter === 'inactive') {
+      list = list.filter(s => s.is_active === false);
+    }
+
+    if (searchQuery) {
+      list = list.filter(s =>
+        (s.title && s.title.toLowerCase().includes(searchQuery)) ||
+        (s.token_code && s.token_code.toLowerCase().includes(searchQuery)) ||
+        (s.bank_name && s.bank_name.toLowerCase().includes(searchQuery)) ||
+        (s.class_target && s.class_target.toLowerCase().includes(searchQuery))
+      );
+    }
+
+    const counts = {
+      all: SCHEDULES.length,
+      active: SCHEDULES.filter(s => s.is_active !== false).length,
+      inactive: SCHEDULES.filter(s => s.is_active === false).length,
+    };
+
     return sendJSON(200, {
       status: 'success',
-      data: SCHEDULES,
-      total: SCHEDULES.length,
+      data: list,
+      total: list.length,
+      counts: counts,
+    });
+  }
+
+  // POST /api/v1/cbt/schedules/:id/toggle-status (Ubah Status Jadwal Aktif / Tidak Aktif)
+  if (pathname.includes('/api/v1/cbt/schedules/') && pathname.endsWith('/toggle-status') && req.method === 'POST') {
+    const parts = pathname.split('/');
+    const schId = parseInt(parts[parts.length - 2], 10);
+    const sch = SCHEDULES.find(s => s.id === schId);
+    if (!sch) {
+      return sendJSON(404, { status: 'error', message: 'Jadwal ujian tidak ditemukan' });
+    }
+    const body = await parseBody(req);
+    if (body.is_active !== undefined) {
+      sch.is_active = !!body.is_active;
+    } else {
+      sch.is_active = (sch.is_active === false) ? true : false;
+    }
+    saveSchedulesToFile();
+    return sendJSON(200, {
+      status: 'success',
+      message: `Status jadwal "${sch.title}" berhasil diubah menjadi ${sch.is_active ? 'AKTIF' : 'TIDAK AKTIF'}!`,
+      data: sch,
     });
   }
 
@@ -1042,6 +1162,7 @@ const server = http.createServer(async (req, res) => {
     if (body.token_code) sch.token_code = body.token_code.trim().toUpperCase();
     if (body.shuffle_questions !== undefined) sch.shuffle_questions = !!body.shuffle_questions;
     if (body.shuffle_options !== undefined) sch.shuffle_options = !!body.shuffle_options;
+    if (body.is_active !== undefined) sch.is_active = !!body.is_active;
 
     compileAndEncryptPackage(schId);
     saveSchedulesToFile();
@@ -1109,6 +1230,15 @@ const server = http.createServer(async (req, res) => {
     const schId = parseInt(parts[5], 10) || 1;
     const curSch = SCHEDULES.find(s => s.id === schId) || SCHEDULES[0];
     const sessionKey = `${curSch.id}_${uid}`;
+
+    // Cek apakah jadwal ujian sedang aktif
+    if (curSch.is_active === false) {
+      return sendJSON(403, {
+        status: 'error',
+        code: 'SCHEDULE_INACTIVE',
+        message: `Jadwal ujian "${curSch.title}" saat ini berstatus TIDAK AKTIF atau belum dibuka oleh proktor.`,
+      });
+    }
 
     // Cek apakah siswa sudah mengumpulkan lembar jawaban
     if (studentSessions[sessionKey] && studentSessions[sessionKey].status === 'submitted') {
@@ -1282,6 +1412,7 @@ const server = http.createServer(async (req, res) => {
         duration_minutes: curSchedule.duration_minutes,
         token_code: curSchedule.token_code,
         start_time: curSchedule.start_time,
+        is_active: curSchedule.is_active !== false,
       },
       schedules: SCHEDULES.map((s) => ({
         id: s.id,
@@ -1289,6 +1420,7 @@ const server = http.createServer(async (req, res) => {
         token_code: s.token_code,
         duration_minutes: s.duration_minutes,
         bank_name: s.bank_name,
+        is_active: s.is_active !== false,
       })),
       server_time: new Date().toISOString(),
     });

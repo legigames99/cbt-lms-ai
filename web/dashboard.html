@@ -592,12 +592,26 @@
           </button>
         </div>
 
+        <!-- Toolbar Pencarian & Filter Status Jadwal Ujian -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900 border border-slate-800 rounded-2xl p-3 px-4 shadow-lg">
+          <div class="relative flex-1 max-w-md">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="schTableSearch" oninput="handleScheduleTableSearch(this.value)" placeholder="Cari nama ujian, mata pelajaran, kode token..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:border-indigo-500">
+          </div>
+          <div class="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-semibold self-start sm:self-auto">
+            <button onclick="setScheduleTableStatusFilter('all')" id="btnFilterSch_all" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white transition">Semua (<span id="schCountTab_all">0</span>)</button>
+            <button onclick="setScheduleTableStatusFilter('active')" id="btnFilterSch_active" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">🟢 Aktif (<span id="schCountTab_active">0</span>)</button>
+            <button onclick="setScheduleTableStatusFilter('inactive')" id="btnFilterSch_inactive" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">⚪ Tidak Aktif (<span id="schCountTab_inactive">0</span>)</button>
+          </div>
+        </div>
+
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl overflow-x-auto">
           <table class="w-full text-xs text-left">
             <thead class="text-slate-400 bg-slate-950 uppercase text-[10px] tracking-wider">
               <tr>
                 <th class="px-4 py-3 rounded-l-lg">ID</th>
                 <th class="px-4 py-3">Nama Ujian</th>
+                <th class="px-4 py-3">Status</th>
                 <th class="px-4 py-3">Bank Soal Terpilih</th>
                 <th class="px-4 py-3">Waktu Mulai</th>
                 <th class="px-4 py-3">Durasi</th>
@@ -627,17 +641,14 @@
             <p class="text-xs text-slate-400">Pantau status pengerjaan, jawaban tersinkronisasi, dan deteksi perpindahan tab browser siswa.</p>
           </div>
           <div class="flex items-center gap-3 flex-wrap">
-            <div class="flex items-center gap-2 bg-slate-950/60 border border-indigo-500/40 rounded-xl px-3 py-1">
-              <span class="text-xs text-indigo-300 font-semibold flex items-center gap-1.5">
-                <i class="fa-solid fa-calendar-check text-indigo-400"></i>
-                <span class="hidden md:inline">Pilih</span> Jadwal:
+            <input type="hidden" id="proctorScheduleFilter" value="1">
+            <button onclick="openProctorSchedulePicker()" class="px-3.5 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-200 border border-indigo-500/40 text-xs font-bold transition flex items-center gap-2 shadow-sm" title="Klik untuk membuka Halaman Pemilihan Jadwal Ujian">
+              <i class="fa-solid fa-calendar-check text-indigo-400"></i>
+              <span id="proctorCurrentScheduleLabel" class="max-w-[200px] sm:max-w-xs truncate">1. UAS Fisika Peminatan XII</span>
+              <span class="px-2 py-0.5 rounded-lg bg-indigo-500/30 text-[10px] text-indigo-300 font-bold flex items-center gap-1">
+                Ganti <i class="fa-solid fa-chevron-down text-[9px]"></i>
               </span>
-              <select id="proctorScheduleFilter" onchange="handleProctorScheduleChange(this.value)" class="bg-transparent text-xs text-white font-bold py-1 focus:outline-none cursor-pointer">
-                <option value="1">1. UAS Fisika Peminatan XII (FISIKA26)</option>
-                <option value="2">2. UTS Matematika Wajib XII (MTK2026)</option>
-                <option value="3">3. Simulasi CBT Bahasa Indonesia (BINDO12)</option>
-              </select>
-            </div>
+            </button>
             <div class="flex items-center gap-2">
               <span class="text-xs text-slate-400">Filter Kelas:</span>
               <select id="filterClassSelect" onchange="lastProctorDataHash=''; fetchProctorSessions();" class="bg-slate-900 border border-slate-800 text-xs text-white rounded-xl px-3 py-1.5 focus:outline-none">
@@ -667,9 +678,11 @@
               <div class="flex items-center gap-2 flex-wrap">
                 <span id="proctorActiveScheduleTitle" class="font-bold text-white text-sm">UAS Fisika Peminatan XII</span>
                 <span id="proctorActiveScheduleTokenBadge" class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono text-[10px] font-bold">Token: FISIKA26</span>
-                <span id="proctorActiveScheduleStatusBadge" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-medium flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Sedang Dipantau
-                </span>
+                <button id="proctorActiveScheduleStatusBtn" onclick="toggleActiveScheduleStatus()" class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1.5 transition hover:bg-emerald-500/30 cursor-pointer" title="Klik untuk mengubah status jadwal (Aktif / Tidak Aktif)">
+                  <span id="proctorActiveScheduleStatusDot" class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span id="proctorActiveScheduleStatusText">Aktif (Sedang Berjalan)</span>
+                  <i class="fa-solid fa-power-off text-[10px] text-emerald-400 ml-1"></i>
+                </button>
               </div>
               <p class="text-slate-400 text-[11px] mt-0.5">
                 <span id="proctorActiveScheduleBank">Bank Soal: Bank Termodinamika & Kalor (5 Butir Soal)</span> •
@@ -678,10 +691,13 @@
               </p>
             </div>
           </div>
-          <div class="flex items-center gap-2 shrink-0">
-            <span class="text-slate-400 text-[11px]">Sesi Ujian terisolasi per jadwal:</span>
-            <span class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-[11px] font-mono">
-              <i class="fa-solid fa-lock text-emerald-400 mr-1"></i>Jadwal ID: <span id="proctorActiveScheduleId">1</span>
+          <div class="flex items-center gap-2 shrink-0 flex-wrap">
+            <button onclick="openProctorSchedulePicker()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-indigo-600/30">
+              <i class="fa-solid fa-arrow-right-arrow-left"></i>
+              <span>Pilih / Ganti Jadwal</span>
+            </button>
+            <span class="px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-[11px] font-mono">
+              <i class="fa-solid fa-lock text-emerald-400 mr-1"></i>ID: <span id="proctorActiveScheduleId">1</span>
             </span>
           </div>
         </div>
@@ -1987,6 +2003,10 @@
             <input type="checkbox" id="schShuffleOpt" checked class="rounded border-slate-800 bg-slate-950 text-indigo-600 focus:ring-0">
             <span>Acak urutan pilihan opsi jawaban A, B, C, D, E</span>
           </label>
+          <label class="flex items-center gap-2 text-slate-300 cursor-pointer pt-1">
+            <input type="checkbox" id="schIsActive" checked class="rounded border-slate-800 bg-slate-950 text-emerald-500 focus:ring-0">
+            <span class="font-bold text-emerald-400">Jadwal Langsung Berstatus Aktif (Dapat diakses siswa)</span>
+          </label>
         </div>
       </div>
 
@@ -2043,6 +2063,10 @@
             <input type="checkbox" id="editSchShuffleOpt" checked class="rounded border-slate-800 bg-slate-950 text-indigo-600 focus:ring-0">
             <span>Acak urutan pilihan opsi jawaban A, B, C, D, E</span>
           </label>
+          <label class="flex items-center gap-2 text-slate-300 cursor-pointer pt-1">
+            <input type="checkbox" id="editSchIsActive" checked class="rounded border-slate-800 bg-slate-950 text-emerald-500 focus:ring-0">
+            <span class="font-bold text-emerald-400">Jadwal Berstatus Aktif (Dapat diakses siswa)</span>
+          </label>
         </div>
       </div>
 
@@ -2052,6 +2076,60 @@
           <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan & Kompilasi Ulang
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL KHUSUS: PUSAT PEMILIHAN JADWAL UJIAN (PROKTOR HUB) ==================== -->
+  <div id="modalSelectScheduleProctor" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div class="bg-slate-900 border border-indigo-500/30 rounded-3xl max-w-4xl w-full p-6 shadow-2xl space-y-5 text-xs text-slate-300 flex flex-col max-h-[90vh]">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <div>
+            <h4 class="text-base font-bold text-white flex items-center gap-2">
+              Pusat Pemilihan & Status Jadwal Ujian
+            </h4>
+            <p class="text-xs text-slate-400">Pilih jadwal ujian untuk dipantau secara realtime atau aktifkan/nonaktifkan sesi ujian dengan cepat.</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modalSelectScheduleProctor')" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Toolbar: Pencarian Realtime & Filter Kategori -->
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
+        <div class="relative flex-1">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input type="text" id="proctorHubSearchInput" oninput="handleProctorHubSearch(this.value)" placeholder="Cari nama ujian, mata pelajaran, kode token (misal: FISIKA26, KIMIA26)..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:border-indigo-500">
+        </div>
+        <div class="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-semibold self-start sm:self-auto shrink-0">
+          <button onclick="setProctorHubFilter('all')" id="btnHubFilter_all" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white transition">Semua (<span id="hubCount_all">0</span>)</button>
+          <button onclick="setProctorHubFilter('active')" id="btnHubFilter_active" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">🟢 Aktif (<span id="hubCount_active">0</span>)</button>
+          <button onclick="setProctorHubFilter('inactive')" id="btnHubFilter_inactive" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">⚪ Tidak Aktif (<span id="hubCount_inactive">0</span>)</button>
+        </div>
+      </div>
+
+      <!-- Daftar Jadwal Cards (Scrollable) -->
+      <div id="proctorHubCardsContainer" class="flex-1 overflow-y-auto pr-1 space-y-3 min-h-[300px]">
+        <!-- Rendered dynamically by renderProctorHubSchedules() -->
+      </div>
+
+      <!-- Footer Info -->
+      <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400 shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>Jadwal Aktif dapat dikerjakan siswa & dipantau proktor.</span>
+        </div>
+        <button onclick="closeModal('modalSelectScheduleProctor')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium transition">
+          Tutup
+        </button>
+      </div>
+
     </div>
   </div>
 
@@ -2786,6 +2864,14 @@
     let currentSchedules = [];
     let currentEditingScheduleId = 1;
 
+    // Filter & Search State untuk Tab 3 (Halaman Manajemen Jadwal)
+    let scheduleTableSearchQuery = '';
+    let scheduleTableStatusFilter = 'all'; // 'all', 'active', 'inactive'
+
+    // Filter & Search State untuk Modal Halaman Pemilihan Jadwal (Proktor Hub)
+    let proctorHubSearchQuery = '';
+    let proctorHubStatusFilter = 'all'; // 'all', 'active', 'inactive'
+
     async function fetchScheduleList() {
       try {
         const res = await fetch('/api/v1/cbt/schedules');
@@ -2795,28 +2881,98 @@
           currentSchedules = json.data;
           renderSchedulesTable(json.data);
           updateProctorScheduleDropdown(json.data);
+          if (typeof renderProctorHubSchedules === 'function') {
+            renderProctorHubSchedules();
+          }
         }
       } catch (e) {
         console.warn('Gagal memuat jadwal ujian:', e);
       }
     }
 
+    // ==============================================================
+    // TAB 3: RENDER TABEL MANAJEMEN JADWAL UJIAN
+    // ==============================================================
+    window.handleScheduleTableSearch = function(val) {
+      scheduleTableSearchQuery = (val || '').trim().toLowerCase();
+      renderSchedulesTable(currentSchedules);
+    };
+
+    window.setScheduleTableStatusFilter = function(filter) {
+      scheduleTableStatusFilter = filter;
+      const btnAll = document.getElementById('btnFilterSch_all');
+      const btnAct = document.getElementById('btnFilterSch_active');
+      const btnInact = document.getElementById('btnFilterSch_inactive');
+
+      [btnAll, btnAct, btnInact].forEach(b => {
+        if (b) {
+          b.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
+        }
+      });
+
+      if (filter === 'all' && btnAll) btnAll.className = 'px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-bold transition';
+      if (filter === 'active' && btnAct) btnAct.className = 'px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold transition';
+      if (filter === 'inactive' && btnInact) btnInact.className = 'px-3 py-1.5 rounded-lg bg-slate-700 text-white font-bold transition';
+
+      renderSchedulesTable(currentSchedules);
+    };
+
     function renderSchedulesTable(schedules) {
       const tbody = document.getElementById('schedulesTableBody');
       if (!tbody) return;
 
-      if (!schedules || schedules.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-500">Belum ada jadwal ujian. Silakan klik "Tambah Jadwal Ujian".</td></tr>`;
+      const totalAll = schedules.length;
+      const totalActive = schedules.filter(s => s.is_active !== false).length;
+      const totalInactive = schedules.filter(s => s.is_active === false).length;
+
+      const cAll = document.getElementById('schCountTab_all');
+      const cAct = document.getElementById('schCountTab_active');
+      const cInact = document.getElementById('schCountTab_inactive');
+      if (cAll) cAll.innerText = totalAll;
+      if (cAct) cAct.innerText = totalActive;
+      if (cInact) cInact.innerText = totalInactive;
+
+      let filtered = schedules;
+      if (scheduleTableStatusFilter === 'active') {
+        filtered = filtered.filter(s => s.is_active !== false);
+      } else if (scheduleTableStatusFilter === 'inactive') {
+        filtered = filtered.filter(s => s.is_active === false);
+      }
+
+      if (scheduleTableSearchQuery) {
+        filtered = filtered.filter(s =>
+          (s.title && s.title.toLowerCase().includes(scheduleTableSearchQuery)) ||
+          (s.token_code && s.token_code.toLowerCase().includes(scheduleTableSearchQuery)) ||
+          (s.bank_name && s.bank_name.toLowerCase().includes(scheduleTableSearchQuery)) ||
+          (s.class_target && s.class_target.toLowerCase().includes(scheduleTableSearchQuery))
+        );
+      }
+
+      if (!filtered || filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-slate-500 font-medium">Tidak ada jadwal ujian yang sesuai dengan pencarian atau filter.</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = schedules.map(sch => {
+      tbody.innerHTML = filtered.map(sch => {
         const encFile = sch.package_file || `exam_${sch.id}_enc.json`;
+        const isActive = sch.is_active !== false;
+
+        const statusBadgeHtml = `
+          <button onclick="handleToggleScheduleActive(${sch.id}, event)" class="px-2.5 py-1 rounded-full ${isActive ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30' : 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700'} text-[11px] font-bold flex items-center gap-1.5 transition cursor-pointer" title="Klik untuk mengubah status aktif/tidak aktif">
+            <span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}"></span>
+            <span>${isActive ? 'Aktif' : 'Tidak Aktif'}</span>
+            <i class="fa-solid ${isActive ? 'fa-toggle-on text-emerald-400 text-sm' : 'fa-toggle-off text-slate-500 text-sm'} ml-0.5"></i>
+          </button>
+        `;
+
         return `
           <tr class="hover:bg-slate-800/40 transition">
             <td class="px-4 py-3.5 font-mono text-slate-400 font-bold">#${sch.id}</td>
             <td class="px-4 py-3.5 font-bold text-white">
               <span id="schRowTitle_${sch.id}">${sch.title}</span>
+            </td>
+            <td class="px-4 py-3.5">
+              ${statusBadgeHtml}
             </td>
             <td class="px-4 py-3.5 text-slate-400">
               <span id="schRowBank_${sch.id}">${sch.bank_name || '-'}</span>
@@ -2856,27 +3012,192 @@
       }).join('');
     }
 
+    // ==============================================================
+    // PROKTOR HUB: MODAL / HALAMAN PEMILIHAN JADWAL UJIAN
+    // ==============================================================
+    window.openProctorSchedulePicker = function() {
+      proctorHubSearchQuery = '';
+      const inp = document.getElementById('proctorHubSearchInput');
+      if (inp) inp.value = '';
+      renderProctorHubSchedules();
+      openModal('modalSelectScheduleProctor');
+      setTimeout(() => { if (inp) inp.focus(); }, 150);
+    };
+
+    window.handleProctorHubSearch = function(val) {
+      proctorHubSearchQuery = (val || '').trim().toLowerCase();
+      renderProctorHubSchedules();
+    };
+
+    window.setProctorHubFilter = function(filter) {
+      proctorHubStatusFilter = filter;
+      const btnAll = document.getElementById('btnHubFilter_all');
+      const btnAct = document.getElementById('btnHubFilter_active');
+      const btnInact = document.getElementById('btnHubFilter_inactive');
+
+      [btnAll, btnAct, btnInact].forEach(b => {
+        if (b) {
+          b.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
+        }
+      });
+
+      if (filter === 'all' && btnAll) btnAll.className = 'px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-bold transition';
+      if (filter === 'active' && btnAct) btnAct.className = 'px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold transition';
+      if (filter === 'inactive' && btnInact) btnInact.className = 'px-3 py-1.5 rounded-lg bg-slate-700 text-white font-bold transition';
+
+      renderProctorHubSchedules();
+    };
+
+    window.renderProctorHubSchedules = function() {
+      const container = document.getElementById('proctorHubCardsContainer');
+      if (!container) return;
+
+      const totalAll = currentSchedules.length;
+      const totalActive = currentSchedules.filter(s => s.is_active !== false).length;
+      const totalInactive = currentSchedules.filter(s => s.is_active === false).length;
+
+      const cAll = document.getElementById('hubCount_all');
+      const cAct = document.getElementById('hubCount_active');
+      const cInact = document.getElementById('hubCount_inactive');
+      if (cAll) cAll.innerText = totalAll;
+      if (cAct) cAct.innerText = totalActive;
+      if (cInact) cInact.innerText = totalInactive;
+
+      let filtered = currentSchedules;
+      if (proctorHubStatusFilter === 'active') {
+        filtered = filtered.filter(s => s.is_active !== false);
+      } else if (proctorHubStatusFilter === 'inactive') {
+        filtered = filtered.filter(s => s.is_active === false);
+      }
+
+      if (proctorHubSearchQuery) {
+        filtered = filtered.filter(s =>
+          (s.title && s.title.toLowerCase().includes(proctorHubSearchQuery)) ||
+          (s.token_code && s.token_code.toLowerCase().includes(proctorHubSearchQuery)) ||
+          (s.bank_name && s.bank_name.toLowerCase().includes(proctorHubSearchQuery)) ||
+          (s.class_target && s.class_target.toLowerCase().includes(proctorHubSearchQuery))
+        );
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center bg-slate-950/40 border border-dashed border-slate-800 rounded-2xl space-y-2">
+            <i class="fa-solid fa-calendar-xmark text-3xl text-slate-600"></i>
+            <p class="text-sm font-semibold text-slate-300">Tidak ada jadwal ujian yang ditemukan</p>
+            <p class="text-xs text-slate-500">Coba kata kunci pencarian lain atau pilih tab filter "Semua".</p>
+          </div>
+        `;
+        return;
+      }
+
+      const currentMonitoredId = getProctorSelectedScheduleId();
+
+      container.innerHTML = filtered.map(sch => {
+        const isActive = sch.is_active !== false;
+        const isCurrent = Number(sch.id) === Number(currentMonitoredId);
+
+        return `
+          <div class="bg-slate-950/70 border ${isCurrent ? 'border-indigo-500/60 ring-1 ring-indigo-500/30' : 'border-slate-800 hover:border-slate-700'} rounded-2xl p-4 transition flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl ${isCurrent ? 'bg-indigo-600 text-white' : 'bg-slate-900 border border-slate-800 text-slate-300'} flex items-center justify-center font-mono font-bold text-sm shrink-0">
+                #${sch.id}
+              </div>
+              <div class="space-y-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-bold text-white text-sm">${sch.title}</span>
+                  <span class="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono text-[10px] font-bold">
+                    Token: ${sch.token_code}
+                  </span>
+                  ${isActive ? `
+                    <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Aktif
+                    </span>
+                  ` : `
+                    <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-[10px] font-medium">
+                      Tidak Aktif
+                    </span>
+                  `}
+                  ${isCurrent ? `
+                    <span class="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[10px] font-bold">
+                      <i class="fa-solid fa-eye text-[9px] mr-1"></i> Sedang Dipantau
+                    </span>
+                  ` : ''}
+                </div>
+                <p class="text-slate-400 text-[11px]">
+                  <i class="fa-solid fa-book-bookmark text-indigo-400 mr-1"></i>${sch.bank_name || '-'} •
+                  <i class="fa-regular fa-clock text-amber-400 ml-1 mr-1"></i>${sch.duration_minutes} Menit •
+                  <i class="fa-solid fa-users text-sky-400 ml-1 mr-1"></i>${sch.class_target || 'Semua Kelas'}
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2.5 shrink-0 flex-wrap justify-end">
+              <!-- Switch Status Aktif / Tidak Aktif -->
+              <button onclick="handleToggleScheduleActive(${sch.id}, event)" class="px-3 py-1.5 rounded-xl ${isActive ? 'bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40' : 'bg-slate-800 hover:bg-slate-700 text-slate-400 border border-slate-700'} text-xs font-semibold transition flex items-center gap-2" title="Klik untuk mengubah status aktif / nonaktif">
+                <i class="fa-solid ${isActive ? 'fa-toggle-on text-emerald-400 text-base' : 'fa-toggle-off text-slate-500 text-base'}"></i>
+                <span>${isActive ? 'Status: Aktif' : 'Status: Nonaktif'}</span>
+              </button>
+
+              <!-- Tombol Pilih & Pantau -->
+              <button onclick="selectScheduleFromHub(${sch.id})" class="px-4 py-2 rounded-xl ${isCurrent ? 'bg-indigo-600 text-white font-bold ring-2 ring-indigo-400 shadow-lg shadow-indigo-600/30' : 'bg-indigo-600/80 hover:bg-indigo-600 text-white font-bold'} text-xs transition flex items-center gap-2">
+                <i class="fa-solid fa-desktop"></i>
+                <span>${isCurrent ? 'Kembali Memantau' : 'Pantau Ujian Ini &rarr;'}</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    };
+
+    window.selectScheduleFromHub = function(scheduleId) {
+      closeModal('modalSelectScheduleProctor');
+      switchToProctorSchedule(scheduleId);
+    };
+
+    // ==============================================================
+    // TOGGLE STATUS JADWAL UJIAN (AKTIF / TIDAK AKTIF)
+    // ==============================================================
+    window.handleToggleScheduleActive = async function(scheduleId, event) {
+      if (event) event.stopPropagation();
+      try {
+        const res = await fetch(`/api/v1/cbt/schedules/${scheduleId}/toggle-status`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+
+        // Update local state and UI
+        await fetchScheduleList();
+        renderProctorHubSchedules();
+        lastProctorDataHash = '';
+        await fetchProctorSessions();
+      } catch (err) {
+        alert('Gagal mengubah status jadwal: ' + err.message);
+      }
+    };
+
+    window.toggleActiveScheduleStatus = async function() {
+      const currentId = getProctorSelectedScheduleId();
+      await handleToggleScheduleActive(currentId);
+    };
+
     function updateProctorScheduleDropdown(schedules) {
       if (!Array.isArray(schedules)) return;
 
       const pSelect = document.getElementById('proctorScheduleFilter');
       const nSelect = document.getElementById('nilaiScheduleFilter');
 
-      const buildOpts = () => schedules.map(sch => `<option value="${sch.id}">Jadwal #${sch.id}: ${sch.title} (${sch.token_code})</option>`).join('');
-
       if (pSelect) {
         const curP = pSelect.value;
-        pSelect.innerHTML = buildOpts();
-        if (schedules.some(s => String(s.id) === String(curP))) {
-          pSelect.value = curP;
-        } else if (schedules.length > 0) {
+        if (!schedules.some(s => String(s.id) === String(curP)) && schedules.length > 0) {
           pSelect.value = String(schedules[0].id);
         }
       }
 
       if (nSelect) {
         const curN = nSelect.value;
-        nSelect.innerHTML = buildOpts();
+        nSelect.innerHTML = schedules.map(sch => `<option value="${sch.id}">Jadwal #${sch.id}: ${sch.title} (${sch.token_code})${sch.is_active === false ? ' [TIDAK AKTIF]' : ''}</option>`).join('');
         if (schedules.some(s => String(s.id) === String(curN))) {
           nSelect.value = curN;
         } else if (schedules.length > 0) {
@@ -2929,6 +3250,7 @@
       const tokenCode = (document.getElementById('schToken')?.value || 'CBT2026').trim().toUpperCase();
       const shuffleQ = document.getElementById('schShuffleQ')?.checked ?? true;
       const shuffleOpt = document.getElementById('schShuffleOpt')?.checked ?? true;
+      const isActive = document.getElementById('schIsActive')?.checked ?? true;
 
       try {
         const res = await fetch('/api/v1/cbt/schedules/create', {
@@ -2942,6 +3264,7 @@
             token_code: tokenCode,
             shuffle_questions: shuffleQ,
             shuffle_options: shuffleOpt,
+            is_active: isActive,
           }),
         });
         const json = await res.json();
@@ -2970,6 +3293,8 @@
             document.getElementById('editSchToken').value = sch.token_code;
             document.getElementById('editSchShuffleQ').checked = !!sch.shuffle_questions;
             document.getElementById('editSchShuffleOpt').checked = !!sch.shuffle_options;
+            const cbActive = document.getElementById('editSchIsActive');
+            if (cbActive) cbActive.checked = sch.is_active !== false;
           }
         }
       } catch (e) {}
@@ -2985,6 +3310,7 @@
       const tokenCode = document.getElementById('editSchToken').value.trim().toUpperCase();
       const shuffleQ = document.getElementById('editSchShuffleQ').checked;
       const shuffleOpt = document.getElementById('editSchShuffleOpt').checked;
+      const isActive = document.getElementById('editSchIsActive')?.checked ?? true;
 
       try {
         const res = await fetch(`/api/v1/cbt/schedules/${scheduleId}/update`, {
@@ -2998,6 +3324,7 @@
             token_code: tokenCode,
             shuffle_questions: shuffleQ,
             shuffle_options: shuffleOpt,
+            is_active: isActive,
           }),
         });
 
@@ -3097,6 +3424,10 @@
           const bannerDuration = document.getElementById('proctorActiveScheduleDuration');
           const bannerPkg = document.getElementById('proctorActiveSchedulePackage');
           const bannerId = document.getElementById('proctorActiveScheduleId');
+          const labelToolbar = document.getElementById('proctorCurrentScheduleLabel');
+          const statusBtn = document.getElementById('proctorActiveScheduleStatusBtn');
+          const statusDot = document.getElementById('proctorActiveScheduleStatusDot');
+          const statusText = document.getElementById('proctorActiveScheduleStatusText');
 
           if (bannerTitle) bannerTitle.innerText = sch.title;
           if (bannerToken) bannerToken.innerText = `Token: ${sch.token_code}`;
@@ -3104,14 +3435,19 @@
           if (bannerDuration) bannerDuration.innerText = `Durasi: ${sch.duration_minutes} Menit`;
           if (bannerPkg) bannerPkg.innerText = `/static/packages/exam_${sch.id}_enc.json`;
           if (bannerId) bannerId.innerText = sch.id;
-        }
+          if (labelToolbar) labelToolbar.innerText = `${sch.id}. ${sch.title} (${sch.token_code})`;
 
-        // Sync dropdown list if available
-        if (json.schedules && Array.isArray(json.schedules)) {
-          const schedSelect = document.getElementById('proctorScheduleFilter');
-          if (schedSelect && schedSelect.options.length !== json.schedules.length) {
-            updateProctorScheduleDropdown(json.schedules);
-            if (schedSelect) schedSelect.value = String(selectedScheduleId);
+          const isActive = sch.is_active !== false;
+          if (statusBtn) {
+            if (isActive) {
+              statusBtn.className = "px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1.5 transition hover:bg-emerald-500/30 cursor-pointer";
+              if (statusDot) statusDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse";
+              if (statusText) statusText.innerText = "Aktif (Sedang Berjalan)";
+            } else {
+              statusBtn.className = "px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-[10px] font-bold flex items-center gap-1.5 transition hover:bg-slate-700 cursor-pointer";
+              if (statusDot) statusDot.className = "w-1.5 h-1.5 rounded-full bg-slate-500";
+              if (statusText) statusText.innerText = "Tidak Aktif (Klik Aktifkan)";
+            }
           }
         }
 

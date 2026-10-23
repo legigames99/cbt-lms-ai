@@ -445,10 +445,11 @@ function sanitizeQuestionText(text) {
 
 function callGoogleGeminiAPI({ apiKey, model, basis_type = 'materi', basis_text = '', topic = '', question_type = 'all', cog_level = 'mixed', count = 5, custom_prompt = '', existing_stems = [] }) {
   return new Promise((resolve, reject) => {
-    let endpointModel = 'gemini-1.5-flash';
-    if (model.includes('flash-lite') || model.includes('3.5-flash-lite')) endpointModel = 'gemini-1.5-flash-8b';
+    let endpointModel = 'gemini-2.5-flash';
+    if (model.includes('flash-lite') || model.includes('3.5-flash-lite')) endpointModel = 'gemini-2.0-flash-lite';
     else if (model.includes('pro')) endpointModel = 'gemini-1.5-pro';
-    else endpointModel = 'gemini-1.5-flash';
+    else if (model.includes('1.5-flash')) endpointModel = 'gemini-1.5-flash';
+    else endpointModel = 'gemini-2.5-flash';
 
     let basisInstruction = '';
     if (basis_type === 'cp') {

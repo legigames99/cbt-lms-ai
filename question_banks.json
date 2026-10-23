@@ -1946,5 +1946,14 @@
     "target_class": "XII IPA 1",
     "description": "",
     "questions": []
+  },
+  {
+    "id": 6,
+    "subject": "Jaringan Komputer & Telekomunikasi",
+    "title": "ASJ",
+    "teacher": "Drs. Budi Pratama, M.Pd.",
+    "target_class": "Semua Kelas",
+    "description": "",
+    "questions": []
   }
 ]

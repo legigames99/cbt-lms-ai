@@ -37,6 +37,12 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
 
+  <!-- Decoy inputs to prevent browser password manager (Chrome/Edge) from autofilling search inputs -->
+  <div style="position:fixed; top:-9999px; left:-9999px; width:0; height:0; opacity:0; pointer-events:none; overflow:hidden;" aria-hidden="true" tabindex="-1">
+    <input type="text" name="decoy_username_prevent_autofill" tabindex="-1" autocomplete="username">
+    <input type="password" name="decoy_password_prevent_autofill" tabindex="-1" autocomplete="current-password">
+  </div>
+
   <!-- ==================== TOP NAVIGATION BAR ==================== -->
   <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-6 py-3 no-print">
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -193,7 +199,7 @@
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 no-print">
       <div class="relative flex-1">
         <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-        <input type="text" id="filterSearch" oninput="applyFilters()" placeholder="Cari teks soal, materi stimulus, atau kata kunci..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:border-indigo-500 placeholder-slate-500">
+        <input type="text" id="filterSearch" name="search_filter_soal" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" oninput="applyFilters()" placeholder="Cari teks soal, materi stimulus, atau kata kunci..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:border-indigo-500 placeholder-slate-500">
       </div>
       <div class="flex items-center gap-2 flex-wrap">
         <select id="filterType" onchange="applyFilters()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
@@ -697,7 +703,7 @@
             <label class="block font-semibold text-slate-300 text-[11px]">Masukkan Google Gemini API Key Anda (BYOK):</label>
             <div class="flex items-center gap-2">
               <div class="relative flex-1">
-                <input type="password" id="aiByokKeyInput" placeholder="Tempelkan API Key (AIzaSy...)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-indigo-500">
+                <input type="password" id="aiByokKeyInput" name="cbt_byok_api_key" autocomplete="new-password" data-lpignore="true" data-form-type="other" placeholder="Tempelkan API Key (AIzaSy...)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-indigo-500">
                 <button type="button" onclick="toggleByokKeyVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white" title="Lihat/Sembunyikan API Key">
                   <i id="btnByokEyeIcon" class="fa-regular fa-eye"></i>
                 </button>
@@ -777,11 +783,32 @@
       if (el) el.classList.add('hidden');
     }
 
-    // Initialize Page
+    // Initialize Page & Defuse Browser Autofill Trap
+    function purgeAutofill() {
+      const el = document.getElementById('filterSearch');
+      if (el && (el.value === 'siswa_1001' || el.value === 'siswa123' || el.value.toLowerCase().includes('siswa_1001'))) {
+        el.value = '';
+        if (typeof applyFilters === 'function') applyFilters();
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
+      purgeAutofill();
       await loadAllBanks();
       await loadActiveBank(activeBankId);
+      purgeAutofill();
+      setTimeout(purgeAutofill, 80);
+      setTimeout(purgeAutofill, 300);
+      setTimeout(purgeAutofill, 800);
+      setTimeout(purgeAutofill, 1500);
     });
+
+    window.addEventListener('load', () => {
+      purgeAutofill();
+      setTimeout(purgeAutofill, 100);
+      setTimeout(purgeAutofill, 500);
+    });
+    window.addEventListener('focus', purgeAutofill);
 
     // 1. Fetch All Banks for header switcher
     async function loadAllBanks() {
@@ -1107,7 +1134,11 @@
     // 6. Filtering & Searching
     function applyFilters() {
       if (!currentBankData || !currentBankData.questions) return;
-      const search = document.getElementById('filterSearch').value.toLowerCase().trim();
+      const searchInput = document.getElementById('filterSearch');
+      if (searchInput && (searchInput.value === 'siswa_1001' || searchInput.value === 'siswa123' || searchInput.value.toLowerCase().includes('siswa_1001'))) {
+        searchInput.value = '';
+      }
+      const search = searchInput ? searchInput.value.toLowerCase().trim() : '';
       const type = document.getElementById('filterType').value;
       const cog = document.getElementById('filterCog').value;
 

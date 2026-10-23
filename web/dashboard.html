@@ -226,6 +226,12 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex font-sans">
 
+  <!-- Decoy inputs to prevent browser password manager (Chrome/Edge) from autofilling search inputs -->
+  <div style="position:fixed; top:-9999px; left:-9999px; width:0; height:0; opacity:0; pointer-events:none; overflow:hidden;" aria-hidden="true" tabindex="-1">
+    <input type="text" name="decoy_username_prevent_autofill" tabindex="-1" autocomplete="username">
+    <input type="password" name="decoy_password_prevent_autofill" tabindex="-1" autocomplete="current-password">
+  </div>
+
   <!-- ==================== SIDEBAR UTAMA ==================== -->
   <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between shrink-0 h-screen sticky top-0 select-none z-40">
     <div>
@@ -562,7 +568,7 @@
           <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900 border border-slate-800 rounded-2xl p-3 px-4 shadow-lg">
             <div class="relative flex-1 max-w-md">
               <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-              <input type="text" id="schSearchActive" oninput="handleScheduleSearchActive(this.value)" placeholder="Cari nama ujian aktif, token, kelas..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:border-emerald-500">
+              <input type="text" id="schSearchActive" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" oninput="handleScheduleSearchActive(this.value)" placeholder="Cari nama ujian aktif, token, kelas..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:border-emerald-500">
             </div>
             <div class="text-xs text-slate-400 flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
@@ -598,7 +604,7 @@
           <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900 border border-slate-800 rounded-2xl p-3 px-4 shadow-lg">
             <div class="relative flex-1 max-w-md">
               <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-              <input type="text" id="schSearchInactive" oninput="handleScheduleSearchInactive(this.value)" placeholder="Cari arsip jadwal tidak aktif..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:border-slate-500">
+              <input type="text" id="schSearchInactive" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" oninput="handleScheduleSearchInactive(this.value)" placeholder="Cari arsip jadwal tidak aktif..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:border-slate-500">
             </div>
             <div class="text-xs text-slate-400 flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-slate-500"></span>
@@ -900,7 +906,7 @@
           <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-2 border-b border-slate-800">
             <div class="relative w-full sm:w-80">
               <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-              <input type="text" id="searchNilaiStudentInput" oninput="handleNilaiStudentSearch(this.value)" placeholder="Cari nama siswa atau NISN..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:border-indigo-500">
+              <input type="text" id="searchNilaiStudentInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" oninput="handleNilaiStudentSearch(this.value)" placeholder="Cari nama siswa atau NISN..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:border-indigo-500">
             </div>
             <div class="flex items-center gap-2 text-xs text-slate-400 self-end sm:self-center">
               <span>Menampilkan <strong id="nilaiFilteredCount" class="text-white font-mono">0</strong> siswa</span>
@@ -994,16 +1000,11 @@
               <span>Pusat Upload & Import Data Master</span>
             </h3>
             <p class="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
-              Impor data institusi sekolah dalam hitungan detik. Pilih kategori data yang ingin diunggah (Data Siswa, Data Kelas, atau Mata Pelajaran), unduh template resmi berformat .xlsx, lalu seret file untuk proses sinkronisasi otomatis.
+              Pusat unggah dan sinkronisasi data master institusi sekolah. Pilih kategori data yang ingin diunggah (Data Siswa, Data Kelas, atau Mata Pelajaran), lalu seret atau pilih file Excel/CSV untuk proses impor langsung ke sistem.
             </p>
           </div>
 
-          <!-- Tombol Download Workbook Lengkap -->
-          <div class="flex items-center gap-3 shrink-0 flex-wrap">
-            <button onclick="downloadAllInOneTemplate()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-xs font-bold text-white transition flex items-center gap-2 shadow-lg shadow-emerald-600/30">
-              <i class="fa-solid fa-file-excel text-amber-300"></i> Unduh Master Workbook Lengkap (3-in-1)
-            </button>
-          </div>
+
         </div>
 
         <!-- 3 Pilihan Kategori Upload (Tab Switcher) -->
@@ -1053,9 +1054,7 @@
               </p>
             </div>
 
-            <button onclick="downloadActiveCategoryTemplate()" id="btnDownloadActiveTemplate" class="px-4 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 font-bold transition flex items-center gap-2 shrink-0">
-              <i class="fa-solid fa-file-arrow-down"></i> Unduh Template Excel (.xlsx)
-            </button>
+
           </div>
 
           <!-- Area Drag & Drop File Excel -->
@@ -1175,7 +1174,7 @@
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
               <i class="fa-solid fa-magnifying-glass"></i>
             </span>
-            <input type="text" id="searchStudentInput" oninput="searchStudentsTable()" placeholder="Cari nama, NISN, atau kelas..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+            <input type="text" id="searchStudentInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" oninput="searchStudentsTable()" placeholder="Cari nama, NISN, atau kelas..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
           </div>
         </div>
 
@@ -1311,7 +1310,7 @@
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
               <i class="fa-solid fa-magnifying-glass"></i>
             </span>
-            <input type="text" id="searchClassInput" oninput="renderMasterClassesTable()" placeholder="Cari nama kelas, jurusan, wali..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
+            <input type="text" id="searchClassInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" oninput="renderMasterClassesTable()" placeholder="Cari nama kelas, jurusan, wali..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
           </div>
         </div>
 
@@ -1418,7 +1417,7 @@
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
               <i class="fa-solid fa-magnifying-glass"></i>
             </span>
-            <input type="text" id="searchSubjectInput" oninput="renderMasterSubjectsTable()" placeholder="Cari nama mapel atau kode..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500">
+            <input type="text" id="searchSubjectInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" oninput="renderMasterSubjectsTable()" placeholder="Cari nama mapel atau kode..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500">
           </div>
         </div>
 
@@ -3211,7 +3210,7 @@
             <div class="flex items-center justify-between gap-2">
               <div class="relative flex-1">
                 <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-[10px]"></i>
-                <input type="text" id="schClassSearch_create" placeholder="Cari nama kelas..." oninput="filterScheduleClassGrid('create')" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-7 pr-2.5 py-1 text-white text-[11px] focus:outline-none focus:border-indigo-500">
+                <input type="text" id="schClassSearch_create" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" placeholder="Cari nama kelas..." oninput="filterScheduleClassGrid('create')" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-7 pr-2.5 py-1 text-white text-[11px] focus:outline-none focus:border-indigo-500">
               </div>
               <div class="flex items-center gap-1 shrink-0 text-[10px]">
                 <button type="button" onclick="selectAllScheduleClasses('create', true)" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 font-semibold transition">Pilih Semua</button>
@@ -3337,7 +3336,7 @@
             <div class="flex items-center justify-between gap-2">
               <div class="relative flex-1">
                 <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-[10px]"></i>
-                <input type="text" id="editSchClassSearch" placeholder="Cari nama kelas..." oninput="filterScheduleClassGrid('edit')" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-7 pr-2.5 py-1 text-white text-[11px] focus:outline-none focus:border-indigo-500">
+                <input type="text" id="editSchClassSearch" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" placeholder="Cari nama kelas..." oninput="filterScheduleClassGrid('edit')" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-7 pr-2.5 py-1 text-white text-[11px] focus:outline-none focus:border-indigo-500">
               </div>
               <div class="flex items-center gap-1 shrink-0 text-[10px]">
                 <button type="button" onclick="selectAllScheduleClasses('edit', true)" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 font-semibold transition">Pilih Semua</button>
@@ -3448,7 +3447,7 @@
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
         <div class="relative flex-1">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-          <input type="text" id="proctorHubSearchInput" oninput="handleProctorHubSearch(this.value)" placeholder="Cari nama ujian aktif, mata pelajaran, kode token (misal: FISIKA26, KIMIA26)..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:border-indigo-500">
+          <input type="text" id="proctorHubSearchInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" oninput="handleProctorHubSearch(this.value)" placeholder="Cari nama ujian aktif, mata pelajaran, kode token (misal: FISIKA26, KIMIA26)..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:border-indigo-500">
         </div>
         <div class="flex items-center gap-2 text-xs shrink-0">
           <span class="px-3 py-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold flex items-center gap-2">
@@ -3507,7 +3506,7 @@
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
         <div class="relative flex-1">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-          <input type="text" id="nilaiHubSearchInput" oninput="handleNilaiHubSearch(this.value)" placeholder="Cari nama ujian, mata pelajaran, kode token (misal: FISIKA26, MTK2026, TPS2026)..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:border-amber-500">
+          <input type="text" id="nilaiHubSearchInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" oninput="handleNilaiHubSearch(this.value)" placeholder="Cari nama ujian, mata pelajaran, kode token (misal: FISIKA26, MTK2026, TPS2026)..." class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:border-amber-500">
         </div>
         <div class="flex items-center gap-1.5 text-xs shrink-0 bg-slate-950 p-1 rounded-xl border border-slate-800">
           <button id="nilaiHubFilter_all" onclick="filterNilaiHubTab('all')" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold transition">Semua (<span id="nilaiHubCount_all">0</span>)</button>
@@ -4161,6 +4160,18 @@
 
     // Pindah Tab / Menu Navigasi
     window.switchTab = function(tabName) {
+      // Purge unwanted browser autofill on all search and filter inputs
+      const searchInputIds = [
+        'searchNilaiStudentInput', 'searchStudentInput', 'searchClassInput',
+        'searchSubjectInput', 'schSearchActive', 'schSearchInactive',
+        'proctorHubSearchInput', 'nilaiHubSearchInput', 'schClassSearch_create', 'editSchClassSearch'
+      ];
+      searchInputIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && (el.value === 'siswa_1001' || el.value === 'siswa123' || el.value.toLowerCase().includes('siswa_1001'))) {
+          el.value = '';
+        }
+      });
       document.querySelectorAll('section[id^="tab-"]').forEach(sec => sec.classList.add('hidden'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
@@ -10756,6 +10767,36 @@
         window.location.href = '/';
       }
     };
+  // Global Browser Autofill Defusal for Dashboard
+    function purgeDashboardAutofill() {
+      const searchInputIds = [
+        'searchNilaiStudentInput', 'searchStudentInput', 'searchClassInput',
+        'searchSubjectInput', 'schSearchActive', 'schSearchInactive',
+        'proctorHubSearchInput', 'nilaiHubSearchInput', 'schClassSearch_create', 'editSchClassSearch'
+      ];
+      searchInputIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && (el.value === 'siswa_1001' || el.value === 'siswa123' || el.value.toLowerCase().includes('siswa_1001'))) {
+          el.value = '';
+          if (id === 'searchStudentInput' && typeof filterStudentsTable === 'function') filterStudentsTable();
+          if (id === 'searchClassInput' && typeof renderMasterClassesTable === 'function') renderMasterClassesTable();
+          if (id === 'searchSubjectInput' && typeof renderMasterSubjectsTable === 'function') renderMasterSubjectsTable();
+        }
+      });
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+      purgeDashboardAutofill();
+      setTimeout(purgeDashboardAutofill, 50);
+      setTimeout(purgeDashboardAutofill, 200);
+      setTimeout(purgeDashboardAutofill, 600);
+      setTimeout(purgeDashboardAutofill, 1200);
+    });
+    window.addEventListener('load', () => {
+      purgeDashboardAutofill();
+      setTimeout(purgeDashboardAutofill, 100);
+      setTimeout(purgeDashboardAutofill, 500);
+    });
+    window.addEventListener('focus', purgeDashboardAutofill);
   </script>
 </body>
 </html>

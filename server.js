@@ -500,6 +500,33 @@ function sanitizeQuestionText(text) {
     .trim();
 }
 
+function safeParseQuestionsJSON(rawText) {
+  if (!rawText || typeof rawText !== 'string') return null;
+  const BT3 = String.fromCharCode(96).repeat(3);
+  let cleaned = rawText.split(BT3 + 'json').join('').split(BT3).join('').trim();
+
+  // Percobaan 1: Parse langsung
+  try {
+    const parsed = JSON.parse(cleaned);
+    if (Array.isArray(parsed)) return parsed;
+    if (parsed.questions && Array.isArray(parsed.questions)) return parsed.questions;
+  } catch (err1) {
+    // Percobaan 2: Repair jika terpotong di akhir output
+    const lastBrace = cleaned.lastIndexOf('}');
+    if (lastBrace !== -1) {
+      const trimmed = cleaned.substring(0, lastBrace + 1) + ']';
+      try {
+        const repaired = JSON.parse(trimmed);
+        if (Array.isArray(repaired) && repaired.length > 0) {
+          console.log(`[Gemini AI] JSON dipulihkan (repaired): Berhasil menyelamatkan ${repaired.length} butir soal lengkap!`);
+          return repaired;
+        }
+      } catch (err2) {}
+    }
+  }
+  return null;
+}
+
 function executeSingleGeminiRequest(endpointModel, apiKey, payloadJson) {
   return new Promise((resolve, reject) => {
     const https = require('https');
@@ -509,7 +536,7 @@ function executeSingleGeminiRequest(endpointModel, apiKey, payloadJson) {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(payloadJson)
       },
-      timeout: 22000
+      timeout: 38000
     }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
@@ -518,11 +545,11 @@ function executeSingleGeminiRequest(endpointModel, apiKey, payloadJson) {
           if (res.statusCode >= 200 && res.statusCode < 300) {
             const parsed = JSON.parse(data);
             const rawText = parsed.candidates && parsed.candidates[0] && parsed.candidates[0].content && parsed.candidates[0].content.parts && parsed.candidates[0].content.parts[0] ? parsed.candidates[0].content.parts[0].text : '';
-            const BT3 = String.fromCharCode(96).repeat(3);
-            const cleaned = rawText.split(BT3 + 'json').join('').split(BT3).join('').trim();
-            const questions = JSON.parse(cleaned);
-            if (Array.isArray(questions)) return resolve(questions);
-            if (questions.questions && Array.isArray(questions.questions)) return resolve(questions.questions);
+            const questions = safeParseQuestionsJSON(rawText);
+            if (questions && Array.isArray(questions) && questions.length > 0) {
+              return resolve(questions);
+            }
+            return reject(new Error("Format output JSON tidak dapat diparsing"));
           }
           reject(new Error("Gemini API HTTP " + res.statusCode + ": " + data.substring(0, 160)));
         } catch (e) {
@@ -532,7 +559,7 @@ function executeSingleGeminiRequest(endpointModel, apiKey, payloadJson) {
     });
 
     req.on('error', reject);
-    req.on('timeout', () => { req.destroy(); reject(new Error('Koneksi ke Gemini API timeout (22s)')); });
+    req.on('timeout', () => { req.destroy(); reject(new Error('Koneksi ke Gemini API timeout (38s)')); });
     req.write(payloadJson);
     req.end();
   });
@@ -598,18 +625,17 @@ async function callGoogleGeminiAPI({ apiKey, model, basis_type = 'materi', basis
     contents: [{ parts: [{ text: promptText }] }],
     generationConfig: {
       temperature: 0.7,
+      maxOutputTokens: 8192,
       responseMimeType: 'application/json'
     }
   });
 
-  // Susun daftar model kandidat untuk Multi-Model Failover Otomatis (jika model utama 503 / 429)
+  // Susun daftar model kandidat untuk Multi-Model Failover Otomatis (Cepat & Handal)
   const candidateModels = [];
   if (model) candidateModels.push(model);
-  candidateModels.push('gemini-3.5-flash-lite');
+  if (model !== 'gemini-3.5-flash-lite') candidateModels.push('gemini-3.5-flash-lite');
+  if (model !== 'gemini-3.5-flash') candidateModels.push('gemini-3.5-flash');
   candidateModels.push('gemini-3.6-flash');
-  candidateModels.push('gemini-2.5-flash');
-  candidateModels.push('gemini-3.7-flash');
-  candidateModels.push('gemini-3.8-flash');
   const uniqueCandidates = [...new Set(candidateModels)];
 
   let lastError = null;

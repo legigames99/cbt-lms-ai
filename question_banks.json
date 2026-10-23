@@ -1954,6 +1954,671 @@
     "teacher": "Drs. Budi Pratama, M.Pd.",
     "target_class": "Semua Kelas",
     "description": "",
-    "questions": []
+    "questions": [
+      {
+        "id": 1,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "Seorang administrator jaringan sekolah mengonfigurasi web server Nginx untuk melayani portal e-learning berbasis PHP. Ketika siswa mengakses ujian daring, sistem tiba-tiba menampilkan halaman kesalahan <code>502 Bad Gateway</code>. Administrator memeriksa error log Nginx dan menemukan entri berikut:<br><code>2023/10/25 08:30:15 [crit] 1234#1234: *56 connect() to unix:/run/php/php7.4-fpm.sock failed (2: No such file or directory) while connecting to upstream</code><br><br>Berdasarkan analisis log tersebut, tindakan teknis apa yang paling tepat dilakukan oleh administrator untuk mengatasi akar permasalahan?",
+        "weight": 1,
+        "explanation": "Pesan error '[crit] connect() to unix:/run/php/php7.4-fpm.sock failed (2: No such file or directory)' menunjukkan bahwa Nginx (sebagai reverse proxy) tidak dapat berkomunikasi dengan backend PHP-FPM melalui UNIX socket yang ditentukan karena file socket tersebut tidak ada atau path-nya salah. Solusi yang tepat adalah memastikan layanan PHP-FPM aktif (running) dan memeriksa konfigurasi jalur socket pada blok `fastcgi_pass` di file konfigurasi Nginx agar sinkron dengan versi dan direktori PHP-FPM yang berjalan.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Mengubah izin akses (chmod) direktori root web server menjadi 755 dan kepemilikan ke www-data."
+          },
+          {
+            "id": "B",
+            "text": "Menyalakan ulang (restart) layanan PHP-FPM dan memastikan jalur UNIX socket pada file konfigurasi Nginx sesuai dengan yang aktif."
+          },
+          {
+            "id": "C",
+            "text": "Menambahkan direktif 'client_max_body_size' pada file nginx.conf untuk mencegah pembatasan unggahan file."
+          },
+          {
+            "id": "D",
+            "text": "Memperbarui sertifikat SSL/TLS menggunakan Let's Encrypt karena masa berlaku port 443 telah kedaluwarsa."
+          },
+          {
+            "id": "E",
+            "text": "Mengonfigurasi ulang aturan firewall (UFW) untuk membuka akses port 80 dan 443 secara bersamaan."
+          }
+        ],
+        "answer": "B"
+      },
+      {
+        "id": 2,
+        "type": "mcq",
+        "cog": "C5",
+        "stem": "Sebuah perusahaan rintisan meluncurkan aplikasi web dengan lalu lintas tinggi menggunakan Apache Web Server. Saat jam sibuk, server sering mengalami lambat merespons dengan keluhan waktu muat yang tinggi. Administrator ingin mengoptimalkan modul MPM (Multi-Processing Module) prefork dengan menganalisis konfigurasi berikut:<br><code>&lt;IfModule mpm_prefork_module&gt;<br> StartServers 5<br> MinSpareServers 5<br> MaxSpareServers 10<br> MaxRequestWorkers 150<br> MaxConnectionsPerChild 1000<br>&lt;/IfModule&gt;</code><br><br>Jika pemantauan sistem menunjukkan penggunaan RAM selalu mencapai 98% dan terjadi proses <i>swap memory</i> yang tinggi akibat lonjakan koneksi bersamaan, evaluasi manakah yang paling akurat untuk menyempurnakan performa server tersebut?",
+        "weight": 1,
+        "explanation": "MPM prefork pada Apache mengalokasikan satu proses terpisah untuk setiap koneksi klien, di mana setiap proses mengonsumsi memori RAM yang cukup besar. Jika RAM habis dan terjadi swap, performa server akan anjlok drastis. Nilai MaxRequestWorkers 150 mungkin terlalu besar untuk kapasitas RAM yang ada. Tindakan yang paling tepat adalah menurunkan MaxRequestWorkers atau beralih ke MPM worker/event yang menggunakan arsitektur berbasis utas (threading) sehingga lebih hemat memori.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Menaikkan nilai MaxRequestWorkers menjadi 300 agar dapat menampung seluruh lonjakan koneksi klien secara simultan."
+          },
+          {
+            "id": "B",
+            "text": "Mengganti MaxConnectionsPerChild menjadi 0 agar proses anak tidak pernah didaur ulang dan menghemat siklus CPU."
+          },
+          {
+            "id": "C",
+            "text": "Menurunkan nilai MaxRequestWorkers dan mempertimbangkan migrasi ke MPM event atau worker yang berbasis multithreading untuk efisiensi memori."
+          },
+          {
+            "id": "D",
+            "text": "Meningkatkan jumlah StartServers menjadi sama dengan MaxRequestWorkers agar proses siap sedia tanpa delay."
+          },
+          {
+            "id": "E",
+            "text": "Menonaktifkan modul KeepAlive pada Apache agar koneksi TCP langsung ditutup setelah satu permintaan selesai."
+          }
+        ],
+        "answer": "C"
+      },
+      {
+        "id": 3,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "Seorang siswa SMK ditugaskan mengonfigurasi Virtual Host pada Nginx untuk dua domain berbeda dalam satu server VPS: <code>sekolah.sch.id</code> dan <code>ppdb.sekolah.sch.id</code>. Setelah konfigurasi dibuat, ketika diuji melalui peramban, domain <code>ppdb.sekolah.sch.id</code> selalu membuka konten dari direktori <code>sekolah.sch.id</code>. Berikut adalah potongan konfigurasi blok server pertama:<br><code>server {<br> listen 80 default_server;<br> server_name sekolah.sch.id;<br> root /var/www/html/utama;<br>...<br>}</code><br><br>Apa akar masalah teknis dari kasus di luar kesesuaian domain tersebut?",
+        "weight": 1,
+        "explanation": "Penggunaan parameter 'default_server' pada blok konfigurasi Nginx untuk domain 'sekolah.sch.id' menginstruksikan Nginx untuk menjadikan blok ini sebagai fallback utama bagi semua permintaan HTTP pada port 80 yang tidak memiliki kecocokan server_name eksplisit atau ketika terjadi konflik prioritas pencocokan blok server. Akibatnya, domain lain yang belum terkonfigurasi dengan benar atau kalah prioritas akan diarahkan ke direktori tersebut.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Penggunaan direktif 'listen 80 default_server' memaksa Nginx menangani seluruh request yang tidak memiliki kecocokan spesifik ke blok server utama."
+          },
+          {
+            "id": "B",
+            "text": "Direktif 'root' pada domain kedua belum mendefinisikan path absolut yang diawali dari direktori root sistem operasi."
+          },
+          {
+            "id": "C",
+            "text": "Domain ppdb.sekolah.sch.id belum diarahkan menggunakan record DNS jenis CNAME ke alamat IP server."
+          },
+          {
+            "id": "D",
+            "text": "Nginx tidak mendukung konfigurasi multi-domain dalam satu IP address yang sama tanpa port yang berbeda."
+          },
+          {
+            "id": "E",
+            "text": "File konfigurasi virtual host kedua belum di-symlink ke dalam direktori sites-enabled."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 4,
+        "type": "mcq",
+        "cog": "C5",
+        "stem": "Sebuah aplikasi web perusahaan mengalami serangan brute force berulang kali pada halaman login administrator (<code>/admin/login.php</code>). Administrator web server Apache ingin menerapkan pembatasan akses tingkat lanjut langsung pada file konfigurasi virtual host tanpa mengubah kode sumber aplikasi. Aturan manakah yang paling efektif dan aman untuk membatasi akses hanya dari rentang IP internal kantor <code>192.168.10.0/24</code>, sementara alamat IP lain tetap dapat mengakses halaman publik?",
+        "weight": 1,
+        "explanation": "Untuk membatasi akses pada direktori atau file tertentu di Apache (seperti halaman login), blok tag <Location> atau <Directory> dengan modul mod_authz_core dapat digunakan. Sintaks yang benar menggunakan blok <Files> atau <Location> dengan arahan 'Require ip 192.168.10.0/24' dan menolak yang lain dengan 'Require all denied' atau logika pengecualian yang tepat.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "<Location \"/admin/login.php\">\nOrder deny,allow\nDeny from all\nAllow from 192.168.10.0/24\n</Location>"
+          },
+          {
+            "id": "B",
+            "text": "<Files \"login.php\">\nRequire ip 192.168.10.0/24\n</Files>"
+          },
+          {
+            "id": "C",
+            "text": "RewriteCond %{REQUEST_URI} /admin/login.php\nRewriteCond %{REMOTE_ADDR} !^192\\.168\\.10\\.\nRewriteRule ^(.*)$ - [F,L]"
+          },
+          {
+            "id": "D",
+            "text": "<Directory \"/var/www/html/admin\">\nAllowOverride AuthConfig\nAuthType Basic\nRequire valid-user\n</Directory>"
+          },
+          {
+            "id": "E",
+            "text": "LimitRequestBody 102400\nSetEnvIf Request_URI \"/admin/login.php\" restricted_ip"
+          }
+        ],
+        "answer": "C"
+      },
+      {
+        "id": 5,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "Seorang pengembang web mengunggah sistem baru ke server produksi berbasis Nginx. Pengembang mendapati bahwa aset gambar dengan format SVG dan CSS dapat dimuat dengan sempurna, namun berkas skrip JavaScript utama gagal dimuat di peramban dengan pesan konsol: <i>'Refused to execute script from... because its MIME type ('text/plain') is not executable'</i>. File konfigurasi Nginx menunjukkan baris berikut:<br><code>include /etc/nginx/mime.types;<br>default_type application/octet-stream;</code><br><br>Menyadari bahwa berkas JavaScript tersebut diunggah tanpa ekstensi file `.js` melainkan bernama `app-bundle`, analisis teknis manakah yang menjelaskan mengapa peramban menolak mengeksekusi skrip tersebut?",
+        "weight": 1,
+        "explanation": "Nginx mengandalkan file `mime.types` untuk memetakan ekstensi file ke tipe MIME HTTP yang dikirimkan melalui header `Content-Type`. Karena file bernama `app-bundle` tidak memiliki ekstensi `.js`, Nginx gagal mencocokkannya dalam kamus `mime.types` dan menggunakan fallback `default_type application/octet-stream` atau menyajikannya sebagai `text/plain`. Peramban modern menolak mengeksekusi skrip jika header MIME-type tidak sesuai dengan standar eksekusi skrip (seperti application/javascript).",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Nginx memblokir eksekusi file tanpa ekstensi karena aturan keamanan default terhadap potensi skrip berbahaya."
+          },
+          {
+            "id": "B",
+            "text": "Tanpa ekstensi .js, Nginx gagal memetakan jenis MIME berkas melalui mime.types sehingga dikirim dengan tipe default yang ditolak peramban."
+          },
+          {
+            "id": "C",
+            "text": "Direktif default_type pada Nginx harus diubah menjadi application/javascript agar seluruh file tanpa ekstensi dianggap sebagai skrip."
+          },
+          {
+            "id": "D",
+            "text": "Peramban mewajibkan protokol HTTPS yang valid untuk mengeksekusi berkas JavaScript yang bersumber dari domain eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Izin akses berkas (chmod) pada file skrip tersebut diset ke 644 sehingga pembaca luar tidak berhak mengeksekusinya."
+          }
+        ],
+        "answer": "B"
+      },
+      {
+        "id": 6,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "Seorang pengelola infrastruktur web mendapati bahwa layanan Nginx di server produksi sering kali mengalami terputusnya koneksi mendadak dengan pesan <code>502 Bad Gateway</code> pada browser klien ketika menerima lonjakan akses. Setelah memeriksa berkas log error Nginx (/var/log/nginx/error.log), ditemukan catatan berikut:<br><code>[crit] 12434#12434: *123 connect() to unix:/run/php/php8.1-fpm.sock failed (13: Permission denied) while connecting to upstream</code><br>Berdasarkan analisis log tersebut, tindakan perbaikan konfigurasi yang paling tepat untuk mengatasi masalah komunikasi antara Nginx dan PHP-FPM adalah...",
+        "weight": 1,
+        "explanation": "Pesan error 'Permission denied' pada soket Unix (unix:/run/php/php8.1-fpm.sock) mengindikasikan bahwa proses Nginx (biasanya berjalan sebagai user 'nginx' atau 'www-data') tidak memiliki izin akses tingkat sistem berkas terhadap soket yang dibuat oleh PHP-FPM. Solusi yang tepat adalah menyesuaikan kepemilikan atau izin akses soket di dalam berkas konfigurasi pool PHP-FPM (misalnya /etc/php/8.1/fpm/pool.d/www.conf) pada parameter 'listen.owner', 'listen.group', dan 'listen.mode' agar sesuai dengan identitas proses pekerja (worker process) Nginx.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Menaikkan nilai parameter worker_connections dan worker_processes pada berkas konfigurasi utama nginx.conf."
+          },
+          {
+            "id": "B",
+            "text": "Mengubah direktif listen.owner dan listen.group di konfigurasi pool PHP-FPM agar cocok dengan user yang menjalankan Nginx, serta memastikan izin soket (listen.mode) diatur dengan benar."
+          },
+          {
+            "id": "C",
+            "text": "Menambahkan direktif proxy_pass http://127.0.0.1:80 pada blok server Nginx agar mengalihkan lalu lintas kembali ke port lokal utama."
+          },
+          {
+            "id": "D",
+            "text": "Melakukan pembersihan berkas cache pada direktori /var/cache/nginx dan memulai ulang layanan iptables."
+          },
+          {
+            "id": "E",
+            "text": "Mengubah izin akses direktori root web menggunakan perintah chmod -R 777 untuk mengizinkan semua proses membaca berkas PHP."
+          }
+        ],
+        "answer": "B"
+      },
+      {
+        "id": 7,
+        "type": "mcq",
+        "cog": "C5",
+        "stem": "Sebuah instansi pemerintah menggunakan Apache Web Server di Linux untuk melayani sistem informasi kependudukan yang sangat sensitif. Auditor keamanan siber menemukan celah bahwa server mengekspos informasi versi lengkap perangkat lunak Apache beserta modul-modul yang aktif pada header respons HTTP (<code>Server: Apache/2.4.41 (Ubuntu) OpenSSL/1.1.1f</code>). Informasi ini dapat dimanfaatkan penyerang untuk merancang eksploitasi berbasis kerentanan spesifik versi. Langkah mitigasi tingkat lanjut pada berkas konfigurasi apache2.conf atau httpd.conf untuk menyembunyikan informasi tersebut secara total adalah...",
+        "weight": 1,
+        "explanation": "Untuk mencegah pengungkapan informasi versi perangkat lunak web server Apache yang dapat mempermudah serangan terarah, administrator harus mengatur dua direktif penting di dalam konfigurasi utama Apache: 'ServerTokens Prod' (hanya menampilkan 'Apache' tanpa detail versi atau sistem operasi) dan 'ServerSignature Off' (menghilangkan baris tanda tangan server pada halaman galat/error yang dihasilkan oleh server).",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Menambahkan direktif ServerTokens Full dan ServerSignature On pada berkas konfigurasi."
+          },
+          {
+            "id": "B",
+            "text": "Mengonfigurasi direktif ServerTokens Prod dan ServerSignature Off di dalam berkas konfigurasi utama Apache."
+          },
+          {
+            "id": "C",
+            "text": "Menonaktifkan modul mod_status dan menghapus seluruh berkas pada direktori /etc/apache2/mods-enabled/."
+          },
+          {
+            "id": "D",
+            "text": "Mengubah hak akses direktori /var/www/html menjadi root:root dengan perintah chown."
+          },
+          {
+            "id": "E",
+            "text": "Menambahkan parameter Header always unset X-Powered-By pada blok VirtualHost."
+          }
+        ],
+        "answer": "B"
+      },
+      {
+        "id": 8,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "Seorang administrator jaringan sedang mengonfigurasi arsitektur <i>Reverse Proxy</i> menggunakan Nginx di depan tiga buah server aplikasi Apache backend untuk membagi beban kerja (load balancing). Konfigurasi blok upstream dituliskan sebagai berikut:<br><code>upstream backend_cluster {\nserver 192.168.1.10:80 weight=3;\nserver 192.168.1.11:80 weight=1;\nserver 192.168.1.12:80 max_fails=3 fail_timeout=10s;\n}</code><br>Berdasarkan cuplikan konfigurasi tersebut, manakah pernyataan yang paling akurat menggambarkan mekanisme kerja distribusi lalu lintas dan penanganan kegagalan server?",
+        "weight": 1,
+        "explanation": "Parameter 'weight=3' dan 'weight=1' menggunakan metode pembagian beban berbasis Weighted Round Robin, di mana server 192.168.1.10 akan menerima porsi permintaan 3 kali lebih banyak dibandingkan 192.168.1.11. Parameter 'max_fails=3' dan 'fail_timeout=10s' berarti jika sebuah server gagal merespons sebanyak 3 kali dalam rentang waktu 10 detik, Nginx akan menganggap server tersebut mati (down) dan berhenti mengirimkan lalu lintas ke server tersebut selama periode waktu timeout yang ditentukan.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Semua server akan menerima jumlah permintaan yang persis sama tanpa mempedulikan spesifikasi perangkat keras."
+          },
+          {
+            "id": "B",
+            "text": "Server 192.168.1.10 akan menerima beban kerja tiga kali lipat lebih banyak dibandingkan server 192.168.1.11, dan server yang gagal merespons sebanyak 3 kali dalam 10 detik akan diisolasi sementara."
+          },
+          {
+            "id": "C",
+            "text": "Metode yang digunakan adalah Least Connections secara otomatis berdasarkan jumlah koneksi aktif pada tiap backend."
+          },
+          {
+            "id": "D",
+            "text": "Server 192.168.1.12 bertindak sebagai server utama cadangan (backup) yang hanya akan menyala jika dua server lainnya hancur total."
+          },
+          {
+            "id": "E",
+            "text": "Nginx akan melakukan enkripsi SSL secara otomatis pada seluruh lalu lintas internal menuju ketiga IP backend tersebut."
+          }
+        ],
+        "answer": "B"
+      },
+      {
+        "id": 9,
+        "type": "mcq",
+        "cog": "C5",
+        "stem": "Sebuah portal berita online yang menggunakan Nginx mengalami lonjakan trafik ekstrem. Administrator mendapati proses pekerja (worker processes) Nginx mengalami pembatasan sumber daya sistem operasi Linux terkait jumlah maksimum deskriptor berkas (file descriptors) yang dapat dibuka secara bersamaan, sehingga muncul log error <code>24: Too many open files</code>. Langkah sistematis tingkat lanjut untuk menyelesaikan akar masalah ini secara permanen pada sistem Linux adalah...",
+        "weight": 1,
+        "explanation": "Pesan error 'Too many open files' terjadi ketika batas sistem operasi (ulimit) terhadap jumlah berkas/soket yang dapat dibuka oleh suatu proses terlampaui. Penyelesaiannya melibatkan dua langkah: (1) Mengatur direktif 'worker_rlimit_nofile' di dalam berkas nginx.conf untuk mendefinisikan batas baru bagi proses Nginx, dan (2) Menyesuaikan batasan batas sumber daya sistem operasi Linux pada berkas /etc/security/limits.conf (atau melalui konfigurasi systemd service override) untuk user yang menjalankan Nginx.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Menghapus modul cache Nginx dan mematikan fungsi keepalive_timeout."
+          },
+          {
+            "id": "B",
+            "text": "Mengonfigurasi parameter worker_rlimit_nofile pada nginx.conf serta menyesuaikan batas konfigurasi system/limits untuk user Nginx di sistem operasi Linux."
+          },
+          {
+            "id": "C",
+            "text": "Mengganti web server Nginx menjadi Apache karena Apache tidak menggunakan deskriptor berkas."
+          },
+          {
+            "id": "D",
+            "text": "Menurunkan nilai worker_connections serendah mungkin untuk menghemat alokasi memori RAM."
+          },
+          {
+            "id": "E",
+            "text": "Melakukan format ulang partisi disk dan memasang ulang sistem operasi Linux dari awal."
+          }
+        ],
+        "answer": "B"
+      },
+      {
+        "id": 10,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "Seorang pengembang web mengunggah aplikasi berbasis kerangka kerja (framework) modern ke server Apache. Aplikasi tersebut menggunakan sistem URL bersih (Clean URL / URL Rewriting) tanpa menyertakan ekstensi berkas atau nama skrip index.php di bilah alamat browser. Namun, ketika tautan selain halaman utama diakses, server Apache mengembalikan halaman galat <code>404 Not Found</code>. Setelah diperiksa, modul mod_rewrite belum diaktifkan secara penuh. Perintah dan konfigurasi apa yang paling tepat untuk memperbaiki masalah ini?",
+        "weight": 1,
+        "explanation": "Clean URL pada framework web modern memerlukan pemetaan ulang permintaan (URL rewriting) ke titik masuk tunggal (index.php) menggunakan modul mod_rewrite Apache. Administrator harus mengaktifkan modul dengan perintah 'a2enmod rewrite', memastikan berkas konfigurasi direktori virtual host mengizinkan override aturan melalui direktif 'AllowOverride All' (bukan None), serta memastikan berkas .htaccess yang memuat aturan RewriteRule terbaca dengan benar.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Mengaktifkan modul mod_rewrite dengan perintah a2enmod rewrite dan memastikan direktif AllowOverride diaktifkan menjadi All pada konfigurasi direktori VirtualHost."
+          },
+          {
+            "id": "B",
+            "text": "Menonaktifkan modul mod_security dan mengubah port default Apache dari 80 ke 8080."
+          },
+          {
+            "id": "C",
+            "text": "Menambahkan baris ekstensi .php ke dalam berkas mime.types di direktori /etc/apache2/."
+          },
+          {
+            "id": "D",
+            "text": "Mengubah izin kepemilikan seluruh berkas web menjadi akses penuh 777."
+          },
+          {
+            "id": "E",
+            "text": "Membuat VirtualHost baru menggunakan protokol HTTP/3 tanpa memerlukan modul tambahan."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 11,
+        "type": "mcq",
+        "cog": "C5",
+        "stem": "Sebuah perusahaan e-commerce menerapkan pengamanan HTTPS menggunakan sertifikat SSL/TLS gratis dari Let's Encrypt pada web server Nginx. Setelah masa berlaku 90 hari hampir habis, proses pembaruan otomatis (auto-renewal) melalui Certbot gagal karena kendala validasi domain (HTTP-01 challenge). Log menunjukkan bahwa Nginx menolak akses ke direktori tersembunyi verifikasi. Bagian konfigurasi blok server Nginx manakah yang wajib dipastikan ada agar proses verifikasi Let's Encrypt dapat berjalan sukses tanpa hambatan?",
+        "weight": 1,
+        "explanation": "Validasi domain metode HTTP-01 yang digunakan oleh Certbot/Let's Encrypt bekerja dengan menempatkan berkas token sementara ke dalam direktori khusus pada web root, yaitu /.well-known/acme-challenge/. Oleh karena itu, Nginx harus dikonfigurasi agar mengizinkan akses publik ke direktori tersebut tanpa pengalihan (redirect) paksa ke HTTPS atau perlindungan otentikasi kata sandi.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "location ~ /\\.well-known/acme-challenge/ { allow all; }"
+          },
+          {
+            "id": "B",
+            "text": "deny all access to the entire /var/www/html/ directory during renewal."
+          },
+          {
+            "id": "C",
+            "text": "ssl_certificate /etc/letsencrypt/live/domain/fullchain.pem; dipindahkan ke port 80."
+          },
+          {
+            "id": "D",
+            "text": "rewrite ^(.*)$ https://$host$permanent; pada setiap direktori root."
+          },
+          {
+            "id": "E",
+            "text": "client_max_body_size 100M; pada tingkat http block."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 12,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "Seorang administrator sistem sedang melakukan audit performa terhadap web server Apache yang berjalan di atas sistem operasi Linux Ubuntu. Berdasarkan pemantauan menggunakan utilitas <code>apachectl fullstatus</code>, ditemukan bahwa modul MPM (Multi-Processing Module) yang sedang aktif adalah <code>Prefork MPM</code>, dan server sering kehabisan memori (RAM) saat lalu lintas meningkat tajam. Analisis teknis yang paling tepat mengenai karakteristik Prefork MPM dan alasan utama masalah tersebut adalah...",
+        "weight": 1,
+        "explanation": "Prefork MPM menggunakan pendekatan non-threaded di mana setiap proses anak (child process) hanya melayani tepat satu koneksi dalam satu waktu dan mengalokasikan ruang memorinya sendiri secara mandiri. Ketika jumlah permintaan bersamaan meningkat, jumlah proses anak membengkak drastis sehingga konsumsi memori RAM melonjak tajam dibandingkan MPM Event atau Worker yang menggunakan arsitektur berbasis utas (threading) yang jauh lebih hemat memori.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Prefork MPM menggunakan satu proses tunggal dengan ribuan utas (threads), sehingga sangat rentan terhadap kegagalan CPU."
+          },
+          {
+            "id": "B",
+            "text": "Prefork MPM menjalankan proses anak terpisah untuk setiap koneksi tanpa pembagian utas, sehingga konsumsi memori meningkat secara linier seiring jumlah klien aktif dan memicu kehabisan RAM."
+          },
+          {
+            "id": "C",
+            "text": "Prefork MPM hanya kompatibel dengan sistem operasi berbasis Windows Server dan tidak stabil di Linux."
+          },
+          {
+            "id": "D",
+            "text": "Prefork MPM secara otomatis memaksa semua skrip PHP berjalan dalam mode multi-threading tingkat kernel."
+          },
+          {
+            "id": "E",
+            "text": "Masalah kehabisan memori disebabkan oleh modul mod_ssl yang tidak dikompresi menggunakan algoritma Gzip."
+          }
+        ],
+        "answer": "B"
+      },
+      {
+        "id": 13,
+        "type": "mcq",
+        "cog": "C5",
+        "stem": "Sebuah perusahaan media daring ingin mengoptimalkan pengiriman aset statis (gambar, video, dan berkas CSS/JS) melalui Nginx untuk mengurangi beban pada server aplikasi utama. Administrator dituntut untuk mengonfigurasi penyimpanan singgahan (browser caching) yang agresif sekaligus memastikan bahwa aset yang diperbarui di server dapat langsung terlihat oleh pengguna tanpa harus menunggu masa kedaluwarsa singgahan habis. Konfigurasi header cache kontrol manakah di dalam blok location Nginx yang paling memenuhi standar industri?",
+        "weight": 1,
+        "explanation": "Untuk aset statis, direktif 'expires' yang dikombinasikan dengan penetapan Cache-Control 'public, no-transform' atau mekanisme versioning berkas (seperti cache-busting query string) adalah praktik terbaik. Namun secara spesifik pada level Nginx, pengaturan waktu kedaluwarsa yang panjang (misalnya 1 tahun: 'expires 1y') untuk aset statis yang diberi cap waktu/versi (versioned assets) memastikan efisiensi bandwidth maksimal tanpa mengorbankan kemudahan pembaruan konten.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "expires 0; add_header Cache-Control \"no-store, no-cache, must-revalidate\";"
+          },
+          {
+            "id": "B",
+            "text": "expires 1y; add_header Cache-Control \"public, immutable\";"
+          },
+          {
+            "id": "C",
+            "text": "proxy_cache_bypass $http_pragma; client_body_buffer_size 128k;"
+          },
+          {
+            "id": "D",
+            "text": "add_header X-Content-Type-Options \"nosniff\"; autoindex on;"
+          },
+          {
+            "id": "E",
+            "text": "chunked_transfer_encoding off; keepalive_requests 1000;"
+          }
+        ],
+        "answer": "B"
+      },
+      {
+        "id": 14,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "Sebuah server Apache di Linux mendadak mengalami kelambatan ekstrem. Melalui penelusuran log koneksi jaringan menggunakan utilitas sistem operasi seperti <code>netstat</code> atau <code>ss</code>, ditemukan ribuan koneksi dalam状态 <code>ESTABLISHED</code> yang berasal dari alamat IP mencurigakan dengan pola permintaan halaman berulang yang mengindikasikan serangan <i>Denial of Service</i> (DoS) lambat (Slowloris). Modul Apache manakah yang harus diaktifkan dan dikonfigurasi untuk memitigasi jenis serangan spesifik yang menjaga koneksi HTTP tetap terbuka selama mungkin tanpa mengirimkan permintaan lengkap?",
+        "weight": 1,
+        "explanation": "Serangan Slowloris beroperasi dengan membuka banyak koneksi ke web server dan mengirimkan permintaan secara sangat lambat (partial HTTP requests) agar koneksi tetap terbuka dan menghabiskan batas maksimal slot koneksi server (MaxClients/MaxRequestWorkers). Modul mod_qos atau mod_reqtimeout pada Apache dirancang khusus untuk membatasi durasi minimum penerimaan header dan badan permintaan (request body), sehingga server dapat secara otomatis memutuskan koneksi dari klien yang bertindak lambat atau mencurigakan.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Modul mod_ssl untuk mengenkripsi seluruh lalu lintas masuk menggunakan sandi TLS 1.3."
+          },
+          {
+            "id": "B",
+            "text": "Modul mod_reqtimeout untuk menetapkan batas waktu minimum penerimaan header dan badan permintaan dari klien."
+          },
+          {
+            "id": "C",
+            "text": "Modul mod_proxy untuk mengalihkan seluruh beban ke server eksternal cloud."
+          },
+          {
+            "id": "D",
+            "text": "Modul mod_autoindex untuk menampilkan daftar direktori berkas secara otomatis."
+          },
+          {
+            "id": "E",
+            "text": "Modul mod_deflate untuk melakukan kompresi data on-the-fly."
+          }
+        ],
+        "answer": "B"
+      },
+      {
+        "id": 15,
+        "type": "mcq",
+        "cog": "C5",
+        "stem": "Seorang administrator sistem ditugaskan mengamankan aplikasi web berbasis Nginx di Linux agar kebal terhadap serangan injeksi skrip lintas situs (XSS) dan pembajakan klik (clickjacking). Administrator harus menyisipkan kebijakan keamanan berbasis header HTTP respons. Konfigurasi baris perintah Nginx manakah yang paling tepat untuk mengimplementasikan proteksi <i>Content Security Policy</i> (CSP) dasar serta pencegahan <i>Clickjacking</i>?",
+        "weight": 1,
+        "explanation": "Untuk mencegah Clickjacking, header 'X-Frame-Options' harus diatur ke 'SAMEORIGIN' atau 'DENY'. Untuk melindungi dari serangan XSS dan injeksi konten berbahaya, header 'Content-Security-Policy' (CSP) harus diterapkan untuk membatasi sumber skrip dan aset yang diizinkan untuk dimuat oleh peramban. Di Nginx, hal ini dilakukan menggunakan direktif 'add_header' di dalam blok server atau location utama.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "add_header X-Frame-Options \"SAMEORIGIN\";\nadd_header Content-Security-Policy \"default-src 'self';\";"
+          },
+          {
+            "id": "B",
+            "text": "add_header X-XSS-Protection \"0\";\nadd_header Allow-Methods \"GET, POST, PUT, DELETE\";"
+          },
+          {
+            "id": "C",
+            "text": "set $secure_cookie on;\nproxy_cookie_flags ~ secure httponly;"
+          },
+          {
+            "id": "D",
+            "text": "limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;"
+          },
+          {
+            "id": "E",
+            "text": "autoindex_exact_size off;\nautoindex_localtime on;"
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 16,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "Seorang Network Administrator di sebuah SMK sedang mengonfigurasi layanan DHCP Server pada Debian Server menggunakan paket <code>isc-dhcp-server</code>. Setelah proses instalasi selesai, administrator mengubah berkas konfigurasi <code>/etc/dhcp/dhcpd.conf</code> dengan mendefinisikan subnet <code>192.168.10.0/24</code>, rentang IP <code>192.168.10.50</code> hingga <code>192.168.10.150</code>, serta menyetel <code>option routers 192.168.10.1;</code>. Namun, saat layanan dijalankan melalui perintah <code>systemctl start isc-dhcp-server</code>, layanan gagal start dan log sistem menunjukkan pesan <code>no subnet declaration for eth0 (10.0.2.15)</code>. Apa akar permasalahan dari kendala tersebut?",
+        "weight": 1,
+        "explanation": "Pesan error 'no subnet declaration for eth0 (10.0.2.15)' menunjukkan bahwa daemon DHCP mendengarkan pada antarmuka jaringan eth0 yang saat itu memiliki IP 10.0.2.15 (tidak sesuai dengan subnet 192.168.10.0/24 yang didefinisikan di dhcpd.conf). DHCP server membutuhkan alamat IP pada interface server yang se-subnet dengan deklarasi network agar dapat melakukan binding.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Antarmuka jaringan fisik (interface) eth0 pada server belum dikonfigurasi dengan alamat IP yang berada dalam satu segmen jaringan (192.168.10.0/24)."
+          },
+          {
+            "id": "B",
+            "text": "Layanan DHCP server belum diizinkan menembus firewall kernel Linux melalui perintah iptables."
+          },
+          {
+            "id": "C",
+            "text": "Berkas konfigurasi dhcpd.conf mengalami kesalahan sintaks (syntax error) pada pendeklarasian netmask."
+          },
+          {
+            "id": "D",
+            "text": "Klien DHCP di jaringan lokal tidak mengirimkan paket broadcast DHCPDISCOVER karena kabel jaringan terlepas."
+          },
+          {
+            "id": "E",
+            "text": "Rentang IP yang dialokasikan (range) tumpang tindih dengan alamat loopback sistem operasi."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 17,
+        "type": "mcq_complex",
+        "cog": "C5",
+        "stem": "Sebuah laboratorium komputer SMK memiliki dua segmen jaringan fisik yang terpisah oleh router, yaitu VLAN 10 (Lab RPL) dengan subnet <code>192.168.20.0/24</code> dan VLAN 20 (Lab TKJ) dengan subnet <code>192.168.30.0/24</code>. Sentral DHCP Server ditempatkan pada VLAN 10. Agar komputer klien di VLAN 20 dapat memperoleh alamat IP secara otomatis dari DHCP Server di VLAN 10, tindakan konfigurasi apa saja yang wajib dilakukan? (Pilih dua jawaban benar)",
+        "weight": 1,
+        "explanation": "Karena paket DHCPDISCOVER awalnya disiarkan secara broadcast (yang tidak bisa melewati router secara default), maka dibutuhkan DHCP Relay (IP Helper) pada router untuk meneruskan paket broadcast tersebut menjadi unicast ke DHCP Server. Selain itu, DHCP Server juga harus mengenali subnet 192.168.30.0/24 di dalam berkas konfigurasinya agar dapat memberikan IP sesuai segmen asal klien.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Mengaktifkan fitur DHCP Relay (IP Helper-Address) pada antarmuka router yang terhubung ke VLAN 20 dengan mengarahkannya ke IP DHCP Server di VLAN 10."
+          },
+          {
+            "id": "B",
+            "text": "Membuat blok subnet baru di dalam berkas konfigurasi <code>dhcpd.conf</code> khusus untuk subnet <code>192.168.30.0/24</code>."
+          },
+          {
+            "id": "C",
+            "text": "Mengganti protokol DHCP dengan protokol statis karena DHCP tidak mendukung lintas VLAN."
+          },
+          {
+            "id": "D",
+            "text": "Menambahkan baris perintah <code>authoritative;</code> di bagian global berkas konfigurasi DHCP server."
+          },
+          {
+            "id": "E",
+            "text": "Memasang kabel fisik tambahan yang menghubungkan langsung VLAN 20 ke port fisik kedua pada DHCP Server."
+          }
+        ],
+        "answer": [
+          "A",
+          "C"
+        ]
+      },
+      {
+        "id": 18,
+        "type": "true_false",
+        "cog": "C4",
+        "stem": "Tentukan apakah pernyataan-pernyataan berikut mengenai mekanisme interaksi protokol DHCP (DORA: Discover, Offer, Request, Acknowledge) adalah Benar atau Salah.",
+        "weight": 1,
+        "explanation": "Pernyataan A benar karena klien belum memiliki IP, sehingga menggunakan alamat 255.255.255.255. Pernyataan B salah karena pada tahap DHCPREQUEST, klien memilih salah satu penawaran dan menyiarkannya kembali ke jaringan. Pernyataan C benar karena DHCPACK adalah tanda sah peminjaman IP.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "statements": [
+          {
+            "id": 0,
+            "text": "Pernyataan 1 terkait DHCP Server",
+            "key": "B"
+          },
+          {
+            "id": 1,
+            "text": "Pernyataan 2 terkait DHCP Server",
+            "key": "S"
+          },
+          {
+            "id": 2,
+            "text": "Pernyataan 3 terkait DHCP Server",
+            "key": "B"
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 19,
+        "type": "matching",
+        "cog": "C4",
+        "stem": "Pasangkan parameter konfigurasi penting pada berkas <code>dhcpd.conf</code> di sistem Linux dengan fungsi operasionalnya yang tepat di bawah ini.",
+        "weight": 1,
+        "explanation": "Pembahasan butir soal #19 terkait DHCP Server.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "premises": [
+          {
+            "id": 0,
+            "text": "Premis 1 DHCP Server"
+          },
+          {
+            "id": 1,
+            "text": "Premis 2 DHCP Server"
+          },
+          {
+            "id": 2,
+            "text": "Premis 3 DHCP Server"
+          }
+        ],
+        "targets": [
+          {
+            "id": "A",
+            "text": "Pasangan target A"
+          },
+          {
+            "id": "B",
+            "text": "Pasangan target B"
+          },
+          {
+            "id": "C",
+            "text": "Pasangan target C"
+          }
+        ],
+        "answer": "P1 cocok dengan fungsi 'Menjadikan server sebagai otoritas utama penentu validitas IP di subnet tersebut', P2 cocok dengan fungsi 'Menentukan durasi waktu standar peminjaman IP sebelum klien harus memperbaharunya', P3 cocok dengan fungsi 'Mengikat alamat IP statis tertentu berdasarkan alamat MAC perangkat keras'."
+      },
+      {
+        "id": 20,
+        "type": "mcq",
+        "cog": "C5",
+        "stem": "Seorang teknisi jaringan di sebuah instansi mendapati bahwa beberapa perangkat komputer kerja sering mengalami perubahan alamat IP secara acak setiap kali komputer direstart, padahal perangkat tersebut adalah komputer server kasir yang wajib memiliki IP permanen melalui DHCP. Berdasarkan prinsip manajemen DHCP, fitur konfigurasi apa yang harus diterapkan pada server DHCP agar perangkat kasir tersebut selalu mendapatkan alamat IP yang sama, dan tuliskan konsep dasar penerapannya?",
+        "weight": 1,
+        "explanation": "Fitur yang harus diterapkan adalah Static DHCP Assignment atau DHCP Reservation. Konsep penerapannya adalah dengan mencatat alamat MAC (Media Access Control) dari kartu jaringan (NIC) komputer kasir tersebut, kemudian pada berkas konfigurasi DHCP server dibuat blok pernyataan 'host' yang memetakan MAC address tersebut dengan satu alamat IP spesifik (fixed-address).",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Opsi jawaban A"
+          },
+          {
+            "id": "B",
+            "text": "Opsi jawaban B"
+          },
+          {
+            "id": "C",
+            "text": "Opsi jawaban C"
+          },
+          {
+            "id": "D",
+            "text": "Opsi jawaban D"
+          },
+          {
+            "id": "E",
+            "text": "Opsi jawaban E"
+          }
+        ],
+        "answer": "A"
+      }
+    ]
   }
 ]

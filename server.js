@@ -500,99 +500,16 @@ function sanitizeQuestionText(text) {
     .trim();
 }
 
-function callGoogleGeminiAPI({ apiKey, model, basis_type = 'materi', basis_text = '', topic = '', question_type = 'all', cog_level = 'mixed', count = 5, custom_prompt = '', existing_stems = [] }) {
+function executeSingleGeminiRequest(endpointModel, apiKey, payloadJson) {
   return new Promise((resolve, reject) => {
-    let endpointModel = 'gemini-3.5-flash';
-    const supportedModels = [
-      'gemini-3.5-flash-lite',
-      'gemini-3.5-flash',
-      'gemini-3.6-flash',
-      'gemini-3.7-flash',
-      'gemini-3.8-flash',
-      'gemini-2.5-flash',
-      'gemini-2.5-pro'
-    ];
-    if (supportedModels.includes(model)) {
-      endpointModel = model;
-    } else if (model && model.includes('flash-lite')) {
-      endpointModel = 'gemini-3.5-flash-lite';
-    } else if (model && model.includes('3.8')) {
-      endpointModel = 'gemini-3.8-flash';
-    } else if (model && model.includes('3.7')) {
-      endpointModel = 'gemini-3.7-flash';
-    } else if (model && model.includes('3.6')) {
-      endpointModel = 'gemini-3.6-flash';
-    } else if (model && model.includes('pro')) {
-      endpointModel = 'gemini-2.5-pro';
-    } else {
-      endpointModel = 'gemini-3.5-flash';
-    }
-
-    let basisInstruction = '';
-    if (basis_type === 'cp') {
-      basisInstruction = "BASIS ACUAN ASESMEN: CAPAIAN PEMBELAJARAN (CP)\n"
-        + "Deskripsi CP yang diuji: \"" + (basis_text || topic) + "\"\n"
-        + "Instruksi: Setiap butir soal WAJIB secara ketat dan spesifik menguji kompetensi, proses kognitif, dan indikator esensial yang tercantum dalam Capaian Pembelajaran tersebut.";
-    } else if (basis_type === 'tp') {
-      basisInstruction = "BASIS ACUAN ASESMEN: TUJUAN PEMBELAJARAN (TP)\n"
-        + "Deskripsi TP yang diuji: \"" + (basis_text || topic) + "\"\n"
-        + "Instruksi: Setiap butir soal WAJIB berorientasi langsung pada ketercapaian Tujuan Pembelajaran tersebut secara terukur, aplikatif, dan detail.";
-    } else {
-      basisInstruction = "BASIS ACUAN ASESMEN: MATERI / SUB-TOPIK SPESIFIK\n"
-        + "Materi Pokok yang diuji: \"" + (basis_text || topic) + "\"\n"
-        + "Instruksi: Susunlah butir soal yang menguji pemahaman konsep, analisis fenomena, dan aplikasi saintifik materi tersebut secara mendalam.";
-    }
-
-    let antiDuplicationPrompt = '';
-    if (existing_stems && Array.isArray(existing_stems) && existing_stems.length > 0) {
-      antiDuplicationPrompt = "\nPERINGATAN KERAS ANTI-DUPLIKASI (DILARANG MEMBUAT SOAL YANG MIRIP/SERUPA):\n"
-        + "Bank soal ini SUDAH MEMILIKI " + existing_stems.length + " butir soal berikut yang telah dibuat sebelumnya:\n"
-        + existing_stems.slice(-12).map((s, idx) => '  [Soal ' + (idx + 1) + '] "' + s + '"').join('\n')
-        + "\n\nATURAN ANTI-DUPLIKASI:\n"
-        + "DILARANG KERAS membuat soal yang serupa, berulang, atau menguji sudut pandang yang sama dengan soal-soal di atas!\n"
-        + "Anda WAJIB menyusun butir soal yang BENAR-BENAR BARU dengan stimulus situasi berbeda, studi kasus/data eksperimen berbeda, konteks aplikasi berbeda, dan indikator penalaran baru yang belum pernah muncul sebelumnya!\n";
-    }
-
-    const promptText = "Anda adalah pakar penyusun asesmen standar TKA (Tes Kemampuan Akademik) SMA/SMK dan Asesmen Nasional Pusmendik Kemdikbudristek.\n"
-      + basisInstruction + "\n"
-      + "Target Jumlah Soal: " + count + " butir soal.\n"
-      + "Format Soal yang diminta: " + (question_type === 'all' ? 'Variasi format campuran TKA (mcq, mcq_complex, true_false, matching, short_essay, long_essay)' : question_type) + ".\n"
-      + (custom_prompt ? ("Instruksi khusus tambahan: " + custom_prompt + "\n") : "")
-      + antiDuplicationPrompt + "\n"
-      + "ATURAN PEDAGOGIS SANGAT KETAT (WAJIB DIPATUHI 100%):\n"
-      + "1. DILARANG KERAS MENCANTUMKAN KODE/LABEL LEVEL KOGNITIF SEPERTI 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'LOTS', 'HOTS', ATAU KATA 'TINGKAT KOGNITIF' DI DALAM TEKS PERTANYAAN (STEM), STIMULUS, MAUPUN PILIHAN JAWABAN! Pertanyaan harus murni bernada akademis, profesional, dan alami bagi siswa SMA/SMK tanpa membocorkan kategori taksonomi di teks soal.\n"
-      + "2. DETAIL, SPESIFIK, DAN MENDALAM: Setiap soal WAJIB memiliki stimulus yang jelas (studi kasus nyata, fenomena alam/kejuruan industri, data numerik/tabel/eksperimen) yang menuntut analisis berpikir kritis, bukan pertanyaan dangkal atau sekadar hafalan definisi.\n"
-      + "3. KUNCI JAWABAN & PEMBAHASAN: Sediakan penjelasan ilmiah yang detail, runtut, dan edukatif untuk setiap butir soal.\n\n"
-      + "Format Output WAJIB berupa JSON array murni tanpa pembungkus markdown.\n"
-      + "Setiap elemen array memiliki struktur:\n"
-      + "- type: 'mcq' | 'mcq_complex' | 'true_false' | 'matching' | 'short_essay' | 'long_essay'\n"
-      + "- cog: level taksonomi ('C2'/'C3'/'C4'/'C5'/'C6') HANYA untuk metadata sistem (JANGAN dicantumkan di teks stem!)\n"
-      + "- weight: number (misal 1.0, 1.5, 2.0, 3.0)\n"
-      + "- stem: teks pertanyaan dalam format HTML (dapat memuat tag <strong>, <em>, <p>, <table>, dll. TANPA ada kata C1-C6)\n"
-      + "- explanation: pembahasan ilmiah detail mengenai alasan jawaban benar (TANPA kata C1-C6)\n"
-      + "- Untuk 'mcq': options: [{id: 'A', text: '...'}, {id: 'B', text: '...'}, {id: 'C', text: '...'}, {id: 'D', text: '...'}, {id: 'E', text: '...'}], answer: 'A'\n"
-      + "- Untuk 'mcq_complex': options: 5 opsi (A-E), answer: array huruf kunci benar (contoh: ['A', 'C'])\n"
-      + "- Untuk 'true_false': statements: [{id: 0, text: '...', key: 'B'}, {id: 1, text: '...', key: 'S'}, ...], answer: {\"0\": \"B\", \"1\": \"S\"}\n"
-      + "- Untuk 'matching': premises: [{id: 0, text: '...'}, ...], targets: [{id: 'A', text: '...'}, ...], answer: {\"0\": \"A\"}\n"
-      + "- Untuk 'short_essay': answer_keys: ['kunci1', 'kunci2']\n"
-      + "- Untuk 'long_essay': rubric: 'kriteria rubrik', ideal_answer: 'uraian jawaban acuan', max_score: 100, keywords: ['kata1', 'kata2']\n";
-
-    const payload = JSON.stringify({
-      contents: [{ parts: [{ text: promptText }] }],
-      generationConfig: {
-        temperature: 0.75,
-        responseMimeType: 'application/json'
-      }
-    });
-
     const https = require('https');
     const req = https.request("https://generativelanguage.googleapis.com/v1beta/models/" + endpointModel + ":generateContent?key=" + encodeURIComponent(apiKey), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(payload)
+        'Content-Length': Buffer.byteLength(payloadJson)
       },
-      timeout: 18000
+      timeout: 22000
     }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
@@ -615,10 +532,102 @@ function callGoogleGeminiAPI({ apiKey, model, basis_type = 'materi', basis_text 
     });
 
     req.on('error', reject);
-    req.on('timeout', () => { req.destroy(); reject(new Error('Koneksi ke Gemini API timeout')); });
-    req.write(payload);
+    req.on('timeout', () => { req.destroy(); reject(new Error('Koneksi ke Gemini API timeout (22s)')); });
+    req.write(payloadJson);
     req.end();
   });
+}
+
+async function callGoogleGeminiAPI({ apiKey, model, basis_type = 'materi', basis_text = '', topic = '', question_type = 'all', cog_level = 'mixed', count = 5, custom_prompt = '', existing_stems = [] }) {
+  let basisInstruction = '';
+  if (basis_type === 'cp') {
+    basisInstruction = "BASIS ACUAN ASESMEN: CAPAIAN PEMBELAJARAN (CP)\n"
+      + "Deskripsi CP yang diuji: \"" + (basis_text || topic) + "\"\n"
+      + "Instruksi Khusus CP: Bongkar Capaian Pembelajaran ini ke dalam indikator esensial, kompetensi operasional, dan alur penalaran kritis.";
+  } else if (basis_type === 'tp') {
+    basisInstruction = "BASIS ACUAN ASESMEN: TUJUAN PEMBELAJARAN (TP)\n"
+      + "Deskripsi TP yang diuji: \"" + (basis_text || topic) + "\"\n"
+      + "Instruksi Khusus TP: Setiap butir soal menguji ketercapaian Tujuan Pembelajaran tersebut secara terukur, aplikatif, dan detail.";
+  } else {
+    basisInstruction = "BASIS ACUAN ASESMEN: MATERI POKOK / SUB-TOPIK\n"
+      + "Materi Pokok: \"" + (basis_text || topic) + "\"\n"
+      + "Instruksi Khusus Materi: Susun butir soal yang menguji pemahaman konsep, analisis fenomena, dan aplikasi teknis/saintifik materi secara mendalam.";
+  }
+
+  let antiDuplicationPrompt = '';
+  if (existing_stems && Array.isArray(existing_stems) && existing_stems.length > 0) {
+    antiDuplicationPrompt = "\nPERINGATAN KERAS ANTI-DUPLIKASI:\n"
+      + "Bank soal ini SUDAH MEMILIKI " + existing_stems.length + " butir soal berikut:\n"
+      + existing_stems.slice(-12).map((s, idx) => '  [Soal ' + (idx + 1) + '] \"' + s + '\"').join('\n')
+      + "\n\nATURAN ANTI-DUPLIKASI: Dilarang keras membuat soal yang serupa atau menguji sudut pandang yang sama dengan soal-soal di atas! Buat stimulus dan skenario baru!\n";
+  }
+
+  const promptText = "Anda adalah pakar penyusun asesmen standar TKA (Tes Kemampuan Akademik) SMA/SMK dan Asesmen Nasional Pusmendik Kemdikbudristek.\n"
+    + basisInstruction + "\n"
+    + "Target Jumlah Soal: " + count + " butir soal.\n"
+    + "Format Soal yang diminta: " + (question_type === 'all' ? 'Variasi format campuran TKA (mcq, mcq_complex, true_false, matching, short_essay, long_essay)' : question_type) + ".\n"
+    + (custom_prompt ? ("Instruksi khusus tambahan guru: " + custom_prompt + "\n") : "")
+    + antiDuplicationPrompt + "\n"
+    + "STANDAR KUALITAS SOAL TINGKAT TINGGI (HOTS - HIGHER ORDER THINKING SKILLS):\n"
+    + "1. DEKOMPOSISI MATERI SECARA MENDALAM (BUKAN SOAL ROBOTIK):\n"
+    + "   DILARANG KERAS hanya mengulang-ulang frasa nama topik/CP secara dangkal di setiap soal! Anda WAJIB membedah materi ini ke dalam aspek teknis riil, arsitektur, parameter spesifik, konfigurasi, protokol, error log, dan metodologi pemecahan masalah (troubleshooting).\n"
+    + "   - Contoh jika topik berkaitan dengan Web Server: Uji analisis error log HTTP (502 Bad Gateway, 504 Gateway Timeout, 403 Forbidden, 404), konfigurasi VirtualHost/ServerBlock Nginx/Apache, integrasi SSL/TLS (Let's Encrypt), Reverse Proxy & load balancing, penanganan izin berkas (chmod 755 / chown www-data), soket PHP-FPM, optimasi worker processes, dsb.\n"
+    + "   - Contoh jika topik Jaringan Komputer: Uji analisis packet capture, subnetting VLSM/CIDR, DHCP lease & relay, routing OSPF/BGP, firewall IPTables/NAT, DNS zone records, dsb.\n"
+    + "   - Contoh jika topik Sains/Umum: Uji analisis data eksperimen tabel, grafik perbandingan dua variabel, studi kasus fenomena nyata industri/lingkungan.\n\n"
+    + "2. STIMULUS RIIL & KONTEKSTUAL DI SETIAP BUTIR SOAL:\n"
+    + "   Setiap butir soal WAJIB menyajikan stimulus yang kaya informasi sebelum pertanyaan diajukan (bisa berupa cuplikan file konfigurasi di tag <code>, potongan error log sistem, tabel data spesifikasi, atau narasi problem solving teknisi di lapangan).\n"
+    + "   Pertanyaan harus menguji penalaran: akar masalah (root cause), perbaikan konfigurasi, atau analisis implikasi teknis.\n\n"
+    + "3. ATURAN BEBAS LABEL KOGNITIF (SANGAT KETAT):\n"
+    + "   DILARANG KERAS MENCANTUMKAN KODE/LABEL 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'LOTS', 'HOTS', ATAU KATA 'TINGKAT KOGNITIF' DI DALAM TEKS PERTANYAAN (STEM), STIMULUS, MAUPUN OPSI JAWABAN! Pertanyaan harus murni bernada akademis, profesional, dan alami bagi siswa SMA/SMK.\n\n"
+    + "4. KUNCI JAWABAN & PEMBAHASAN ANALITIS LENGKAP:\n"
+    + "   Sertakan pembahasan ilmiah yang detail, runtut, dan edukatif yang mengupas tuntas alasan teknis kunci jawaban benar dan mengapa distraktor lainnya salah.\n\n"
+    + "Format Output WAJIB berupa JSON array murni tanpa pembungkus markdown:\n"
+    + "[\n"
+    + "  {\n"
+    + "    \"type\": \"mcq\" | \"mcq_complex\" | \"true_false\" | \"matching\" | \"short_essay\" | \"long_essay\",\n"
+    + "    \"cog\": \"C2\" | \"C3\" | \"C4\" | \"C5\" | \"C6\",\n"
+    + "    \"weight\": 1.0,\n"
+    + "    \"stem\": \"teks HTML pertanyaan dengan stimulus kaya dan spesifik (TANPA kata C1-C6)\",\n"
+    + "    \"explanation\": \"pembahasan analitis detail (TANPA kata C1-C6)\",\n"
+    + "    \"options\": [{\"id\": \"A\", \"text\": \"...\"}, {\"id\": \"B\", \"text\": \"...\"}, {\"id\": \"C\", \"text\": \"...\"}, {\"id\": \"D\", \"text\": \"...\"}, {\"id\": \"E\", \"text\": \"...\"}],\n"
+    + "    \"answer\": \"A\"\n"
+    + "  }\n"
+    + "]\n";
+
+  const payload = JSON.stringify({
+    contents: [{ parts: [{ text: promptText }] }],
+    generationConfig: {
+      temperature: 0.7,
+      responseMimeType: 'application/json'
+    }
+  });
+
+  // Susun daftar model kandidat untuk Multi-Model Failover Otomatis (jika model utama 503 / 429)
+  const candidateModels = [];
+  if (model) candidateModels.push(model);
+  candidateModels.push('gemini-3.5-flash-lite');
+  candidateModels.push('gemini-3.6-flash');
+  candidateModels.push('gemini-2.5-flash');
+  candidateModels.push('gemini-3.7-flash');
+  candidateModels.push('gemini-3.8-flash');
+  const uniqueCandidates = [...new Set(candidateModels)];
+
+  let lastError = null;
+  for (const tryModel of uniqueCandidates) {
+    try {
+      console.log("[Gemini AI] Menghubungi Google Gemini API (" + tryModel + ") - Basis: " + basis_type.toUpperCase() + "...");
+      const questions = await executeSingleGeminiRequest(tryModel, apiKey, payload);
+      if (questions && Array.isArray(questions) && questions.length > 0) {
+        console.log("[Gemini AI] SUKSES! Berhasil mengunduh " + questions.length + " butir soal HOTS dari Google Gemini API (" + tryModel + ").");
+        return { questions, usedModel: tryModel };
+      }
+    } catch (err) {
+      lastError = err;
+      console.warn("[Gemini AI] Model " + tryModel + " gagal (" + err.message + "). Mencoba kandidat failover berikutnya...");
+    }
+  }
+
+  throw (lastError || new Error("Semua model Gemini mengalami kendala jaringan."));
 }
 
 function generatePedagogicalTKAQuestions({ topic, basis_type = 'materi', basis_text = '', question_type = 'all', cog_level = 'mixed', count = 5, custom_prompt = '', modelUsed = 'gemini-3.5-flash', existingCount = 0 }) {
@@ -783,8 +792,7 @@ async function generateQuestionsWithGeminiAI({
 
   if (effectiveKey && effectiveKey.trim().length > 10) {
     try {
-      console.log("[Gemini AI] Menghubungi Google Gemini API (" + model + ") - Basis: " + basis_type.toUpperCase() + "...");
-      const apiQuestions = await callGoogleGeminiAPI({
+      const apiResult = await callGoogleGeminiAPI({
         apiKey: effectiveKey.trim(),
         model,
         basis_type,
@@ -796,13 +804,12 @@ async function generateQuestionsWithGeminiAI({
         custom_prompt,
         existing_stems
       });
-      if (apiQuestions && Array.isArray(apiQuestions) && apiQuestions.length > 0) {
-        questions = apiQuestions;
-        sourceUsed = "google_gemini_api (" + model + ")";
-        console.log("[Gemini AI] Berhasil mengunduh " + questions.length + " butir soal dari Google Gemini API.");
+      if (apiResult && apiResult.questions && Array.isArray(apiResult.questions) && apiResult.questions.length > 0) {
+        questions = apiResult.questions;
+        sourceUsed = "google_gemini_api (" + apiResult.usedModel + ")";
       }
     } catch (err) {
-      console.warn('[Gemini AI] Panggilan Google Gemini API dialihkan ke Pedagogical Engine:', err.message);
+      console.warn('[Gemini AI] Panggilan Google Gemini API gagal di seluruh model kandidat:', err.message);
     }
   }
 

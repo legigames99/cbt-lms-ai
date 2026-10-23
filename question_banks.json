@@ -1958,65 +1958,65 @@
       {
         "id": 1,
         "type": "mcq",
-        "cog": "C3",
-        "stem": "<p>Seorang administrator jaringan sekolah baru saja melakukan pemasangan sistem operasi Ubuntu Server 24.04 LTS. Langkah awal yang harus dilakukan untuk mempersiapkan infrastruktur pemberian alamat IP otomatis kepada klien adalah menginstal paket perangkat lunak layanan DHCP yang paling stabil dan umum digunakan pada sistem operasi tersebut. Perintah manakah yang paling tepat untuk menginstal paket layanan DHCP server tersebut melalui terminal?</p>",
+        "cog": "C4",
+        "stem": "Seorang administrator jaringan mengonfigurasi Nginx sebagai reverse proxy untuk aplikasi web berbasis Node.js yang berjalan pada port internal 3000. Ketika pengguna mengakses domain aplikasi, browser menampilkan pesan <code>502 Bad Gateway</code>. Administrator memeriksa error log Nginx dan menemukan entri berikut:<br><br><code>2023/10/25 10:15:00 [crit] 1234#1234: *56 connect() to 127.0.0.1:3000 failed (13: Permission denied) while connecting to upstream, client: 192.168.1.50, server: example.com, request: \"GET / HTTP/1.1\", upstream: \"http://127.0.0.1:3000/\"</code><br><br>Berdasarkan analisis log dan arsitektur sistem Linux modern, apa akar permasalahan utama dan tindakan korektif yang paling tepat untuk mengatasi error tersebut?",
         "weight": 1,
-        "explanation": "Paket standar yang digunakan untuk membangun layanan DHCP server pada sistem operasi berbasis Debian dan Ubuntu adalah 'isc-dhcp-server'. Pilihan B adalah layanan DNS (BIND9), pilihan C adalah web server (Apache2), pilihan D adalah proxy server (Squid), dan pilihan E adalah FTP server (vsftpd).",
-        "generated_by": "gemini-3.5-flash-lite",
+        "explanation": "Pesan error <code>(13: Permission denied)</code> pada sistem Linux menunjukkan bahwa proses Nginx dicegah oleh kebijakan keamanan sistem operasi (biasanya modul SELinux atau AppArmor) untuk melakukan koneksi jaringan keluar (network socket outbound) ke port TCP non-standar seperti 3000. Meskipun konfigurasi proxy_pass sudah benar, sistem Mandatory Access Control (MAC) memblokir koneksi tersebut. Tindakan korektif yang tepat adalah mengizinkan Nginx melakukan koneksi jaringan melalui boolean SELinux menggunakan perintah <code>setsebool -P httpd_can_network_connect 1</code> (atau menyesuaikan profil AppArmor yang relevan). Pilihan lain seperti mengubah hak akses berkas (chmod/chown) tidak relevan karena masalahnya adalah koneksi jaringan TCP, bukan akses file lokal.",
+        "generated_by": "gemini-3.5-flash",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "sudo apt install isc-dhcp-server -y"
+            "text": "Mengubah izin kepemilikan direktori aplikasi Node.js menggunakan perintah chown agar dapat dibaca oleh user www-data."
           },
           {
             "id": "B",
-            "text": "sudo apt install bind9 -y"
+            "text": "Mengaktifkan modul SELinux boolean untuk httpd_can_network_connect agar Nginx diizinkan melakukan komunikasi jaringan upstream ke port lokal."
           },
           {
             "id": "C",
-            "text": "sudo apt install apache2 -y"
+            "text": "Menaikkan batas worker_connections pada berkas konfigurasi nginx.conf untuk mencegah kehabisan soket koneksi."
           },
           {
             "id": "D",
-            "text": "sudo apt install squid -y"
+            "text": "Menambahkan konfigurasi proxy_next_upstream timeout pada blok server Nginx."
           },
           {
             "id": "E",
-            "text": "sudo apt install vsftpd -y"
+            "text": "Mengganti protokol HTTP dengan HTTPS pada direktif proxy_pass karena aplikasi Node.js memerlukan enkripsi SSL internal."
           }
         ],
-        "answer": "A"
+        "answer": "B"
       },
       {
         "id": 2,
         "type": "mcq",
-        "cog": "C4",
-        "stem": "<p>Administrator jaringan sedang mengonfigurasi file <code>/etc/dhcp/dhcpd.conf</code> pada Ubuntu Server 24.04 dengan spesifikasi subnet lokal <code>192.168.10.0/24</code>, rentang IP penyewaan (range) dari <code>192.168.10.50</code> hingga <code>192.168.10.150</code>, serta mendefinisikan gateway <code>192.168.10.1</code> dan DNS server <code>8.8.8.8</code>. Setelah file konfigurasi disimpan, layanan gagal berjalan saat diperiksa menggunakan perintah <code>sudo systemctl status isc-dhcp-server</code>. Berdasarkan log sistem, ditemukan galat karena belum mendeklarasikan antarmuka jaringan (interface) yang melayani permintaan DHCP tersebut. Berkas konfigurasi manakah yang harus disunting untuk menentukan interface jaringan (misal: <code>enp0s3</code>) pada Ubuntu Server 24.04?</p>",
-        "weight": 1.5,
-        "explanation": "Pada Ubuntu Server yang menggunakan paket isc-dhcp-server, antarmuka jaringan (interface) tempat DHCP server mendengarkan (listen) permintaan klien harus didefinisikan secara eksplisit di dalam file konfigurasi default sistem yaitu `/etc/default/isc-dhcp-server` pada variabel `INTERVACESv4`.",
-        "generated_by": "gemini-3.5-flash-lite",
+        "cog": "C5",
+        "stem": "Sebuah server web Apache di lingkungan produksi mengalami lonjakan trafik yang drastis, mengakibatkan respons server sangat lambat dan memori fisik (RAM) habis terpakai (Out of Memory). Administrator menggunakan MPM (Multi-Processing Module) prefork dengan konfigurasi default yang menangani setiap koneksi menggunakan satu proses terpisah. Potongan status dari modul server-status menunjukkan ratusan proses httpd berada dalam status 'W' (Sending Reply) dengan durasi eksekusi skrip PHP yang lama.<br><br>Untuk mengoptimalkan performa dan stabilitas web server dalam menangani ribuan concurrent connections secara efisien tanpa menghabiskan sumber daya RAM, strategi migrasi arsitektur apa yang paling tepat?",
+        "weight": 1,
+        "explanation": "MPM Prefork pada Apache mendedikasikan satu proses terpisah untuk setiap koneksi, yang sangat boros memori jika menghadapi ribuan koneksi konkuren, terutama jika proses PHP-FPM memakan waktu lama. Migrasi ke MPM Event (atau beralih ke Nginx dengan arsitektur asynchronous event-driven) adalah solusi terbaik. MPM Event menggunakan mekanisme asynchronous non-blocking di mana beberapa thread dapat menangani banyak koneksi secara simultan (keep-alive connections dipisahkan dari proses penanganan request utama), sehingga konsumsi memori dapat ditekan secara signifikan dibandingkan model proses tunggal per koneksi.",
+        "generated_by": "gemini-3.5-flash",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "/etc/default/isc-dhcp-server"
+            "text": "Memigrasikan MPM Apache dari Prefork ke MPM Event serta mengintegrasikannya dengan handler PHP-FPM agar penanganan proses I/O lebih asinkron dan efisien dalam penggunaan memori."
           },
           {
             "id": "B",
-            "text": "/etc/network/interfaces"
+            "text": "Menurunkan nilai MaxClients dan ServerLimit pada konfigurasi Apache agar proses httpd dibatasi secara ketat dan tidak melebihi kapasitas RAM."
           },
           {
             "id": "C",
-            "text": "/etc/netplan/01-netcfg.yaml"
+            "text": "Mengaktifkan fitur KeepAlive Off pada konfigurasi Apache agar setiap koneksi langsung diputus setelah satu request selesai."
           },
           {
             "id": "D",
-            "text": "/etc/resolv.conf"
+            "text": "Menaikkan nilai Timeout dan KeepAliveTimeout agar klien memiliki waktu lebih lama untuk mengunduh konten statis yang besar."
           },
           {
             "id": "E",
-            "text": "/etc/hosts"
+            "text": "Mengubah hak akses direktori root web menggunakan chmod 777 agar proses Apache dapat membaca berkas dengan kecepatan penuh."
           }
         ],
         "answer": "A"
@@ -2024,35 +2024,35 @@
       {
         "id": 3,
         "type": "mcq",
-        "cog": "C5",
-        "stem": "<p>Seorang teknisi jaringan telah selesai menginstal dan mengonfigurasi ISC DHCP Server pada Ubuntu 24.04. Untuk membuktikan bahwa layanan DHCP server berjalan dengan baik dan klien mendapatkan alokasi IP sesuai aturan subnet, teknisi tersebut menghubungkan komputer klien ke jaringan. Namun, pada komputer klien berbasis Linux, alamat IP tidak kunjung didapatkan dan terus berstatus <em>searching/dhcpdiscover</em>. Perintah diagnostik apa yang paling tepat dijalankan di sisi klien untuk melihat proses negosiasi DHCP secara real-time dan mendeteksi letak kegagalan pembuktian koneksi tersebut?</p>",
-        "weight": 2,
-        "explanation": "Perintah `sudo dhclient -v <interface>` pada sisi klien memaksa antarmuka jaringan klien untuk melepaskan konfigurasi lama dan meminta IP baru dari DHCP server secara verbose (menampilkan proses DHCPOFFER, DHCPREQUEST, hingga DHCPACK), sehingga sangat efektif untuk membuktikan dan mendiagnosis keberhasilan komunikasi DHCP.",
-        "generated_by": "gemini-3.5-flash-lite",
+        "cog": "C6",
+        "stem": "Seorang engineer infrastruktur mendapati bahwa sertifikat SSL/TLS Let's Encrypt pada web server Nginx miliknya kedaluwarsa karena proses pembaruan otomatis (cron job Certbot) gagal. Berkas konfigurasi server block saat ini masih mengarah ke sertifikat lama yang tidak valid:<br><br><code>ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;<br>ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;</code><br><br>Setelah berhasil memperbarui sertifikat secara manual menggunakan Certbot, engineer tersebut harus memastikan bahwa server menerapkan standar keamanan cipher modern, mencegah serangan downgrade, dan menerapkan HTTP Strict Transport Security (HSTS). Manakah blok konfigurasi Nginx yang paling akurat dan aman untuk diterapkan?",
+        "weight": 1,
+        "explanation": "Konfigurasi yang aman untuk modern web server harus memenuhi beberapa kriteria: (1) Mengarahkan path sertifikat dan private key yang valid, (2) Hanya mengaktifkan protokol TLS versi terbaru dan aman (TLSv1.2 dan TLSv1.3) untuk menghindari kerentanan SSLv3/TLSv1.0/TLSv1.1, (3) Menggunakan sekumpulan cipher suite yang kuat, dan (4) Menyertakan header HTTP Strict Transport Security (HSTS) via <code>add_header Strict-Transport-Security</code> guna memaksa browser selalu menggunakan HTTPS. Pilihan yang memuat kombinasi protokol TLSv1.2/TLSv1.3 serta header HSTS adalah standar industri terbaik saat ini.",
+        "generated_by": "gemini-3.5-flash",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "sudo dhclient -v <nama_interface_klien>"
+            "text": "<code>listen 443 ssl;<br>ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;<br>ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;<br>ssl_protocols TLSv1 TLSv1.1 TLSv1.2;<br></code>"
           },
           {
             "id": "B",
-            "text": "ping -c 4 127.0.0.1"
+            "text": "<code>listen 443 ssl http2;<br>ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;<br>ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;<br>ssl_protocols TLSv1.2 TLSv1.3;<br>ssl_ciphers HIGH:!aNULL:!MD5;<br>add_header Strict-Transport-Security \"max-age=31536000; includeSubDomains\" always;<br></code>"
           },
           {
             "id": "C",
-            "text": "sudo ufw status verbose"
+            "text": "<code>listen 80;<br>return 301 https://$host$request_uri;<br>ssl_certificate /etc/letsencrypt/live/example.com/cert.pem;<br>ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;<br></code>"
           },
           {
             "id": "D",
-            "text": "netstat -tulnp"
+            "text": "<code>listen 443 ssl;<br>ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;<br>ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;<br>ssl_protocols SSLv3 TLSv1.2;<br></code>"
           },
           {
             "id": "E",
-            "text": "sudo systemctl restart networking"
+            "text": "<code>listen 443 ssl;<br>ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;<br>ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;<br>add_header X-Frame-Options \"SAMEORIGIN\";<br></code>"
           }
         ],
-        "answer": "A"
+        "answer": "B"
       }
     ]
   }

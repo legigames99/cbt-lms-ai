@@ -1072,6 +1072,10 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     return fs.createReadStream(path.join(WEB_DIR, 'dashboard.html')).pipe(res);
   }
+  if (pathname === '/kelola-soal' || pathname === '/bank-soal/kelola') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    return fs.createReadStream(path.join(WEB_DIR, 'kelola-soal.html')).pipe(res);
+  }
   if (pathname === '/exam') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     return fs.createReadStream(path.join(WEB_DIR, 'student.html')).pipe(res);
@@ -2440,6 +2444,55 @@ const server = http.createServer(async (req, res) => {
       message: `Butir soal No. ${newQuestion.id} (${newQuestion.type}) berhasil ditambahkan ke "${bank.title}"!`,
       data: newQuestion
     });
+  }
+
+  // POST /api/v1/cbt/question-banks/:id/update-question/:qid (Edit / Update Butir Soal)
+  if (pathname.startsWith('/api/v1/cbt/question-banks/') && pathname.includes('/update-question/') && req.method === 'POST') {
+    const parts = pathname.split('/');
+    const bankId = parseInt(parts[5], 10);
+    const qId = parseInt(parts[7], 10);
+    const bank = QUESTION_BANKS.find(b => b.id === bankId) || QUESTION_BANKS[0];
+    if (bank && bank.questions) {
+      const qIndex = bank.questions.findIndex(q => q.id === qId);
+      if (qIndex !== -1) {
+        const body = await parseBody(req);
+        const existingQ = bank.questions[qIndex];
+        const updatedQuestion = {
+          ...existingQ,
+          type: body.type || existingQ.type,
+          cog: body.cog || existingQ.cog || 'C2',
+          stem: body.stem || existingQ.stem,
+          weight: Number(body.weight) || existingQ.weight || 1.0,
+          explanation: body.explanation !== undefined ? body.explanation : existingQ.explanation,
+        };
+        if (updatedQuestion.type === 'mcq') {
+          updatedQuestion.options = body.options || existingQ.options || [];
+          updatedQuestion.answer = body.answer || existingQ.answer || 'A';
+        } else if (updatedQuestion.type === 'mcq_complex') {
+          updatedQuestion.options = body.options || existingQ.options || [];
+          updatedQuestion.answer = Array.isArray(body.answer) ? body.answer : [body.answer || 'A'];
+        } else if (updatedQuestion.type === 'true_false') {
+          updatedQuestion.statements = body.statements || existingQ.statements || [];
+          updatedQuestion.answer = body.answer || existingQ.answer || {};
+        } else if (updatedQuestion.type === 'matching') {
+          updatedQuestion.premises = body.premises || existingQ.premises || [];
+          updatedQuestion.targets = body.targets || existingQ.targets || [];
+          updatedQuestion.answer = body.answer || existingQ.answer || {};
+        } else if (updatedQuestion.type === 'short_essay') {
+          updatedQuestion.answer_keys = Array.isArray(body.answer_keys) ? body.answer_keys : [body.answer_keys || ''];
+        } else if (updatedQuestion.type === 'long_essay') {
+          updatedQuestion.rubric = body.rubric !== undefined ? body.rubric : existingQ.rubric;
+          updatedQuestion.ideal_answer = body.ideal_answer !== undefined ? body.ideal_answer : existingQ.ideal_answer;
+          updatedQuestion.max_score = Number(body.max_score) || existingQ.max_score || 100;
+          updatedQuestion.keywords = Array.isArray(body.keywords) ? body.keywords : (typeof body.keywords === 'string' ? body.keywords.split(',').map(s => s.trim()).filter(Boolean) : existingQ.keywords || []);
+        }
+        bank.questions[qIndex] = updatedQuestion;
+        saveQuestionBanksToFile();
+        compileAndEncryptPackage();
+        return sendJSON(200, { status: 'success', message: `Butir soal #${qId} berhasil diperbarui!`, data: updatedQuestion });
+      }
+    }
+    return sendJSON(404, { status: 'error', message: 'Bank soal atau butir soal tidak ditemukan' });
   }
 
   // POST /api/v1/cbt/question-banks/:id/delete-question/:qid (Hapus Butir Soal)

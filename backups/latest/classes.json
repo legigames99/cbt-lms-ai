@@ -1,0 +1,114 @@
+[
+  {
+    "id": 1,
+    "name": "XII IPA 1",
+    "level": "XII",
+    "major": "MIPA",
+    "homeroom": "Dra. Sri Wahyuni",
+    "room": "Ruang Lab Komputer 01"
+  },
+  {
+    "id": 2,
+    "name": "XII IPA 2",
+    "level": "XII",
+    "major": "MIPA",
+    "homeroom": "Drs. Bambang Irawan",
+    "room": "Ruang Lab Komputer 02"
+  },
+  {
+    "id": 3,
+    "name": "XII IPS 1",
+    "level": "XII",
+    "major": "IPS",
+    "homeroom": "Nurul Hidayati, S.Pd.",
+    "room": "Ruang Lab Komputer 03"
+  },
+  {
+    "id": 4,
+    "name": "XII IPS 2",
+    "level": "XII",
+    "major": "IPS",
+    "homeroom": "Hendra Kurniawan, M.Pd.",
+    "room": "Ruang Lab Bahasa"
+  },
+  {
+    "id": 5,
+    "name": "XI MIPA 1",
+    "level": "XI",
+    "major": "MIPA",
+    "homeroom": "Rahmat Hidayat, S.Si.",
+    "room": "Ruang Teori 11"
+  },
+  {
+    "id": 6,
+    "name": "XI MIPA 2",
+    "level": "XI",
+    "major": "MIPA",
+    "homeroom": "Dewi Lestari, S.Pd.",
+    "room": "Ruang Teori 12"
+  },
+  {
+    "id": 7,
+    "name": "XI IPS 1",
+    "level": "XI",
+    "major": "IPS",
+    "homeroom": "Agus Salim, M.Pd.",
+    "room": "Ruang Teori 13"
+  },
+  {
+    "id": 8,
+    "name": "X-1",
+    "level": "X",
+    "major": "Umum (Fase E)",
+    "homeroom": "Fitri Handayani, S.Pd.",
+    "room": "Ruang Teori 01"
+  },
+  {
+    "id": 9,
+    "name": "X-2",
+    "level": "X",
+    "major": "Umum (Fase E)",
+    "homeroom": "Aris Munandar, S.Kom.",
+    "room": "Ruang Teori 02"
+  },
+  {
+    "id": 10,
+    "name": "XII RPL 1",
+    "level": "XII",
+    "major": "Rekayasa Perangkat Lunak",
+    "homeroom": "Yusuf Habibie, S.Kom.",
+    "room": "Lab Software Engineering"
+  },
+  {
+    "id": 11,
+    "name": "XII TKJ 1",
+    "level": "XII",
+    "major": "Teknik Komputer Jaringan",
+    "homeroom": "Budi Hartono, M.T.",
+    "room": "Lab Jaringan Cisco"
+  },
+  {
+    "id": 12,
+    "name": "XII RPL 3",
+    "level": "XII",
+    "major": "Rekayasa Perangkat Lunak",
+    "homeroom": "Bpk. Hendra, S.Kom",
+    "room": "Lab RPL 2"
+  },
+  {
+    "id": 13,
+    "name": "XII MIPA 3",
+    "level": "XII",
+    "major": "MIPA",
+    "homeroom": "Drs. Subagyo",
+    "room": "Lab Komputer 03"
+  },
+  {
+    "id": 14,
+    "name": "X-3",
+    "level": "X",
+    "major": "Umum (Fase E)",
+    "homeroom": "Lestari, S.Pd.",
+    "room": "Ruang Teori 03"
+  }
+]

@@ -1,0 +1,3058 @@
+{
+  "backup_info": {
+    "system": "CBT & LMS Terintegrasi AI (Pusmendik / ANBK Standard)",
+    "created_at": "2026-10-23T08:11:23.109Z",
+    "timestamp_local": "23/10/2026, 15.11.23",
+    "version": "2.0.0-PROD"
+  },
+  "statistics": {
+    "question_banks": 6,
+    "students": 15,
+    "schedules": 8,
+    "classes": 14,
+    "subjects": 20,
+    "school_profile": 1
+  },
+  "data": {
+    "question_banks": [
+      {
+        "id": 1,
+        "subject": "Fisika XII",
+        "title": "Bank Soal Termodinamika & Kalor",
+        "teacher": "Drs. Budi Pratama, M.Pd.",
+        "target_class": "Kelas XII IPA",
+        "description": "Kumpulan butir soal Termodinamika, Siklus Carnot, Kalor, dan Hukum Termodinamika sesuai standar TKA SMA/SMK.",
+        "questions": [
+          {
+            "id": 1,
+            "type": "mcq",
+            "cog": "C2",
+            "stem": "<p>Prinsip utama yang mendasari <strong>Hukum Pertama Termodinamika</strong> adalah...</p>",
+            "options": [
+              {
+                "id": "A",
+                "text": "Kekekalan momentum"
+              },
+              {
+                "id": "B",
+                "text": "Kekekalan massa"
+              },
+              {
+                "id": "C",
+                "text": "Kekekalan energi"
+              },
+              {
+                "id": "D",
+                "text": "Entropi selalu bertambah"
+              },
+              {
+                "id": "E",
+                "text": "Suhu nol mutlak"
+              }
+            ],
+            "answer": "C",
+            "weight": 1.2,
+            "explanation": "Hukum I Termodinamika menyatakan kekekalan energi (ΔU = Q - W) terverifikasi."
+          },
+          {
+            "id": 2,
+            "type": "mcq",
+            "cog": "C3",
+            "stem": "<p>Suatu gas ideal menyerap kalor sebesar <strong>800 Joule</strong> dan melakukan usaha ke lingkungan sebesar <strong>300 Joule</strong>. Berapakah perubahan energi dalam (&Delta;U) gas tersebut?</p>",
+            "options": [
+              {
+                "id": "A",
+                "text": "1.100 Joule"
+              },
+              {
+                "id": "B",
+                "text": "500 Joule"
+              },
+              {
+                "id": "C",
+                "text": "-500 Joule"
+              },
+              {
+                "id": "D",
+                "text": "240 Joule"
+              },
+              {
+                "id": "E",
+                "text": "300 Joule"
+              }
+            ],
+            "answer": "B",
+            "weight": 1,
+            "explanation": "Berdasarkan Hukum I Termodinamika: ΔU = Q - W = 800 J - 300 J = 500 Joule."
+          },
+          {
+            "id": 3,
+            "type": "mcq_complex",
+            "cog": "C4",
+            "stem": "<p>Perhatikan pernyataan mengenai gas ideal pada ruang tertutup berikut!<br><strong>Pilihlah semua pernyataan yang BENAR!</strong> <em>(Jawaban benar lebih dari satu)</em></p>",
+            "options": [
+              {
+                "id": "A",
+                "text": "Pada proses isotermik, perubahan energi dalam gas selalu bernilai nol (ΔU = 0)."
+              },
+              {
+                "id": "B",
+                "text": "Pada proses isokhorik, gas tidak melakukan usaha terhadap lingkungan (W = 0)."
+              },
+              {
+                "id": "C",
+                "text": "Pada proses adiabatik, perpindahan kalor antara sistem dan lingkungan selalu berlangsung cepat sehingga Q > 0."
+              },
+              {
+                "id": "D",
+                "text": "Usaha pada proses isobarik dapat dihitung dengan persamaan W = P × ΔV."
+              },
+              {
+                "id": "E",
+                "text": "Efisiensi mesin Carnot ideal dapat mencapai 100% pada suhu reservoir kamar 300 K."
+              }
+            ],
+            "answer": [
+              "A",
+              "B",
+              "D"
+            ],
+            "weight": 1.5,
+            "explanation": "Pernyataan A benar (karena T tetap maka ΔU = 0). Pernyataan B benar (karena ΔV = 0 maka W = 0). Pernyataan D benar (W = PΔV pada tekanan tetap). Pernyataan C salah (adiabatik Q = 0). Pernyataan E salah (efisiensi 100% hanya mungkin pada 0 K mutlak)."
+          },
+          {
+            "id": 4,
+            "type": "true_false",
+            "cog": "C4",
+            "stem": "<p>Tentukan apakah setiap pernyataan mengenai <strong>Siklus Carnot dan Hukum Kedua Termodinamika</strong> berikut bernilai <strong>Benar (B)</strong> atau <strong>Salah (S)</strong>:</p>",
+            "statements": [
+              {
+                "id": 0,
+                "text": "Siklus Carnot terdiri atas dua proses isotermik reversibel dan dua proses adiabatik reversibel.",
+                "key": "B"
+              },
+              {
+                "id": 1,
+                "text": "Mesin pendingin (kulkas) bekerja memindahkan kalor dari suhu tinggi ke suhu rendah secara spontan tanpa usaha luar.",
+                "key": "S"
+              },
+              {
+                "id": 2,
+                "text": "Efisiensi mesin kalor dapat ditingkatkan dengan memperbesar selisih suhu antara reservoir tinggi dan reservoir rendah.",
+                "key": "B"
+              }
+            ],
+            "answer": {
+              "0": "B",
+              "1": "S",
+              "2": "B"
+            },
+            "weight": 1.5,
+            "explanation": "Pernyataan 1 Benar (definisi 4 tahapan siklus Carnot). Pernyataan 2 Salah (memindahkan kalor dari dingin ke panas butuh kerja W dari luar sesuai Hukum II Termodinamika). Pernyataan 3 Benar (η = 1 - T2/T1)."
+          },
+          {
+            "id": 5,
+            "type": "matching",
+            "cog": "C3",
+            "stem": "<p><strong>Pasangkanlah</strong> nama proses termodinamika di sebelah kiri dengan kondisi parameter fisika yang sesuai di sebelah kanan!</p>",
+            "premises": [
+              {
+                "id": 0,
+                "text": "1. Proses Isobarik"
+              },
+              {
+                "id": 1,
+                "text": "2. Proses Isokhorik"
+              },
+              {
+                "id": 2,
+                "text": "3. Proses Isotermik"
+              },
+              {
+                "id": 3,
+                "text": "4. Proses Adiabatik"
+              }
+            ],
+            "targets": [
+              {
+                "id": "A",
+                "text": "Suhu sistem tetap konstan (ΔT = 0, ΔU = 0)"
+              },
+              {
+                "id": "B",
+                "text": "Tekanan sistem konstan (P = tetap)"
+              },
+              {
+                "id": "C",
+                "text": "Volume sistem tetap konstan sehingga usaha W = 0"
+              },
+              {
+                "id": "D",
+                "text": "Tidak ada pertukaran kalor antara sistem & lingkungan (Q = 0)"
+              }
+            ],
+            "answer": {
+              "0": "B",
+              "1": "C",
+              "2": "A",
+              "3": "D"
+            },
+            "weight": 2,
+            "explanation": "Isobarik = Tekanan tetap (B), Isokhorik = Volume tetap (C), Isotermik = Suhu tetap (A), Adiabatik = Kalor Q = 0 (D)."
+          },
+          {
+            "id": 6,
+            "type": "short_essay",
+            "cog": "C2",
+            "stem": "<p>Hukum termodinamika yang menyatakan bahwa kalor mengalir secara alami dari benda bersuhu tinggi ke benda bersuhu rendah dan entropi alam semesta cenderung meningkat adalah <strong>Hukum ke-</strong>...</p>",
+            "answer_keys": [
+              "dua",
+              "2",
+              "kedua",
+              "hukum 2",
+              "hukum kedua"
+            ],
+            "weight": 1,
+            "explanation": "Hukum Kedua Termodinamika (pernyataan Clausius dan Kelvin-Planck mengenai arah aliran kalor dan entropi)."
+          },
+          {
+            "id": 7,
+            "type": "long_essay",
+            "cog": "C5",
+            "stem": "<p>Jelaskan secara komprehensif prinsip kerja <strong>mesin pendingin (refrigerator)</strong> berdasarkan Hukum Kedua Termodinamika!<br>Uraikan bagaimana peran kompresor, zat pendingin (refrigerant), evaporator, dan kondensor dalam memindahkan kalor dari ruang dingin ke lingkungan luar yang lebih hangat, serta sebutkan parameter efisiensinya (COP).</p>",
+            "rubric": "Rubrik Penilaian AI (Skor 0 - 100):\n1. Konsep Hukum II Termodinamika: Aliran kalor dari reservoir dingin ke reservoir panas tidak spontan dan memerlukan usaha luar (W) (Bobot: 25 poin)\n2. Peran Kompresor & Evaporator: Menjelaskan zat pendingin menyerap kalor di evaporator dan dinaikkan tekanan/suhunya oleh kompresor (Bobot: 25 poin)\n3. Peran Kondensor: Menjelaskan pelepasan kalor ke lingkungan bersuhu lebih hangat (Bobot: 25 poin)\n4. Parameter Kinerja: Menyebutkan Koefisien Performansi (COP) sebagai ukuran efisiensi (Bobot: 25 poin)",
+            "ideal_answer": "Mesin pendingin bekerja berdasarkan Hukum Kedua Termodinamika, di mana kalor secara alami tidak dapat mengalir secara spontan dari benda dingin ke benda panas. Untuk membalik arah aliran ini, dibutuhkan kerja atau usaha dari luar (W) yang disuplai oleh kompresor listrik. Siklus pendingin diawali dari fluida pendingin (refrigerant) bersuhu rendah yang menyerap kalor (Q_in) dari dalam ruang lemari pendingin melalui evaporator. Kemudian kompresor memampatkan uap refrigerant sehingga tekanan dan suhunya naik tajam. Selanjutnya di kondensor yang berada di luar lemari es, uap bertekanan tinggi ini mengembun dan melepaskan kalor (Q_out) ke lingkungan sekitar yang bersuhu lebih hangat. Kinerja mesin pendingin diukur menggunakan Koefisien Performansi (Coefficient of Performance atau COP), yaitu rasio antara kalor yang diserap terhadap usaha kerja kompresor (COP = Q_in / W).",
+            "max_score": 100,
+            "keywords": [
+              "hukum kedua termodinamika",
+              "reservoir dingin",
+              "reservoir panas",
+              "kompresor",
+              "evaporator",
+              "kondensor",
+              "refrigerant",
+              "usaha luar",
+              "koefisien performansi",
+              "cop",
+              "kalor"
+            ],
+            "weight": 3
+          },
+          {
+            "id": 8,
+            "type": "mcq",
+            "cog": "C2",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Kekekalan Energi & Entropi</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Fokuskan pada aplikasi industri pendingin]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Kekekalan Energi & Entropi, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash",
+            "source_engine": "pedagogical_engine (gemini-3.5-flash)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Kekekalan Energi & Entropi secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 9,
+            "type": "mcq_complex",
+            "cog": "C3",
+            "stem": "<p>Terkait materi <strong>Kekekalan Energi & Entropi</strong>, perhatikan beberapa premis berikut!<br><strong>Pilihlah semua pernyataan yang BENAR!</strong> <em>(Jawaban benar lebih dari satu)</em></p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Fokuskan pada aplikasi industri pendingin]</em></small>",
+            "weight": 1.5,
+            "explanation": "Pernyataan A, B, dan D bernilai benar berdasarkan landasan teoretis Kekekalan Energi & Entropi. Pernyataan C dan E tidak sesuai kaidah ilmiah.",
+            "generated_by": "gemini-3.5-flash",
+            "source_engine": "pedagogical_engine (gemini-3.5-flash)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Prinsip Kekekalan Energi & Entropi berlaku secara konsisten pada sistem tertutup maupun terbuka."
+              },
+              {
+                "id": "B",
+                "text": "Terdapat hubungan linier antara energi yang diserap dengan kerja efektif yang dihasilkan."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan entalpi selalu bernilai tak terhingga pada tekanan konstan atmosfer."
+              },
+              {
+                "id": "D",
+                "text": "Analisis matematis membuktikan adanya batas efisiensi maksimum yang tidak dapat dilampaui."
+              },
+              {
+                "id": "E",
+                "text": "Tidak diperlukan kalibrasi instrumen dalam pengukuran parameter kuantitatif."
+              }
+            ],
+            "answer": [
+              "A",
+              "B",
+              "D"
+            ]
+          },
+          {
+            "id": 10,
+            "type": "true_false",
+            "cog": "C4",
+            "stem": "<p>Tentukan nilai kebenaran <strong>Benar (B)</strong> atau <strong>Salah (S)</strong> untuk setiap pernyataan mengenai <strong>Kekekalan Energi & Entropi</strong> berikut:</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Fokuskan pada aplikasi industri pendingin]</em></small>",
+            "weight": 1.5,
+            "explanation": "Pernyataan 1 Benar (relevansi teknologi). Pernyataan 2 Salah (melanggar hukum kekekalan). Pernyataan 3 Benar (pengaruh termal).",
+            "generated_by": "gemini-3.5-flash",
+            "source_engine": "pedagogical_engine (gemini-3.5-flash)",
+            "statements": [
+              {
+                "id": 0,
+                "text": "Konsep Kekekalan Energi & Entropi merupakan dasar fundamental dalam perancangan teknologi modern.",
+                "key": "B"
+              },
+              {
+                "id": 1,
+                "text": "Sistem dapat menghasilkan energi tanpa batas secara mandiri tanpa menyerap daya dari lingkungan.",
+                "key": "S"
+              },
+              {
+                "id": 2,
+                "text": "Peningkatan temperatur operasional berdampak langsung terhadap laju perpindahan kalor atau kestabilan sistem.",
+                "key": "B"
+              }
+            ],
+            "answer": {
+              "0": "B",
+              "1": "S",
+              "2": "B"
+            }
+          },
+          {
+            "id": 11,
+            "type": "matching",
+            "cog": "C3",
+            "stem": "<p><strong>Pasangkanlah</strong> komponen atau terminologi di sebelah kiri dengan deskripsi fungsi/kondisi yang sesuai di sebelah kanan terkait materi <strong>Termodinamika Lanjut</strong>!</p>",
+            "weight": 2,
+            "explanation": "Pasangan terverifikasi: 1 -> B (kerangka logika), 2 -> C (gradien lingkungan), 3 -> A (efisiensi kerja).",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (gemini-3.5-flash-lite)",
+            "premises": [
+              {
+                "id": 0,
+                "text": "1. Komponen Analisis Konseptual Termodinamika Lanjut"
+              },
+              {
+                "id": 1,
+                "text": "2. Pengaruh Faktor Lingkungan Operasional"
+              },
+              {
+                "id": 2,
+                "text": "3. Indikator Efisiensi & Kinerja Sistem"
+              }
+            ],
+            "targets": [
+              {
+                "id": "A",
+                "text": "Menentukan batas optimal konversi energi dan output kerja efektif."
+              },
+              {
+                "id": "B",
+                "text": "Memberikan kerangka logika untuk memprediksi arah dinamika sistem."
+              },
+              {
+                "id": "C",
+                "text": "Memengaruhi gradien suhu, tekanan, dan laju disipasi energi."
+              }
+            ],
+            "answer": {
+              "0": "B",
+              "1": "C",
+              "2": "A"
+            }
+          },
+          {
+            "id": 12,
+            "type": "matching",
+            "cog": "C3",
+            "stem": "<p><strong>Pasangkanlah</strong> komponen atau terminologi di sebelah kiri dengan deskripsi fungsi/kondisi yang sesuai di sebelah kanan terkait materi <strong>Termodinamika Lanjut</strong>!</p>",
+            "weight": 2,
+            "explanation": "Pasangan terverifikasi: 1 -> B (kerangka logika), 2 -> C (gradien lingkungan), 3 -> A (efisiensi kerja).",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (gemini-3.5-flash-lite)",
+            "premises": [
+              {
+                "id": 0,
+                "text": "1. Komponen Analisis Konseptual Termodinamika Lanjut"
+              },
+              {
+                "id": 1,
+                "text": "2. Pengaruh Faktor Lingkungan Operasional"
+              },
+              {
+                "id": 2,
+                "text": "3. Indikator Efisiensi & Kinerja Sistem"
+              }
+            ],
+            "targets": [
+              {
+                "id": "A",
+                "text": "Menentukan batas optimal konversi energi dan output kerja efektif."
+              },
+              {
+                "id": "B",
+                "text": "Memberikan kerangka logika untuk memprediksi arah dinamika sistem."
+              },
+              {
+                "id": "C",
+                "text": "Memengaruhi gradien suhu, tekanan, dan laju disipasi energi."
+              }
+            ],
+            "answer": {
+              "0": "B",
+              "1": "C",
+              "2": "A"
+            }
+          },
+          {
+            "id": 13,
+            "type": "mcq",
+            "cog": "C2",
+            "stem": "<p>Sebuah instalasi pembangkit daya industri memanfaatkan fluida kerja dengan siklus termodinamika tertutup. Suhu reservoar kalor tinggi dipertahankan pada <strong>650 K</strong> dan reservoar suhu rendah pada <strong>325 K</strong>. Berdasarkan hukum kekekalan energi dan efisiensi termal maksimum Carnot terkait <strong>Siklus Termodinamika Turbin Pembangkit Daya</strong>, berapakah efisiensi teoritis tertinggi dari sistem konversi energi tersebut, serta apa implikasi fisis jika terjadi rugi-rugi gesekan pada turbin?</p>",
+            "weight": 1,
+            "explanation": "Efisiensi maksimum Carnot: η = 1 - (Tc / Th) = 1 - (325 / 650) = 0.50 atau 50%. Sesuai Hukum Kedua Termodinamika, tidak ada mesin riil yang dapat melampaui efisiensi Carnot karena adanya ireversibilitas dan peningkatan entropi.",
+            "generated_by": "gemini-3.5-flash",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Efisiensi teoritis maksimum adalah 50%, dan rugi gesekan akan meningkatkan pelepasan kalor disipatif ke lingkungan sehingga efisiensi riil selalu di bawah 50%."
+              },
+              {
+                "id": "B",
+                "text": "Efisiensi teoritis maksimum adalah 100%, karena energi kalor dapat diubah seluruhnya menjadi kerja mekanik tanpa pelepasan kalor buang."
+              },
+              {
+                "id": "C",
+                "text": "Efisiensi teoritis adalah 25%, dan rugi gesekan tidak memengaruhi kerja mekanik total fluida kerja."
+              },
+              {
+                "id": "D",
+                "text": "Efisiensi sistem konstan tanpa dipengaruhi oleh temperatur reservoar pendingin."
+              },
+              {
+                "id": "E",
+                "text": "Penurunan suhu reservoar dingin akan menurunkan efisiensi konversi sistem secara drastis."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 14,
+            "type": "mcq_complex",
+            "cog": "C3",
+            "stem": "<p>Terkait <strong>Siklus Termodinamika Turbin Pembangkit Daya</strong> dalam domain <strong>Sistem Pendingin & Koefisien Performa (COP)</strong>, perhatikan premis-premis fisis berikut!<br><strong>Pilihlah SEMUA pernyataan yang BENAR!</strong> <em>(Jawaban benar dapat lebih dari satu)</em></p>",
+            "weight": 1.5,
+            "explanation": "Pernyataan A, B, dan C benar secara fisis menurut Hukum I dan II Termodinamika. Pernyataan D salah (mutlak perlu fluida kerja). Pernyataan E salah (melanggar Pernyataan Kelvin-Planck).",
+            "generated_by": "gemini-3.5-flash",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Prinsip konservasi energi berlaku universal di mana kalor yang diserap sistem setara dengan akumulasi kerja mekanik dan perubahan energi dalam fluida."
+              },
+              {
+                "id": "B",
+                "text": "Efisiensi termal siklus daya berbanding lurus dengan selisih temperatur antara reservoar panas dan dingin."
+              },
+              {
+                "id": "C",
+                "text": "Semua proses alami berlangsung spontan menuju keadaan dengan tingkat ketidakteraturan (entropi) total yang lebih tinggi atau tetap."
+              },
+              {
+                "id": "D",
+                "text": "Tidak diperlukan fluida kerja dalam perancangan mesin konversi energi termodinamika siklus tertutup."
+              },
+              {
+                "id": "E",
+                "text": "Usaha mekanik dapat dihasilkan secara berkesinambungan hanya dengan menyerap kalor dari satu reservoar tunggal tanpa membuang kalor."
+              }
+            ],
+            "answer": [
+              "A",
+              "B",
+              "C"
+            ]
+          },
+          {
+            "id": 15,
+            "type": "true_false",
+            "cog": "C4",
+            "stem": "<p>Berdasarkan kajian ilmiah mengenai <strong>Siklus Termodinamika Turbin Pembangkit Daya</strong> pada konteks <strong>proses ekspansi kuasistatik gas ideal monoatomik</strong>, tentukan nilai kebenaran <strong>Benar (B)</strong> atau <strong>Salah (S)</strong> untuk setiap pernyataan evaluasi parameter berikut:</p>",
+            "weight": 1.5,
+            "explanation": "Pernyataan 1 Benar (prinsip efisiensi Carnot). Pernyataan 2 Salah (melanggar Hukum II Termodinamika pernyataan Clausius). Pernyataan 3 Benar (sumber utama disipasi energi riil).",
+            "generated_by": "gemini-3.5-flash",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash)",
+            "statements": [
+              {
+                "id": 0,
+                "text": "Peningkatan temperatur kerja reservoar kalor tinggi secara teoritis meningkatkan batas atas efisiensi konversi energi siklus termal.",
+                "key": "B"
+              },
+              {
+                "id": 1,
+                "text": "Energi kalor dapat berpindah secara spontan dari benda bersuhu lebih rendah ke benda bersuhu lebih tinggi tanpa bantuan usaha eksternal.",
+                "key": "S"
+              },
+              {
+                "id": 2,
+                "text": "Rugi-rugi gesekan fluida dan pelepasan kalor tak terisolasi merupakan faktor utama penyebab ireversibilitas dalam siklus termodinamika riil.",
+                "key": "B"
+              }
+            ],
+            "answer": {
+              "0": "B",
+              "1": "S",
+              "2": "B"
+            }
+          },
+          {
+            "id": 16,
+            "type": "mcq",
+            "cog": "C4",
+            "stem": "<p>Pada sistem penukar kalor tipe aliran berlawanan arah (counter-flow heat exchanger) yang diterapkan dalam <strong>Peserta didik mampu menganalisis keterkaitan hukum termodinamika dengan konversi energi pada mesin pendingin dan teknologi industri ramah lingkungan</strong>, laju perpindahan kalor dipengaruhi oleh beda temperatur rata-rata logaritmik (LMTD) dan koefisien perpindahan panas menyeluruh. Manakah konfigurasi teknis yang paling efektif untuk meminimalkan kehilangan energi?</p>",
+            "weight": 1,
+            "explanation": "Aliran counter-flow memberikan efektivitas termal tertinggi dibanding parallel-flow karena menjaga gradien temperatur yang stabil di sepanjang penukar panas.",
+            "generated_by": "gemini-3.5-flash",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Mempertahankan pola aliran counter-flow dengan sirip termal (fins) konduktivitas tinggi guna memperluas area kontak dan mempertahankan gradien suhu yang seragam."
+              },
+              {
+                "id": "B",
+                "text": "Mengubah pola aliran menjadi parallel-flow agar kedua fluida keluar pada temperatur yang tepat sama."
+              },
+              {
+                "id": "C",
+                "text": "Menggunakan material berisolasi tebal di antara kedua saluran fluida kerja."
+              },
+              {
+                "id": "D",
+                "text": "Mempercepat laju alir hingga melampaui batas kritis tanpa memperhatikan penurunan tekanan fluida."
+              },
+              {
+                "id": "E",
+                "text": "Menghilangkan lapisan turbulensi fluida agar aliran bersifat laminer murni tanpa percampuran panas."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 17,
+            "type": "mcq",
+            "cog": "C5",
+            "stem": "<p>Sebuah mesin siklus Stirling memanfaatkan udara bertekanan sebagai fluida kerja dengan regenerator termal internal terkait kajian <strong>Peserta didik mampu menganalisis keterkaitan hukum termodinamika dengan konversi energi pada mesin pendingin dan teknologi industri ramah lingkungan</strong>. Mengapa regenerator termal memegang peranan krusial dalam mendongkrak efisiensi siklus tersebut?</p>",
+            "weight": 1,
+            "explanation": "Regenerator pada mesin Stirling berfungsi sebagai penyimpan energi termal internal bolak-balik (thermal sponge) yang mendekatkan efisiensi teoretis mesin Stirling ke efisiensi Carnot.",
+            "generated_by": "gemini-3.5-flash",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Regenerator menyimpan kalor selama proses isokhorik pendinginan dan melepaskannya kembali saat proses pemanasan isokhorik, sehingga menekan kebutuhan kalor dari sumber luar."
+              },
+              {
+                "id": "B",
+                "text": "Regenerator menghilangkan keharusan adanya pembuangan kalor pada reservoar dingin."
+              },
+              {
+                "id": "C",
+                "text": "Regenerator mempercepat laju pembakaran bahan bakar di dalam ruang silinder kerja."
+              },
+              {
+                "id": "D",
+                "text": "Regenerator menaikkan tekanan fluida kerja hingga mencapai kondisi superkritis secara spontan."
+              },
+              {
+                "id": "E",
+                "text": "Regenerator menghentikan peningkatan entropi sistem sehingga efisiensi mencapai 100%."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 18,
+            "type": "mcq_complex",
+            "cog": "C6",
+            "stem": "<p>Terkait <strong>Peserta didik dapat menghitung koefisien performa mesin pendingin dan menganalisis dampaknya terhadap konsumsi energi listrik secara kuantitatif</strong> dalam domain <strong>Disipasi Termal & Efisiensi Energi Pusat Komputasi</strong>, perhatikan premis-premis fisis berikut!<br><strong>Pilihlah SEMUA pernyataan yang BENAR!</strong> <em>(Jawaban benar dapat lebih dari satu)</em></p>",
+            "weight": 1.5,
+            "explanation": "Pernyataan A, B, dan C benar secara fisis menurut Hukum I dan II Termodinamika. Pernyataan D salah (mutlak perlu fluida kerja). Pernyataan E salah (melanggar Pernyataan Kelvin-Planck).",
+            "generated_by": "gemini-3.5-flash",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Prinsip konservasi energi berlaku universal di mana kalor yang diserap sistem setara dengan akumulasi kerja mekanik dan perubahan energi dalam fluida."
+              },
+              {
+                "id": "B",
+                "text": "Efisiensi termal siklus daya berbanding lurus dengan selisih temperatur antara reservoar panas dan dingin."
+              },
+              {
+                "id": "C",
+                "text": "Semua proses alami berlangsung spontan menuju keadaan dengan tingkat ketidakteraturan (entropi) total yang lebih tinggi atau tetap."
+              },
+              {
+                "id": "D",
+                "text": "Tidak diperlukan fluida kerja dalam perancangan mesin konversi energi termodinamika siklus tertutup."
+              },
+              {
+                "id": "E",
+                "text": "Usaha mekanik dapat dihasilkan secara berkesinambungan hanya dengan menyerap kalor dari satu reservoar tunggal tanpa membuang kalor."
+              }
+            ],
+            "answer": [
+              "A",
+              "B",
+              "C"
+            ]
+          },
+          {
+            "id": 19,
+            "type": "mcq_complex",
+            "cog": "C2",
+            "stem": "<p>Terkait <strong>Peserta didik dapat menghitung koefisien performa mesin pendingin dan menganalisis dampaknya terhadap konsumsi energi listrik secara kuantitatif</strong> dalam domain <strong>Siklus Termal & Pembangkit Daya Industri</strong>, perhatikan premis-premis fisis berikut!<br><strong>Pilihlah SEMUA pernyataan yang BENAR!</strong> <em>(Jawaban benar dapat lebih dari satu)</em></p>",
+            "weight": 1.5,
+            "explanation": "Pernyataan A, B, dan C benar secara fisis menurut Hukum I dan II Termodinamika. Pernyataan D salah (mutlak perlu fluida kerja). Pernyataan E salah (melanggar Pernyataan Kelvin-Planck).",
+            "generated_by": "gemini-3.5-flash",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Prinsip konservasi energi berlaku universal di mana kalor yang diserap sistem setara dengan akumulasi kerja mekanik dan perubahan energi dalam fluida."
+              },
+              {
+                "id": "B",
+                "text": "Efisiensi termal siklus daya berbanding lurus dengan selisih temperatur antara reservoar panas dan dingin."
+              },
+              {
+                "id": "C",
+                "text": "Semua proses alami berlangsung spontan menuju keadaan dengan tingkat ketidakteraturan (entropi) total yang lebih tinggi atau tetap."
+              },
+              {
+                "id": "D",
+                "text": "Tidak diperlukan fluida kerja dalam perancangan mesin konversi energi termodinamika siklus tertutup."
+              },
+              {
+                "id": "E",
+                "text": "Usaha mekanik dapat dihasilkan secara berkesinambungan hanya dengan menyerap kalor dari satu reservoar tunggal tanpa membuang kalor."
+              }
+            ],
+            "answer": [
+              "A",
+              "B",
+              "C"
+            ]
+          },
+          {
+            "id": 20,
+            "type": "mcq",
+            "cog": "C4",
+            "stem": "Seorang system administrator menerima laporan bahwa aplikasi web perusahaan sering mengalami gangguan terputus secara acak dengan kode status HTTP 504 Gateway Timeout. Arsitektur infrastruktur web menggunakan web server Nginx sebagai reverse proxy yang meneruskan permintaan (request) ke backend aplikasi PHP-FPM melalui soket Unix. Berikut adalah cuplikan konfigurasi dari Nginx block:</p><pre><code>server {\nlisten 80;\nserver_name aplikasi.internal;\nlocation / {\ninclude fastcgi_params;\nfastcgi_pass unix:/run/php/php8.1-fpm.sock;\nfastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;\nfastcgi_read_timeout 5s;\n}\n}</code></pre><p>Berdasarkan analisis log error Nginx, ditemukan pesan: <code>upstream timed out (110: Connection timed out) while reading response header from upstream</code>. Manakah tindakan perbaikan konfigurasi yang paling tepat secara teknis untuk mengatasi akar masalah tersebut tanpa mengorbankan stabilitas sistem?",
+            "weight": 1,
+            "explanation": "Error 504 Gateway Timeout pada Nginx reverse proxy mengindikasikan bahwa server upstream (dalam hal ini PHP-FPM) gagal menghasilkan respons atau memproses skrip dalam batas waktu yang ditentukan oleh Nginx. Pada konfigurasi di atas, parameter `fastcgi_read_timeout 5s` menetapkan batas waktu tunggu yang sangat singkat (hanya 5 detik). Jika ada kueri basis data atau pemrosesan logika backend yang memakan waktu lebih dari 5 detik, Nginx akan memutus koneksi dan mengirimkan error 504 ke klien. Solusi utamanya adalah menaikkan nilai `fastcgi_read_timeout` ke angka yang lebih wajar (misalnya 60s), sekaligus melakukan optimasi pada kode backend atau indeks basis data yang lambat.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Mengubah direktif fastcgi_pass dari soket Unix ke alamat TCP loopback 127.0.0.1:9000 karena soket Unix tidak mendukung timeout."
+              },
+              {
+                "id": "B",
+                "text": "Menambahkan direktif client_max_body_size 100M pada blok server untuk mengantisipasi data payload yang terlalu besar."
+              },
+              {
+                "id": "C",
+                "text": "Meningkatkan nilai parameter fastcgi_read_timeout pada blok location dan menginvestigasi query database backend yang berjalan lambat."
+              },
+              {
+                "id": "D",
+                "text": "Mengganti protokol fastcgi_params menjadi proxy_pass dan mengubah Nginx menjadi web server mandiri tanpa backend PHP-FPM."
+              },
+              {
+                "id": "E",
+                "text": "Menurunkan nilai worker_connections pada file konfigurasi global nginx.conf untuk mengurangi beban antrean koneksi."
+              }
+            ],
+            "answer": "C"
+          },
+          {
+            "id": 21,
+            "type": "mcq",
+            "cog": "C5",
+            "stem": "Pada sebuah server produksi yang menjalankan web server Apache HTTP Server, pengguna tiba-tiba melaporkan halaman utama tidak dapat diakses dan memunculkan error 502 Bad Gateway saat diintegrasikan di belakang load balancer HAProxy. Administrator memeriksa file log error Apache (<code>/var/log/apache2/error.log</code>) dan menemukan entri berikut:</p><p><code>[proxy:error] [pid 1642:tid 1402] (111)Connection refused: AH00957: HTTP: attempt to connect to 127.0.0.1:8080 (127.0.0.1) failed</code></p><p>Sementara itu, layanan aplikasi internal yang berjalan pada port 8080 sedang aktif tetapi dikonfigurasi hanya mendengarkan pada antarmuka IPv6 (<code>[::1]:8080</code>). Sebagai seorang arsitek jaringan dan web server, analisis manakah yang paling akurat untuk menyelesaikan masalah ini?",
+            "weight": 1,
+            "explanation": "Error 502 Bad Gateway pada Apache (bertindak sebagai reverse proxy atau melalui modul proxy_http) dengan pesan 'Connection refused' menunjukkan bahwa Apache mencoba meneruskan permintaan ke alamat target (127.0.0.1:8080), tetapi tidak ada proses yang mendengarkan (listening) pada port tersebut. Karena aplikasi backend hanya mendengarkan pada IPv6 ([::1]:8080) atau menggunakan soket localhost yang tidak cocok, koneksi ditolak. Solusinya adalah mengubah konfigurasi aplikasi backend agar mendengarkan pada alamat IPv4 (0.0.0.0:8080 atau 127.0.0.1:8080) atau menyesuaikan konfigurasi ProxyPass pada Apache agar merujuk ke alamat IPv6 yang benar.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Mengubah hak akses file (chmod) pada direktori root web Apache menjadi 777 agar modul proxy dapat membaca direktori."
+              },
+              {
+                "id": "B",
+                "text": "Menyesuaikan konfigurasi binding aplikasi backend agar mendengarkan pada alamat IPv4 127.0.0.1:8080 atau memperbarui target ProxyPass Apache ke format IPv6 yang sesuai."
+              },
+              {
+                "id": "C",
+                "text": "Menonaktifkan modul SSL/TLS pada Apache karena enkripsi HTTPS menyebabkan kegagalan handshake dengan port 8080."
+              },
+              {
+                "id": "D",
+                "text": "Menambahkan baris ServerName localhost pada file httpd.conf untuk menghindari konflik resolusi DNS lokal."
+              },
+              {
+                "id": "E",
+                "text": "Membersihkan cache browser pengguna dan memperbarui modul mpm_prefork menjadi mpm_winnt di dalam server Linux."
+              }
+            ],
+            "answer": "B"
+          },
+          {
+            "id": 22,
+            "type": "mcq",
+            "cog": "C4",
+            "stem": "Perhatikan skenario konfigurasi Nginx berikut. Sebuah perusahaan migrasi dari Apache ke Nginx untuk meningkatkan performa penanganan file statis dan reverse proxy Node.js. Administrator menulis konfigurasi Server Block sebagai berikut:</p><pre><code>server {\nlisten 443 ssl;\nserver_name portal.enterprise.co.id;\nssl_certificate /etc/ssl/certs/portal.crt;\nssl_certificate_key /etc/ssl/private/portal.key;\nlocation /api/ {\nproxy_pass http://127.0.0.1:3000;\nproxy_set_header Host $host;\nproxy_set_header X-Real-IP $remote_addr;\n}\nlocation / {\nroot /var/www/html;\ntry_files $uri $uri/ =404;\n}\n}</code></pre><p>Setelah diterapkan, pengembang melaporkan bahwa aplikasi klien di browser mengalami kegagalan terus-menerus dengan error 502 Bad Gateway setiap kali melakukan POST request berukuran besar ke endpoint <code>/api/upload</code>, padahal GET request berukuran kecil berjalan normal. Apa penyebab teknis utama dari fenomena ini?",
+            "weight": 1,
+            "explanation": "Error 502 Bad Gateway pada Nginx reverse proxy yang hanya terjadi saat mengunggah (POST request) file berukuran besar biasanya disebabkan oleh batasan ukuran body permintaan yang diizinkan oleh Nginx. Secara default, direktif `client_max_body_size` di Nginx bernilai 1M (1 Megabyte). Ketika klien mengirimkan payload POST yang melebihi 1 Megabyte (seperti pada endpoint /api/upload), Nginx menolak permintaan tersebut sebelum diteruskan ke backend (Node.js) atau memutus koneksi di tengah jalan, yang berakibat pada respons error 502. Solusinya adalah menambahkan direktif `client_max_body_size 50M;` (atau ukuran yang sesuai) di dalam blok http, server, atau location.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Direktif proxy_pass menggunakan alamat IP loopback IPv4 alih-alih nama domain internal backend Node.js."
+              },
+              {
+                "id": "B",
+                "text": "Sertifikat SSL/TLS kedaluwarsa sehingga enkripsi payload POST berukuran besar gagal diverifikasi oleh modul proxy Nginx."
+              },
+              {
+                "id": "C",
+                "text": "Direktif client_max_body_size default Nginx (1MB) terlampaui oleh payload unggahan berkas, sehingga Nginx menolak koneksi sebelum mencapai backend."
+              },
+              {
+                "id": "D",
+                "text": "Penggunaan try_files pada location root menimpa jalur routing dari location /api/, menyebabkan konflik penanganan protokol HTTP."
+              },
+              {
+                "id": "E",
+                "text": "Modul proxy_set_header tidak menyertakan variabel X-Forwarded-For sehingga aplikasi Node.js menolak koneksi lintas domain."
+              }
+            ],
+            "answer": "C"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "subject": "TKA Campuran (SMA/SMK)",
+        "title": "Bank Soal Asesmen Standar TKA SMA & SMK / ANBK Literasi Sains",
+        "teacher": "Tim Pokja Asesmen Nasional",
+        "target_class": "Semua Kelas",
+        "description": "Model butir soal standar Pusmendik Kemdikbudristek: PG, PG Kompleks, Benar/Salah, Menjodohkan, Isian Singkat, dan Uraian Analisis Terbuka.",
+        "questions": [
+          {
+            "id": 1,
+            "type": "mcq",
+            "cog": "C2",
+            "stem": "<p>Sebuah generator listrik di PLTA mengubah energi kinetik aliran air menjadi energi listrik. Perubahan bentuk energi ini merupakan penerapan langsung dari prinsip...</p>",
+            "options": [
+              {
+                "id": "A",
+                "text": "Hukum Kekekalan Energi"
+              },
+              {
+                "id": "B",
+                "text": "Hukum Pascal"
+              },
+              {
+                "id": "C",
+                "text": "Hukum Archimedes"
+              },
+              {
+                "id": "D",
+                "text": "Hukum Gravitasi Newton"
+              },
+              {
+                "id": "E",
+                "text": "Hukum Boyle-Gay Lussac"
+              }
+            ],
+            "answer": "A",
+            "weight": 1,
+            "explanation": "Perubahan energi potensial dan kinetik air menjadi energi listrik adalah wujud Hukum Kekekalan Energi."
+          },
+          {
+            "id": 2,
+            "type": "mcq_complex",
+            "cog": "C4",
+            "stem": "<p>Perhatikan sumber-sumber energi terbarukan berikut!<br><strong>Pilihlah seluruh energi yang ramah lingkungan dan tidak menghasilkan emisi gas rumah kaca saat beroperasi!</strong> <em>(Pilihan benar lebih dari satu)</em></p>",
+            "options": [
+              {
+                "id": "A",
+                "text": "Pembangkit Listrik Tenaga Surya (PLTS)"
+              },
+              {
+                "id": "B",
+                "text": "Pembangkit Listrik Tenaga Bayu/Angin (PLTB)"
+              },
+              {
+                "id": "C",
+                "text": "Pembangkit Listrik Tenaga Batubara (PLTU)"
+              },
+              {
+                "id": "D",
+                "text": "Pembangkit Listrik Tenaga Panas Bumi (PLTP)"
+              },
+              {
+                "id": "E",
+                "text": "Pembangkit Listrik Berbahan Bakar Minyak Solar (PLTD)"
+              }
+            ],
+            "answer": [
+              "A",
+              "B",
+              "D"
+            ],
+            "weight": 1.5,
+            "explanation": "PLTS, PLTB, dan PLTP adalah sumber energi baru terbarukan (EBT) ramah lingkungan tanpa emisi karbon."
+          },
+          {
+            "id": 3,
+            "type": "true_false",
+            "cog": "C4",
+            "stem": "<p>Tentukan apakah setiap pernyataan mengenai <strong>Dampak Efek Rumah Kaca & Perubahan Iklim</strong> berikut bernilai <strong>Benar (B)</strong> atau <strong>Salah (S)</strong>:</p>",
+            "statements": [
+              {
+                "id": 0,
+                "text": "Gas karbon dioksida (CO2) dan metana (CH4) adalah gas rumah kaca utama yang menyerap radiasi inframerah.",
+                "key": "B"
+              },
+              {
+                "id": 1,
+                "text": "Efek rumah kaca alami sepenuhnya merugikan dan harus dihilangkan seluruhnya dari atmosfer bumi.",
+                "key": "S"
+              },
+              {
+                "id": 2,
+                "text": "Pemanasan global memicu kenaikan permukaan air laut akibat pencairan gletser dan pemuaian termal air laut.",
+                "key": "B"
+              }
+            ],
+            "answer": {
+              "0": "B",
+              "1": "S",
+              "2": "B"
+            },
+            "weight": 1.5,
+            "explanation": "Pernyataan 1 Benar. Pernyataan 2 Salah (tanpa efek rumah kaca alami, suhu bumi akan membeku sekitar -18°C). Pernyataan 3 Benar."
+          },
+          {
+            "id": 4,
+            "type": "matching",
+            "cog": "C3",
+            "stem": "<p><strong>Pasangkanlah</strong> instrumen alat ukur di kolom kiri dengan besaran fisika yang diukurnya di kolom kanan!</p>",
+            "premises": [
+              {
+                "id": 0,
+                "text": "1. Jangka Sorong"
+              },
+              {
+                "id": 1,
+                "text": "2. Barometer"
+              },
+              {
+                "id": 2,
+                "text": "3. Termometer"
+              },
+              {
+                "id": 3,
+                "text": "4. Luxmeter"
+              }
+            ],
+            "targets": [
+              {
+                "id": "A",
+                "text": "Tekanan Udara / Atmosfer"
+              },
+              {
+                "id": "B",
+                "text": "Ketebalan atau Diameter Benda Presisi"
+              },
+              {
+                "id": "C",
+                "text": "Intensitas Penerangan / Cahaya"
+              },
+              {
+                "id": "D",
+                "text": "Derajat Suhu Suatu Benda"
+              }
+            ],
+            "answer": {
+              "0": "B",
+              "1": "A",
+              "2": "D",
+              "3": "C"
+            },
+            "weight": 2,
+            "explanation": "Jangka Sorong = Diameter/Ketebalan (B), Barometer = Tekanan (A), Termometer = Suhu (D), Luxmeter = Intensitas Cahaya (C)."
+          },
+          {
+            "id": 5,
+            "type": "short_essay",
+            "cog": "C3",
+            "stem": "<p>Satuan Sistem Internasional (SI) untuk mengukur <strong>daya listrik</strong> atau laju pemakaian energi sebesar satu joule per detik adalah...</p>",
+            "answer_keys": [
+              "watt",
+              "w"
+            ],
+            "weight": 1,
+            "explanation": "Satuan SI daya adalah Watt (W = Joule/sekon)."
+          },
+          {
+            "id": 6,
+            "type": "long_essay",
+            "cog": "C6",
+            "stem": "<p>Sebagai calon teknisi atau saintis muda, rancanglah sebuah strategi penerapan <strong>transisi energi bersih terbarukan</strong> untuk lingkungan sekolah atau bengkel SMK Anda!<br>Jelaskan sumber energi yang dipilih, estimasi penghematan biaya, serta langkah edukasi kepada warga sekolah mengenai efisiensi energi.</p>",
+            "rubric": "Rubrik Penilaian AI (Skor 0 - 100):\n1. Pemilihan sumber energi terbarukan yang relevan dan aplikatif di sekolah (misal Solar Panel Rooftop / Biogas) (Bobot: 30 poin)\n2. Analisis teknis dan efisiensi penghematan energi (Bobot: 30 poin)\n3. Program edukasi atau kampanye budaya hemat energi untuk warga sekolah (Bobot: 25 poin)\n4. Kerapian bahasa, logika argumentasi, dan kesimpulan (Bobot: 15 poin)",
+            "ideal_answer": "Penerapan strategi transisi energi di lingkungan sekolah dapat dimulai dengan instalasi Pembangkit Listrik Tenaga Surya (PLTS) Atap (Rooftop Solar PV) pada gedung utama dan bengkel praktik. Energi surya sangat ideal karena jam operasional sekolah berlangsung saat radiasi matahari maksimal (pukul 07.00 - 16.00). PLTS ini dapat memotong tagihan listrik PLN sebesar 30-40% per bulan, sekaligus berfungsi sebagai media pembelajaran riil bagi siswa teknik ketenagalistrikan. Selain instalasi fisik, diterapkan kebijakan 'Green Behavior' seperti penggantian lampu hemat energi LED, sensor otomatis pemutus daya di ruang kelas kosong, serta pembentukan duta energi pelajar untuk mengedukasi warga sekolah tentang pentingnya reduksi jejak karbon.",
+            "max_score": 100,
+            "keywords": [
+              "plts",
+              "solar panel",
+              "energi surya",
+              "penghematan listrik",
+              "edukasi",
+              "efisiensi energi",
+              "ramah lingkungan",
+              "jejak karbon",
+              "terbarukan"
+            ],
+            "weight": 3
+          },
+          {
+            "id": 7,
+            "type": "long_essay",
+            "cog": "C5",
+            "stem": "<p>Jelaskan secara komprehensif bagaimana prinsip dasar <strong>Literasi Sains & Bioenergi</strong> diterapkan dalam pemecahan masalah teknologi nyata!<br>Uraikan alur proses sains yang terjadi, tantangan efisiensi yang dihadapi, serta alternatif solusi inovatif untuk meminimalkan kehilangan energi!</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Studi kasus transisi energi ramah lingkungan]</em></small>",
+            "weight": 3,
+            "explanation": "Soal ini mengukur kemampuan berpikir tingkat tinggi (C5) dalam menyintesis konsep Literasi Sains & Bioenergi ke dalam studi kasus aplikatif.",
+            "generated_by": "gemini-3.8-flash",
+            "source_engine": "pedagogical_engine (fallback gemini-3.8-flash)",
+            "rubric": "Rubrik Penilaian AI (Skor 0 - 100):\n1. Penguasaan Konsep Teori Dasar: Menguraikan prinsip Literasi Sains & Bioenergi secara presisi dan logis (Bobot: 30 poin)\n2. Analisis Mekanisme & Proses: Mengidentifikasi komponen dan tahapan konversi energi (Bobot: 35 poin)\n3. Rekomendasi Solusi & Efisiensi: Memberikan gagasan optimasi dan pertimbangan sains (Bobot: 35 poin)",
+            "ideal_answer": "Prinsip Literasi Sains & Bioenergi menyatakan keteraturan dinamika energi di mana sistem beroperasi menurut hukum kekekalan dan arah spontanitas tertentu. Dalam penerapannya, energi input dialirkan melalui komponen konversi untuk menghasilkan kerja bermanfaat, sementara sebagian energi terdisipasi sebagai kalor lingkungan. Untuk meningkatkan efisiensi, inovasi material berisolasi tinggi dan siklus regenerasi energi dapat diterapkan guna menekan degradasi entropi secara signifikan.",
+            "max_score": 100,
+            "keywords": [
+              "literasi sains & bioenergi",
+              "efisiensi",
+              "energi",
+              "sistem",
+              "proses",
+              "konversi",
+              "prinsip"
+            ]
+          },
+          {
+            "id": 8,
+            "type": "long_essay",
+            "cog": "C5",
+            "stem": "<p>Jelaskan secara komprehensif bagaimana prinsip dasar <strong>Literasi Sains & Bioenergi</strong> diterapkan dalam pemecahan masalah teknologi nyata!<br>Uraikan alur proses sains yang terjadi, tantangan efisiensi yang dihadapi, serta alternatif solusi inovatif untuk meminimalkan kehilangan energi!</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Studi kasus transisi energi ramah lingkungan]</em></small>",
+            "weight": 3,
+            "explanation": "Soal ini mengukur kemampuan berpikir tingkat tinggi (C5) dalam menyintesis konsep Literasi Sains & Bioenergi ke dalam studi kasus aplikatif.",
+            "generated_by": "gemini-3.8-flash",
+            "source_engine": "pedagogical_engine (fallback gemini-3.8-flash)",
+            "rubric": "Rubrik Penilaian AI (Skor 0 - 100):\n1. Penguasaan Konsep Teori Dasar: Menguraikan prinsip Literasi Sains & Bioenergi secara presisi dan logis (Bobot: 30 poin)\n2. Analisis Mekanisme & Proses: Mengidentifikasi komponen dan tahapan konversi energi (Bobot: 35 poin)\n3. Rekomendasi Solusi & Efisiensi: Memberikan gagasan optimasi dan pertimbangan sains (Bobot: 35 poin)",
+            "ideal_answer": "Prinsip Literasi Sains & Bioenergi menyatakan keteraturan dinamika energi di mana sistem beroperasi menurut hukum kekekalan dan arah spontanitas tertentu. Dalam penerapannya, energi input dialirkan melalui komponen konversi untuk menghasilkan kerja bermanfaat, sementara sebagian energi terdisipasi sebagai kalor lingkungan. Untuk meningkatkan efisiensi, inovasi material berisolasi tinggi dan siklus regenerasi energi dapat diterapkan guna menekan degradasi entropi secara signifikan.",
+            "max_score": 100,
+            "keywords": [
+              "literasi sains & bioenergi",
+              "efisiensi",
+              "energi",
+              "sistem",
+              "proses",
+              "konversi",
+              "prinsip"
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "subject": "Matematika XII",
+        "title": "Bank Soal Aljabar Linear, Matriks & Vektor",
+        "teacher": "Dra. Siti Rahmawati",
+        "target_class": "Kelas XII IPA / IPS",
+        "description": "Butir soal matriks, determinan, invers, dan aljabar linear terapan.",
+        "questions": [
+          {
+            "id": 1,
+            "type": "mcq",
+            "cog": "C2",
+            "stem": "<p>Jika determinan suatu matriks persegi berordo 2x2 bernilai nol, maka matriks tersebut disebut sebagai matriks...</p>",
+            "options": [
+              {
+                "id": "A",
+                "text": "Matriks Identitas"
+              },
+              {
+                "id": "B",
+                "text": "Matriks Singular"
+              },
+              {
+                "id": "C",
+                "text": "Matriks Diagonal"
+              },
+              {
+                "id": "D",
+                "text": "Matriks Skalar"
+              },
+              {
+                "id": "E",
+                "text": "Matriks Simetris"
+              }
+            ],
+            "answer": "B",
+            "weight": 1,
+            "explanation": "Matriks yang determinannya sama dengan 0 dinamakan matriks singular dan tidak memiliki invers."
+          },
+          {
+            "id": 2,
+            "type": "mcq_complex",
+            "cog": "C3",
+            "stem": "<p>Diketahui matriks A dan B berordo sama n x n. Manakah sifat-sifat matriks berikut yang <strong>BENAR</strong>? <em>(Jawaban benar lebih dari satu)</em></p>",
+            "options": [
+              {
+                "id": "A",
+                "text": "det(A × B) = det(A) × det(B)"
+              },
+              {
+                "id": "B",
+                "text": "Perkalian matriks bersifat komutatif: A × B = B × A untuk semua matriks"
+              },
+              {
+                "id": "C",
+                "text": "det(A^T) = det(A) di mana A^T adalah transpos matriks A"
+              },
+              {
+                "id": "D",
+                "text": "Jika det(A) ≠ 0, maka A memiliki invers A⁻¹"
+              }
+            ],
+            "answer": [
+              "A",
+              "C",
+              "D"
+            ],
+            "weight": 1.5,
+            "explanation": "Perkalian matriks pada umumnya TIDAK komutatif, sehingga opsi B salah. Opsi A, C, dan D adalah sifat fundamental matriks."
+          },
+          {
+            "id": 3,
+            "type": "true_false",
+            "cog": "C3",
+            "stem": "<p>Tentukan nilai kebenaran <strong>Benar (B)</strong> atau <strong>Salah (S)</strong> untuk sifat operasi aljabar berikut:</p>",
+            "statements": [
+              {
+                "id": 0,
+                "text": "Matriks identitas I bila dikalikan dengan matriks sembarang A akan menghasilkan matriks A itu sendiri.",
+                "key": "B"
+              },
+              {
+                "id": 1,
+                "text": "Dua matriks dapat dijumlahkan meskipun ordonya berbeda.",
+                "key": "S"
+              },
+              {
+                "id": 2,
+                "text": "Invers dari matriks invers (A⁻¹)⁻¹ adalah kembali ke matriks semula A.",
+                "key": "B"
+              }
+            ],
+            "answer": {
+              "0": "B",
+              "1": "S",
+              "2": "B"
+            },
+            "weight": 1.5,
+            "explanation": "Penjumlahan matriks mensyaratkan ordo harus persis sama."
+          },
+          {
+            "id": 4,
+            "type": "short_essay",
+            "cog": "C3",
+            "stem": "<p>Jika matriks A = [[3, 2], [1, 4]], maka nilai <strong>determinan dari matriks A</strong> adalah...</p>",
+            "answer_keys": [
+              "10"
+            ],
+            "weight": 1,
+            "explanation": "det(A) = (3 × 4) - (2 × 1) = 12 - 2 = 10."
+          },
+          {
+            "id": 5,
+            "type": "long_essay",
+            "cog": "C4",
+            "stem": "<p>Sebuah toko peralatan sekolah menjual paket buku dan pena. Paket A berisi 3 buku dan 2 pena seharga Rp 26.000. Paket B berisi 2 buku dan 5 pena seharga Rp 32.000.<br>Selesaikan sistem persamaan linear tersebut menggunakan <strong>metode matriks (invers atau aturan Cramer)</strong> dan tentukan harga masing-masing satu buah buku dan satu buah pena!</p>",
+            "rubric": "Rubrik Penilaian AI:\n1. Membentuk model persamaan matriks AX = B dengan benar (Bobot: 30 poin)\n2. Menghitung determinan matriks utama dengan benar (Bobot: 25 poin)\n3. Menyelesaikan invers atau aturan Cramer langkah demi langkah (Bobot: 25 poin)\n4. Menuliskan kesimpulan harga satuan buku (Rp 6.000) dan pena (Rp 4.000) dengan tepat (Bobot: 20 poin)",
+            "ideal_answer": "Model persamaan matriks: [[3, 2], [2, 5]] [x, y]^T = [26000, 32000]^T, di mana x = harga buku dan y = harga pena.\nDeterminan matriks D = (3)(5) - (2)(2) = 15 - 4 = 11.\nMenggunakan aturan Cramer:\nDx = (26000)(5) - (32000)(2) = 130000 - 64000 = 66000\nDy = (3)(32000) - (2)(26000) = 96000 - 52000 = 44000\nNilai x = Dx / D = 66000 / 11 = 6000\nNilai y = Dy / D = 44000 / 11 = 4000\nKesimpulan: Harga 1 buah buku adalah Rp 6.000 dan harga 1 buah pena adalah Rp 4.000.",
+            "max_score": 100,
+            "keywords": [
+              "matriks",
+              "determinan",
+              "cramer",
+              "invers",
+              "6000",
+              "4000",
+              "buku",
+              "pena",
+              "11"
+            ],
+            "weight": 3
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "subject": "Bahasa Indonesia XII",
+        "title": "Bank Soal Teks Editorial & Puisi Kontemporer",
+        "teacher": "Nurul Hidayati, S.Pd.",
+        "target_class": "Semua Kelas",
+        "description": "Butir soal literasi membaca, analisis struktur teks editorial, fakta vs opini, dan majas puisi.",
+        "questions": [
+          {
+            "id": 1,
+            "type": "mcq",
+            "cog": "C2",
+            "stem": "<p>Bagian pengenalan isu atau pengantar masalah utama dalam struktur teks editorial disebut...</p>",
+            "options": [
+              {
+                "id": "A",
+                "text": "Tesis (Pengenalan Isu)"
+              },
+              {
+                "id": "B",
+                "text": "Argumentasi"
+              },
+              {
+                "id": "C",
+                "text": "Penegasan Ulang"
+              },
+              {
+                "id": "D",
+                "text": "Koda"
+              },
+              {
+                "id": "E",
+                "text": "Orientasi Latar"
+              }
+            ],
+            "answer": "A",
+            "weight": 1,
+            "explanation": "Struktur teks editorial terdiri atas: Tesis/Pengenalan Isu, Argumentasi, dan Penegasan Ulang."
+          },
+          {
+            "id": 2,
+            "type": "true_false",
+            "cog": "C3",
+            "stem": "<p>Tentukan apakah kalimat-kalimat berikut tergolong <strong>Fakta (Benar)</strong> atau <strong>Opini (Salah)</strong> dalam artikel:</p>",
+            "statements": [
+              {
+                "id": 0,
+                "text": "Indonesia resmi memindahkan ibu kota negara ke Nusantara di Kalimantan Timur sesuai Undang-Undang IKN.",
+                "key": "B"
+              },
+              {
+                "id": 1,
+                "text": "Pembangunan transportasi massal adalah kebijakan terbaik yang paling disukai seluruh masyarakat.",
+                "key": "S"
+              },
+              {
+                "id": 2,
+                "text": "Badan Pusat Statistik (BPS) mencatat pertumbuhan ekonomi Indonesia triwulan lalu mencapai 5,05%.",
+                "key": "B"
+              }
+            ],
+            "answer": {
+              "0": "B",
+              "1": "S",
+              "2": "B"
+            },
+            "weight": 1.5,
+            "explanation": "Pernyataan 1 dan 3 adalah fakta objektif terdata. Pernyataan 2 adalah opini subjektif (terdapat kata 'terbaik yang paling disukai')."
+          },
+          {
+            "id": 3,
+            "type": "long_essay",
+            "cog": "C5",
+            "stem": "<p>Bacalah isu mengenai peningkatan penggunaan Artificial Intelligence (AI) di kalangan pelajar saat ini.<br>Tuliskan sebuah <strong>teks editorial singkat (3 paragraf: Tesis, Argumentasi, dan Penegasan Ulang/Solusi)</strong> yang menyampaikan pandangan kritis Anda mengenai pemanfaatan AI dalam dunia pendidikan tanpa menghilangkan kejujuran akademik!</p>",
+            "rubric": "Rubrik Penilaian AI:\n1. Memiliki struktur teks editorial lengkap: Tesis, Argumentasi, dan Rekomendasi/Penegasan Ulang (Bobot: 35 poin)\n2. Argumen kritis berimbang (menyajikan manfaat AI dan risiko degradasi integritas akademik) (Bobot: 35 poin)\n3. Rekomendasi solusi konkret bagi siswa dan guru (Bobot: 20 poin)\n4. Kaidah kebahasaan dan ejaan EYD yang baik (Bobot: 10 poin)",
+            "ideal_answer": "Pemanfaatan kecerdasan buatan (AI) di era pendidikan modern bagaikan pedang bermata dua. Di satu sisi, AI menjadi asisten belajar yang luar biasa cepat dalam merangkum konsep dan membuka wawasan baru. Namun di sisi lain, ketergantungan berlebih berisiko menumpulkan daya kritis serta memicu plagiarisme instan jika tidak dilandasi etika kejujuran akademik.\n\nPelajar tidak boleh memposisikan AI sebagai pembuat tugas akhir, melainkan sebagai mitra diskusi konseptual. Kemampuan berpikir analitis, berargumen logis, dan empati kemanusiaan adalah esensi pendidikan yang tidak dapat digantikan oleh algoritma mesin mana pun.\n\nOleh karena itu, sekolah dan guru perlu merumuskan pedoman literasi AI yang jelas. Evaluasi pembelajaran hendaknya lebih berorientasi pada proses penalaran otentik dan pemecahan masalah nyata, sehingga teknologi menjadi akselerator kecerdasan bangsa yang berkarakter jujur.",
+            "max_score": 100,
+            "keywords": [
+              "artificial intelligence",
+              "ai",
+              "kejujuran akademik",
+              "pendidikan",
+              "daya kritis",
+              "etika",
+              "solusi",
+              "literasi",
+              "karakter"
+            ],
+            "weight": 3
+          },
+          {
+            "id": 4,
+            "type": "mcq",
+            "cog": "C2",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 5,
+            "type": "mcq",
+            "cog": "C3",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 6,
+            "type": "mcq",
+            "cog": "C4",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 7,
+            "type": "mcq",
+            "cog": "C4",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 8,
+            "type": "mcq",
+            "cog": "C5",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 9,
+            "type": "mcq",
+            "cog": "C6",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 10,
+            "type": "mcq",
+            "cog": "C2",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 11,
+            "type": "mcq",
+            "cog": "C3",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 12,
+            "type": "mcq",
+            "cog": "C4",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 13,
+            "type": "mcq",
+            "cog": "C4",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 14,
+            "type": "mcq",
+            "cog": "C2",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 15,
+            "type": "mcq",
+            "cog": "C3",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 16,
+            "type": "mcq",
+            "cog": "C4",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 17,
+            "type": "mcq",
+            "cog": "C4",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 18,
+            "type": "mcq",
+            "cog": "C5",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 19,
+            "type": "mcq",
+            "cog": "C6",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 20,
+            "type": "mcq",
+            "cog": "C2",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 21,
+            "type": "mcq",
+            "cog": "C3",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 22,
+            "type": "mcq",
+            "cog": "C4",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 23,
+            "type": "mcq",
+            "cog": "C4",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 24,
+            "type": "mcq",
+            "cog": "C5",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 25,
+            "type": "mcq",
+            "cog": "C6",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 26,
+            "type": "mcq",
+            "cog": "C2",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 27,
+            "type": "mcq",
+            "cog": "C3",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          },
+          {
+            "id": 28,
+            "type": "mcq",
+            "cog": "C4",
+            "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+            "weight": 1,
+            "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+              },
+              {
+                "id": "B",
+                "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+              },
+              {
+                "id": "C",
+                "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+              },
+              {
+                "id": "D",
+                "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+              },
+              {
+                "id": "E",
+                "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+              }
+            ],
+            "answer": "A"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "subject": "Kimia",
+        "title": "Bank Soal Kimia Organik & Stoikiometri",
+        "teacher": "Guru Pengampu",
+        "target_class": "XII IPA 1",
+        "description": "",
+        "questions": []
+      },
+      {
+        "id": 6,
+        "subject": "Jaringan Komputer & Telekomunikasi",
+        "title": "ASJ",
+        "teacher": "Drs. Budi Pratama, M.Pd.",
+        "target_class": "Semua Kelas",
+        "description": "",
+        "questions": [
+          {
+            "id": 1,
+            "type": "mcq",
+            "cog": "C4",
+            "stem": "Seorang administrator jaringan di SMK sedang melakukan audit keamanan pada server Ubuntu Server kelas XI TKJ. Saat memeriksa log otentikasi melalui perintah <code>sudo tail -f /var/log/auth.log</code>, ditemukan baris peringatan berikut:<br><br><code>sshd[1942]: Connection reset by authenticating user admin [preauth]</code><br><code>sshd[1948]: Failed password for root from 192.168.10.45 port 54321 ssh2</code><br><br>Berdasarkan cuplikan log tersebut, langkah mitigasi paling tepat yang harus diterapkan dalam konfigurasi <code>/etc/ssh/sshd_config</code> untuk mencegah eksploitasi lanjutan adalah...",
+            "weight": 1,
+            "explanation": "Log menunjukkan adanya percobaan brute-force login menggunakan akun 'root' dari IP lokal 192.168.10.45. Praktik keamanan terbaik (best practice) pada OpenSSH server adalah melarang login langsung sebagai pengguna root (PermitRootLogin no) untuk mencegah penyerang mendapatkan hak akses tertinggi secara langsung, serta menggunakan autentikasi berbasis SSH Key.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Mengubah port default SSH dari port 22 ke port yang tidak umum digunakan."
+              },
+              {
+                "id": "B",
+                "text": "Menonaktifkan akses login langsung untuk pengguna root (PermitRootLogin no) dan membatasi autentikasi berbasis kunci publik."
+              },
+              {
+                "id": "C",
+                "text": "Menonaktifkan protokol SSHv2 dan memaksa penggunaan protokol SSHv1 untuk enkripsi yang lebih cepat."
+              },
+              {
+                "id": "D",
+                "text": "Mengaktifkan X11Forwarding agar sesi grafis dapat dipantau langsung oleh administrator."
+              },
+              {
+                "id": "E",
+                "text": "Menaikkan nilai MaxSessions dan MaxStartups untuk menampung koneksi masuk secara bersamaan."
+              }
+            ],
+            "answer": "B"
+          },
+          {
+            "id": 2,
+            "type": "mcq_complex",
+            "cog": "C4",
+            "stem": "Seorang siswa kelas XI TKJ diminta mengonfigurasi akses SSH tanpa password (key-based authentication) dari klien Linux ke server jarak jauh. Siswa tersebut telah menjalankan perintah <code>ssh-keygen -t rsa -b 4096</code> pada mesin klien. Manakah dari pernyataan berikut yang merupakan langkah lanjutan yang benar dan aman? (Pilih dua jawaban yang benar)",
+            "weight": 1.5,
+            "explanation": "Penggunaan SSH key memerlukan transfer kunci PUBLIK (bukan privat) ke server, yang dapat dilakukan secara mudah via perintah `ssh-copy-id`. Selain itu, OpenSSH server sangat ketat terhadap izin berkas; jika direktori `.ssh` atau `authorized_keys` terlalu longgar (misalnya bisa ditulis oleh grup atauothers), server akan menolak autentikasi kunci tersebut demi alasan keamanan.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Menyalin berkas kunci publik (id_rsa.pub) ke direktori tujuan di server menggunakan perintah <code>ssh-copy-id</code>."
+              },
+              {
+                "id": "B",
+                "text": "Menyalin berkas kunci privat (id_rsa) ke direktori <code>/home/user/.ssh/authorized_keys</code> di server."
+              },
+              {
+                "id": "C",
+                "text": "Memastikan direktori <code>~/.ssh</code> di server memiliki hak akses (permissions) 700 dan berkas <code>authorized_keys</code> memiliki hak akses 600."
+              },
+              {
+                "id": "D",
+                "text": "Mengubah parameter konfigurasi server <code>PasswordAuthentication yes</code> menjadi wajib diaktifkan agar kunci publik berfungsi."
+              },
+              {
+                "id": "E",
+                "text": "Menghapus berkas kunci privat di mesin klien segera setelah proses transfer kunci selesai dilakukan."
+              }
+            ],
+            "answer": [
+              "A",
+              "C"
+            ]
+          },
+          {
+            "id": 3,
+            "type": "true_false",
+            "cog": "C4",
+            "stem": "Perhatikan konfigurasi file <code>/etc/ssh/sshd_config</code> pada server remote berikut:\n<code>Port 2222</code>\n<code>PermitRootLogin prohibit-password</code>\n<code>PubkeyAuthentication yes</code>\n<code>PasswordAuthentication no</code>\nTentukan kebenaran dari setiap pernyataan analisis teknis berikut berdasarkan konfigurasi tersebut:",
+            "weight": 1.5,
+            "explanation": "Pernyataan 0 salah karena Port SSH telah diubah ke 2222, sehingga klien harus menyertakan `-p 2222`. Pernyataan 1 benar karena `PermitRootLogin prohibit-password` mengizinkan root login asalkan memakai kunci publik. Pernyataan 2 benar karena `PasswordAuthentication no` menutup total metode login dengan password.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+            "statements": [
+              {
+                "id": 0,
+                "text": "Klien yang mencoba terhubung menggunakan perintah standar <code>ssh user@server_ip</code> tanpa menentukan port akan langsung berhasil terhubung ke server.",
+                "key": "S"
+              },
+              {
+                "id": 1,
+                "text": "Pengguna root diizinkan masuk ke server, tetapi hanya jika menggunakan metode autentikasi berbasis kunci (SSH key), bukan kata sandi.",
+                "key": "B"
+              },
+              {
+                "id": 2,
+                "text": "Server menolak semua upaya login yang mengandalkan autentikasi berbasis kata sandi (password) dari semua jenis akun pengguna.",
+                "key": "B"
+              }
+            ],
+            "answer": {
+              "0": "S",
+              "1": "B",
+              "2": "B"
+            }
+          },
+          {
+            "id": 4,
+            "type": "matching",
+            "cog": "C4",
+            "stem": "Pasangkan parameter konfigurasi SSH Server di sebelah kiri dengan fungsi atau dampak operasionalnya di sebelah kanan secara tepat:",
+            "weight": 2,
+            "explanation": "ClientAliveInterval mengatur keep-alive untuk mendeteksi koneksi idle/dead. X11Forwarding berkaitan dengan GUI forwarding. MaxAuthTries membatasi jumlah salah ketik password/key sebelum koneksi diputus untuk mencegah brute-force.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+            "premises": [
+              {
+                "id": 0,
+                "text": "ClientAliveInterval"
+              },
+              {
+                "id": 1,
+                "text": "X11Forwarding"
+              },
+              {
+                "id": 2,
+                "text": "MaxAuthTries"
+              }
+            ],
+            "targets": [
+              {
+                "id": "A",
+                "text": "Menentukan batas maksimum percobaan autentikasi yang diizinkan per koneksi koneksi SSH."
+              },
+              {
+                "id": "B",
+                "text": "Mengatur jeda waktu dalam detik di mana server akan mengirim sinyal kosong ke klien untuk mendeteksi koneksi yang terputus."
+              },
+              {
+                "id": "C",
+                "text": "Mengizinkan penerusan aplikasi grafis berbasis sistem windowing X11 dari jarak jauh."
+              }
+            ],
+            "answer": {
+              "0": "B",
+              "1": "C",
+              "2": "A"
+            }
+          },
+          {
+            "id": 5,
+            "type": "short_essay",
+            "cog": "C3",
+            "stem": "Sebutkan nama utilitas atau perintah bawaan paket OpenSSH yang digunakan untuk melakukan penyalinan berkas secara aman (secure file transfer) melalui protokol SSH di lingkungan terminal Linux.",
+            "weight": 1,
+            "explanation": "Perintah `scp` (Secure Copy Protocol) atau `sftp` (Secure File Transfer Protocol) adalah utilitas standar yang memanfaatkan terowongan SSH untuk menyalin berkas secara terenkripsi antara host lokal dan remote.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+            "answer_keys": [
+              "scp",
+              "sftp"
+            ]
+          },
+          {
+            "id": 6,
+            "type": "long_essay",
+            "cog": "C5",
+            "stem": "Sebuah perusahaan rintisan mengalami insiden keamanan di mana server produksi berbasis Debian yang menjalankan OpenSSH Server berhasil disusupi oleh penyerang melalui teknik brute-force pada port default (22) dengan akun layanan yang lemah. Sebagai seorang administrator jaringan profesional, Anda ditugaskan untuk melakukan hardoning (pengerasan) total pada layanan SSH tersebut.\nUraikan langkah-langkah komprehensif yang harus Anda lakukan, mencakup:\n1. Identifikasi celah keamanan utama pada skenario di atas.\n2. Analisis minimal 4 parameter penting dalam berkas <code>/etc/ssh/sshd_config</code> yang wajib diubah beserta nilai konfigurasinya.\n3. Implementasi lapisan keamanan tambahan di luar konfigurasi SSH bawaan (misalnya penggunaan firewall atau port knocking/fail2ban).",
+            "weight": 3,
+            "explanation": "Pengerasan SSH server memerlukan pendekatan berlapis, mulai dari perubahan port, pengetatan otentikasi daemon SSH, hingga proteksi eksternal menggunakan fail2ban untuk mitigasi serangan brute-force.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+            "rubric": "Kriteria penilaian: 35% ketepatan identifikasi celah, 35% ketepatan analisis dan parameter konfigurasi sshd_config, 30% implementasi pengamanan tambahan yang relevan.",
+            "ideal_answer": "1. Identifikasi celah: Penggunaan port default 22 memudahkan pemindaian botnet, izin login root aktif, dan autentikasi berbasis password lemah.\n2. Parameter sshd_config: Port diubah (misal: Port 2233), PermitRootLogin no, PasswordAuthentication no, MaxAuthTries 3.\n3. Lapisan tambahan: Instalasi fail2ban untuk memblokir IP penyerang secara otomatis setelah beberapa kali gagal login, atau pembatasan akses menggunakan UFW/iptables.",
+            "max_score": 100,
+            "keywords": [
+              "Port",
+              "PermitRootLogin",
+              "PasswordAuthentication",
+              "fail2ban",
+              "hardoning"
+            ]
+          },
+          {
+            "id": 7,
+            "type": "mcq",
+            "cog": "C4",
+            "stem": "Saat seorang siswa mencoba melakukan koneksi SSH ke server praktikum, muncul pesan error di terminal klien sebagai berikut:<br><br><code>@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</code><br><code>@ WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED! @</code><br><code>@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</code><br><code>IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!</code><br><br>Apa akar masalah (root cause) utama yang memicu kemunculan peringatan keamanan tersebut?",
+            "weight": 1,
+            "explanation": "Peringatan 'REMOTE HOST IDENTIFICATION HAS CHANGED' muncul ketika RSA/ECDSA/ED25519 host key dari server berbeda dengan yang tercatat di `~/.ssh/known_hosts` klien. Ini biasa terjadi jika server di-reinstall atau identitas IP-nya dipakai oleh perangkat lain.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "Layanan SSH di server belum diaktifkan atau mengalami crash pada port daemon."
+              },
+              {
+                "id": "B",
+                "text": "Sidik jari (fingerprint) / kunci host di server telah berubah (misalnya karena instalasi ulang OS server), sehingga tidak cocok dengan catatan yang tersimpan di berkas <code>known_hosts</code> klien."
+              },
+              {
+                "id": "C",
+                "text": "Klien salah memasukkan password sebanyak tiga kali berturut-turut sehingga terkena mekanisme auto-block."
+              },
+              {
+                "id": "D",
+                "text": "Versi protokol SSH yang digunakan oleh klien tidak kompatibel dengan versi yang didukung oleh daemon server."
+              },
+              {
+                "id": "E",
+                "text": "Kunci privat milik pengguna di mesin klien telah kadaluarsa atau rusak."
+              }
+            ],
+            "answer": "B"
+          },
+          {
+            "id": 8,
+            "type": "mcq_complex",
+            "cog": "C4",
+            "stem": "Dalam manajemen terowongan jaringan (SSH Tunneling / Port Forwarding), seorang administrator sistem sering kali perlu meneruskan port lokal ke server jarak jauh. Manakah di antara perintah berikut yang benar dalam mengimplementasikan local port forwarding? (Pilih dua jawaban yang benar)",
+            "weight": 1.5,
+            "explanation": "Opsi A menggunakan flag `-L` yang merupakan sintaks baku untuk local port forwarding (port lokal diteruskan ke tujuan remote). Penjelasan pada opsi C sangat akurat mendeskripsikan cara kerjanya. Opsi D terbalik, dan opsi E benar mengenai dynamic forwarding.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "<code>ssh -L 8080:localhost:80 user@remote_server</code>"
+              },
+              {
+                "id": "B",
+                "text": "<code>ssh -R 8080:localhost:80 user@remote_server</code>"
+              },
+              {
+                "id": "C",
+                "text": "Perintah tersebut meneruskan lalu lintas dari port 8080 di mesin lokal ke port 80 pada server remote (atau jaringan lokal di sisi remote)."
+              },
+              {
+                "id": "D",
+                "text": "Parameter <code>-L</code> digunakan secara eksklusif untuk remote port forwarding, sedangkan <code>-R</code> untuk local port forwarding."
+              },
+              {
+                "id": "E",
+                "text": "<code>ssh -D 1080 user@remote_server</code> digunakan untuk melakukan dynamic port forwarding (SOCKS proxy)."
+              }
+            ],
+            "answer": [
+              "A",
+              "C"
+            ]
+          },
+          {
+            "id": 9,
+            "type": "true_false",
+            "cog": "C4",
+            "stem": "Evaluasi pernyataan berikut terkait mekanisme kerja dan protokol keamanan SSH (Secure Shell):\n1. SSH beroperasi pada Layer Aplikasi dalam model OSI dan menggunakan protokol TCP pada port default 22.\n2. Seluruh data autentikasi dan muatan sesi (payload) ditransmisikan dalam bentuk teks biasa (plaintext) sebelum pertukaran kunci selesai dilakukan.\n3. SSH menyediakan enkripsi simetris untuk mengamankan data yang dikirimkan setelah proses negosiasi kunci asimetris selesai.",
+            "weight": 1.5,
+            "explanation": "Pernyataan 0 benar (TCP port 22). Pernyataan 1 salah karena bahkan pada fase awal, SSH melakukan pertukaran kunci (Diffie-Hellman) untuk membangun terowongan terenkripsi sebelum kredensial/autentikasi dikirim. Pernyataan 2 benar (menggunakan asimetris untuk autentikasi/pertukaran kunci, lalu simetris untuk kecepatan enkripsi data sesi).",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+            "statements": [
+              {
+                "id": 0,
+                "text": "SSH beroperasi pada Layer Aplikasi dalam model OSI dan menggunakan protokol TCP pada port default 22.",
+                "key": "B"
+              },
+              {
+                "id": 1,
+                "text": "Seluruh data autentikasi dan muatan sesi (payload) ditransmisikan dalam bentuk teks biasa (plaintext) sebelum pertukaran kunci selesai dilakukan.",
+                "key": "S"
+              },
+              {
+                "id": 2,
+                "text": "SSH menyediakan enkripsi simetris untuk mengamankan data yang dikirimkan setelah proses negosiasi kunci asimetris selesai.",
+                "key": "B"
+              }
+            ],
+            "answer": {
+              "0": "B",
+              "1": "S",
+              "2": "B"
+            }
+          },
+          {
+            "id": 10,
+            "type": "matching",
+            "cog": "C4",
+            "stem": "Jodohkan perintah troubleshooting atau manajemen layanan SSH di Linux dengan fungsi operasionalnya yang sesuai:",
+            "weight": 2,
+            "explanation": "systemctl restart ssh menerapkan konfigurasi baru, sshd -t sangat berguna untuk memastikan tidak ada error sintaks di sshd_config yang dapat membuat server terkunci (lockout), dan journalctl -u ssh memantau log operasional SSH.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+            "premises": [
+              {
+                "id": 0,
+                "text": "sudo systemctl restart ssh"
+              },
+              {
+                "id": 1,
+                "text": "sshd -t"
+              },
+              {
+                "id": 2,
+                "text": "journalctl -u ssh"
+              }
+            ],
+            "targets": [
+              {
+                "id": "A",
+                "text": "Melakukan uji sintaks (syntax check) pada file konfigurasi sshd_config sebelum daemon direstart."
+              },
+              {
+                "id": "B",
+                "text": "Menerapkan perubahan parameter konfigurasi baru pada layanan SSH server."
+              },
+              {
+                "id": "C",
+                "text": "Menampilkan log sistem khusus yang berkaitan dengan aktivitas daemon SSH menggunakan systemd journal."
+              }
+            ],
+            "answer": {
+              "0": "B",
+              "1": "A",
+              "2": "C"
+            }
+          }
+        ]
+      }
+    ],
+    "students": [
+      {
+        "id": 1001,
+        "username": "siswa_1001",
+        "pass": "siswa123",
+        "full_name": "Ahmad Rizki Pratama",
+        "role": "student",
+        "class_name": "XII IPA 1",
+        "nisn": "0078123451",
+        "nis": "23241001",
+        "exam_no": "26-01-05-1001",
+        "birth_place_date": "Jakarta, 01 Januari 2008",
+        "gender": "Laki-laki",
+        "room": "Ruang Lab Komputer 01",
+        "session": "Sesi 1 (07:30 - 09:30)",
+        "server": "SRV-01"
+      },
+      {
+        "id": 1002,
+        "username": "siswa_1002",
+        "pass": "siswa123",
+        "full_name": "Siti Nur Aisyah",
+        "role": "student",
+        "class_name": "XII IPA 1",
+        "nisn": "0078123452",
+        "nis": "23241002",
+        "exam_no": "26-01-05-1002",
+        "birth_place_date": "Jakarta, 01 Januari 2008",
+        "gender": "Perempuan",
+        "room": "Ruang Lab Komputer 01",
+        "session": "Sesi 1 (07:30 - 09:30)",
+        "server": "SRV-01"
+      },
+      {
+        "id": 1003,
+        "username": "siswa_1003",
+        "pass": "siswa123",
+        "full_name": "Budi Santoso",
+        "role": "student",
+        "class_name": "XII IPA 1",
+        "nisn": "0078123453",
+        "nis": "23241003",
+        "exam_no": "26-01-05-1003",
+        "birth_place_date": "Jakarta, 01 Januari 2008",
+        "gender": "Laki-laki",
+        "room": "Ruang Lab Komputer 01",
+        "session": "Sesi 1 (07:30 - 09:30)",
+        "server": "SRV-01"
+      },
+      {
+        "id": 1004,
+        "username": "siswa_1004",
+        "pass": "siswa123",
+        "full_name": "Andi Saputra",
+        "role": "student",
+        "class_name": "XII IPA 1",
+        "nisn": "0078123454",
+        "nis": "23241004",
+        "exam_no": "26-01-05-1004",
+        "birth_place_date": "Jakarta, 01 Januari 2008",
+        "gender": "Laki-laki",
+        "room": "Ruang Lab Komputer 01",
+        "session": "Sesi 1 (07:30 - 09:30)",
+        "server": "SRV-01"
+      },
+      {
+        "id": 1005,
+        "username": "siswa_1005",
+        "pass": "siswa123",
+        "full_name": "Fikri Hidayat",
+        "role": "student",
+        "class_name": "XII IPA 1",
+        "nisn": "0078123455",
+        "nis": "23241005",
+        "exam_no": "26-01-05-1005",
+        "birth_place_date": "Jakarta, 01 Januari 2008",
+        "gender": "Laki-laki",
+        "room": "Ruang Lab Komputer 01",
+        "session": "Sesi 1 (07:30 - 09:30)",
+        "server": "SRV-01"
+      },
+      {
+        "id": 1006,
+        "username": "siswa_1006",
+        "pass": "siswa123",
+        "full_name": "Rizky Ramadhan",
+        "role": "student",
+        "class_name": "XII IPA 1",
+        "nisn": "0078123456",
+        "nis": "23241006",
+        "exam_no": "26-01-05-1006",
+        "birth_place_date": "Jakarta, 01 Januari 2008",
+        "gender": "Laki-laki",
+        "room": "Ruang Lab Komputer 01",
+        "session": "Sesi 1 (07:30 - 09:30)",
+        "server": "SRV-01"
+      },
+      {
+        "id": 1007,
+        "username": "siswa_1007",
+        "pass": "siswa123",
+        "full_name": "Ilham Setiawan",
+        "role": "student",
+        "class_name": "XII IPA 1",
+        "nisn": "0078123457",
+        "nis": "23241007",
+        "exam_no": "26-01-05-1007",
+        "birth_place_date": "Jakarta, 01 Januari 2008",
+        "gender": "Laki-laki",
+        "room": "Ruang Lab Komputer 01",
+        "session": "Sesi 1 (07:30 - 09:30)",
+        "server": "SRV-01"
+      },
+      {
+        "id": 1008,
+        "username": "siswa_1008",
+        "pass": "siswa123",
+        "full_name": "Muhammad Fajar",
+        "role": "student",
+        "class_name": "XII IPA 1",
+        "nisn": "0078123458",
+        "nis": "23241008",
+        "exam_no": "26-01-05-1008",
+        "birth_place_date": "Jakarta, 01 Januari 2008",
+        "gender": "Laki-laki",
+        "room": "Ruang Lab Komputer 01",
+        "session": "Sesi 1 (07:30 - 09:30)",
+        "server": "SRV-01"
+      },
+      {
+        "id": 1009,
+        "username": "siswa_1009",
+        "pass": "siswa123",
+        "full_name": "Reza Kurniawan",
+        "role": "student",
+        "class_name": "XII IPA 1",
+        "nisn": "0078123459",
+        "nis": "23241009",
+        "exam_no": "26-01-05-1009",
+        "birth_place_date": "Jakarta, 01 Januari 2008",
+        "gender": "Laki-laki",
+        "room": "Ruang Lab Komputer 01",
+        "session": "Sesi 1 (07:30 - 09:30)",
+        "server": "SRV-01"
+      },
+      {
+        "id": 1010,
+        "username": "siswa_1010",
+        "pass": "siswa123",
+        "full_name": "Dimas Pratama",
+        "role": "student",
+        "class_name": "XII IPA 2",
+        "nisn": "0078123460",
+        "nis": "23241010",
+        "exam_no": "26-01-05-1010",
+        "birth_place_date": "Jakarta, 01 Januari 2008",
+        "gender": "Perempuan",
+        "room": "Ruang Lab Komputer 01",
+        "session": "Sesi 2 (10:00 - 12:00)",
+        "server": "SRV-02"
+      },
+      {
+        "id": 1011,
+        "username": "siswa_1011",
+        "pass": "siswa123",
+        "full_name": "Bagas Permana",
+        "role": "student",
+        "class_name": "XII IPA 2",
+        "nisn": "0078123461",
+        "nis": "23241011",
+        "exam_no": "26-01-05-1011",
+        "birth_place_date": "Jakarta, 01 Januari 2008",
+        "gender": "Perempuan",
+        "room": "Ruang Lab Komputer 02",
+        "session": "Sesi 2 (10:00 - 12:00)",
+        "server": "SRV-02"
+      },
+      {
+        "id": 1012,
+        "username": "siswa_1012",
+        "pass": "siswa123",
+        "full_name": "Rian Maulana",
+        "role": "student",
+        "class_name": "XII IPA 2",
+        "nisn": "0078123462",
+        "nis": "23241012",
+        "exam_no": "26-01-05-1012",
+        "birth_place_date": "Jakarta, 01 Januari 2008",
+        "gender": "Laki-laki",
+        "room": "Ruang Lab Komputer 02",
+        "session": "Sesi 2 (10:00 - 12:00)",
+        "server": "SRV-02"
+      },
+      {
+        "id": 1013,
+        "username": "siswa_1013",
+        "pass": "siswa123",
+        "full_name": "Siti Nurhaliza",
+        "role": "student",
+        "class_name": "XII IPA 2",
+        "nisn": "0078123463",
+        "nis": "23241013",
+        "exam_no": "26-01-05-1013",
+        "birth_place_date": "Jakarta, 01 Januari 2008",
+        "gender": "Laki-laki",
+        "room": "Ruang Lab Komputer 02",
+        "session": "Sesi 2 (10:00 - 12:00)",
+        "server": "SRV-02"
+      },
+      {
+        "id": 1014,
+        "username": "siswa_1014",
+        "pass": "siswa123",
+        "full_name": "Aditya Firmansyah",
+        "role": "student",
+        "class_name": "XII IPA 2",
+        "nisn": "0078123464",
+        "nis": "23241014",
+        "exam_no": "26-01-05-1014",
+        "birth_place_date": "Jakarta, 01 Januari 2008",
+        "gender": "Laki-laki",
+        "room": "Ruang Lab Komputer 02",
+        "session": "Sesi 2 (10:00 - 12:00)",
+        "server": "SRV-02"
+      },
+      {
+        "id": 1015,
+        "username": "siswa_1015",
+        "pass": "siswa123",
+        "full_name": "Putri Amelia",
+        "role": "student",
+        "class_name": "XII IPA 2",
+        "nisn": "0078123465",
+        "nis": "23241015",
+        "exam_no": "26-01-05-1015",
+        "birth_place_date": "Jakarta, 01 Januari 2008",
+        "gender": "Laki-laki",
+        "room": "Ruang Lab Komputer 02",
+        "session": "Sesi 2 (10:00 - 12:00)",
+        "server": "SRV-02"
+      }
+    ],
+    "schedules": [
+      {
+        "id": 1,
+        "title": "UAS Fisika Peminatan XII",
+        "bank_name": "Bank Termodinamika (5 Soal)",
+        "start_time": "Hari ini, 07:30 WIB",
+        "duration_minutes": 90,
+        "token_code": "56HLYE",
+        "shuffle_questions": true,
+        "shuffle_options": true,
+        "class_target": "Semua Kelas",
+        "package_url": "/static/packages/exam_1_enc.json",
+        "is_active": true,
+        "token_type": "static",
+        "token_interval": 15,
+        "token_updated_at": 1792713080774,
+        "token_prev_code": "5GEKV3",
+        "token_prev_expires_at": 1792713140774
+      },
+      {
+        "id": 2,
+        "title": "Penilaian Akhir Matematika Wajib XII",
+        "bank_name": "Bank Aljabar & Matriks (5 Soal)",
+        "start_time": "Hari ini, 10:00 WIB",
+        "duration_minutes": 120,
+        "token_code": "MTK2026",
+        "shuffle_questions": true,
+        "shuffle_options": true,
+        "class_target": "Semua Kelas",
+        "package_url": "/static/packages/exam_2_enc.json",
+        "is_active": true,
+        "token_type": "static",
+        "token_interval": 15
+      },
+      {
+        "id": 3,
+        "title": "Asesmen Bahasa Indonesia XII",
+        "bank_name": "Bank Teks Editorial & Puisi (5 Soal)",
+        "start_time": "Hari ini, 13:00 WIB",
+        "duration_minutes": 90,
+        "token_code": "BIND2026",
+        "shuffle_questions": true,
+        "shuffle_options": true,
+        "class_target": "Semua Kelas",
+        "package_url": "/static/packages/exam_3_enc.json",
+        "is_active": true,
+        "token_type": "static",
+        "token_interval": 15
+      },
+      {
+        "id": 4,
+        "title": "Penilaian Harian Kimia Organik XII",
+        "bank_name": "Bank Senyawa Karbon & Benzena (5 Soal)",
+        "start_time": "Hari ini, 14:30 WIB",
+        "duration_minutes": 90,
+        "token_code": "KIMIA26",
+        "shuffle_questions": true,
+        "shuffle_options": true,
+        "class_target": "XII IPA 1",
+        "package_url": "/static/packages/exam_4_enc.json",
+        "is_active": true,
+        "token_type": "static",
+        "token_interval": 15
+      },
+      {
+        "id": 5,
+        "title": "Ujian Biologi Genetika & Mutasi XII",
+        "bank_name": "Bank Substansi Genetika (5 Soal)",
+        "start_time": "Besok, 07:30 WIB",
+        "duration_minutes": 75,
+        "token_code": "BIOL2026",
+        "shuffle_questions": true,
+        "shuffle_options": true,
+        "class_target": "XII IPA 2",
+        "package_url": "/static/packages/exam_5_enc.json",
+        "is_active": true,
+        "token_type": "static",
+        "token_interval": 15
+      },
+      {
+        "id": 6,
+        "title": "Asesmen Bahasa Inggris XII (Listening & Reading)",
+        "bank_name": "Bank Narrative & Discussion (5 Soal)",
+        "start_time": "Besok, 10:00 WIB",
+        "duration_minutes": 90,
+        "token_code": "ENG2026",
+        "shuffle_questions": true,
+        "shuffle_options": true,
+        "class_target": "Semua Kelas",
+        "package_url": "/static/packages/exam_6_enc.json",
+        "is_active": true,
+        "token_type": "static",
+        "token_interval": 15
+      },
+      {
+        "id": 7,
+        "title": "Ujian Sekolah Sejarah Indonesia XII",
+        "bank_name": "Bank Pergerakan Nasional & Kemerdekaan (5 Soal)",
+        "start_time": "Lusa, 08:00 WIB",
+        "duration_minutes": 60,
+        "token_code": "SEJ2026",
+        "shuffle_questions": true,
+        "shuffle_options": true,
+        "class_target": "Semua Kelas",
+        "package_url": "/static/packages/exam_7_enc.json",
+        "is_active": true,
+        "token_type": "static",
+        "token_interval": 15
+      },
+      {
+        "id": 8,
+        "title": "Tryout Mandiri UTBK TPS XII",
+        "bank_name": "Bank Penalaran Matematika & Literasi (5 Soal)",
+        "start_time": "Lusa, 13:00 WIB",
+        "duration_minutes": 105,
+        "token_code": "TPS2026",
+        "shuffle_questions": true,
+        "shuffle_options": true,
+        "class_target": "Semua Kelas",
+        "package_url": "/static/packages/exam_8_enc.json",
+        "is_active": true,
+        "token_type": "static",
+        "token_interval": 15
+      }
+    ],
+    "classes": [
+      {
+        "id": 1,
+        "name": "XII IPA 1",
+        "level": "XII",
+        "major": "MIPA",
+        "homeroom": "Dra. Sri Wahyuni",
+        "room": "Ruang Lab Komputer 01"
+      },
+      {
+        "id": 2,
+        "name": "XII IPA 2",
+        "level": "XII",
+        "major": "MIPA",
+        "homeroom": "Drs. Bambang Irawan",
+        "room": "Ruang Lab Komputer 02"
+      },
+      {
+        "id": 3,
+        "name": "XII IPS 1",
+        "level": "XII",
+        "major": "IPS",
+        "homeroom": "Nurul Hidayati, S.Pd.",
+        "room": "Ruang Lab Komputer 03"
+      },
+      {
+        "id": 4,
+        "name": "XII IPS 2",
+        "level": "XII",
+        "major": "IPS",
+        "homeroom": "Hendra Kurniawan, M.Pd.",
+        "room": "Ruang Lab Bahasa"
+      },
+      {
+        "id": 5,
+        "name": "XI MIPA 1",
+        "level": "XI",
+        "major": "MIPA",
+        "homeroom": "Rahmat Hidayat, S.Si.",
+        "room": "Ruang Teori 11"
+      },
+      {
+        "id": 6,
+        "name": "XI MIPA 2",
+        "level": "XI",
+        "major": "MIPA",
+        "homeroom": "Dewi Lestari, S.Pd.",
+        "room": "Ruang Teori 12"
+      },
+      {
+        "id": 7,
+        "name": "XI IPS 1",
+        "level": "XI",
+        "major": "IPS",
+        "homeroom": "Agus Salim, M.Pd.",
+        "room": "Ruang Teori 13"
+      },
+      {
+        "id": 8,
+        "name": "X-1",
+        "level": "X",
+        "major": "Umum (Fase E)",
+        "homeroom": "Fitri Handayani, S.Pd.",
+        "room": "Ruang Teori 01"
+      },
+      {
+        "id": 9,
+        "name": "X-2",
+        "level": "X",
+        "major": "Umum (Fase E)",
+        "homeroom": "Aris Munandar, S.Kom.",
+        "room": "Ruang Teori 02"
+      },
+      {
+        "id": 10,
+        "name": "XII RPL 1",
+        "level": "XII",
+        "major": "Rekayasa Perangkat Lunak",
+        "homeroom": "Yusuf Habibie, S.Kom.",
+        "room": "Lab Software Engineering"
+      },
+      {
+        "id": 11,
+        "name": "XII TKJ 1",
+        "level": "XII",
+        "major": "Teknik Komputer Jaringan",
+        "homeroom": "Budi Hartono, M.T.",
+        "room": "Lab Jaringan Cisco"
+      },
+      {
+        "id": 12,
+        "name": "XII RPL 3",
+        "level": "XII",
+        "major": "Rekayasa Perangkat Lunak",
+        "homeroom": "Bpk. Hendra, S.Kom",
+        "room": "Lab RPL 2"
+      },
+      {
+        "id": 13,
+        "name": "XII MIPA 3",
+        "level": "XII",
+        "major": "MIPA",
+        "homeroom": "Drs. Subagyo",
+        "room": "Lab Komputer 03"
+      },
+      {
+        "id": 14,
+        "name": "X-3",
+        "level": "X",
+        "major": "Umum (Fase E)",
+        "homeroom": "Lestari, S.Pd.",
+        "room": "Ruang Teori 03"
+      }
+    ],
+    "subjects": [
+      {
+        "id": 1,
+        "code": "FIS",
+        "name": "Fisika",
+        "level": "SMA/SMK",
+        "group": "Peminatan MIPA / Teknik"
+      },
+      {
+        "id": 2,
+        "code": "MTK-W",
+        "name": "Matematika Wajib",
+        "level": "SMA/SMK",
+        "group": "Umum"
+      },
+      {
+        "id": 3,
+        "code": "MTK-P",
+        "name": "Matematika Peminatan",
+        "level": "SMA",
+        "group": "Peminatan MIPA"
+      },
+      {
+        "id": 4,
+        "code": "BIND",
+        "name": "Bahasa Indonesia",
+        "level": "SMA/SMK",
+        "group": "Umum"
+      },
+      {
+        "id": 5,
+        "code": "BING",
+        "name": "Bahasa Inggris",
+        "level": "SMA/SMK",
+        "group": "Umum"
+      },
+      {
+        "id": 6,
+        "code": "KIM",
+        "name": "Kimia",
+        "level": "SMA/SMK",
+        "group": "Peminatan MIPA"
+      },
+      {
+        "id": 7,
+        "code": "BIO",
+        "name": "Biologi",
+        "level": "SMA/SMK",
+        "group": "Peminatan MIPA"
+      },
+      {
+        "id": 8,
+        "code": "SEJ",
+        "name": "Sejarah",
+        "level": "SMA/SMK",
+        "group": "Umum"
+      },
+      {
+        "id": 9,
+        "code": "EKO",
+        "name": "Ekonomi",
+        "level": "SMA",
+        "group": "Peminatan IPS"
+      },
+      {
+        "id": 10,
+        "code": "SOS",
+        "name": "Sosiologi",
+        "level": "SMA",
+        "group": "Peminatan IPS"
+      },
+      {
+        "id": 11,
+        "code": "GEO",
+        "name": "Geografi",
+        "level": "SMA",
+        "group": "Peminatan IPS"
+      },
+      {
+        "id": 12,
+        "code": "INF",
+        "name": "Informatika / TIK",
+        "level": "SMA/SMK",
+        "group": "Umum / Pilihan"
+      },
+      {
+        "id": 13,
+        "code": "PPKN",
+        "name": "Pendidikan Pancasila (PPKn)",
+        "level": "SMA/SMK",
+        "group": "Umum"
+      },
+      {
+        "id": 14,
+        "code": "PAI",
+        "name": "Pendidikan Agama & Budi Pekerti",
+        "level": "SMA/SMK",
+        "group": "Umum"
+      },
+      {
+        "id": 15,
+        "code": "PROD-RPL",
+        "name": "Pemrograman & RPL",
+        "level": "SMK",
+        "group": "Kejuruan SMK"
+      },
+      {
+        "id": 16,
+        "code": "PROD-TKJ",
+        "name": "Jaringan Komputer & Telekomunikasi",
+        "level": "SMK",
+        "group": "Kejuruan SMK"
+      },
+      {
+        "id": 17,
+        "code": "TKA",
+        "name": "TKA Campuran (SMA/SMK)",
+        "level": "SMA/SMK",
+        "group": "Asesmen Nasional / TKA"
+      },
+      {
+        "id": 18,
+        "code": "AI-ENG",
+        "name": "Kecerdasan Buatan dan Prompting",
+        "level": "SMA/SMK",
+        "group": "Kejuruan"
+      },
+      {
+        "id": 19,
+        "code": "ANT",
+        "name": "Antropologi",
+        "level": "SMA",
+        "group": "Pilihan IPS"
+      },
+      {
+        "id": 20,
+        "code": "SENI",
+        "name": "Seni Budaya",
+        "level": "SMA/SMK",
+        "group": "Umum"
+      }
+    ],
+    "school_profile": {
+      "name": "SMK NEGERI 5 BANDUNG",
+      "npsn": "20219143",
+      "level": "SMK",
+      "status": "Negeri",
+      "dinas": "PEMERINTAH PROVINSI DAERAH KOTA BANDUNG\nDINAS PENDIDIKAN",
+      "address": "Jl. Bojongkoneng 37A",
+      "village": "Pisangan Baru",
+      "district": "Matraman",
+      "city": "KOTA BANDUNG",
+      "province": "JAWA BARAT",
+      "postal_code": "40191",
+      "phone": "(022) 7100428",
+      "email": "info@smkn5bandung.sch.id",
+      "website": "https://smkn5bandung.sch.id/",
+      "headmaster_name": "Drs. H. Ahmad Fauzi, M.Pd.",
+      "headmaster_nip": "19710815 199802 1 003",
+      "exam_title_1": "KARTU PESERTA UJIAN",
+      "exam_title_2": "ASESMEN SUMATIF AKHIR SEMESTER (ASAS)",
+      "academic_year": "2026/2027",
+      "semester": "Ganjil",
+      "signature_place": "Jakarta",
+      "signature_date": "21 Oktober 2026",
+      "logo_url": "/static/uploads/logo_sekolah_1792567623623.png",
+      "signature_url": "/static/uploads/ttd_kepsek_1792626005815.png",
+      "stamp_url": "/static/uploads/cap_sekolah_1792625946689.jpg",
+      "signature_size": 110,
+      "stamp_size": 69,
+      "stamp_offset_x": 31,
+      "stamp_offset_y": -4,
+      "exam_rules": "1. Membawa Kartu Peserta Ujian ini selama berlangsungnya tes.\n2. Hadir di ruang ujian 15 menit sebelum ujian dimulai.\n3. Dilarang membawa HP / catatan ke dalam ruang ujian.",
+      "show_student_photo": false,
+      "show_signatures": true,
+      "show_exam_rules": false,
+      "cards_per_page": 10
+    }
+  }
+}

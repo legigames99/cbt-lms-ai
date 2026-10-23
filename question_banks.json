@@ -2058,31 +2058,31 @@
         "id": 1,
         "type": "mcq",
         "cog": "C4",
-        "stem": "Seorang Network Administrator di sebuah SMK sedang menganalisis log file pada ISC DHCP Server di Ubuntu Server. Ia menemukan pesan error berikut berulang kali:<br><code>DHCPDISCOVER from b8:27:eb:12:34:56 via eth0: network 192.168.1.0/24: no free leases</code><br>Padahal, jumlah perangkat laboratorium komputer yang aktif hanya 25 unit, sementara rentang IP address yang dikonfigurasi pada file <code>dhcpd.conf</code> adalah <code>range 192.168.1.50 192.168.1.70;</code> dengan waktu sewa <code>default-lease-time 86400;</code>. Berdasarkan analisis log tersebut, akar masalah utama yang menyebabkan terjadinya error <em>no free leases</em> adalah...",
+        "stem": "Seorang administrator jaringan di SMK sedang melakukan audit keamanan pada server Ubuntu Server kelas XI TKJ. Saat memeriksa log otentikasi melalui perintah <code>sudo tail -f /var/log/auth.log</code>, ditemukan baris peringatan berikut:<br><br><code>sshd[1942]: Connection reset by authenticating user admin [preauth]</code><br><code>sshd[1948]: Failed password for root from 192.168.10.45 port 54321 ssh2</code><br><br>Berdasarkan cuplikan log tersebut, langkah mitigasi paling tepat yang harus diterapkan dalam konfigurasi <code>/etc/ssh/sshd_config</code> untuk mencegah eksploitasi lanjutan adalah...",
         "weight": 1,
-        "explanation": "Rentang IP yang disediakan adalah dari .50 sampai .70 (hanya 21 IP address), sedangkan jumlah perangkat yang meminta IP mencapai 25 unit. Selain itu, default-lease-time yang panjang (86400 detik / 24 jam) menyebabkan IP yang pernah disewa oleh perangkat yang sudah disconnect tidak langsung dilepaskan kembali ke pool dalam waktu dekat. Hal ini menyebabkan kehabisan alamat IP (exhaustion).",
+        "explanation": "Log menunjukkan adanya percobaan brute-force login menggunakan akun 'root' dari IP lokal 192.168.10.45. Praktik keamanan terbaik (best practice) pada OpenSSH server adalah melarang login langsung sebagai pengguna root (PermitRootLogin no) untuk mencegah penyerang mendapatkan hak akses tertinggi secara langsung, serta menggunakan autentikasi berbasis SSH Key.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "Terjadi konflik alamat IP statis pada gateway jaringan lokal."
+            "text": "Mengubah port default SSH dari port 22 ke port yang tidak umum digunakan."
           },
           {
             "id": "B",
-            "text": "Kapasitas rentang IP (range pool) pada konfigurasi DHCP lebih kecil daripada jumlah perangkat yang meminta alamat IP, ditambah durasi lease time yang lama."
+            "text": "Menonaktifkan akses login langsung untuk pengguna root (PermitRootLogin no) dan membatasi autentikasi berbasis kunci publik."
           },
           {
             "id": "C",
-            "text": "Interface jaringan eth0 pada server mengalami kerusakan fisik atau saturasi bandwidth."
+            "text": "Menonaktifkan protokol SSHv2 dan memaksa penggunaan protokol SSHv1 untuk enkripsi yang lebih cepat."
           },
           {
             "id": "D",
-            "text": "Protokol DHCP menggunakan port UDP yang diblokir oleh firewall iptables pada sisi server."
+            "text": "Mengaktifkan X11Forwarding agar sesi grafis dapat dipantau langsung oleh administrator."
           },
           {
             "id": "E",
-            "text": "File konfigurasi dhcpd.conf mengalami korupsi sintaks akibat salah pengetikan subnet mask."
+            "text": "Menaikkan nilai MaxSessions dan MaxStartups untuk menampung koneksi masuk secara bersamaan."
           }
         ],
         "answer": "B"
@@ -2090,32 +2090,32 @@
       {
         "id": 2,
         "type": "mcq_complex",
-        "cog": "C5",
-        "stem": "Perhatikan cuplikan konfigurasi ISC DHCP Server (<code>/etc/dhcp/dhcpd.conf</code>) untuk sebuah gedung sekolah berikut:<br><code>subnet 10.10.20.0 netmask 255.255.255.0 {\nrange 10.10.20.10 10.10.20.100;\noption routers 10.10.20.1;\noption domain-name-servers 8.8.8.8, 1.1.1.1;\ndefault-lease-time 600;\nmax-lease-time 7200;\n}\nhost PC-Admin {\nhardware ethernet 00:11:22:33:44:55;\nfixed-address 10.10.20.200;\n}</code><br>Manakah dari pernyataan berikut yang <strong>benar</strong> terkait perilaku DHCP server berdasarkan konfigurasi di atas? (Pilih dua atau lebih jawaban yang benar)",
-        "weight": 1,
-        "explanation": "Pernyataan B benar karena PC-Admin memiliki konfigurasi fixed-address di luar range dinamis (10.10.20.200 berada di luar 10.10.20.10 - 10.10.20.100), yang merupakan praktik terbaik reservasi DHCP. Pernyataan D benar karena perangkat biasa akan mendapatkan durasi sewa minimal 600 detik sebelum melakukan DHCP Request pembaharuan (T1 biasanya 50% dari default-lease-time). Pernyataan A salah karena PC-Admin berada di luar range utama tapi tetap satu subnet. Pernyataan C salah karena fixed-address sah selama masih dalam satu network subnet yang didefinisikan.",
+        "cog": "C4",
+        "stem": "Seorang siswa kelas XI TKJ diminta mengonfigurasi akses SSH tanpa password (key-based authentication) dari klien Linux ke server jarak jauh. Siswa tersebut telah menjalankan perintah <code>ssh-keygen -t rsa -b 4096</code> pada mesin klien. Manakah dari pernyataan berikut yang merupakan langkah lanjutan yang benar dan aman? (Pilih dua jawaban yang benar)",
+        "weight": 1.5,
+        "explanation": "Penggunaan SSH key memerlukan transfer kunci PUBLIK (bukan privat) ke server, yang dapat dilakukan secara mudah via perintah `ssh-copy-id`. Selain itu, OpenSSH server sangat ketat terhadap izin berkas; jika direktori `.ssh` atau `authorized_keys` terlalu longgar (misalnya bisa ditulis oleh grup atauothers), server akan menolak autentikasi kunci tersebut demi alasan keamanan.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "Perangkat PC-Admin tidak akan bisa mendapatkan IP karena fixed-address berada di luar rentang (range) dinamis."
+            "text": "Menyalin berkas kunci publik (id_rsa.pub) ke direktori tujuan di server menggunakan perintah <code>ssh-copy-id</code>."
           },
           {
             "id": "B",
-            "text": "Konfigurasi host PC-Admin diperbolehkan meskipun fixed-address berada di luar range dinamis, asalkan masih dalam network 10.10.20.0/24."
+            "text": "Menyalin berkas kunci privat (id_rsa) ke direktori <code>/home/user/.ssh/authorized_keys</code> di server."
           },
           {
             "id": "C",
-            "text": "Client reguler akan langsung mendapatkan IP address secara permanen tanpa batas waktu sewa."
+            "text": "Memastikan direktori <code>~/.ssh</code> di server memiliki hak akses (permissions) 700 dan berkas <code>authorized_keys</code> memiliki hak akses 600."
           },
           {
             "id": "D",
-            "text": "Client reguler memiliki waktu sewa awal (default lease time) selama 10 menit."
+            "text": "Mengubah parameter konfigurasi server <code>PasswordAuthentication yes</code> menjadi wajib diaktifkan agar kunci publik berfungsi."
           },
           {
             "id": "E",
-            "text": "DNS Server yang didistribusikan ke client adalah DNS lokal milik sekolah."
+            "text": "Menghapus berkas kunci privat di mesin klien segera setelah proses transfer kunci selesai dilakukan."
           }
         ],
         "answer": [
@@ -2127,147 +2127,140 @@
         "id": 3,
         "type": "true_false",
         "cog": "C4",
-        "stem": "Dalam arsitektur jaringan komputer skala besar yang memiliki beberapa VLAN terpisah dalam router yang berbeda, proses distribusi DHCP memerlukan mekanisme khusus karena sifat paket broadcast DHCP yang tidak bisa melewati router secara default. Tentukan apakah pernyataan teknis berikut Benar atau Salah!",
-        "weight": 1,
-        "explanation": "Pernyataan 1 Benar karena DHCP menggunakan broadcast (DORA: Discover, Offer, Request, Acknowledge) yang diblokir oleh router. Pernyataan 2 Benar karena DHCP Relay Agent (helper-address) berfungsi meneruskan broadcast dari client menjadi unicast ke DHCP Server pusat. Pernyataan 3 Salah karena DHCP server tetap dapat melayani banyak subnet asalkan didefinisikan secara eksplisit di file konfigurasinya (shared-network atau multiple subnet blocks).",
+        "stem": "Perhatikan konfigurasi file <code>/etc/ssh/sshd_config</code> pada server remote berikut:\n<code>Port 2222</code>\n<code>PermitRootLogin prohibit-password</code>\n<code>PubkeyAuthentication yes</code>\n<code>PasswordAuthentication no</code>\nTentukan kebenaran dari setiap pernyataan analisis teknis berikut berdasarkan konfigurasi tersebut:",
+        "weight": 1.5,
+        "explanation": "Pernyataan 0 salah karena Port SSH telah diubah ke 2222, sehingga klien harus menyertakan `-p 2222`. Pernyataan 1 benar karena `PermitRootLogin prohibit-password` mengizinkan root login asalkan memakai kunci publik. Pernyataan 2 benar karena `PasswordAuthentication no` menutup total metode login dengan password.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "statements": [
           {
             "id": 0,
-            "text": "Paket DHCPDISCOVER dari klien menggunakan mekanisme broadcast layer 2 sehingga diblokir dan tidak dapat melewati antarmuka router secara default.",
-            "key": "B"
+            "text": "Klien yang mencoba terhubung menggunakan perintah standar <code>ssh user@server_ip</code> tanpa menentukan port akan langsung berhasil terhubung ke server.",
+            "key": "S"
           },
           {
             "id": 1,
-            "text": "DHCP Relay Agent (IP Helper-Address) pada router berfungsi mengubah broadcast DHCP klien menjadi paket unicast yang diteruskan ke DHCP Server pusat.",
+            "text": "Pengguna root diizinkan masuk ke server, tetapi hanya jika menggunakan metode autentikasi berbasis kunci (SSH key), bukan kata sandi.",
             "key": "B"
           },
           {
             "id": 2,
-            "text": "Satu DHCP Server fisik hanya mampu melayani satu segmen subnet tunggal dan tidak dapat dikonfigurasi untuk beberapa pool subnet sekaligus.",
-            "key": "S"
+            "text": "Server menolak semua upaya login yang mengandalkan autentikasi berbasis kata sandi (password) dari semua jenis akun pengguna.",
+            "key": "B"
           }
         ],
         "answer": {
-          "0": "B",
+          "0": "S",
           "1": "B",
-          "2": "S"
+          "2": "B"
         }
       },
       {
         "id": 4,
         "type": "matching",
-        "cog": "C3",
-        "stem": "Pasangkan tahapan komunikasi dalam proses transaksi DHCP (DORA Process) di sebelah kiri dengan deskripsi aktivitas teknis yang tepat di sebelah kanan!",
-        "weight": 1,
-        "explanation": "DHCPDISCOVER adalah saat client mencari server secara broadcast. DHCPOFFER adalah penawaran IP dari server ke client. DHCPREQUEST adalah permintaan resmi client untuk memakai IP yang ditawarkan. DHCPACK adalah konfirmasi akhir dari server bahwa IP resmi diberikan beserta parameternya.",
+        "cog": "C4",
+        "stem": "Pasangkan parameter konfigurasi SSH Server di sebelah kiri dengan fungsi atau dampak operasionalnya di sebelah kanan secara tepat:",
+        "weight": 2,
+        "explanation": "ClientAliveInterval mengatur keep-alive untuk mendeteksi koneksi idle/dead. X11Forwarding berkaitan dengan GUI forwarding. MaxAuthTries membatasi jumlah salah ketik password/key sebelum koneksi diputus untuk mencegah brute-force.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "premises": [
           {
             "id": 0,
-            "text": "DHCPDISCOVER"
+            "text": "ClientAliveInterval"
           },
           {
             "id": 1,
-            "text": "DHCPOFFER"
+            "text": "X11Forwarding"
           },
           {
             "id": 2,
-            "text": "DHCPREQUEST"
-          },
-          {
-            "id": 3,
-            "text": "DHCPACK"
+            "text": "MaxAuthTries"
           }
         ],
         "targets": [
           {
             "id": "A",
-            "text": "Klien mengirim pesan broadcast mencari DHCP Server yang aktif di subnet lokal"
+            "text": "Menentukan batas maksimum percobaan autentikasi yang diizinkan per koneksi koneksi SSH."
           },
           {
             "id": "B",
-            "text": "Server mengirimkan penawaran konfigurasi IP, subnet mask, dan lease time ke klien"
+            "text": "Mengatur jeda waktu dalam detik di mana server akan mengirim sinyal kosong ke klien untuk mendeteksi koneksi yang terputus."
           },
           {
             "id": "C",
-            "text": "Klien meminta persetujuan resmi untuk menggunakan alamat IP yang telah ditawarkan"
-          },
-          {
-            "id": "D",
-            "text": "Server mengirimkan konfirmasi penerimaan akhir dan parameter jaringan lengkap"
+            "text": "Mengizinkan penerusan aplikasi grafis berbasis sistem windowing X11 dari jarak jauh."
           }
         ],
         "answer": {
-          "0": "A",
-          "1": "B",
-          "2": "C",
-          "3": "D"
+          "0": "B",
+          "1": "C",
+          "2": "A"
         }
       },
       {
         "id": 5,
         "type": "short_essay",
-        "cog": "C5",
-        "stem": "Suatu hari, jaringan di sebuah kantor cabang mendadak lumpuh karena munculnya rogue DHCP server (DHCP server liar) yang dipasang secara sengaja oleh oknum tidak bertanggung jawab. Akibatnya, komputer staf mendapatkan konfigurasi gateway palsu dan tidak bisa mengakses internet. Sebagai seorang teknisi jaringan, teknik pengamanan switch layer 2 apa yang harus dikonfigurasi untuk mencegah serangan rogue DHCP server ini di masa mendatang?",
+        "cog": "C3",
+        "stem": "Sebutkan nama utilitas atau perintah bawaan paket OpenSSH yang digunakan untuk melakukan penyalinan berkas secara aman (secure file transfer) melalui protokol SSH di lingkungan terminal Linux.",
         "weight": 1,
-        "explanation": "Teknik pengamanan yang paling efektif pada switch Cisco/Managed Switch adalah DHCP Snooping. Fitur ini bekerja dengan membedakan port switch menjadi trusted (terhubung ke DHCP server sah) dan untrusted (terhubung ke client). Paket DHCPOFFER/DHCPACK yang berasal dari port untrusted akan otomatis didrop oleh switch sehingga rogue DHCP server tidak dapat mendistribusikan IP palsu.",
+        "explanation": "Perintah `scp` (Secure Copy Protocol) atau `sftp` (Secure File Transfer Protocol) adalah utilitas standar yang memanfaatkan terowongan SSH untuk menyalin berkas secara terenkripsi antara host lokal dan remote.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "answer_keys": [
-          "jawaban benar",
-          "kunci alternatif"
+          "scp",
+          "sftp"
         ]
       },
       {
         "id": 6,
         "type": "long_essay",
-        "cog": "C6",
-        "stem": "Perhatikan skenario topologi jaringan berikut:<br>Sebuah SMK memiliki 2 lab komputer (Lab A: 192.168.10.0/24 dan Lab B: 192.168.20.0/24) serta satu server utama berbasis Debian yang terhubung melalui router mikrotik. Kepala sekolah meminta Anda mengimplementasikan satu DHCP Server terpusat di server Debian tersebut agar dapat melayani kedua lab secara otomatis, sekaligus memastikan PC milik guru (MAC: AA:BB:CC:DD:EE:FF) di Lab A selalu mendapatkan IP statis <code>192.168.10.100</code>.<br>Jelaskan langkah-langkah perancangan konseptual arsitektur dan tuliskan struktur kerangka file konfigurasi <code>dhcpd.conf</code> pada Debian untuk memenuhi kebutuhan skenario di atas secara lengkap!",
-        "weight": 1,
-        "explanation": "Pembahasan harus mencakup: 1) Konsep DHCP Relay / IP Helper pada router agar request dari Lab B diteruskan ke Debian Server. 2) Struktur file dhcpd.conf di Debian yang mendeklarasikan dua blok subnet (subnet 192.168.10.0/24 dan subnet 192.168.20.0/24). 3) Blok deklarasi 'host' khusus dengan parameter 'hardware ethernet' dan 'fixed-address' untuk PC guru di dalam blok subnet Lab A.",
+        "cog": "C5",
+        "stem": "Sebuah perusahaan rintisan mengalami insiden keamanan di mana server produksi berbasis Debian yang menjalankan OpenSSH Server berhasil disusupi oleh penyerang melalui teknik brute-force pada port default (22) dengan akun layanan yang lemah. Sebagai seorang administrator jaringan profesional, Anda ditugaskan untuk melakukan hardoning (pengerasan) total pada layanan SSH tersebut.\nUraikan langkah-langkah komprehensif yang harus Anda lakukan, mencakup:\n1. Identifikasi celah keamanan utama pada skenario di atas.\n2. Analisis minimal 4 parameter penting dalam berkas <code>/etc/ssh/sshd_config</code> yang wajib diubah beserta nilai konfigurasinya.\n3. Implementasi lapisan keamanan tambahan di luar konfigurasi SSH bawaan (misalnya penggunaan firewall atau port knocking/fail2ban).",
+        "weight": 3,
+        "explanation": "Pengerasan SSH server memerlukan pendekatan berlapis, mulai dari perubahan port, pengetatan otentikasi daemon SSH, hingga proteksi eksternal menggunakan fail2ban untuk mitigasi serangan brute-force.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "rubric": "Rubrik penilaian komprehensif konsep DHCP Server.",
-        "ideal_answer": "Uraian jawaban ideal mengenai prinsip dan aplikasi DHCP Server.",
+        "rubric": "Kriteria penilaian: 35% ketepatan identifikasi celah, 35% ketepatan analisis dan parameter konfigurasi sshd_config, 30% implementasi pengamanan tambahan yang relevan.",
+        "ideal_answer": "1. Identifikasi celah: Penggunaan port default 22 memudahkan pemindaian botnet, izin login root aktif, dan autentikasi berbasis password lemah.\n2. Parameter sshd_config: Port diubah (misal: Port 2233), PermitRootLogin no, PasswordAuthentication no, MaxAuthTries 3.\n3. Lapisan tambahan: Instalasi fail2ban untuk memblokir IP penyerang secara otomatis setelah beberapa kali gagal login, atau pembatasan akses menggunakan UFW/iptables.",
         "max_score": 100,
         "keywords": [
-          "dhcp server",
-          "prinsip",
-          "efisiensi"
+          "Port",
+          "PermitRootLogin",
+          "PasswordAuthentication",
+          "fail2ban",
+          "hardoning"
         ]
       },
       {
         "id": 7,
         "type": "mcq",
         "cog": "C4",
-        "stem": "Saat melakukan troubleshooting koneksi jaringan, seorang siswa SMK menjalankan perintah <code>ipconfig /renew</code> di Command Prompt Windows. Pesan yang muncul di layar adalah:<br><code>An error occurred while renewing interface Ethernet : Unable to contact your DHCP server. Request has timed out.</code><br>Analisis manakah yang paling tepat mengenai penyebab kegagalan komunikasi pada lapisan fisik dan data link?",
+        "stem": "Saat seorang siswa mencoba melakukan koneksi SSH ke server praktikum, muncul pesan error di terminal klien sebagai berikut:<br><br><code>@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</code><br><code>@ WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED! @</code><br><code>@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</code><br><code>IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!</code><br><br>Apa akar masalah (root cause) utama yang memicu kemunculan peringatan keamanan tersebut?",
         "weight": 1,
-        "explanation": "Pesan 'Unable to contact your DHCP server' menunjukkan bahwa komputer client gagal mengirimkan paket DHCPDISCOVER atau menerima DHCPOFFER karena terputusnya jalur komunikasi di layer bawah. Kemungkinan terbesar adalah kabel jaringan terlepas, port switch mati, atau masalah pada konfigurasi driver kartu jaringan (NIC), bukan masalah pada database lease server.",
+        "explanation": "Peringatan 'REMOTE HOST IDENTIFICATION HAS CHANGED' muncul ketika RSA/ECDSA/ED25519 host key dari server berbeda dengan yang tercatat di `~/.ssh/known_hosts` klien. Ini biasa terjadi jika server di-reinstall atau identitas IP-nya dipakai oleh perangkat lain.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "Database lease pada DHCP server mengalami korupsi data."
+            "text": "Layanan SSH di server belum diaktifkan atau mengalami crash pada port daemon."
           },
           {
             "id": "B",
-            "text": "Kabel UTP terputus, port switch down, atau terjadi gangguan fisik pada koneksi antara client dan switch."
+            "text": "Sidik jari (fingerprint) / kunci host di server telah berubah (misalnya karena instalasi ulang OS server), sehingga tidak cocok dengan catatan yang tersimpan di berkas <code>known_hosts</code> klien."
           },
           {
             "id": "C",
-            "text": "Durasi lease time pada server telah habis total."
+            "text": "Klien salah memasukkan password sebanyak tiga kali berturut-turut sehingga terkena mekanisme auto-block."
           },
           {
             "id": "D",
-            "text": "IP address client mengalami duplikasi dengan komputer lain."
+            "text": "Versi protokol SSH yang digunakan oleh klien tidak kompatibel dengan versi yang didukung oleh daemon server."
           },
           {
             "id": "E",
-            "text": "Layanan DNS Server pada Debian berhenti berjalan."
+            "text": "Kunci privat milik pengguna di mesin klien telah kadaluarsa atau rusak."
           }
         ],
         "answer": "B"
@@ -2275,32 +2268,32 @@
       {
         "id": 8,
         "type": "mcq_complex",
-        "cog": "C5",
-        "stem": "Seorang administrator jaringan ingin memastikan bahwa alamat IP yang dialokasikan oleh DHCP Server tidak mengalami bentrok (IP Address Conflict) dengan perangkat lain yang menggunakan IP statis di jaringan lokal yang sama. Tindakan preventif apa saja yang dapat dilakukan oleh administrator tersebut? (Pilih dua atau lebih jawaban yang benar)",
-        "weight": 1,
-        "explanation": "Pernyataan B benar karena fitur ping-check pada DHCP server akan melakukan ICMP echo sebelum menawarkan IP ke client. Pernyataan D benar karena teknik pengecualian (exclude range) memastikan IP server/gateway statis tidak ikut dibagikan secara dinamis. Pernyataan A, C, dan E tidak efektif atau tidak sesuai standar operasional pencegahan konflik IP.",
+        "cog": "C4",
+        "stem": "Dalam manajemen terowongan jaringan (SSH Tunneling / Port Forwarding), seorang administrator sistem sering kali perlu meneruskan port lokal ke server jarak jauh. Manakah di antara perintah berikut yang benar dalam mengimplementasikan local port forwarding? (Pilih dua jawaban yang benar)",
+        "weight": 1.5,
+        "explanation": "Opsi A menggunakan flag `-L` yang merupakan sintaks baku untuk local port forwarding (port lokal diteruskan ke tujuan remote). Penjelasan pada opsi C sangat akurat mendeskripsikan cara kerjanya. Opsi D terbalik, dan opsi E benar mengenai dynamic forwarding.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "Memperpanjang durasi default-lease-time menjadi 30 hari."
+            "text": "<code>ssh -L 8080:localhost:80 user@remote_server</code>"
           },
           {
             "id": "B",
-            "text": "Mengaktifkan fungsi pemeriksaan konflik (ping-check) pada konfigurasi DHCP server sebelum IP disewakan."
+            "text": "<code>ssh -R 8080:localhost:80 user@remote_server</code>"
           },
           {
             "id": "C",
-            "text": "Mengubah port default DHCP dari port 67 UDP ke port 80 TCP."
+            "text": "Perintah tersebut meneruskan lalu lintas dari port 8080 di mesin lokal ke port 80 pada server remote (atau jaringan lokal di sisi remote)."
           },
           {
             "id": "D",
-            "text": "Membuat batasan exclude range pada alamat IP yang telah dialokasikan untuk server dan perangkat infrastruktur."
+            "text": "Parameter <code>-L</code> digunakan secara eksklusif untuk remote port forwarding, sedangkan <code>-R</code> untuk local port forwarding."
           },
           {
             "id": "E",
-            "text": "Mengubah subnet mask jaringan dari /24 menjadi /30 secara keseluruhan."
+            "text": "<code>ssh -D 1080 user@remote_server</code> digunakan untuk melakukan dynamic port forwarding (SOCKS proxy)."
           }
         ],
         "answer": [
@@ -2312,84 +2305,75 @@
         "id": 9,
         "type": "true_false",
         "cog": "C4",
-        "stem": "Perhatikan karakteristik port protokol yang digunakan dalam layanan DHCP. Tentukan apakah pernyataan berikut Benar atau Salah!",
-        "weight": 1,
-        "explanation": "Pernyataan 1 Benar karena DHCP Server menggunakan port UDP 67 dan DHCP Client menggunakan port UDP 68. Pernyataan 2 Benar karena komunikasi awal DHCP menggunakan broadcast layer 2 (MAC address FF:FF:FF:FF:FF:FF) sebelum IP address client terbentuk. Pernyataan 3 Salah karena DHCP menggunakan protokol UDP yang tidak berorientasi koneksi (connectionless), bukan TCP.",
+        "stem": "Evaluasi pernyataan berikut terkait mekanisme kerja dan protokol keamanan SSH (Secure Shell):\n1. SSH beroperasi pada Layer Aplikasi dalam model OSI dan menggunakan protokol TCP pada port default 22.\n2. Seluruh data autentikasi dan muatan sesi (payload) ditransmisikan dalam bentuk teks biasa (plaintext) sebelum pertukaran kunci selesai dilakukan.\n3. SSH menyediakan enkripsi simetris untuk mengamankan data yang dikirimkan setelah proses negosiasi kunci asimetris selesai.",
+        "weight": 1.5,
+        "explanation": "Pernyataan 0 benar (TCP port 22). Pernyataan 1 salah karena bahkan pada fase awal, SSH melakukan pertukaran kunci (Diffie-Hellman) untuk membangun terowongan terenkripsi sebelum kredensial/autentikasi dikirim. Pernyataan 2 benar (menggunakan asimetris untuk autentikasi/pertukaran kunci, lalu simetris untuk kecepatan enkripsi data sesi).",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "statements": [
           {
             "id": 0,
-            "text": "Layanan DHCP Server mendengarkan permintaan pada port UDP 67, sedangkan klien menerima respon pada port UDP 68.",
+            "text": "SSH beroperasi pada Layer Aplikasi dalam model OSI dan menggunakan protokol TCP pada port default 22.",
             "key": "B"
           },
           {
             "id": 1,
-            "text": "Komunikasi inisiasi DHCPDISCOVER menggunakan frame broadcast layer 2 dengan alamat tujuan FF:FF:FF:FF:FF:FF.",
-            "key": "B"
+            "text": "Seluruh data autentikasi dan muatan sesi (payload) ditransmisikan dalam bentuk teks biasa (plaintext) sebelum pertukaran kunci selesai dilakukan.",
+            "key": "S"
           },
           {
             "id": 2,
-            "text": "Protokol DHCP beroperasi di atas transport layer TCP dengan mekanisme three-way handshake sebelum alokasi IP dilakukan.",
-            "key": "S"
+            "text": "SSH menyediakan enkripsi simetris untuk mengamankan data yang dikirimkan setelah proses negosiasi kunci asimetris selesai.",
+            "key": "B"
           }
         ],
         "answer": {
           "0": "B",
-          "1": "B",
-          "2": "S"
+          "1": "S",
+          "2": "B"
         }
       },
       {
         "id": 10,
         "type": "matching",
         "cog": "C4",
-        "stem": "Cocokkan parameter konfigurasi tingkat lanjut dalam file <code>dhcpd.conf</code> di sebelah kiri dengan fungsi utamanya di sebelah kanan!",
-        "weight": 1,
-        "explanation": "option routers mendefinisikan Default Gateway. option domain-name-servers mendefinisikan alamat IP DNS. max-lease-time mendefinisikan batas waktu maksimum sewa IP. authoritative menandakan bahwa server ini adalah otoritas resmi subnet tersebut.",
+        "stem": "Jodohkan perintah troubleshooting atau manajemen layanan SSH di Linux dengan fungsi operasionalnya yang sesuai:",
+        "weight": 2,
+        "explanation": "systemctl restart ssh menerapkan konfigurasi baru, sshd -t sangat berguna untuk memastikan tidak ada error sintaks di sshd_config yang dapat membuat server terkunci (lockout), dan journalctl -u ssh memantau log operasional SSH.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "premises": [
           {
             "id": 0,
-            "text": "option routers"
+            "text": "sudo systemctl restart ssh"
           },
           {
             "id": 1,
-            "text": "option domain-name-servers"
+            "text": "sshd -t"
           },
           {
             "id": 2,
-            "text": "max-lease-time"
-          },
-          {
-            "id": 3,
-            "text": "authoritative"
+            "text": "journalctl -u ssh"
           }
         ],
         "targets": [
           {
             "id": "A",
-            "text": "Mendefinisikan alamat default gateway jaringan yang diberikan ke klien"
+            "text": "Melakukan uji sintaks (syntax check) pada file konfigurasi sshd_config sebelum daemon direstart."
           },
           {
             "id": "B",
-            "text": "Mendefinisikan daftar alamat IP DNS server untuk resolusi domain klien"
+            "text": "Menerapkan perubahan parameter konfigurasi baru pada layanan SSH server."
           },
           {
             "id": "C",
-            "text": "Menentukan batas durasi waktu sewa maksimum alamat IP pada pool"
-          },
-          {
-            "id": "D",
-            "text": "Menyatakan server sebagai otoritas resmi yang berhak menolak sewa tidak sah"
+            "text": "Menampilkan log sistem khusus yang berkaitan dengan aktivitas daemon SSH menggunakan systemd journal."
           }
         ],
         "answer": {
-          "0": "A",
-          "1": "B",
-          "2": "C",
-          "3": "D"
+          "0": "B",
+          "1": "A",
+          "2": "C"
         }
       }
     ]

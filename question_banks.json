@@ -868,6 +868,831 @@
           "karakter"
         ],
         "weight": 3
+      },
+      {
+        "id": 4,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C2, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 5,
+        "type": "mcq",
+        "cog": "C3",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C3, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 6,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 7,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 8,
+        "type": "mcq",
+        "cog": "C5",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C5, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 9,
+        "type": "mcq",
+        "cog": "C6",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C6, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 10,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C2, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 11,
+        "type": "mcq",
+        "cog": "C3",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C3, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 12,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 13,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 14,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C2, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 15,
+        "type": "mcq",
+        "cog": "C3",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C3, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 16,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 17,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 18,
+        "type": "mcq",
+        "cog": "C5",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C5, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 19,
+        "type": "mcq",
+        "cog": "C6",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C6, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 20,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C2, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 21,
+        "type": "mcq",
+        "cog": "C3",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C3, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 22,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 23,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 24,
+        "type": "mcq",
+        "cog": "C5",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C5, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 25,
+        "type": "mcq",
+        "cog": "C6",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C6, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 26,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C2, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 27,
+        "type": "mcq",
+        "cog": "C3",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C3, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 28,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Hukum Termodinamika & Siklus Carnot secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
       }
     ]
   }

@@ -3138,9 +3138,7 @@
       // Sinkronisasi data profil sekolah & master siswa untuk cetak kartu ujian
       fetchSchoolProfile();
       fetchMasterStudents();
-      fetchQuestionBanks().then(() => {
-        viewQuestionList(currentActiveBankId || 1);
-      });
+      fetchQuestionBanks();
 
       // Auto-update live monitoring sesi ujian siswa secara realtime (setiap 2 detik)
       fetchProctorSessions();
@@ -3200,9 +3198,7 @@
         fetchMasterStudents();
       }
       if (tabName === 'bank-soal') {
-        fetchQuestionBanks().then(() => {
-          viewQuestionList(currentActiveBankId || 1);
-        });
+        fetchQuestionBanks();
       }
 
       const titleMap = {
@@ -3669,7 +3665,6 @@
         closeModal('modalAddQuestionManual');
         alert(json.message || 'Butir soal berhasil ditambahkan ke bank soal!');
         await fetchQuestionBanks();
-        await viewQuestionList(bankId);
       } catch (err) {
         alert('Gagal menambah butir soal: ' + err.message);
       }
@@ -3686,7 +3681,6 @@
         if (!res.ok) throw new Error(json.message);
         alert(json.message || 'Butir soal berhasil dihapus!');
         await fetchQuestionBanks();
-        await viewQuestionList(bankId);
       } catch (err) {
         alert('Gagal menghapus butir soal: ' + err.message);
       }

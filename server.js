@@ -658,18 +658,22 @@ async function callGoogleGeminiAPI({ apiKey, model, basis_type = 'materi', basis
     + "   DILARANG KERAS MENCANTUMKAN KODE/LABEL 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'LOTS', 'HOTS', ATAU KATA 'TINGKAT KOGNITIF' DI DALAM TEKS PERTANYAAN (STEM), STIMULUS, MAUPUN OPSI JAWABAN! Pertanyaan harus murni bernada akademis, profesional, dan alami bagi siswa SMA/SMK.\n\n"
     + "4. KUNCI JAWABAN & PEMBAHASAN ANALITIS LENGKAP:\n"
     + "   Sertakan pembahasan ilmiah yang detail, runtut, dan edukatif yang mengupas tuntas alasan teknis kunci jawaban benar dan mengapa distraktor lainnya salah.\n\n"
-    + "Format Output WAJIB berupa JSON array murni tanpa pembungkus markdown:\n"
-    + "[\n"
-    + "  {\n"
-    + "    \"type\": \"mcq\" | \"mcq_complex\" | \"true_false\" | \"matching\" | \"short_essay\" | \"long_essay\",\n"
-    + "    \"cog\": \"C2\" | \"C3\" | \"C4\" | \"C5\" | \"C6\",\n"
-    + "    \"weight\": 1.0,\n"
-    + "    \"stem\": \"teks HTML pertanyaan dengan stimulus kaya dan spesifik (TANPA kata C1-C6)\",\n"
-    + "    \"explanation\": \"pembahasan analitis detail (TANPA kata C1-C6)\",\n"
-    + "    \"options\": [{\"id\": \"A\", \"text\": \"...\"}, {\"id\": \"B\", \"text\": \"...\"}, {\"id\": \"C\", \"text\": \"...\"}, {\"id\": \"D\", \"text\": \"...\"}, {\"id\": \"E\", \"text\": \"...\"}],\n"
-    + "    \"answer\": \"A\"\n"
-    + "  }\n"
-    + "]\n";
+    + "Format Output WAJIB berupa JSON array murni tanpa pembungkus markdown [ ... ].\n"
+    + "STRUKTUR DATA JSON SPESIFIK BERDASARKAN TIPE SOAL (DILARANG TERTUKAR / DILARANG KOSONG):\n\n"
+    + "1. JIKA TYPE 'mcq' (Pilihan Ganda Tunggal 5 Opsi):\n"
+    + "   {\"type\": \"mcq\", \"cog\": \"C4\", \"weight\": 1.0, \"stem\": \"stimulus HTML dan pertanyaan...\", \"options\": [{\"id\": \"A\", \"text\": \"...\"}, {\"id\": \"B\", \"text\": \"...\"}, {\"id\": \"C\", \"text\": \"...\"}, {\"id\": \"D\", \"text\": \"...\"}, {\"id\": \"E\", \"text\": \"...\"}], \"answer\": \"A\", \"explanation\": \"pembahasan ilmiah detail...\"}\n\n"
+    + "2. JIKA TYPE 'mcq_complex' (Pilihan Ganda Kompleks - Multi Jawaban Benar):\n"
+    + "   {\"type\": \"mcq_complex\", \"cog\": \"C4\", \"weight\": 1.5, \"stem\": \"stimulus HTML dan pertanyaan (Pilih semua jawaban yang benar)...\", \"options\": [{\"id\": \"A\", \"text\": \"...\"}, {\"id\": \"B\", \"text\": \"...\"}, {\"id\": \"C\", \"text\": \"...\"}, {\"id\": \"D\", \"text\": \"...\"}, {\"id\": \"E\", \"text\": \"...\"}], \"answer\": [\"A\", \"C\"], \"explanation\": \"pembahasan...\"}\n\n"
+    + "3. JIKA TYPE 'true_false' (Pernyataan Matriks Benar / Salah):\n"
+    + "   Setiap butir WAJIB memiliki minimal 3 pernyataan analitis teknis di array 'statements' lengkap dengan key 'B' atau 'S'!\n"
+    + "   {\"type\": \"true_false\", \"cog\": \"C4\", \"weight\": 1.5, \"stem\": \"stimulus HTML dan instruksi evaluasi kebenaran...\", \"statements\": [{\"id\": 0, \"text\": \"Pernyataan evaluasi spesifik 1...\", \"key\": \"B\"}, {\"id\": 1, \"text\": \"Pernyataan evaluasi spesifik 2...\", \"key\": \"S\"}, {\"id\": 2, \"text\": \"Pernyataan evaluasi spesifik 3...\", \"key\": \"B\"}], \"answer\": {\"0\": \"B\", \"1\": \"S\", \"2\": \"B\"}, \"explanation\": \"pembahasan rinci setiap pernyataan...\"}\n\n"
+    + "4. JIKA TYPE 'matching' (Menjodohkan Premis Kiri dengan Target Kanan):\n"
+    + "   Setiap butir WAJIB memiliki minimal 3-4 pasang konsep/parameter di 'premises' dan 'targets', TIDAK BOLEH bernilai kosong atau teks placeholder!\n"
+    + "   {\"type\": \"matching\", \"cog\": \"C4\", \"weight\": 2.0, \"stem\": \"Cocokkan parameter/istilah di sebelah kiri dengan fungsi/deskripsi di sebelah kanan:\", \"premises\": [{\"id\": 0, \"text\": \"Parameter / Istilah Teknis 1\"}, {\"id\": 1, \"text\": \"Parameter / Istilah Teknis 2\"}, {\"id\": 2, \"text\": \"Parameter / Istilah Teknis 3\"}], \"targets\": [{\"id\": \"A\", \"text\": \"Deskripsi atau Fungsi Solusi A\"}, {\"id\": \"B\", \"text\": \"Deskripsi atau Fungsi Solusi B\"}, {\"id\": \"C\", \"text\": \"Deskripsi atau Fungsi Solusi C\"}], \"answer\": {\"0\": \"A\", \"1\": \"B\", \"2\": \"C\"}, \"explanation\": \"pembahasan relasi pasangan benar...\"}\n\n"
+    + "5. JIKA TYPE 'short_essay' (Isian Singkat):\n"
+    + "   {\"type\": \"short_essay\", \"cog\": \"C3\", \"weight\": 1.0, \"stem\": \"stimulus dan pertanyaan isian terarah...\", \"answer_keys\": [\"kata kunci utama\", \"sinonim istilah 2\"], \"explanation\": \"pembahasan...\"}\n\n"
+    + "6. JIKA TYPE 'long_essay' (Uraian / Esai Komprehensif AI):\n"
+    + "   {\"type\": \"long_essay\", \"cog\": \"C5\", \"weight\": 3.0, \"stem\": \"stimulus skenario studi kasus dan instruksi uraian...\", \"rubric\": \"Kriteria penilaian rubrik berbobot (35% identifikasi, 35% analisis teknis, 30% solusi)...\", \"ideal_answer\": \"Uraian jawaban model komprehensif dan runtut...\", \"keywords\": [\"istilah1\", \"istilah2\", \"istilah3\"], \"max_score\": 100, \"explanation\": \"pembahasan intisari esai...\"}\n";
 
   const payload = JSON.stringify({
     contents: [{ parts: [{ text: promptText }] }],
@@ -3326,31 +3330,149 @@ const server = http.createServer(async (req, res) => {
         ];
         baseQ.answer = Array.isArray(q.answer) ? q.answer : ['A', 'C'];
       } else if (baseQ.type === 'true_false') {
-        baseQ.statements = q.statements || [
-          { id: 0, text: `Pernyataan 1 terkait ${topic}`, key: 'B' },
-          { id: 1, text: `Pernyataan 2 terkait ${topic}`, key: 'S' },
-          { id: 2, text: `Pernyataan 3 terkait ${topic}`, key: 'B' }
-        ];
-        baseQ.answer = q.answer || { "0": "B", "1": "S", "2": "B" };
+        let statements = [];
+        let ansMap = {};
+
+        if (Array.isArray(q.statements) && q.statements.length > 0) {
+          statements = q.statements.map((s, idx) => {
+            const sid = s.id !== undefined ? s.id : idx;
+            let key = (s.key || (typeof q.answer === 'object' && q.answer && q.answer[sid]) || 'B').toString().toUpperCase().trim();
+            if (key.startsWith('B') || key === 'TRUE' || key === '1') key = 'B';
+            else key = 'S';
+            return {
+              id: sid,
+              text: s.text || (typeof s === 'string' ? s : `Pernyataan evaluasi analisis ${idx + 1}`),
+              key: key
+            };
+          });
+        } else if (Array.isArray(q.options) && q.options.length > 0) {
+          // AI memberikan pernyataan di array options
+          statements = q.options.map((opt, idx) => ({
+            id: idx,
+            text: opt.text || (typeof opt === 'string' ? opt : `Pernyataan evaluasi ${idx + 1}`),
+            key: (opt.key || 'B').toString().toUpperCase().startsWith('B') ? 'B' : 'S'
+          }));
+        } else if (typeof q.answer === 'string' && q.answer.includes(',')) {
+          // AI memberikan answer string "Benar, Benar, Salah"
+          const tokens = q.answer.split(',').map(t => t.trim());
+          statements = tokens.map((tok, idx) => ({
+            id: idx,
+            text: `Pernyataan analisis teknis ke-${idx + 1} terkait materi ${topic}`,
+            key: tok.toUpperCase().startsWith('B') ? 'B' : 'S'
+          }));
+        }
+
+        if (statements.length === 0) {
+          statements = [
+            { id: 0, text: `Konfigurasi dan implementasi parameter operasional ${topic} wajib diverifikasi fungsionalitasnya.`, key: 'B' },
+            { id: 1, text: `Layanan ${topic} dapat diimplementasikan tanpa penyesuaian dependensi arsitektur jaringan lokal.`, key: 'S' },
+            { id: 2, text: `Pemeriksaan catatan log berkala merupakan prosedur penting dalam menjaga keandalan sistem ${topic}.`, key: 'B' }
+          ];
+        }
+
+        statements.forEach(s => {
+          ansMap[s.id] = s.key;
+        });
+
+        baseQ.statements = statements;
+        baseQ.answer = ansMap;
       } else if (baseQ.type === 'matching') {
-        baseQ.premises = q.premises || [
-          { id: 0, text: `Premis 1 ${topic}` },
-          { id: 1, text: `Premis 2 ${topic}` },
-          { id: 2, text: `Premis 3 ${topic}` }
-        ];
-        baseQ.targets = q.targets || [
-          { id: 'A', text: 'Pasangan target A' },
-          { id: 'B', text: 'Pasangan target B' },
-          { id: 'C', text: 'Pasangan target C' }
-        ];
-        baseQ.answer = q.answer || { "0": "A", "1": "B", "2": "C" };
+        let premises = [];
+        let targets = [];
+        let ansMap = {};
+
+        // 1. Ekstraksi premises
+        if (Array.isArray(q.premises) && q.premises.length > 0) {
+          premises = q.premises.map((p, idx) => ({
+            id: p.id !== undefined ? p.id : idx,
+            text: p.text || (typeof p === 'string' ? p : `Parameter ${idx + 1}`)
+          }));
+        } else if (Array.isArray(q.pairs) && q.pairs.length > 0) {
+          premises = q.pairs.map((pr, idx) => ({
+            id: idx,
+            text: pr.left || pr.premise || pr.question || `Parameter ${idx + 1}`
+          }));
+        } else if (typeof q.answer === 'object' && q.answer !== null && !Array.isArray(q.answer)) {
+          // AI memberikan mapping key: value di answer, e.g. { "option routers": "A", "max-lease-time": "B" }
+          const keys = Object.keys(q.answer);
+          if (keys.length > 0 && isNaN(Number(keys[0]))) {
+            premises = keys.map((k, idx) => ({ id: idx, text: k }));
+          }
+        }
+
+        // 2. Ekstraksi targets
+        if (Array.isArray(q.targets) && q.targets.length > 0) {
+          targets = q.targets.map((t, idx) => ({
+            id: t.id || String.fromCharCode(65 + idx),
+            text: t.text || (typeof t === 'string' ? t : `Pilihan fungsi ${String.fromCharCode(65 + idx)}`)
+          }));
+        } else if (Array.isArray(q.options) && q.options.length > 0) {
+          targets = q.options.map((opt, idx) => ({
+            id: opt.id || String.fromCharCode(65 + idx),
+            text: opt.text || (typeof opt === 'string' ? opt : `Pilihan fungsi ${String.fromCharCode(65 + idx)}`)
+          }));
+        } else if (Array.isArray(q.pairs) && q.pairs.length > 0) {
+          targets = q.pairs.map((pr, idx) => ({
+            id: String.fromCharCode(65 + idx),
+            text: pr.right || pr.target || pr.answer || `Pilihan fungsi ${String.fromCharCode(65 + idx)}`
+          }));
+        }
+
+        // 3. Normalisasi answer mapping
+        if (premises.length > 0) {
+          if (typeof q.answer === 'object' && q.answer !== null && !Array.isArray(q.answer)) {
+            premises.forEach((p, idx) => {
+              if (q.answer[p.id] !== undefined) {
+                ansMap[p.id] = q.answer[p.id];
+              } else if (q.answer[p.text] !== undefined) {
+                ansMap[p.id] = q.answer[p.text];
+              } else {
+                ansMap[p.id] = String.fromCharCode(65 + (idx % Math.max(1, targets.length)));
+              }
+            });
+          } else {
+            premises.forEach((p, idx) => {
+              ansMap[p.id] = String.fromCharCode(65 + (idx % Math.max(1, targets.length)));
+            });
+          }
+        }
+
+        if (premises.length === 0) {
+          premises = [
+            { id: 0, text: `Parameter Konfigurasi Utama 1 (${topic})` },
+            { id: 1, text: `Parameter Konfigurasi Utama 2 (${topic})` },
+            { id: 2, text: `Parameter Konfigurasi Utama 3 (${topic})` }
+          ];
+        }
+        if (targets.length === 0) {
+          targets = [
+            { id: 'A', text: `Fungsi operasional dan kontrol parameter 1 pada ${topic}` },
+            { id: 'B', text: `Fungsi integrasi dan verifikasi layanan 2 pada ${topic}` },
+            { id: 'C', text: `Fungsi proteksi dan pencatatan riwayat 3 pada ${topic}` }
+          ];
+          premises.forEach((p, idx) => {
+            if (!ansMap[p.id]) ansMap[p.id] = String.fromCharCode(65 + idx);
+          });
+        }
+
+        baseQ.premises = premises;
+        baseQ.targets = targets;
+        baseQ.answer = ansMap;
       } else if (baseQ.type === 'short_essay') {
-        baseQ.answer_keys = Array.isArray(q.answer_keys) ? q.answer_keys : ['jawaban benar', 'kunci alternatif'];
+        let keys = [];
+        if (Array.isArray(q.answer_keys) && q.answer_keys.length > 0) {
+          keys = q.answer_keys;
+        } else if (typeof q.answer === 'string' && q.answer.trim()) {
+          keys = [q.answer.trim()];
+        } else if (q.ideal_answer) {
+          keys = [String(q.ideal_answer).split(/[\s,.;]+/)[0]];
+        }
+        baseQ.answer_keys = keys.length > 0 ? keys : [topic.toLowerCase(), 'konfigurasi'];
       } else if (baseQ.type === 'long_essay') {
-        baseQ.rubric = q.rubric || `Rubrik penilaian komprehensif konsep ${topic}.`;
-        baseQ.ideal_answer = q.ideal_answer || `Uraian jawaban ideal mengenai prinsip dan aplikasi ${topic}.`;
+        baseQ.rubric = q.rubric || `Rubrik penilaian komprehensif konsep ${topic}. Aspek dinilai: ketepatan konsep (35%), alur analisis (35%), penyelesaian masalah (30%).`;
+        baseQ.ideal_answer = q.ideal_answer || q.explanation || `Uraian jawaban ideal mengenai prinsip dan implementasi ${topic}.`;
         baseQ.max_score = Number(q.max_score) || 100;
-        baseQ.keywords = Array.isArray(q.keywords) ? q.keywords : [String(topic).toLowerCase(), 'prinsip', 'efisiensi'];
+        baseQ.keywords = Array.isArray(q.keywords) && q.keywords.length > 0 ? q.keywords : [String(topic).toLowerCase(), 'analisis', 'solusi'];
       }
 
       return baseQ;

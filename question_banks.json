@@ -2135,21 +2135,25 @@
         "statements": [
           {
             "id": 0,
-            "text": "Pernyataan 1 terkait DHCP Server",
+            "text": "Paket DHCPDISCOVER dari klien menggunakan mekanisme broadcast layer 2 sehingga diblokir dan tidak dapat melewati antarmuka router secara default.",
             "key": "B"
           },
           {
             "id": 1,
-            "text": "Pernyataan 2 terkait DHCP Server",
-            "key": "S"
+            "text": "DHCP Relay Agent (IP Helper-Address) pada router berfungsi mengubah broadcast DHCP klien menjadi paket unicast yang diteruskan ke DHCP Server pusat.",
+            "key": "B"
           },
           {
             "id": 2,
-            "text": "Pernyataan 3 terkait DHCP Server",
-            "key": "B"
+            "text": "Satu DHCP Server fisik hanya mampu melayani satu segmen subnet tunggal dan tidak dapat dikonfigurasi untuk beberapa pool subnet sekaligus.",
+            "key": "S"
           }
         ],
-        "answer": "Benar, Benar, Salah"
+        "answer": {
+          "0": "B",
+          "1": "B",
+          "2": "S"
+        }
       },
       {
         "id": 4,
@@ -2163,36 +2167,44 @@
         "premises": [
           {
             "id": 0,
-            "text": "Premis 1 DHCP Server"
+            "text": "DHCPDISCOVER"
           },
           {
             "id": 1,
-            "text": "Premis 2 DHCP Server"
+            "text": "DHCPOFFER"
           },
           {
             "id": 2,
-            "text": "Premis 3 DHCP Server"
+            "text": "DHCPREQUEST"
+          },
+          {
+            "id": 3,
+            "text": "DHCPACK"
           }
         ],
         "targets": [
           {
             "id": "A",
-            "text": "Pasangan target A"
+            "text": "Klien mengirim pesan broadcast mencari DHCP Server yang aktif di subnet lokal"
           },
           {
             "id": "B",
-            "text": "Pasangan target B"
+            "text": "Server mengirimkan penawaran konfigurasi IP, subnet mask, dan lease time ke klien"
           },
           {
             "id": "C",
-            "text": "Pasangan target C"
+            "text": "Klien meminta persetujuan resmi untuk menggunakan alamat IP yang telah ditawarkan"
+          },
+          {
+            "id": "D",
+            "text": "Server mengirimkan konfirmasi penerimaan akhir dan parameter jaringan lengkap"
           }
         ],
         "answer": {
-          "DHCPDISCOVER": "A",
-          "DHCPOFFER": "B",
-          "DHCPREQUEST": "C",
-          "DHCPACK": "D"
+          "0": "A",
+          "1": "B",
+          "2": "C",
+          "3": "D"
         }
       },
       {
@@ -2308,21 +2320,25 @@
         "statements": [
           {
             "id": 0,
-            "text": "Pernyataan 1 terkait DHCP Server",
+            "text": "Layanan DHCP Server mendengarkan permintaan pada port UDP 67, sedangkan klien menerima respon pada port UDP 68.",
             "key": "B"
           },
           {
             "id": 1,
-            "text": "Pernyataan 2 terkait DHCP Server",
-            "key": "S"
+            "text": "Komunikasi inisiasi DHCPDISCOVER menggunakan frame broadcast layer 2 dengan alamat tujuan FF:FF:FF:FF:FF:FF.",
+            "key": "B"
           },
           {
             "id": 2,
-            "text": "Pernyataan 3 terkait DHCP Server",
-            "key": "B"
+            "text": "Protokol DHCP beroperasi di atas transport layer TCP dengan mekanisme three-way handshake sebelum alokasi IP dilakukan.",
+            "key": "S"
           }
         ],
-        "answer": "Benar, Benar, Salah"
+        "answer": {
+          "0": "B",
+          "1": "B",
+          "2": "S"
+        }
       },
       {
         "id": 10,
@@ -2336,36 +2352,44 @@
         "premises": [
           {
             "id": 0,
-            "text": "Premis 1 DHCP Server"
+            "text": "option routers"
           },
           {
             "id": 1,
-            "text": "Premis 2 DHCP Server"
+            "text": "option domain-name-servers"
           },
           {
             "id": 2,
-            "text": "Premis 3 DHCP Server"
+            "text": "max-lease-time"
+          },
+          {
+            "id": 3,
+            "text": "authoritative"
           }
         ],
         "targets": [
           {
             "id": "A",
-            "text": "Pasangan target A"
+            "text": "Mendefinisikan alamat default gateway jaringan yang diberikan ke klien"
           },
           {
             "id": "B",
-            "text": "Pasangan target B"
+            "text": "Mendefinisikan daftar alamat IP DNS server untuk resolusi domain klien"
           },
           {
             "id": "C",
-            "text": "Pasangan target C"
+            "text": "Menentukan batas durasi waktu sewa maksimum alamat IP pada pool"
+          },
+          {
+            "id": "D",
+            "text": "Menyatakan server sebagai otoritas resmi yang berhak menolak sewa tidak sah"
           }
         ],
         "answer": {
-          "option routers": "A",
-          "option domain-name-servers": "B",
-          "max-lease-time": "C",
-          "authoritative": "D"
+          "0": "A",
+          "1": "B",
+          "2": "C",
+          "3": "D"
         }
       }
     ]

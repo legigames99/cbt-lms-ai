@@ -279,6 +279,12 @@
 
         <div class="pt-3 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Master & Akademik</div>
 
+        <a href="#upload-master" onclick="switchTab('upload-master')" id="nav-upload-master" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+          <i class="fa-solid fa-file-arrow-up w-4 text-center text-emerald-400"></i>
+          <span>Upload Data Master</span>
+          <span class="ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold font-mono">Excel</span>
+        </a>
+
         <a href="#siswa" onclick="switchTab('siswa')" id="nav-siswa" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
           <i class="fa-solid fa-user-graduate w-4 text-center text-indigo-400"></i>
           <span>Data Siswa</span>
@@ -970,6 +976,164 @@
       <!-- ============================================================== -->
       <!-- TAB 7: DATA SISWA & KELAS -->
       <!-- ============================================================== -->
+      <!-- ============================================================== -->
+      <!-- TAB 8C: PUSAT UPLOAD DATA MASTER (SISWA, KELAS, & MAPEL) -->
+      <!-- ============================================================== -->
+      <section id="tab-upload-master" class="hidden space-y-6">
+        <!-- Banner Header -->
+        <div class="bg-gradient-to-r from-emerald-950/70 via-slate-900 to-indigo-950/50 border border-emerald-500/30 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-file-excel"></i> Import Terpadu (Excel / CSV)
+              </span>
+              <span class="text-xs text-slate-500">•</span>
+              <span class="text-xs text-slate-400">Siswa, Kelas & Mata Pelajaran</span>
+            </div>
+            <h3 class="text-xl font-bold text-white flex items-center gap-2.5">
+              <span>Pusat Upload & Import Data Master</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              Impor data institusi sekolah dalam hitungan detik. Pilih kategori data yang ingin diunggah (Data Siswa, Data Kelas, atau Mata Pelajaran), unduh template resmi berformat .xlsx, lalu seret file untuk proses sinkronisasi otomatis.
+            </p>
+          </div>
+
+          <!-- Tombol Download Workbook Lengkap -->
+          <div class="flex items-center gap-3 shrink-0 flex-wrap">
+            <button onclick="downloadAllInOneTemplate()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-xs font-bold text-white transition flex items-center gap-2 shadow-lg shadow-emerald-600/30">
+              <i class="fa-solid fa-file-excel text-amber-300"></i> Unduh Master Workbook Lengkap (3-in-1)
+            </button>
+          </div>
+        </div>
+
+        <!-- 3 Pilihan Kategori Upload (Tab Switcher) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div onclick="setMasterImportCategory('siswa')" id="btnCatSiswa" class="cursor-pointer p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-950/20 hover:bg-emerald-950/30 transition flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-lg font-bold">
+              <i class="fa-solid fa-user-graduate"></i>
+            </div>
+            <div>
+              <h4 class="text-xs font-bold text-white">1. Data Master Siswa</h4>
+              <p class="text-[11px] text-slate-400 mt-0.5">NISN, Nama, Kelas, Sesi & Ruang Lab</p>
+            </div>
+          </div>
+
+          <div onclick="setMasterImportCategory('kelas')" id="btnCatKelas" class="cursor-pointer p-4 rounded-2xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800/60 transition flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center text-lg font-bold">
+              <i class="fa-solid fa-chalkboard-user"></i>
+            </div>
+            <div>
+              <h4 class="text-xs font-bold text-white">2. Data Kelas & Rombel</h4>
+              <p class="text-[11px] text-slate-400 mt-0.5">Nama Kelas, Tingkat, Jurusan & Wali</p>
+            </div>
+          </div>
+
+          <div onclick="setMasterImportCategory('mapel')" id="btnCatMapel" class="cursor-pointer p-4 rounded-2xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800/60 transition flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-amber-600/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-lg font-bold">
+              <i class="fa-solid fa-book-bookmark"></i>
+            </div>
+            <div>
+              <h4 class="text-xs font-bold text-white">3. Mata Pelajaran (Mapel)</h4>
+              <p class="text-[11px] text-slate-400 mt-0.5">Kode Mapel, Nama & Kelompok Kurikulum</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel Workspace Upload Aktif -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5 text-xs">
+          
+          <!-- Bar Informasi Kategori & Tombol Download Template Khusus -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+            <div>
+              <h4 id="uploadActiveTitle" class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-user-graduate text-emerald-400"></i> Upload Data Master Siswa
+              </h4>
+              <p id="uploadActiveDesc" class="text-slate-400 text-[11px] mt-0.5">
+                Pastikan file memuat kolom: <span class="text-emerald-300 font-mono">No. Peserta, Nama Lengkap, Kelas, NISN, Ruang, Sesi, Password</span>
+              </p>
+            </div>
+
+            <button onclick="downloadActiveCategoryTemplate()" id="btnDownloadActiveTemplate" class="px-4 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 font-bold transition flex items-center gap-2 shrink-0">
+              <i class="fa-solid fa-file-arrow-down"></i> Unduh Template Excel (.xlsx)
+            </button>
+          </div>
+
+          <!-- Area Drag & Drop File Excel -->
+          <div id="masterDropZone" onclick="document.getElementById('masterFileInput').click()" class="border-2 border-dashed border-slate-700 hover:border-emerald-500/80 bg-slate-950/70 hover:bg-emerald-950/10 rounded-2xl p-8 text-center cursor-pointer transition space-y-2 group">
+            <input type="file" id="masterFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleMasterFileSelected(event)">
+            <div class="w-14 h-14 mx-auto rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <div class="font-bold text-white text-sm">
+              Klik untuk memilih file Excel atau seret file ke area ini
+            </div>
+            <p class="text-[11px] text-slate-400">
+              Format yang didukung: <span class="text-slate-300 font-mono">.XLSX</span>, <span class="text-slate-300 font-mono">.XLS</span>, atau <span class="text-slate-300 font-mono">.CSV</span>
+            </p>
+            <div id="masterSelectedFileInfo" class="hidden pt-2 text-xs font-semibold text-emerald-400 flex items-center justify-center gap-2">
+              <i class="fa-solid fa-file-circle-check"></i>
+              <span id="masterSelectedFileName">file.xlsx</span>
+              <span id="masterSelectedFileSize" class="text-slate-500 font-normal">(0 KB)</span>
+            </div>
+          </div>
+
+          <!-- Opsi Penggabungan / Timpa Data -->
+          <div class="p-4 rounded-xl bg-slate-950/70 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-0.5">
+              <div class="font-bold text-white text-xs">Opsi Penanganan Data Duplikat / Bentrok:</div>
+              <p class="text-[11px] text-slate-400">Tentukan apakah data lama yang memiliki ID/Username/Nama sama akan ditimpa atau dilewati.</p>
+            </div>
+            <div class="flex items-center gap-4 shrink-0">
+              <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+                <input type="radio" name="masterImportModeRadio" value="overwrite" checked class="accent-emerald-600">
+                <span>Perbarui / Timpa Data Lama</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+                <input type="radio" name="masterImportModeRadio" value="append" class="accent-emerald-600">
+                <span>Hanya Tambah Data Baru</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Pratinjau Tabel Excel Sebelum Simpan -->
+          <div id="masterPreviewContainer" class="hidden space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="font-bold text-white flex items-center gap-2 text-xs">
+                <i class="fa-solid fa-table-list text-emerald-400"></i> Pratinjau Baris Data Terbaca
+                <span id="masterParsedCountBadge" class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold font-mono text-[10px]">
+                  0 Baris Terdeteksi
+                </span>
+              </div>
+              <span class="text-slate-500 text-[11px]">Menampilkan baris teratas hasil parsing</span>
+            </div>
+            <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/60 max-h-64 custom-scrollbar">
+              <table class="w-full text-left text-xs">
+                <thead id="masterPreviewThead" class="text-slate-400 bg-slate-950 uppercase text-[10px] tracking-wider sticky top-0">
+                  <!-- Generated dynamically -->
+                </thead>
+                <tbody id="masterPreviewTbody" class="divide-y divide-slate-800 text-slate-300">
+                  <!-- Generated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tombol Eksekusi & Status -->
+          <div class="pt-3 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div id="masterImportStatusText" class="text-xs text-slate-400 font-medium"></div>
+            <div class="flex items-center gap-3 ml-auto">
+              <button onclick="resetMasterUpload()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+                Reset / Pilih Ulang
+              </button>
+              <button id="btnExecuteMasterImport" disabled onclick="executeMasterImport()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-600/30">
+                <i class="fa-solid fa-file-import"></i> Mulai Simpan Data ke Sistem
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
       <section id="tab-siswa" class="hidden space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -4032,6 +4196,9 @@
         fetchSchoolProfile();
         fetchMasterStudents();
         setTimeout(syncFilterToModal, 100);
+      }
+      if (tabName === 'upload-master') {
+        initUploadMasterTab();
       }
       if (tabName === 'siswa') {
         fetchMasterStudents();
@@ -9481,6 +9648,352 @@
 
 
     // ==============================================================
+    // ==============================================================
+    // CONTROLLER: PUSAT UPLOAD DATA MASTER (SISWA, KELAS, & MAPEL)
+    // ==============================================================
+    let activeMasterCategory = 'siswa'; // 'siswa' | 'kelas' | 'mapel'
+    let parsedMasterData = [];
+
+    window.initUploadMasterTab = function() {
+      setMasterImportCategory(activeMasterCategory);
+    };
+
+    window.setMasterImportCategory = function(cat) {
+      activeMasterCategory = cat;
+      parsedMasterData = [];
+      resetMasterUpload();
+
+      const btnSiswa = document.getElementById('btnCatSiswa');
+      const btnKelas = document.getElementById('btnCatKelas');
+      const btnMapel = document.getElementById('btnCatMapel');
+
+      const defClass = 'cursor-pointer p-4 rounded-2xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800/60 transition flex items-center gap-3.5';
+      if (btnSiswa) btnSiswa.className = defClass;
+      if (btnKelas) btnKelas.className = defClass;
+      if (btnMapel) btnMapel.className = defClass;
+
+      const titleEl = document.getElementById('uploadActiveTitle');
+      const descEl = document.getElementById('uploadActiveDesc');
+
+      if (cat === 'siswa') {
+        if (btnSiswa) btnSiswa.className = 'cursor-pointer p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-950/20 hover:bg-emerald-950/30 transition flex items-center gap-3.5 shadow-lg shadow-emerald-950/30';
+        if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-user-graduate text-emerald-400"></i> Upload Data Master Siswa';
+        if (descEl) descEl.innerHTML = 'Kolom Template: <span class="text-emerald-300 font-mono">No. Peserta, Nama Lengkap, Kelas, NISN, Ruang, Sesi, Password</span>';
+      } else if (cat === 'kelas') {
+        if (btnKelas) btnKelas.className = 'cursor-pointer p-4 rounded-2xl border-2 border-blue-500 bg-blue-950/20 hover:bg-blue-950/30 transition flex items-center gap-3.5 shadow-lg shadow-blue-950/30';
+        if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-chalkboard-user text-blue-400"></i> Upload Data Kelas & Rombongan Belajar';
+        if (descEl) descEl.innerHTML = 'Kolom Template: <span class="text-blue-300 font-mono">Nama Rombel/Kelas, Tingkat (X/XI/XII), Jurusan, Wali Kelas, Ruang Lab CBT</span>';
+      } else if (cat === 'mapel') {
+        if (btnMapel) btnMapel.className = 'cursor-pointer p-4 rounded-2xl border-2 border-amber-500 bg-amber-950/20 hover:bg-amber-950/30 transition flex items-center gap-3.5 shadow-lg shadow-amber-950/30';
+        if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-book-bookmark text-amber-400"></i> Upload Master Mata Pelajaran (Mapel)';
+        if (descEl) descEl.innerHTML = 'Kolom Template: <span class="text-amber-300 font-mono">Kode Mapel, Nama Mata Pelajaran, Jenjang, Kelompok Kurikulum</span>';
+      }
+    };
+
+    window.resetMasterUpload = function() {
+      parsedMasterData = [];
+      const fileInput = document.getElementById('masterFileInput');
+      if (fileInput) fileInput.value = '';
+
+      const fileInfo = document.getElementById('masterSelectedFileInfo');
+      if (fileInfo) fileInfo.classList.add('hidden');
+
+      const previewContainer = document.getElementById('masterPreviewContainer');
+      if (previewContainer) previewContainer.classList.add('hidden');
+
+      const btn = document.getElementById('btnExecuteMasterImport');
+      if (btn) btn.disabled = true;
+
+      const statusText = document.getElementById('masterImportStatusText');
+      if (statusText) statusText.innerText = '';
+    };
+
+    window.downloadActiveCategoryTemplate = function() {
+      if (typeof XLSX === 'undefined') {
+        alert('Modul Excel sedang disiapkan. Silakan coba kembali dalam beberapa detik.');
+        return;
+      }
+
+      if (activeMasterCategory === 'siswa') {
+        handleDownloadExcelTemplate();
+      } else if (activeMasterCategory === 'kelas') {
+        const sampleClasses = [
+          { "No": 1, "Nama Rombel": "XII IPA 1", "Tingkat": "XII", "Jurusan": "MIPA", "Wali Kelas": "Dra. Sri Wahyuni", "Ruang Lab CBT": "Ruang Lab Komputer 01" },
+          { "No": 2, "Nama Rombel": "XII IPA 2", "Tingkat": "XII", "Jurusan": "MIPA", "Wali Kelas": "Drs. Bambang Irawan", "Ruang Lab CBT": "Ruang Lab Komputer 02" },
+          { "No": 3, "Nama Rombel": "XII IPS 1", "Tingkat": "XII", "Jurusan": "IPS", "Wali Kelas": "Nurul Hidayati, S.Pd.", "Ruang Lab CBT": "Ruang Lab Komputer 03" },
+          { "No": 4, "Nama Rombel": "X-1", "Tingkat": "X", "Jurusan": "Umum (Fase E)", "Wali Kelas": "Fitri Handayani, S.Pd.", "Ruang Lab CBT": "Ruang Teori 01" },
+          { "No": 5, "Nama Rombel": "XII RPL 1", "Tingkat": "XII", "Jurusan": "Rekayasa Perangkat Lunak", "Wali Kelas": "Yusuf Habibie, S.Kom.", "Ruang Lab CBT": "Lab Software Engineering" }
+        ];
+        const ws = XLSX.utils.json_to_sheet(sampleClasses);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Master_Kelas");
+        XLSX.writeFile(wb, "Template_Master_Kelas_CBT.xlsx");
+      } else if (activeMasterCategory === 'mapel') {
+        const sampleSubjects = [
+          { "No": 1, "Kode Mapel": "FIS", "Nama Mata Pelajaran": "Fisika", "Jenjang": "SMA/SMK", "Kelompok Kurikulum": "Peminatan MIPA / Teknik" },
+          { "No": 2, "Kode Mapel": "MTK-W", "Nama Mata Pelajaran": "Matematika Wajib", "Jenjang": "SMA/SMK", "Kelompok Kurikulum": "Umum" },
+          { "No": 3, "Kode Mapel": "BIND", "Nama Mata Pelajaran": "Bahasa Indonesia", "Jenjang": "SMA/SMK", "Kelompok Kurikulum": "Umum" },
+          { "No": 4, "Kode Mapel": "BING", "Nama Mata Pelajaran": "Bahasa Inggris", "Jenjang": "SMA/SMK", "Kelompok Kurikulum": "Umum" },
+          { "No": 5, "Kode Mapel": "KIM", "Nama Mata Pelajaran": "Kimia", "Jenjang": "SMA/SMK", "Kelompok Kurikulum": "Peminatan MIPA" },
+          { "No": 6, "Kode Mapel": "BIO", "Nama Mata Pelajaran": "Biologi", "Jenjang": "SMA/SMK", "Kelompok Kurikulum": "Peminatan MIPA" },
+          { "No": 7, "Kode Mapel": "PROD-RPL", "Nama Mata Pelajaran": "Pemrograman & RPL", "Jenjang": "SMK", "Kelompok Kurikulum": "Kejuruan SMK" }
+        ];
+        const ws = XLSX.utils.json_to_sheet(sampleSubjects);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Master_Mapel");
+        XLSX.writeFile(wb, "Template_Master_Mata_Pelajaran_CBT.xlsx");
+      }
+    };
+
+    window.downloadAllInOneTemplate = function() {
+      if (typeof XLSX === 'undefined') {
+        alert('Modul Excel sedang disiapkan. Silakan coba kembali.');
+        return;
+      }
+      const wb = XLSX.utils.book_new();
+
+      // Sheet 1: Siswa
+      const sampleStudents = [
+        { "No": 1, "No. Peserta": "26-01-05-1001", "Nama Lengkap": "Ahmad Rizki Pratama", "Kelas": "XII IPA 1", "NISN": "0078123451", "NIS": "23241001", "Tempat, Tanggal Lahir": "Jakarta, 01 Januari 2008", "Jenis Kelamin": "Laki-laki", "Ruang": "Ruang Lab Komputer 01", "Sesi": "Sesi 1 (07:30 - 09:30)", "Server": "SRV-01", "Password": "siswa123" },
+        { "No": 2, "No. Peserta": "26-01-05-1002", "Nama Lengkap": "Siti Nur Aisyah", "Kelas": "XII IPA 1", "NISN": "0078123452", "NIS": "23241002", "Tempat, Tanggal Lahir": "Jakarta, 02 Februari 2008", "Jenis Kelamin": "Perempuan", "Ruang": "Ruang Lab Komputer 01", "Sesi": "Sesi 1 (07:30 - 09:30)", "Server": "SRV-01", "Password": "siswa123" }
+      ];
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(sampleStudents), "Siswa");
+
+      // Sheet 2: Kelas
+      const sampleClasses = [
+        { "No": 1, "Nama Rombel": "XII IPA 1", "Tingkat": "XII", "Jurusan": "MIPA", "Wali Kelas": "Dra. Sri Wahyuni", "Ruang Lab CBT": "Ruang Lab Komputer 01" },
+        { "No": 2, "Nama Rombel": "XII IPS 1", "Tingkat": "XII", "Jurusan": "IPS", "Wali Kelas": "Nurul Hidayati, S.Pd.", "Ruang Lab CBT": "Ruang Lab Komputer 03" }
+      ];
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(sampleClasses), "Kelas");
+
+      // Sheet 3: Mapel
+      const sampleSubjects = [
+        { "No": 1, "Kode Mapel": "FIS", "Nama Mata Pelajaran": "Fisika", "Jenjang": "SMA/SMK", "Kelompok Kurikulum": "Peminatan MIPA / Teknik" },
+        { "No": 2, "Kode Mapel": "MTK-W", "Nama Mata Pelajaran": "Matematika Wajib", "Jenjang": "SMA/SMK", "Kelompok Kurikulum": "Umum" }
+      ];
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(sampleSubjects), "Mapel");
+
+      XLSX.writeFile(wb, "Master_Workbook_CBT_Lengkap (3-in-1).xlsx");
+    };
+
+    window.handleMasterFileSelected = function(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const fileInfo = document.getElementById('masterSelectedFileInfo');
+      if (fileInfo) fileInfo.classList.remove('hidden');
+      const nameEl = document.getElementById('masterSelectedFileName');
+      if (nameEl) nameEl.innerText = file.name;
+      const sizeEl = document.getElementById('masterSelectedFileSize');
+      if (sizeEl) sizeEl.innerText = '(' + Math.round(file.size / 1024) + ' KB)';
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const data = new Uint8Array(evt.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          let sheetName = workbook.SheetNames[0];
+
+          // Jika workbook multi-sheet, cari nama sheet yang sesuai kategori aktif
+          if (activeMasterCategory === 'siswa' && workbook.SheetNames.includes('Siswa')) sheetName = 'Siswa';
+          if (activeMasterCategory === 'kelas' && (workbook.SheetNames.includes('Kelas') || workbook.SheetNames.includes('Master_Kelas'))) sheetName = workbook.SheetNames.find(s => s.toLowerCase().includes('kelas'));
+          if (activeMasterCategory === 'mapel' && (workbook.SheetNames.includes('Mapel') || workbook.SheetNames.includes('Master_Mapel'))) sheetName = workbook.SheetNames.find(s => s.toLowerCase().includes('mapel'));
+
+          const sheet = workbook.Sheets[sheetName];
+          const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+          if (!rawRows || rawRows.length === 0) {
+            alert('File Excel atau sheet "' + sheetName + '" tidak memiliki baris data!');
+            resetMasterUpload();
+            return;
+          }
+
+          parseMasterRows(rawRows);
+        } catch (err) {
+          alert('Gagal membaca file Excel: ' + err.message);
+          resetMasterUpload();
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    };
+
+    function parseMasterRows(rows) {
+      parsedMasterData = [];
+
+      if (activeMasterCategory === 'siswa') {
+        parsedMasterData = rows.map((r, i) => {
+          const fullName = r['Nama Lengkap'] || r['Nama Siswa'] || r['Nama'] || r['nama'] || r['full_name'] || '';
+          const nisn = r['NISN'] || r['nisn'] || r['Nomor Induk Siswa Nasional'] || '';
+          const examNo = r['No. Peserta'] || r['No Peserta'] || r['Nomor Peserta'] || r['exam_no'] || '';
+          const username = r['Username'] || r['username'] || r['ID Login'] || examNo || nisn || ('siswa_' + (1000 + i));
+          const pass = r['Password CBT'] || r['Password'] || r['password'] || r['pass'] || 'siswa123';
+          const className = r['Kelas'] || r['Kelas / Rombel'] || r['Rombel'] || r['class_name'] || 'XII IPA 1';
+
+          return {
+            username: String(username).trim(),
+            full_name: String(fullName).trim(),
+            pass: String(pass).trim(),
+            class_name: String(className).trim(),
+            nisn: String(nisn).trim(),
+            nis: String(r['NIS'] || r['nis'] || '').trim(),
+            exam_no: String(examNo).trim(),
+            gender: String(r['Jenis Kelamin'] || r['JK'] || 'Laki-laki').trim(),
+            room: String(r['Ruang'] || r['Ruang Ujian'] || 'Ruang Lab Komputer 01').trim(),
+            session: String(r['Sesi'] || r['Sesi Ujian'] || 'Sesi 1 (07:30 - 09:30)').trim(),
+            server: String(r['Server'] || 'SRV-01').trim()
+          };
+        }).filter(s => s.full_name && s.username);
+      } else if (activeMasterCategory === 'kelas') {
+        parsedMasterData = rows.map((r, i) => {
+          const name = r['Nama Rombel'] || r['Nama Kelas'] || r['Kelas'] || r['name'] || '';
+          const level = r['Tingkat'] || r['Jenjang'] || r['level'] || (String(name).startsWith('XII') ? 'XII' : (String(name).startsWith('XI') ? 'XI' : 'X'));
+          const major = r['Jurusan'] || r['Program Keahlian'] || r['major'] || 'Umum';
+          const homeroom = r['Wali Kelas'] || r['Wali'] || r['homeroom'] || '-';
+          const room = r['Ruang Lab CBT'] || r['Ruang'] || r['Lab'] || r['room'] || 'Ruang Teori';
+
+          return {
+            name: String(name).trim(),
+            level: String(level).trim(),
+            major: String(major).trim(),
+            homeroom: String(homeroom).trim(),
+            room: String(room).trim()
+          };
+        }).filter(c => c.name);
+      } else if (activeMasterCategory === 'mapel') {
+        parsedMasterData = rows.map((r, i) => {
+          const name = r['Nama Mata Pelajaran'] || r['Nama Mapel'] || r['Mapel'] || r['name'] || '';
+          const code = r['Kode Mapel'] || r['Kode'] || r['code'] || String(name).substring(0, 4).toUpperCase();
+          const level = r['Jenjang'] || r['Tingkat'] || r['level'] || 'SMA/SMK';
+          const group = r['Kelompok Kurikulum'] || r['Kelompok'] || r['group'] || 'Umum';
+
+          return {
+            name: String(name).trim(),
+            code: String(code).trim(),
+            level: String(level).trim(),
+            group: String(group).trim()
+          };
+        }).filter(m => m.name);
+      }
+
+      renderMasterPreviewTable();
+    }
+
+    function renderMasterPreviewTable() {
+      const container = document.getElementById('masterPreviewContainer');
+      const thead = document.getElementById('masterPreviewThead');
+      const tbody = document.getElementById('masterPreviewTbody');
+      const badge = document.getElementById('masterParsedCountBadge');
+      const btn = document.getElementById('btnExecuteMasterImport');
+
+      if (!parsedMasterData || parsedMasterData.length === 0) {
+        alert('Tidak ada baris data valid yang berhasil dibaca. Pastikan nama kolom sesuai template!');
+        resetMasterUpload();
+        return;
+      }
+
+      if (container) container.classList.remove('hidden');
+      if (badge) badge.innerText = parsedMasterData.length + ' Baris Valid Terdeteksi';
+      if (btn) btn.disabled = false;
+
+      // Render headers
+      if (activeMasterCategory === 'siswa') {
+        thead.innerHTML = '<tr><th class="px-3 py-2 w-10 text-center">No</th><th class="px-3 py-2">No. Peserta</th><th class="px-3 py-2">Nama Lengkap</th><th class="px-3 py-2">Kelas</th><th class="px-3 py-2">NISN</th><th class="px-3 py-2">Ruang & Sesi</th><th class="px-3 py-2">Password</th></tr>';
+        tbody.innerHTML = parsedMasterData.slice(0, 8).map((s, idx) => `
+          <tr class="hover:bg-slate-900/60">
+            <td class="px-3 py-2 text-center text-slate-500 font-mono">${idx + 1}</td>
+            <td class="px-3 py-2 font-mono text-emerald-400 font-bold">${s.exam_no || '-'}</td>
+            <td class="px-3 py-2 font-bold text-white">${s.full_name}</td>
+            <td class="px-3 py-2 font-semibold text-indigo-300">${s.class_name}</td>
+            <td class="px-3 py-2 font-mono text-slate-400">${s.nisn || '-'}</td>
+            <td class="px-3 py-2 text-slate-300">${s.room} (${s.session})</td>
+            <td class="px-3 py-2 font-mono text-amber-300">${s.pass}</td>
+          </tr>
+        `).join('');
+      } else if (activeMasterCategory === 'kelas') {
+        thead.innerHTML = '<tr><th class="px-3 py-2 w-10 text-center">No</th><th class="px-3 py-2">Nama Rombel / Kelas</th><th class="px-3 py-2">Tingkat</th><th class="px-3 py-2">Jurusan</th><th class="px-3 py-2">Wali Kelas</th><th class="px-3 py-2">Ruang Lab CBT</th></tr>';
+        tbody.innerHTML = parsedMasterData.slice(0, 8).map((c, idx) => `
+          <tr class="hover:bg-slate-900/60">
+            <td class="px-3 py-2 text-center text-slate-500 font-mono">${idx + 1}</td>
+            <td class="px-3 py-2 font-bold text-white flex items-center gap-2"><span class="w-6 h-6 rounded bg-blue-600/20 text-blue-400 flex items-center justify-center font-bold text-xs">${c.name.substring(0,2)}</span> ${c.name}</td>
+            <td class="px-3 py-2 font-semibold text-blue-300">${c.level}</td>
+            <td class="px-3 py-2 text-slate-300">${c.major}</td>
+            <td class="px-3 py-2 text-slate-300">${c.homeroom}</td>
+            <td class="px-3 py-2 text-slate-400">${c.room}</td>
+          </tr>
+        `).join('');
+      } else if (activeMasterCategory === 'mapel') {
+        thead.innerHTML = '<tr><th class="px-3 py-2 w-10 text-center">No</th><th class="px-3 py-2">Kode Mapel</th><th class="px-3 py-2">Nama Mata Pelajaran</th><th class="px-3 py-2">Jenjang</th><th class="px-3 py-2">Kelompok Kurikulum</th></tr>';
+        tbody.innerHTML = parsedMasterData.slice(0, 8).map((m, idx) => `
+          <tr class="hover:bg-slate-900/60">
+            <td class="px-3 py-2 text-center text-slate-500 font-mono">${idx + 1}</td>
+            <td class="px-3 py-2 font-mono text-amber-400 font-bold">${m.code}</td>
+            <td class="px-3 py-2 font-bold text-white">${m.name}</td>
+            <td class="px-3 py-2 text-slate-300">${m.level}</td>
+            <td class="px-3 py-2 text-slate-300"><span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-semibold">${m.group}</span></td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    window.executeMasterImport = async function() {
+      if (!parsedMasterData || parsedMasterData.length === 0) return;
+
+      const btn = document.getElementById('btnExecuteMasterImport');
+      const statusText = document.getElementById('masterImportStatusText');
+      const mode = document.querySelector('input[name="masterImportModeRadio"]:checked')?.value || 'overwrite';
+      const overwrite = mode === 'overwrite';
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan ke Sistem...';
+      if (statusText) statusText.innerText = 'Mengunggah dan memproses data di server...';
+
+      try {
+        let endpoint = '';
+        let payload = {};
+
+        if (activeMasterCategory === 'siswa') {
+          endpoint = '/api/v1/master/students/bulk-import';
+          payload = { students: parsedMasterData, overwrite: overwrite };
+        } else if (activeMasterCategory === 'kelas') {
+          endpoint = '/api/v1/master/classes/bulk-import';
+          payload = { classes: parsedMasterData, overwrite: overwrite };
+        } else if (activeMasterCategory === 'mapel') {
+          endpoint = '/api/v1/master/subjects/bulk-import';
+          payload = { subjects: parsedMasterData, overwrite: overwrite };
+        }
+
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+
+        if (json.status === 'success') {
+          alert('SUKSES! ' + (json.message || 'Data berhasil diimpor ke sistem.'));
+          resetMasterUpload();
+
+          // Refresh data lokal
+          await fetchMasterStudents();
+          await fetchMasterClasses();
+          await fetchMasterSubjects();
+
+          // Navigasikan pengguna ke tab terkait
+          if (activeMasterCategory === 'siswa') switchTab('siswa');
+          else if (activeMasterCategory === 'kelas') switchTab('kelas');
+          else if (activeMasterCategory === 'mapel') switchTab('mapel');
+        } else {
+          alert('Gagal mengimpor: ' + (json.message || 'Error server'));
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan saat mengunggah: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-file-import"></i> Mulai Simpan Data ke Sistem';
+        if (statusText) statusText.innerText = '';
+      }
+    };
+
     // ==============================================================
     // CONTROLLER: MASTER DATA KELAS & MATA PELAJARAN
     // ==============================================================

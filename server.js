@@ -2076,6 +2076,120 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
+// POST /api/v1/master/classes/bulk-import (Import Massal Kelas via Excel)
+  if (pathname === '/api/v1/master/classes/bulk-import' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const list = body.classes || [];
+    const overwrite = body.overwrite !== false;
+
+    if (!Array.isArray(list) || list.length === 0) {
+      return sendJSON(400, { status: 'error', message: 'Data kelas dari file Excel kosong atau tidak valid!' });
+    }
+
+    let addedCount = 0;
+    let updatedCount = 0;
+    let maxId = Math.max(...MASTER_CLASSES.map(c => c.id || 0), 0);
+
+    for (const item of list) {
+      const name = (item.name || item.class_name || item.kelas || '').toString().trim();
+      if (!name) continue;
+
+      const level = (item.level || item.tingkat || (name.startsWith('XII') ? 'XII' : (name.startsWith('XI') ? 'XI' : 'X'))).toString().trim();
+      const major = (item.major || item.jurusan || item.program || 'Umum').toString().trim();
+      const homeroom = (item.homeroom || item.wali_kelas || item.wali || '-').toString().trim();
+      const room = (item.room || item.ruang || item.lab || 'Ruang Teori').toString().trim();
+
+      const existingIdx = MASTER_CLASSES.findIndex(c => c.name.toLowerCase() === name.toLowerCase());
+      if (existingIdx !== -1) {
+        if (overwrite) {
+          MASTER_CLASSES[existingIdx] = {
+            ...MASTER_CLASSES[existingIdx],
+            level,
+            major,
+            homeroom,
+            room
+          };
+          updatedCount++;
+        }
+      } else {
+        maxId++;
+        MASTER_CLASSES.push({
+          id: maxId,
+          name,
+          level,
+          major,
+          homeroom,
+          room
+        });
+        addedCount++;
+      }
+    }
+
+    saveClassesToFile();
+
+    return sendJSON(200, {
+      status: 'success',
+      message: `Berhasil mengimpor kelas: ${addedCount} rombel baru ditambahkan, ${updatedCount} rombel diperbarui.`,
+      data: { added: addedCount, updated: updatedCount, total: MASTER_CLASSES.length }
+    });
+  }
+
+  // POST /api/v1/master/subjects/bulk-import (Import Massal Mata Pelajaran via Excel)
+  if (pathname === '/api/v1/master/subjects/bulk-import' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const list = body.subjects || [];
+    const overwrite = body.overwrite !== false;
+
+    if (!Array.isArray(list) || list.length === 0) {
+      return sendJSON(400, { status: 'error', message: 'Data mata pelajaran dari file Excel kosong atau tidak valid!' });
+    }
+
+    let addedCount = 0;
+    let updatedCount = 0;
+    let maxId = Math.max(...MASTER_SUBJECTS.map(s => s.id || 0), 0);
+
+    for (const item of list) {
+      const name = (item.name || item.mapel || item.mata_pelajaran || '').toString().trim();
+      if (!name) continue;
+
+      const code = (item.code || item.kode || name.substring(0, 4).toUpperCase()).toString().trim();
+      const level = (item.level || item.jenjang || 'SMA/SMK').toString().trim();
+      const group = (item.group || item.kelompok || 'Umum').toString().trim();
+
+      const existingIdx = MASTER_SUBJECTS.findIndex(s => s.name.toLowerCase() === name.toLowerCase() || s.code.toLowerCase() === code.toLowerCase());
+      if (existingIdx !== -1) {
+        if (overwrite) {
+          MASTER_SUBJECTS[existingIdx] = {
+            ...MASTER_SUBJECTS[existingIdx],
+            name,
+            code,
+            level,
+            group
+          };
+          updatedCount++;
+        }
+      } else {
+        maxId++;
+        MASTER_SUBJECTS.push({
+          id: maxId,
+          code,
+          name,
+          level,
+          group
+        });
+        addedCount++;
+      }
+    }
+
+    saveSubjectsToFile();
+
+    return sendJSON(200, {
+      status: 'success',
+      message: `Berhasil mengimpor mata pelajaran: ${addedCount} mapel baru ditambahkan, ${updatedCount} mapel diperbarui.`,
+      data: { added: addedCount, updated: updatedCount, total: MASTER_SUBJECTS.length }
+    });
+  }
+
   // POST /api/v1/master/students/bulk-delete (Hapus Beberapa Siswa atau Semua Siswa Sekaligus)
   if (pathname === '/api/v1/master/students/bulk-delete' && req.method === 'POST') {
     const body = await parseBody(req);

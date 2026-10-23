@@ -519,22 +519,175 @@
       const listContainer = document.getElementById('qOptionsList');
       listContainer.innerHTML = '';
 
-      const optionsList = Array.isArray(q.options) ? q.options : [];
-      optionsList.forEach((opt, optIndex) => {
-        const displayLetter = String.fromCharCode(65 + optIndex); // Selalu 'A', 'B', 'C', 'D', 'E' berurutan
-        const card = document.createElement('div');
-        const isSelected = selectedAns === opt.id;
-        card.className = `option-card border border-slate-700 bg-slate-900/60 rounded-xl p-4 flex items-center gap-4 cursor-pointer transition ${isSelected ? 'selected' : ''}`;
-        card.onclick = () => selectOption(q.id, opt.id);
+      const qType = q.type || 'mcq';
 
-        card.innerHTML = `
-          <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs border ${isSelected ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400'}">
-            ${displayLetter}
-          </div>
-          <div class="text-sm text-slate-200">${opt.text}</div>
+      // 1. Tipe: Pilihan Ganda Tunggal (MCQ)
+      if (qType === 'mcq') {
+        const optionsList = Array.isArray(q.options) ? q.options : [];
+        optionsList.forEach((opt, optIndex) => {
+          const displayLetter = String.fromCharCode(65 + optIndex);
+          const isSelected = (selectedAns === opt.id || selectedAns === displayLetter);
+          const card = document.createElement('div');
+          card.className = `option-card border border-slate-700 bg-slate-900/60 rounded-xl p-4 flex items-center gap-4 cursor-pointer transition ${isSelected ? 'selected ring-2 ring-indigo-500 bg-indigo-950/40' : ''}`;
+          card.onclick = () => selectOption(q.id, opt.id);
+
+          card.innerHTML = `
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs border ${isSelected ? 'bg-indigo-600 border-indigo-500 text-white shadow-md shadow-indigo-600/30' : 'bg-slate-800 border-slate-700 text-slate-400'}">
+              ${displayLetter}
+            </div>
+            <div class="text-sm text-slate-200">${opt.text}</div>
+          `;
+          listContainer.appendChild(card);
+        });
+      }
+
+      // 2. Tipe: Pilihan Ganda Kompleks (MCQ Complex / Checkbox)
+      else if (qType === 'mcq_complex') {
+        const headerNotice = document.createElement('div');
+        headerNotice.className = 'mb-3 px-3.5 py-2 rounded-xl bg-purple-500/15 border border-purple-500/30 text-xs text-purple-300 flex items-center gap-2';
+        headerNotice.innerHTML = `<i class="fa-solid fa-square-check text-purple-400 text-sm"></i> <span><strong>Pilihan Ganda Kompleks:</strong> Pilih satu atau lebih jawaban yang benar.</span>`;
+        listContainer.appendChild(headerNotice);
+
+        const currentChoices = Array.isArray(selectedAns) ? selectedAns : (selectedAns ? [selectedAns] : []);
+        const optionsList = Array.isArray(q.options) ? q.options : [];
+
+        optionsList.forEach((opt, optIndex) => {
+          const displayLetter = String.fromCharCode(65 + optIndex);
+          const isSelected = currentChoices.includes(opt.id) || currentChoices.includes(displayLetter);
+          const card = document.createElement('div');
+          card.className = `option-card border border-slate-700 bg-slate-900/60 rounded-xl p-4 flex items-center gap-4 cursor-pointer transition ${isSelected ? 'selected ring-2 ring-purple-500 bg-purple-950/40' : ''}`;
+          card.onclick = () => toggleComplexOption(q.id, opt.id);
+
+          card.innerHTML = `
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs border ${isSelected ? 'bg-purple-600 border-purple-500 text-white shadow-md shadow-purple-600/30' : 'bg-slate-800 border-slate-700 text-slate-400'}">
+              <i class="fa-solid ${isSelected ? 'fa-check' : 'fa-square'}"></i>
+            </div>
+            <div class="flex-1 text-sm text-slate-200"><strong class="text-purple-300 mr-2">${displayLetter}.</strong>${opt.text}</div>
+          `;
+          listContainer.appendChild(card);
+        });
+      }
+
+      // 3. Tipe: Benar / Salah (True / False Statement Matrix)
+      else if (qType === 'true_false') {
+        const headerNotice = document.createElement('div');
+        headerNotice.className = 'mb-3 px-3.5 py-2 rounded-xl bg-amber-500/15 border border-amber-500/30 text-xs text-amber-300 flex items-center gap-2';
+        headerNotice.innerHTML = `<i class="fa-solid fa-list-check text-amber-400 text-sm"></i> <span><strong>Pernyataan Benar / Salah:</strong> Tentukan apakah setiap pernyataan bernilai Benar (B) atau Salah (S).</span>`;
+        listContainer.appendChild(headerNotice);
+
+        const statements = Array.isArray(q.statements) ? q.statements : [];
+        const currentAnswers = (typeof selectedAns === 'object' && selectedAns !== null) ? selectedAns : {};
+
+        const tableContainer = document.createElement('div');
+        tableContainer.className = 'border border-slate-700 rounded-xl overflow-hidden bg-slate-900/60';
+        let rowsHtml = '';
+
+        statements.forEach((st, sIdx) => {
+          const stKey = st.id !== undefined ? st.id : sIdx;
+          const choice = currentAnswers[stKey] !== undefined ? currentAnswers[stKey] : (currentAnswers[sIdx] || currentAnswers[String(sIdx)]);
+          const isBenar = (choice === 'B' || choice === 'b');
+          const isSalah = (choice === 'S' || choice === 's');
+
+          rowsHtml += `
+            <div class="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 last:border-b-0">
+              <div class="text-xs text-slate-200 flex-1 leading-relaxed"><span class="font-bold text-slate-400 mr-2">${sIdx + 1}.</span>${st.text}</div>
+              <div class="flex items-center gap-2 shrink-0">
+                <button type="button" onclick="setTrueFalseAnswer(${q.id}, ${stKey}, 'B')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${isBenar ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30 ring-1 ring-emerald-400' : 'bg-slate-800 text-slate-400 hover:text-white'}">
+                  <i class="fa-solid fa-check"></i> Benar (B)
+                </button>
+                <button type="button" onclick="setTrueFalseAnswer(${q.id}, ${stKey}, 'S')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${isSalah ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30 ring-1 ring-rose-400' : 'bg-slate-800 text-slate-400 hover:text-white'}">
+                  <i class="fa-solid fa-xmark"></i> Salah (S)
+                </button>
+              </div>
+            </div>
+          `;
+        });
+        tableContainer.innerHTML = rowsHtml;
+        listContainer.appendChild(tableContainer);
+      }
+
+      // 4. Tipe: Menjodohkan (Matching Pairs)
+      else if (qType === 'matching') {
+        const headerNotice = document.createElement('div');
+        headerNotice.className = 'mb-3 px-3.5 py-2 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-xs text-cyan-300 flex items-center gap-2';
+        headerNotice.innerHTML = `<i class="fa-solid fa-shuffle text-cyan-400 text-sm"></i> <span><strong>Menjodohkan:</strong> Pasangkan setiap premis di sebelah kiri dengan pilihan yang tepat di sebelah kanan.</span>`;
+        listContainer.appendChild(headerNotice);
+
+        const premises = Array.isArray(q.premises) ? q.premises : [];
+        const targets = Array.isArray(q.targets) ? q.targets : [];
+        const currentPairs = (typeof selectedAns === 'object' && selectedAns !== null) ? selectedAns : {};
+
+        const pairsContainer = document.createElement('div');
+        pairsContainer.className = 'space-y-3';
+
+        premises.forEach((p, pIdx) => {
+          const pKey = p.id !== undefined ? p.id : pIdx;
+          const selectedTarget = currentPairs[pKey] !== undefined ? currentPairs[pKey] : (currentPairs[pIdx] || currentPairs[String(pIdx)] || '');
+          const row = document.createElement('div');
+          row.className = 'p-3.5 bg-slate-900/60 border border-slate-700 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3';
+
+          let optionsHtml = `<option value="">-- Pilih Pasangan Jawaban --</option>`;
+          targets.forEach(t => {
+            const isSel = (String(t.id) === String(selectedTarget));
+            optionsHtml += `<option value="${t.id}" ${isSel ? 'selected' : ''}>[${t.id}] ${t.text}</option>`;
+          });
+
+          row.innerHTML = `
+            <div class="text-xs font-semibold text-slate-200 flex-1">${p.text}</div>
+            <div class="w-full md:w-72">
+              <select onchange="setMatchingAnswer(${q.id}, ${pKey}, this.value)" class="w-full bg-slate-950 border border-slate-700 text-xs text-cyan-300 rounded-xl px-3 py-2 font-medium focus:outline-none focus:border-cyan-500">
+                ${optionsHtml}
+              </select>
+            </div>
+          `;
+          pairsContainer.appendChild(row);
+        });
+        listContainer.appendChild(pairsContainer);
+      }
+
+      // 5. Tipe: Isian Singkat (Short Essay)
+      else if (qType === 'short_essay') {
+        const headerNotice = document.createElement('div');
+        headerNotice.className = 'mb-3 px-3.5 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs text-emerald-300 flex items-center gap-2';
+        headerNotice.innerHTML = `<i class="fa-solid fa-pen-nib text-emerald-400 text-sm"></i> <span><strong>Isian Singkat:</strong> Ketikkan jawaban ringkas/pasti pada kolom di bawah.</span>`;
+        listContainer.appendChild(headerNotice);
+
+        const inputWrap = document.createElement('div');
+        inputWrap.className = 'space-y-2';
+        inputWrap.innerHTML = `
+          <input type="text" id="shortEssayInput_${q.id}" value="${selectedAns || ''}" oninput="setShortEssayAnswer(${q.id}, this.value)" placeholder="Ketik jawaban singkat Anda di sini..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-emerald-500 font-medium">
+          <p class="text-[11px] text-slate-400 italic">Jawaban akan otomatis tersimpan ke server CBT saat Anda mengetik.</p>
         `;
-        listContainer.appendChild(card);
-      });
+        listContainer.appendChild(inputWrap);
+      }
+
+      // 6. Tipe: Uraian / Esai Panjang AI (Long Essay)
+      else if (qType === 'long_essay') {
+        const headerNotice = document.createElement('div');
+        headerNotice.className = 'mb-3 px-3.5 py-2.5 rounded-xl bg-indigo-500/15 border border-indigo-500/30 text-xs text-indigo-300 flex items-center justify-between gap-2';
+        headerNotice.innerHTML = `
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles text-amber-400 text-sm"></i>
+            <span><strong>Uraian / Esai Panjang:</strong> Jawaban dianalisis menggunakan rubrik terpadu dan Asistensi Koreksi AI.</span>
+          </div>
+          <span class="text-[11px] font-mono text-indigo-400 font-bold bg-slate-900 px-2 py-0.5 rounded border border-indigo-500/30">Skor Maks: ${q.max_score || 100}</span>
+        `;
+        listContainer.appendChild(headerNotice);
+
+        const essayWrap = document.createElement('div');
+        essayWrap.className = 'space-y-2';
+        const currentEssayText = String(selectedAns || '');
+        const currentWords = currentEssayText.trim() ? currentEssayText.trim().split(/\s+/).length : 0;
+
+        essayWrap.innerHTML = `
+          <textarea id="longEssayInput_${q.id}" rows="8" oninput="setLongEssayAnswer(${q.id}, this.value)" placeholder="Tuliskan penjabaran analisis, uraian logika, serta argumen pendukung lengkap Anda di sini..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-4 text-white text-sm leading-relaxed focus:outline-none focus:border-indigo-500 font-normal custom-scrollbar">${currentEssayText}</textarea>
+          <div class="flex items-center justify-between text-xs text-slate-400">
+            <span class="flex items-center gap-1.5 text-emerald-400"><i class="fa-solid fa-floppy-disk"></i> Tersimpan otomatis ke memori lokal & server</span>
+            <span class="font-mono bg-slate-900 px-2.5 py-0.5 rounded border border-slate-800"><strong id="essayWordCount_${q.id}" class="text-indigo-300">${currentWords}</strong> Kata</span>
+          </div>
+        `;
+        listContainer.appendChild(essayWrap);
+      }
 
       document.getElementById('btnPrevQ').disabled = (currentIndex === 0);
       document.getElementById('btnNextQ').disabled = (currentIndex === engine.questions.length - 1);
@@ -546,6 +699,65 @@
       await engine.saveAnswer(qId, letter, isDoubt);
       renderCurrentQuestion();
       renderNumberGrid();
+    };
+
+    window.toggleComplexOption = async function(qId, letter) {
+      const existing = engine.answers[qId];
+      const currentList = Array.isArray(existing?.a) ? [...existing.a] : (existing?.a ? [existing.a] : []);
+      const idx = currentList.indexOf(letter);
+      if (idx > -1) {
+        currentList.splice(idx, 1);
+      } else {
+        currentList.push(letter);
+      }
+      currentList.sort();
+      const isDoubt = existing ? existing.d : 0;
+      await engine.saveAnswer(qId, currentList, isDoubt);
+      renderCurrentQuestion();
+      renderNumberGrid();
+    };
+
+    window.setTrueFalseAnswer = async function(qId, statementId, val) {
+      const existing = engine.answers[qId];
+      const currentMap = (typeof existing?.a === 'object' && existing?.a !== null && !Array.isArray(existing?.a)) ? { ...existing.a } : {};
+      currentMap[statementId] = val;
+      const isDoubt = existing ? existing.d : 0;
+      await engine.saveAnswer(qId, currentMap, isDoubt);
+      renderCurrentQuestion();
+      renderNumberGrid();
+    };
+
+    window.setMatchingAnswer = async function(qId, premiseId, val) {
+      const existing = engine.answers[qId];
+      const currentMap = (typeof existing?.a === 'object' && existing?.a !== null && !Array.isArray(existing?.a)) ? { ...existing.a } : {};
+      currentMap[premiseId] = val;
+      const isDoubt = existing ? existing.d : 0;
+      await engine.saveAnswer(qId, currentMap, isDoubt);
+      renderCurrentQuestion();
+      renderNumberGrid();
+    };
+
+    window.setShortEssayAnswer = async function(qId, val) {
+      const existing = engine.answers[qId];
+      const isDoubt = existing ? existing.d : 0;
+      await engine.saveAnswer(qId, val, isDoubt);
+      renderNumberGrid();
+    };
+
+    let essayDebounceTimer = null;
+    window.setLongEssayAnswer = async function(qId, val) {
+      const counterEl = document.getElementById(`essayWordCount_${qId}`);
+      if (counterEl) {
+        const words = val.trim() ? val.trim().split(/\s+/).length : 0;
+        counterEl.innerText = words;
+      }
+      clearTimeout(essayDebounceTimer);
+      essayDebounceTimer = setTimeout(async () => {
+        const existing = engine.answers[qId];
+        const isDoubt = existing ? existing.d : 0;
+        await engine.saveAnswer(qId, val, isDoubt);
+        renderNumberGrid();
+      }, 350);
     };
 
     window.toggleDoubt = async function() {
@@ -567,6 +779,16 @@
       }
     };
 
+    function isAnswerDone(ans) {
+      if (!ans || ans.a === undefined || ans.a === null || ans.a === '') return false;
+      if (Array.isArray(ans.a)) return ans.a.length > 0;
+      if (typeof ans.a === 'object') {
+        const keys = Object.keys(ans.a);
+        return keys.length > 0 && keys.some(k => ans.a[k] !== undefined && ans.a[k] !== '');
+      }
+      return String(ans.a).trim().length > 0;
+    }
+
     function renderNumberGrid() {
       const grid = document.getElementById('numberGrid');
       grid.innerHTML = '';
@@ -578,7 +800,7 @@
         const btn = document.createElement('button');
         const ans = engine.answers ? engine.answers[q.id] : null;
         const isCurrent = (idx === currentIndex);
-        const hasAnswer = (ans && ans.a !== '');
+        const hasAnswer = isAnswerDone(ans);
         const isDoubt = (ans && ans.d === 1);
 
         if (hasAnswer) answeredCount++;
@@ -602,7 +824,10 @@
         grid.appendChild(btn);
       });
 
-      document.getElementById('answeredCounter').innerText = `${answeredCount}/${engine.questions.length}`;
+      const totalQ = engine ? (engine.questions ? engine.questions.length : 0) : 0;
+      document.getElementById('answeredCounter').innerText = `${answeredCount}/${totalQ}`;
+      const finishCount = document.getElementById('finishModalAnsweredCount');
+      if (finishCount) finishCount.innerText = `${answeredCount} / ${totalQ}`;
     }
 
     function startTimer(seconds) {

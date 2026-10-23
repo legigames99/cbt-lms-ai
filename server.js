@@ -215,8 +215,45 @@ if (fs.existsSync(SCHOOL_PROFILE_PATH)) {
   } catch (err) {}
 }
 
-// Master Questions (Fisika)
-const QUESTIONS = [
+// Master Questions & Bank Soal (Mendukung Standar TKA SMA/SMK, ANBK, AKM)
+const QUESTION_BANKS_FILE = path.join(__dirname, 'question_banks.json');
+let QUESTION_BANKS = [];
+
+if (fs.existsSync(QUESTION_BANKS_FILE)) {
+  try {
+    const raw = fs.readFileSync(QUESTION_BANKS_FILE, 'utf8');
+    QUESTION_BANKS = JSON.parse(raw);
+    console.log(`[Bank Soal] Berhasil memuat ${QUESTION_BANKS.length} bank soal dari question_banks.json`);
+  } catch (err) {
+    console.error('[Bank Soal] Gagal membaca question_banks.json, menggunakan fallback:', err.message);
+  }
+}
+
+function saveQuestionBanksToFile() {
+  try {
+    fs.writeFileSync(QUESTION_BANKS_FILE, JSON.stringify(QUESTION_BANKS, null, 2), 'utf8');
+  } catch (e) {
+    console.error('Failed to save question_banks.json:', e.message);
+  }
+}
+
+// Helper: Mengambil butir soal yang sesuai untuk suatu jadwal ujian
+function getQuestionsForSchedule(sch) {
+  if (!sch) return (QUESTION_BANKS[0] && QUESTION_BANKS[0].questions) ? QUESTION_BANKS[0].questions : [];
+  if (sch.bank_name) {
+    const bName = sch.bank_name.toLowerCase();
+    const found = QUESTION_BANKS.find(b => 
+      bName.includes(b.title.toLowerCase()) || 
+      bName.includes(b.subject.toLowerCase()) ||
+      b.title.toLowerCase().includes(bName)
+    );
+    if (found && found.questions && found.questions.length > 0) return found.questions;
+  }
+  return (QUESTION_BANKS[0] && QUESTION_BANKS[0].questions) ? QUESTION_BANKS[0].questions : [];
+}
+
+// Master Questions untuk kompatibilitas bawaan
+const QUESTIONS = (QUESTION_BANKS[0] && QUESTION_BANKS[0].questions) ? QUESTION_BANKS[0].questions : [
   {
     id: 1,
     type: 'mcq',
@@ -229,65 +266,136 @@ const QUESTIONS = [
       { id: 'D', text: 'Entropi selalu bertambah' },
       { id: 'E', text: 'Suhu nol mutlak' },
     ],
+    answer: 'C',
     weight: 1.0,
-  },
-  {
-    id: 2,
-    type: 'mcq',
-    cog: 'C3',
-    stem: '<p>Suatu gas menyerap kalor sebesar 800 J dan melakukan usaha sebesar 300 J. Berapakah perubahan energi dalam gas tersebut?</p>',
-    options: [
-      { id: 'A', text: '1.100 Joule' },
-      { id: 'B', text: '500 Joule' },
-      { id: 'C', text: '-500 Joule' },
-      { id: 'D', text: '240 Joule' },
-      { id: 'E', text: '300 Joule' },
-    ],
-    weight: 1.0,
-  },
-  {
-    id: 3,
-    type: 'mcq',
-    cog: 'C2',
-    stem: '<p>Proses termodinamika yang berlangsung pada volume tetap disebut proses...</p>',
-    options: [
-      { id: 'A', text: 'Isotermik' },
-      { id: 'B', text: 'Isobarik' },
-      { id: 'C', text: 'Isokhorik' },
-      { id: 'D', text: 'Adiabatik' },
-      { id: 'E', text: 'Politropik' },
-    ],
-    weight: 1.0,
-  },
-  {
-    id: 4,
-    type: 'mcq',
-    cog: 'C4',
-    stem: '<p>Pada proses adiabatik, tidak terjadi perpindahan kalor (Q = 0). Jika gas melakukan usaha W > 0, apa yang terjadi pada energi dalam sistem?</p>',
-    options: [
-      { id: 'A', text: 'Energi dalam sistem bertambah' },
-      { id: 'B', text: 'Energi dalam sistem berkurang' },
-      { id: 'C', text: 'Suhu sistem selalu naik' },
-      { id: 'D', text: 'Tekanan gas tetap konstan' },
-      { id: 'E', text: 'Tidak terjadi perubahan suhu' },
-    ],
-    weight: 1.0,
-  },
-  {
-    id: 5,
-    type: 'mcq',
-    cog: 'C3',
-    stem: '<p>Efisiensi maksimum mesin Carnot yang bekerja antara reservoir suhu tinggi 600 K dan reservoir suhu rendah 300 K adalah...</p>',
-    options: [
-      { id: 'A', text: '25%' },
-      { id: 'B', text: '33%' },
-      { id: 'C', text: '50%' },
-      { id: 'D', text: '60%' },
-      { id: 'E', text: '75%' },
-    ],
-    weight: 1.0,
-  },
+  }
 ];
+
+// ==============================================================
+// AI ESSAY CORRECTION ENGINE (Asistensi Koreksi Esai Cerdas & Pedagogis)
+// ==============================================================
+function gradeEssayWithAI({ question_stem, rubric, ideal_answer, student_answer, keywords = [], max_score = 100 }) {
+  const ans = (student_answer || '').trim();
+  const maxScore = Number(max_score) || 100;
+
+  if (!ans || ans.length < 5) {
+    return {
+      score: 0,
+      max_score: maxScore,
+      grade_letter: 'E',
+      grade_percentage: 0,
+      feedback: 'Lembar jawaban esai kosong atau terlalu singkat untuk dapat dianalisis AI.',
+      analysis: {
+        keywords_matched: [],
+        keywords_missing: keywords || [],
+        word_count: 0,
+        strengths: ['Belum ada teks substansi jawaban yang dapat dievaluasi.'],
+        suggestions: ['Tuliskan uraian argumen lengkap sesuai rubrik dan instruksi soal.']
+      }
+    };
+  }
+
+  const ansLower = ans.toLowerCase();
+  const matchedKeywords = [];
+  const missingKeywords = [];
+
+  // 1. Ekstraksi dan evaluasi kata kunci konsep utama
+  const effectiveKeywords = Array.isArray(keywords) && keywords.length > 0 
+    ? keywords 
+    : ['prinsip', 'proses', 'analisis', 'hukum', 'sistem', 'reaksi', 'metode'];
+
+  for (const kw of effectiveKeywords) {
+    const cleanKw = String(kw).trim().toLowerCase();
+    if (!cleanKw) continue;
+    if (ansLower.includes(cleanKw)) {
+      matchedKeywords.push(kw);
+    } else {
+      missingKeywords.push(kw);
+    }
+  }
+
+  // 2. Evaluasi Kedalaman & Kepadatan Argumen (Word Count)
+  const words = ans.split(/\s+/).filter(Boolean);
+  const wordCount = words.length;
+  let lengthFactor = 1.0;
+  if (wordCount < 10) lengthFactor = 0.35;
+  else if (wordCount < 25) lengthFactor = 0.60;
+  else if (wordCount < 45) lengthFactor = 0.85;
+  else lengthFactor = 1.0;
+
+  // 3. Evaluasi Indikator Penalaran & Koherensi Logika Ilmiah
+  const reasoningTerms = [
+    'karena', 'sehingga', 'berdasarkan', 'akibatnya', 'menghasilkan',
+    'oleh karena itu', 'prinsip', 'proses', 'menyebabkan', 'fungsi',
+    'artinya', 'yaitu', 'merupakan', 'hubungan', 'dapat disimpulkan', 'melalui'
+  ];
+  const reasoningHits = reasoningTerms.filter(t => ansLower.includes(t)).length;
+  const reasoningScore = Math.min(1.0, 0.45 + (reasoningHits * 0.15));
+
+  // 4. Hitung Rasio Kecocokan Konsep
+  const keywordRatio = effectiveKeywords.length > 0 
+    ? (matchedKeywords.length / effectiveKeywords.length)
+    : 0.85;
+
+  // 5. Pembobotan Skor Total (0 - 100)
+  // Bobot: Pemenuhan Konsep Kunci (50%) + Kedalaman Uraian (30%) + Alur Penalaran (20%)
+  const rawPercentage = (keywordRatio * 0.50) + (lengthFactor * 0.30) + (reasoningScore * 0.20);
+  let finalScore = Math.round(rawPercentage * maxScore);
+  finalScore = Math.max(15, Math.min(maxScore, finalScore));
+
+  // 6. Penentuan Huruf Mutu (Grade)
+  let gradeLetter = 'C';
+  if (finalScore >= 85) gradeLetter = 'A';
+  else if (finalScore >= 75) gradeLetter = 'B';
+  else if (finalScore >= 60) gradeLetter = 'C';
+  else if (finalScore >= 45) gradeLetter = 'D';
+  else gradeLetter = 'E';
+
+  // 7. Generasi Ulasan Kekuatan & Rekomendasi Pedagogis
+  const strengths = [];
+  if (matchedKeywords.length > 0) {
+    strengths.push(`Tepat menyertakan konsep esensial: ${matchedKeywords.slice(0, 4).join(', ')}.`);
+  }
+  if (wordCount >= 35) {
+    strengths.push('Uraian argumentasi memiliki kedalaman deskripsi dan penjelasan yang runtut.');
+  }
+  if (reasoningHits >= 2) {
+    strengths.push('Alur pemikiran menunjukkan hubungan sebab-akibat ilmiah yang logis.');
+  }
+  if (strengths.length === 0) {
+    strengths.push('Siswa mencoba menjawab esai dengan pemahaman awal yang baik.');
+  }
+
+  const suggestions = [];
+  if (missingKeywords.length > 0) {
+    suggestions.push(`Dapat diperkaya dengan mengulas konsep: ${missingKeywords.slice(0, 3).join(', ')}.`);
+  }
+  if (wordCount < 30) {
+    suggestions.push('Disarankan memperdalam uraian dengan memberikan rincian mekanisme atau rumus pendukung.');
+  }
+  if (finalScore < 75) {
+    suggestions.push('Pelajari kembali rubrik materi dan gunakan peristilahan ilmiah baku.');
+  } else {
+    suggestions.push('Pertahankan ketajaman analisis dan gaya penulisan ilmiah yang sudah sangat baik!');
+  }
+
+  const feedback = `Skor AI: ${finalScore}/${maxScore} (${gradeLetter}). ${strengths.join(' ')} ${suggestions.join(' ')}`;
+
+  return {
+    score: finalScore,
+    max_score: maxScore,
+    grade_letter: gradeLetter,
+    grade_percentage: Math.round((finalScore / maxScore) * 100),
+    feedback: feedback,
+    analysis: {
+      keywords_matched: matchedKeywords,
+      keywords_missing: missingKeywords,
+      word_count: wordCount,
+      strengths: strengths,
+      suggestions: suggestions
+    }
+  };
+}
 
 // Jadwal Ujian (Multi-Jadwal CBT) & Paket AES-256-GCM
 const SCHEDULES_FILE = path.join(__dirname, 'schedules.json');
@@ -569,6 +677,7 @@ function compileAndEncryptPackage(targetScheduleId = null) {
   for (const sch of targetList) {
     const key = crypto.randomBytes(32);
     const nonce = crypto.randomBytes(12);
+    const schQuestions = getQuestionsForSchedule(sch);
 
     const payload = JSON.stringify({
       schedule_id: sch.id,
@@ -576,7 +685,7 @@ function compileAndEncryptPackage(targetScheduleId = null) {
       duration_minutes: sch.duration_minutes,
       shuffle_questions: sch.shuffle_questions,
       shuffle_options: sch.shuffle_options,
-      questions: QUESTIONS,
+      questions: schQuestions,
     });
 
     const cipher = crypto.createCipheriv('aes-256-gcm', key, nonce);
@@ -612,18 +721,173 @@ function compileAndEncryptPackage(targetScheduleId = null) {
 
 compileAndEncryptPackage();
 
+// ==============================================================
+// PENILAIAN OTOMATIS BERBAGAI TIPE SOAL (TKA SMA/SMK, ANBK, AKM)
+// ==============================================================
+function evaluateStudentAnswers(questions, userAnswers) {
+  let earnedWeight = 0;
+  let totalWeight = 0;
+  let mostlyCorrectCount = 0;
+
+  for (const q of questions) {
+    const qWeight = Number(q.weight) || 1.0;
+    totalWeight += qWeight;
+    const ansObj = userAnswers ? userAnswers[q.id] : null;
+    const studentVal = ansObj ? ansObj.a : undefined;
+    let ratio = 0;
+    let isCorrect = false;
+
+    if (studentVal !== undefined && studentVal !== null && studentVal !== '') {
+      switch (q.type) {
+        case 'mcq': {
+          isCorrect = (String(studentVal).trim().toUpperCase() === String(q.answer || '').trim().toUpperCase());
+          ratio = isCorrect ? 1.0 : 0.0;
+          break;
+        }
+        case 'mcq_complex': {
+          const chosen = Array.isArray(studentVal) ? studentVal : [studentVal];
+          const correctKeys = Array.isArray(q.answer) ? q.answer : [q.answer];
+          const overlap = chosen.filter(c => correctKeys.includes(c)).length;
+          const wrong = chosen.filter(c => !correctKeys.includes(c)).length;
+          ratio = Math.max(0, (overlap / (correctKeys.length || 1)) - (wrong * 0.25));
+          isCorrect = (ratio >= 0.85);
+          break;
+        }
+        case 'true_false': {
+          const statements = q.statements || [];
+          const stAnswers = (typeof studentVal === 'object') ? studentVal : {};
+          if (statements.length > 0) {
+            let matches = 0;
+            statements.forEach((st, idx) => {
+              const studentChoice = stAnswers[st.id] !== undefined ? stAnswers[st.id] : (stAnswers[idx] !== undefined ? stAnswers[idx] : stAnswers[String(idx)]);
+              if (studentChoice && String(studentChoice).toUpperCase() === String(st.key).toUpperCase()) {
+                matches++;
+              }
+            });
+            ratio = matches / statements.length;
+            isCorrect = (ratio >= 0.7);
+          }
+          break;
+        }
+        case 'matching': {
+          const premises = q.premises || [];
+          const correctPairs = q.answer || {};
+          const studentPairs = (typeof studentVal === 'object') ? studentVal : {};
+          if (premises.length > 0) {
+            let matches = 0;
+            premises.forEach((p, idx) => {
+              const sTarget = studentPairs[p.id] !== undefined ? studentPairs[p.id] : (studentPairs[idx] !== undefined ? studentPairs[idx] : studentPairs[String(idx)]);
+              const cTarget = correctPairs[p.id] !== undefined ? correctPairs[p.id] : (correctPairs[idx] !== undefined ? correctPairs[idx] : correctPairs[String(idx)]);
+              if (sTarget && cTarget && String(sTarget).toUpperCase() === String(cTarget).toUpperCase()) {
+                matches++;
+              }
+            });
+            ratio = matches / premises.length;
+            isCorrect = (ratio >= 0.7);
+          }
+          break;
+        }
+        case 'short_essay': {
+          const sText = String(studentVal).trim().toLowerCase();
+          const validKeys = (q.answer_keys || []).map(k => String(k).trim().toLowerCase());
+          isCorrect = validKeys.includes(sText);
+          ratio = isCorrect ? 1.0 : 0.0;
+          break;
+        }
+        case 'long_essay': {
+          let essayScore = ansObj.ai_score;
+          if (essayScore === undefined && String(studentVal).trim().length > 0) {
+            const graded = gradeEssayWithAI({
+              question_stem: q.stem,
+              rubric: q.rubric,
+              ideal_answer: q.ideal_answer,
+              student_answer: studentVal,
+              keywords: q.keywords,
+              max_score: q.max_score || 100
+            });
+            essayScore = graded.score;
+            ansObj.ai_score = essayScore;
+            ansObj.ai_feedback = graded.feedback;
+            ansObj.ai_analysis = graded.analysis;
+          }
+          ratio = Math.max(0, Math.min(1.0, (essayScore || 0) / (q.max_score || 100)));
+          isCorrect = (ratio >= 0.75);
+          break;
+        }
+        default: {
+          isCorrect = (String(studentVal).trim() === String(q.answer || '').trim());
+          ratio = isCorrect ? 1.0 : 0.0;
+          break;
+        }
+      }
+    }
+
+    if (isCorrect || ratio >= 0.7) {
+      mostlyCorrectCount++;
+    }
+    earnedWeight += (ratio * qWeight);
+  }
+
+  const finalScore = totalWeight > 0 ? Math.round((earnedWeight / totalWeight) * 100) : 0;
+  return {
+    score: Math.min(100, Math.max(0, finalScore)),
+    correct_count: mostlyCorrectCount,
+    wrong_count: Math.max(0, questions.length - mostlyCorrectCount),
+  };
+}
+
 // In-Memory Session & Answer Store (Multi-Jadwal: {schedule_id}_{student_id})
 const studentAnswersStore = {
-  // Jadwal 1 (UAS Fisika Peminatan XII)
-  '1_1001': { 1: { a: 'C', d: 0 }, 2: { a: 'B', d: 0 }, 3: { a: 'C', d: 0 }, 4: { a: 'B', d: 0 }, 5: { a: 'C', d: 0 } },
-  '1_1002': { 1: { a: 'A', d: 1 }, 2: { a: 'B', d: 0 }, 3: { a: 'C', d: 0 } },
+  // Jadwal 1 (UAS Fisika Peminatan XII - Bank Soal Termodinamika & Kalor TKA)
+  '1_1001': {
+    1: { a: 'C', d: 0 },
+    2: { a: 'B', d: 0 },
+    3: { a: ['A', 'B', 'D'], d: 0 },
+    4: { a: { '0': 'B', '1': 'S', '2': 'B' }, d: 0 },
+    5: { a: { '0': 'B', '1': 'C', '2': 'A', '3': 'D' }, d: 0 },
+    6: { a: 'Hukum Kedua Termodinamika', d: 0 },
+    7: {
+      a: 'Mesin pendingin bekerja berdasarkan Hukum Kedua Termodinamika, di mana kalor secara alami tidak dapat mengalir secara spontan dari benda dingin ke benda panas. Untuk membalik arah aliran ini, dibutuhkan kerja atau usaha dari luar (W) yang disuplai oleh kompresor listrik. Siklus pendingin diawali dari zat pendingin (refrigerant) bersuhu rendah menyerap kalor di evaporator, kemudian dimampatkan oleh kompresor sehingga tekanan dan suhunya naik, lalu melepaskan kalor di kondensor ke lingkungan luar yang lebih hangat. Kinerja mesin pendingin diukur dengan Koefisien Performansi (COP).',
+      d: 0,
+      ai_score: 95,
+      ai_feedback: 'Skor AI: 95/100 (A). Tepat menyertakan konsep esensial: hukum kedua termodinamika, kompresor, evaporator, kondensor. Uraian argumentasi memiliki kedalaman deskripsi dan penjelasan yang runtut. Alur pemikiran menunjukkan hubungan sebab-akibat ilmiah yang logis.',
+      ai_analysis: {
+        keywords_matched: ['hukum kedua termodinamika', 'kompresor', 'evaporator', 'kondensor', 'refrigerant', 'koefisien performansi', 'cop', 'kalor'],
+        keywords_missing: [],
+        word_count: 78,
+        strengths: ['Siswa menguraikan seluruh siklus refrigerasi secara tepat.', 'Mengkaitkan peran usaha luar kompresor dengan batasan Hukum II Termodinamika.'],
+        suggestions: ['Pertahankan struktur penulisan ilmiah yang sangat baik!']
+      }
+    }
+  },
+  '1_1002': {
+    1: { a: 'C', d: 0 },
+    2: { a: 'B', d: 0 },
+    3: { a: ['A', 'B'], d: 0 },
+    4: { a: { '0': 'B', '1': 'B', '2': 'B' }, d: 0 },
+    5: { a: { '0': 'B', '1': 'C', '2': 'A', '3': 'C' }, d: 0 },
+    6: { a: 'Hukum II', d: 0 },
+    7: {
+      a: 'Kulkas bekerja memindahkan panas dari dalam lemari es keluar. Kalor diserap oleh freon pendingin lalu kompresor memompanya keluar ke kondensor di belakang kulkas sehingga ruangan terasa hangat.',
+      d: 0,
+      ai_score: 72,
+      ai_feedback: 'Skor AI: 72/100 (C). Tepat menyertakan konsep esensial: kompresor, kondensor, kalor. Disarankan memperdalam uraian dengan memberikan rincian mekanisme atau rumus pendukung COP.',
+      ai_analysis: {
+        keywords_matched: ['kompresor', 'kondensor', 'kalor'],
+        keywords_missing: ['hukum kedua termodinamika', 'evaporator', 'koefisien performansi'],
+        word_count: 27,
+        strengths: ['Memahami alur dasar penyerapan dan pelepasan panas kulkas.'],
+        suggestions: ['Ulas konsep Hukum Kedua Termodinamika bahwa proses ini membutuhkan usaha luar W, serta sebutkan fungsi evaporator.']
+      }
+    }
+  },
   // Jadwal 2 (Penilaian Akhir Matematika Wajib XII)
-  '2_1001': { 1: { a: 'B', d: 0 }, 2: { a: 'B', d: 0 }, 3: { a: 'B', d: 0 } },
-  '2_1002': { 1: { a: 'C', d: 0 }, 2: { a: 'C', d: 0 }, 3: { a: 'C', d: 0 }, 4: { a: 'C', d: 0 }, 5: { a: 'C', d: 0 } },
-  '2_1003': { 1: { a: 'A', d: 1 }, 2: { a: 'D', d: 0 } },
+  '2_1001': { 1: { a: 'B', d: 0 }, 2: { a: ['A', 'C', 'D'], d: 0 }, 3: { a: { '0': 'B', '1': 'S', '2': 'B' }, d: 0 }, 4: { a: '10', d: 0 } },
+  '2_1002': { 1: { a: 'B', d: 0 }, 2: { a: ['A', 'C', 'D'], d: 0 }, 3: { a: { '0': 'B', '1': 'S', '2': 'B' }, d: 0 }, 4: { a: '10', d: 0 } },
+  '2_1003': { 1: { a: 'A', d: 1 }, 2: { a: ['A', 'B'], d: 0 } },
   // Jadwal 3 (Asesmen Bahasa Indonesia XII)
-  '3_1001': { 1: { a: 'C', d: 0 }, 2: { a: 'B', d: 0 }, 3: { a: 'A', d: 0 }, 4: { a: 'D', d: 0 }, 5: { a: 'B', d: 0 } },
-  '3_1003': { 1: { a: 'C', d: 0 }, 2: { a: 'C', d: 0 } },
+  '3_1001': { 1: { a: 'A', d: 0 }, 2: { a: { '0': 'B', '1': 'S', '2': 'B' }, d: 0 } },
+  '3_1003': { 1: { a: 'A', d: 0 }, 2: { a: { '0': 'B', '1': 'S', '2': 'B' }, d: 0 } },
 };
 
 const studentSessions = {
@@ -1667,12 +1931,24 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
-  // GET /api/v1/cbt/proctor/live-sessions (Monitoring Real-time Live Proktor)
+  // GET /api/v1/cbt/proctor/live-sessions (Monitoring Real-time Live Proktor & Nilai Multi-Tipe Soal TKA)
   if (pathname === '/api/v1/cbt/proctor/live-sessions' && req.method === 'GET') {
-    const answerKeys = { 1: 'C', 2: 'B', 3: 'C', 4: 'B', 5: 'C' };
     const classFilter = parsedUrl.searchParams.get('class');
     const scheduleId = parseInt(parsedUrl.searchParams.get('schedule_id'), 10) || SCHEDULES[0]?.id || 1;
     const curSchedule = SCHEDULES.find((s) => s.id === scheduleId) || SCHEDULES[0];
+    const schQuestions = getQuestionsForSchedule(curSchedule);
+
+    // Kunci jawaban ringkas untuk kompatibilitas
+    const answerKeys = {};
+    schQuestions.forEach(q => {
+      if (q.type === 'mcq') answerKeys[q.id] = q.answer;
+      else if (q.type === 'mcq_complex') answerKeys[q.id] = Array.isArray(q.answer) ? q.answer.join(', ') : q.answer;
+      else if (q.type === 'true_false') answerKeys[q.id] = (q.statements || []).map(s => `${s.key}`).join('-');
+      else if (q.type === 'matching') answerKeys[q.id] = 'Matching Pairs';
+      else if (q.type === 'short_essay') answerKeys[q.id] = (q.answer_keys || []).join(' / ');
+      else if (q.type === 'long_essay') answerKeys[q.id] = 'Rubrik AI Esai';
+      else answerKeys[q.id] = q.answer || '-';
+    });
 
     let students = USERS.filter((u) => u.role === 'student');
     if (classFilter && classFilter !== 'all') {
@@ -1690,16 +1966,15 @@ const server = http.createServer(async (req, res) => {
 
       const userAnswers = studentAnswersStore[sessionKey] || studentAnswersStore[st.id] || sess.answers || {};
       const answeredKeys = Object.keys(userAnswers);
-      const answeredCount = answeredKeys.filter((k) => userAnswers[k] && userAnswers[k].a).length;
+      const answeredCount = answeredKeys.filter((k) => userAnswers[k] && userAnswers[k].a !== undefined && userAnswers[k].a !== '').length;
       const isDoubt = answeredKeys.some((k) => userAnswers[k] && userAnswers[k].d === 1);
 
-      let correctCount = 0;
-      for (const [qId, correctOpt] of Object.entries(answerKeys)) {
-        if (userAnswers[qId] && userAnswers[qId].a === correctOpt) {
-          correctCount++;
-        }
-      }
-      const score = Math.round((correctCount / QUESTIONS.length) * 100);
+      // Evaluasi nilai komprehensif mendukung seluruh tipe soal TKA (PG, Kompleks, B/S, Jodoh, Isian, Esai AI)
+      const evalResult = evaluateStudentAnswers(schQuestions, userAnswers);
+      const score = evalResult.score;
+      const correctCount = evalResult.correct_count;
+      const wrongCount = evalResult.wrong_count;
+
       const extraMinutesKey = `${curSchedule.id}_${st.id}`;
       const schExtra = scheduleExtraMinutes[curSchedule.id] || 0;
       const stExtra = studentExtraMinutes[extraMinutesKey] || studentExtraMinutes[st.id] || 0;
@@ -1716,13 +1991,13 @@ const server = http.createServer(async (req, res) => {
         submitted_at: sess.submitted_at || null,
         started_at: sess.started_at || null,
         answered_count: answeredCount,
-        total_questions: QUESTIONS.length,
+        total_questions: schQuestions.length,
         is_doubt: isDoubt,
         tab_violations: sess.tab_violations || 0,
         ip_address: sess.ip_address || `192.168.1.${100 + (st.id % 100)}`,
         score: score,
         correct_count: correctCount,
-        wrong_count: QUESTIONS.length - correctCount,
+        wrong_count: wrongCount,
         is_passed: score >= 75,
         extra_minutes: schExtra + stExtra,
         answers: userAnswers,
@@ -1745,12 +2020,22 @@ const server = http.createServer(async (req, res) => {
         class_target: curSchedule.class_target,
         is_active: curSchedule.is_active !== false,
       },
-      questions: QUESTIONS.map((q) => ({
+      questions: schQuestions.map((q) => ({
         id: q.id,
+        type: q.type || 'mcq',
         stem: q.stem,
-        options: q.options,
-        weight: q.weight,
-        cog: q.cog,
+        options: q.options || [],
+        statements: q.statements || [],
+        premises: q.premises || [],
+        targets: q.targets || [],
+        answer: q.answer || null,
+        answer_keys: q.answer_keys || [],
+        rubric: q.rubric || '',
+        ideal_answer: q.ideal_answer || '',
+        max_score: q.max_score || 100,
+        keywords: q.keywords || [],
+        weight: q.weight || 1.0,
+        cog: q.cog || 'C2',
       })),
       answer_keys: answerKeys,
       school_profile: schoolProfile,
@@ -2044,6 +2329,213 @@ const server = http.createServer(async (req, res) => {
       res.end();
     }, 2200);
     return;
+  }
+
+  // ==============================================================
+  // API BANK SOAL & ASESMEN TKA SMA/SMK (PG, Kompleks, B/S, Jodoh, Isian, Esai AI)
+  // ==============================================================
+
+  // GET /api/v1/cbt/question-banks (Daftar Semua Bank Soal)
+  if (pathname === '/api/v1/cbt/question-banks' && req.method === 'GET') {
+    const data = QUESTION_BANKS.map(b => {
+      const qTypes = [...new Set((b.questions || []).map(q => q.type || 'mcq'))];
+      return {
+        id: b.id,
+        subject: b.subject,
+        title: b.title,
+        teacher: b.teacher,
+        target_class: b.target_class,
+        description: b.description,
+        question_count: (b.questions || []).length,
+        question_types: qTypes,
+      };
+    });
+    return sendJSON(200, { status: 'success', data });
+  }
+
+  // GET /api/v1/cbt/question-banks/:id (Detail Bank Soal Beserta Butir Soal Lengkap)
+  if (pathname.startsWith('/api/v1/cbt/question-banks/') && req.method === 'GET') {
+    const parts = pathname.split('/');
+    const lastPart = parts[parts.length - 1];
+    const bankId = parseInt(lastPart === 'questions' ? parts[parts.length - 2] : lastPart, 10);
+    const bank = QUESTION_BANKS.find(b => b.id === bankId) || QUESTION_BANKS[0];
+    if (!bank) {
+      return sendJSON(404, { status: 'error', message: 'Bank soal tidak ditemukan' });
+    }
+    return sendJSON(200, { status: 'success', data: bank });
+  }
+
+  // POST /api/v1/cbt/question-banks/create (Buat Bank Soal Baru)
+  if (pathname === '/api/v1/cbt/question-banks/create' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const nextId = QUESTION_BANKS.length > 0 ? Math.max(...QUESTION_BANKS.map(b => b.id || 0)) + 1 : 1;
+    const newBank = {
+      id: nextId,
+      subject: (body.subject || 'Mata Pelajaran').trim(),
+      title: (body.title || `Bank Soal Baru #${nextId}`).trim(),
+      teacher: (body.teacher || 'Guru Pengampu').trim(),
+      target_class: (body.target_class || 'Semua Kelas').trim(),
+      description: (body.description || '').trim(),
+      questions: body.questions || []
+    };
+    QUESTION_BANKS.push(newBank);
+    saveQuestionBanksToFile();
+    return sendJSON(200, {
+      status: 'success',
+      message: `Bank soal "${newBank.title}" berhasil dibuat!`,
+      data: newBank
+    });
+  }
+
+  // POST /api/v1/cbt/question-banks/:id/add-question (Tambah Butir Soal Baru)
+  if (pathname.startsWith('/api/v1/cbt/question-banks/') && pathname.endsWith('/add-question') && req.method === 'POST') {
+    const parts = pathname.split('/');
+    const bankId = parseInt(parts[5], 10);
+    const bank = QUESTION_BANKS.find(b => b.id === bankId) || QUESTION_BANKS[0];
+    if (!bank) {
+      return sendJSON(404, { status: 'error', message: 'Bank soal tidak ditemukan' });
+    }
+    const body = await parseBody(req);
+    const questions = bank.questions || [];
+    const nextQId = questions.length > 0 ? Math.max(...questions.map(q => q.id || 0)) + 1 : 1;
+
+    const newQuestion = {
+      id: nextQId,
+      type: body.type || 'mcq',
+      cog: body.cog || 'C2',
+      stem: body.stem || 'Teks pertanyaan butir soal',
+      weight: Number(body.weight) || 1.0,
+      explanation: body.explanation || '',
+    };
+
+    if (newQuestion.type === 'mcq') {
+      newQuestion.options = body.options || [];
+      newQuestion.answer = body.answer || 'A';
+    } else if (newQuestion.type === 'mcq_complex') {
+      newQuestion.options = body.options || [];
+      newQuestion.answer = Array.isArray(body.answer) ? body.answer : [body.answer || 'A'];
+    } else if (newQuestion.type === 'true_false') {
+      newQuestion.statements = body.statements || [];
+      newQuestion.answer = body.answer || {};
+    } else if (newQuestion.type === 'matching') {
+      newQuestion.premises = body.premises || [];
+      newQuestion.targets = body.targets || [];
+      newQuestion.answer = body.answer || {};
+    } else if (newQuestion.type === 'short_essay') {
+      newQuestion.answer_keys = Array.isArray(body.answer_keys) ? body.answer_keys : [body.answer_keys || ''];
+    } else if (newQuestion.type === 'long_essay') {
+      newQuestion.rubric = body.rubric || '';
+      newQuestion.ideal_answer = body.ideal_answer || '';
+      newQuestion.max_score = Number(body.max_score) || 100;
+      newQuestion.keywords = Array.isArray(body.keywords) ? body.keywords : (typeof body.keywords === 'string' ? body.keywords.split(',').map(s => s.trim()).filter(Boolean) : []);
+    }
+
+    questions.push(newQuestion);
+    bank.questions = questions;
+    saveQuestionBanksToFile();
+    compileAndEncryptPackage();
+
+    return sendJSON(200, {
+      status: 'success',
+      message: `Butir soal No. ${newQuestion.id} (${newQuestion.type}) berhasil ditambahkan ke "${bank.title}"!`,
+      data: newQuestion
+    });
+  }
+
+  // POST /api/v1/cbt/question-banks/:id/delete-question/:qid (Hapus Butir Soal)
+  if (pathname.startsWith('/api/v1/cbt/question-banks/') && pathname.includes('/delete-question/') && req.method === 'POST') {
+    const parts = pathname.split('/');
+    const bankId = parseInt(parts[5], 10);
+    const qId = parseInt(parts[7], 10);
+    const bank = QUESTION_BANKS.find(b => b.id === bankId) || QUESTION_BANKS[0];
+    if (bank && bank.questions) {
+      bank.questions = bank.questions.filter(q => q.id !== qId);
+      saveQuestionBanksToFile();
+      compileAndEncryptPackage();
+      return sendJSON(200, { status: 'success', message: `Butir soal #${qId} berhasil dihapus dari bank soal!` });
+    }
+    return sendJSON(404, { status: 'error', message: 'Bank soal atau butir soal tidak ditemukan' });
+  }
+
+  // POST /api/v1/cbt/ai/grade-essay (Penilaian Esai Berbasis AI)
+  if (pathname === '/api/v1/cbt/ai/grade-essay' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const { question_stem, rubric, ideal_answer, student_answer, keywords, max_score, schedule_id, student_id, question_id } = body;
+
+    const evalResult = gradeEssayWithAI({
+      question_stem,
+      rubric,
+      ideal_answer,
+      student_answer,
+      keywords,
+      max_score: max_score || 100
+    });
+
+    // Simpan ke session store jika schedule_id, student_id, question_id diberikan
+    if (schedule_id && student_id && question_id) {
+      const sessionKey = `${schedule_id}_${student_id}`;
+      if (!studentAnswersStore[sessionKey]) studentAnswersStore[sessionKey] = {};
+      if (!studentAnswersStore[sessionKey][question_id]) {
+        studentAnswersStore[sessionKey][question_id] = { a: student_answer, d: 0 };
+      }
+      studentAnswersStore[sessionKey][question_id].ai_score = evalResult.score;
+      studentAnswersStore[sessionKey][question_id].ai_feedback = evalResult.feedback;
+      studentAnswersStore[sessionKey][question_id].ai_analysis = evalResult.analysis;
+      if (studentSessions[sessionKey]) {
+        studentSessions[sessionKey].answers = studentAnswersStore[sessionKey];
+      }
+    }
+
+    return sendJSON(200, {
+      status: 'success',
+      message: 'Penilaian esai berbasis AI berhasil diproses!',
+      data: evalResult
+    });
+  }
+
+  // POST /api/v1/cbt/ai/batch-grade-essays (Koreksi Massal Seluruh Jawaban Esai via AI)
+  if (pathname === '/api/v1/cbt/ai/batch-grade-essays' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const schId = parseInt(body.schedule_id, 10) || 1;
+    const curSch = SCHEDULES.find(s => s.id === schId) || SCHEDULES[0];
+    const schQuestions = getQuestionsForSchedule(curSch);
+    const essayQuestions = schQuestions.filter(q => q.type === 'long_essay');
+
+    let gradedCount = 0;
+    const students = USERS.filter(u => u.role === 'student');
+
+    for (const st of students) {
+      const sessionKey = `${curSch.id}_${st.id}`;
+      const userAnswers = studentAnswersStore[sessionKey];
+      if (!userAnswers) continue;
+
+      for (const eq of essayQuestions) {
+        const studentAns = userAnswers[eq.id];
+        if (studentAns && studentAns.a && String(studentAns.a).trim().length > 0) {
+          const evalResult = gradeEssayWithAI({
+            question_stem: eq.stem,
+            rubric: eq.rubric,
+            ideal_answer: eq.ideal_answer,
+            student_answer: studentAns.a,
+            keywords: eq.keywords,
+            max_score: eq.max_score || 100
+          });
+          studentAns.ai_score = evalResult.score;
+          studentAns.ai_feedback = evalResult.feedback;
+          studentAns.ai_analysis = evalResult.analysis;
+          gradedCount++;
+        }
+      }
+      if (studentSessions[sessionKey]) {
+        studentSessions[sessionKey].answers = userAnswers;
+      }
+    }
+
+    return sendJSON(200, {
+      status: 'success',
+      message: `Berhasil mengoreksi ${gradedCount} lembar jawaban esai dengan asistensi AI!`,
+      graded_count: gradedCount
+    });
   }
 
   // GET /api/v1/system/metrics

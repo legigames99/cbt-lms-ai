@@ -500,94 +500,33 @@
           </div>
         </div>
 
-        <!-- Daftar Bank Soal Card Grid -->
+        <!-- Daftar Bank Soal Card Grid (Terkoneksi Real-time ke Database Bank Soal TKA) -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="bankSoalGrid">
-          <!-- Card 1 -->
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg flex flex-col justify-between hover:border-slate-700 transition">
-            <div>
-              <div class="flex items-center justify-between mb-3">
-                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase">Fisika XII</span>
-                <span class="text-xs text-slate-400"><strong class="text-white">5</strong> Butir Soal</span>
-              </div>
-              <h4 class="text-base font-bold text-white mb-1">Bank Soal Termodinamika & Kalor</h4>
-              <p class="text-xs text-slate-400 mb-4">Pengampu: Drs. Budi Pratama, M.Pd. • Kelas XII IPA</p>
-            </div>
-            <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
-              <button onclick="viewQuestionList(1)" class="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
-                <i class="fa-regular fa-eye"></i> Kelola Butir Soal
-              </button>
-              <div class="flex items-center gap-2">
-                <button onclick="openModal('modalAddQuestionManual')" class="text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800 transition">
-                  <i class="fa-solid fa-plus"></i> Soal
-                </button>
-                <button onclick="handleDeleteCard(this, 'Bank Soal')" class="text-rose-400 hover:text-rose-300 px-2 py-1 rounded bg-rose-600/10 border border-rose-500/20 transition flex items-center gap-1">
-                  <i class="fa-regular fa-trash-can"></i> Hapus
-                </button>
-              </div>
-            </div>
-          </div>
+          <!-- Kartu Bank Soal dirender dinamis via renderBankSoalGrid() -->
         </div>
 
         <!-- Tabel Detail Butir Soal Pada Bank Soal Aktif -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-          <div class="flex items-center justify-between mb-4">
+        <div id="questionsDetailCard" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl scroll-mt-20">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-800">
             <div>
-              <h4 class="text-sm font-bold text-white">Daftar Butir Soal: Bank Soal Termodinamika</h4>
-              <p class="text-xs text-slate-400">Total 5 butir soal pilihan ganda (5 Opsi: A, B, C, D, E)</p>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                <h4 id="activeBankTitle" class="text-base font-bold text-white">Daftar Butir Soal: Bank Soal Termodinamika & Kalor</h4>
+              </div>
+              <p id="activeBankSubtitle" class="text-xs text-slate-400">Fisika XII • 7 Butir Soal (Mendukung Pilihan Ganda, PG Kompleks, Benar/Salah, Menjodohkan, Isian Singkat, Uraian AI)</p>
             </div>
-            <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-medium border border-emerald-500/30">
-              5 Soal Aktif
-            </span>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="activeBankCountBadge" class="text-xs px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">
+                7 Butir Soal Aktif
+              </span>
+              <button onclick="openAddQuestionModalCurrentBank()" class="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/30">
+                <i class="fa-solid fa-plus"></i> Tambah Soal
+              </button>
+            </div>
           </div>
 
           <div class="space-y-4" id="questionsListContainer">
-            <!-- Item Soal 1 -->
-            <div class="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2 relative group">
-              <div class="flex items-center justify-between text-xs">
-                <div class="flex items-center gap-2">
-                  <span class="font-bold text-white bg-slate-800 px-2 py-0.5 rounded">No. 1</span>
-                  <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold text-[10px]">C2 - Pemahaman</span>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span class="text-emerald-400 font-bold">Kunci: C</span>
-                  <button onclick="handleDeleteCard(this, 'Butir Soal')" class="text-rose-400 hover:text-rose-300 p-1 rounded hover:bg-rose-600/20 transition flex items-center gap-1 text-[11px]" title="Hapus Soal Ini">
-                    <i class="fa-regular fa-trash-can"></i> Hapus
-                  </button>
-                </div>
-              </div>
-              <div class="text-xs text-slate-200">Prinsip utama yang mendasari Hukum Pertama Termodinamika adalah...</div>
-              <div class="text-[11px] text-slate-400 pl-4 border-l-2 border-indigo-500/40 space-y-0.5">
-                <div>A. Kekekalan momentum</div>
-                <div>B. Kekekalan massa</div>
-                <div class="text-emerald-400 font-semibold">C. Kekekalan energi (Kunci Jawaban)</div>
-                <div>D. Entropi selalu bertambah</div>
-                <div>E. Suhu nol mutlak</div>
-              </div>
-            </div>
-
-            <!-- Item Soal 2 -->
-            <div class="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2 relative group">
-              <div class="flex items-center justify-between text-xs">
-                <div class="flex items-center gap-2">
-                  <span class="font-bold text-white bg-slate-800 px-2 py-0.5 rounded">No. 2</span>
-                  <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold text-[10px]">C3 - Penerapan</span>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span class="text-emerald-400 font-bold">Kunci: B</span>
-                  <button onclick="handleDeleteCard(this, 'Butir Soal')" class="text-rose-400 hover:text-rose-300 p-1 rounded hover:bg-rose-600/20 transition flex items-center gap-1 text-[11px]" title="Hapus Soal Ini">
-                    <i class="fa-regular fa-trash-can"></i> Hapus
-                  </button>
-                </div>
-              </div>
-              <div class="text-xs text-slate-200">Suatu gas menyerap kalor sebesar 800 J dan melakukan usaha sebesar 300 J. Berapakah perubahan energi dalam gas tersebut?</div>
-              <div class="text-[11px] text-slate-400 pl-4 border-l-2 border-indigo-500/40 space-y-0.5">
-                <div>A. 1.100 Joule</div>
-                <div class="text-emerald-400 font-semibold">B. 500 Joule (Kunci Jawaban)</div>
-                <div>C. -500 Joule</div>
-                <div>D. 240 Joule</div>
-                <div>E. 300 Joule</div>
-              </div>
-            </div>
+            <!-- Dirender dinamis oleh viewQuestionList(bankId) -->
           </div>
         </div>
       </section>
@@ -897,6 +836,10 @@
             </div>
           </div>
           <div class="flex items-center gap-2 shrink-0 flex-wrap">
+            <button onclick="handleBatchGradeEssaysWithAI()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/30" title="Koreksi otomatis seluruh lembar jawaban esai siswa pada jadwal ini menggunakan AI">
+              <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+              <span>Koreksi Esai via AI</span>
+            </button>
             <button onclick="openNilaiSchedulePicker()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-indigo-600/30">
               <i class="fa-solid fa-arrow-right-arrow-left"></i>
               <span>Pilih / Ganti Jadwal</span>
@@ -2007,17 +1950,44 @@
     </div>
   </div>
 
-  <!-- ==================== MODAL 2: TAMBAH SOAL MANUAL ==================== -->
+  <!-- ==================== MODAL 2: TAMBAH SOAL MANUAL (STANDAR TKA SMA/SMK) ==================== -->
   <div id="modalAddQuestionManual" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto custom-scrollbar">
       <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-        <h4 class="text-sm font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-pen-to-square text-blue-400"></i> Form Tambah Butir Soal Baru
-        </h4>
+        <div>
+          <h4 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-pen-to-square text-blue-400"></i> Form Butir Soal Standar TKA SMA & SMK
+          </h4>
+          <p class="text-[11px] text-slate-400 mt-0.5">Mendukung PG Biasa, PG Kompleks, Benar/Salah, Menjodohkan, Isian Singkat, dan Esai Panjang AI.</p>
+        </div>
         <button onclick="closeModal('modalAddQuestionManual')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
       <form onsubmit="handleSaveManualQuestion(event)" class="space-y-4 text-xs">
+        <!-- Target Bank Soal & Tipe Soal -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Target Bank Soal</label>
+            <select id="manualBankId" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-medium focus:border-indigo-500">
+              <option value="1">1. Bank Soal Termodinamika & Kalor (Fisika XII)</option>
+              <option value="2">2. Bank Asesmen Standar TKA SMA & SMK</option>
+              <option value="3">3. Bank Soal Aljabar & Matriks (Matematika XII)</option>
+              <option value="4">4. Bank Soal Teks Editorial & Puisi (B. Indonesia XII)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-indigo-300 mb-1">Tipe Soal (Format Asesmen)</label>
+            <select id="manualQuestionType" onchange="handleQuestionTypeChange(this.value)" class="w-full bg-slate-950 border border-indigo-500/40 rounded-xl p-2.5 text-white font-bold text-indigo-300 focus:border-indigo-500">
+              <option value="mcq">Pilihan Ganda Tunggal (PG Biasa)</option>
+              <option value="mcq_complex">Pilihan Ganda Kompleks (Multi Jawaban / Checkbox)</option>
+              <option value="true_false">Pernyataan Benar / Salah (Matrix)</option>
+              <option value="matching">Menjodohkan (Matching Pairs)</option>
+              <option value="short_essay">Isian Singkat (Short Answer)</option>
+              <option value="long_essay">Uraian / Esai Panjang (Koreksi AI & Rubrik)</option>
+            </select>
+          </div>
+        </div>
+
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block font-semibold text-slate-300 mb-1">Tingkat Kognitif (Bloom)</label>
@@ -2031,49 +2001,159 @@
             </select>
           </div>
           <div>
-            <label class="block font-semibold text-slate-300 mb-1">Kunci Jawaban Benar</label>
-            <select id="manualCorrectAnswer" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-bold text-indigo-400">
-              <option value="A">Pilihan A</option>
-              <option value="B">Pilihan B</option>
-              <option value="C">Pilihan C</option>
-              <option value="D">Pilihan D</option>
-              <option value="E">Pilihan E</option>
-            </select>
+            <label class="block font-semibold text-slate-300 mb-1">Bobot Nilai Butir Soal</label>
+            <input type="number" id="manualWeight" step="0.5" min="0.5" max="10" value="1.0" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-mono">
           </div>
         </div>
 
         <div>
           <label class="block font-semibold text-slate-300 mb-1">Teks / Pertanyaan Soal (Stem HTML)</label>
-          <textarea id="manualStem" rows="3" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-indigo-500" placeholder="Ketik kalimat soal di sini..."></textarea>
+          <textarea id="manualStem" rows="3" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-indigo-500" placeholder="Ketik pertanyaan atau stimulus soal di sini..."></textarea>
         </div>
 
-        <div class="space-y-2">
-          <label class="block font-semibold text-slate-300">Pilihan Jawaban (A s/d E):</label>
-          <div class="flex items-center gap-2">
-            <span class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-300">A</span>
-            <input type="text" id="manualOptA" required placeholder="Teks opsi A" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2 text-white">
+        <!-- 1. SECTION: MCQ (PILIHAN GANDA TUNGGAL) -->
+        <div id="formSection_mcq" class="space-y-3">
+          <div class="flex items-center justify-between">
+            <label class="block font-semibold text-slate-300">Pilihan Jawaban (A s/d E):</label>
+            <div class="flex items-center gap-2">
+              <span class="text-slate-400">Kunci Benar:</span>
+              <select id="manualCorrectAnswer" class="bg-slate-950 border border-indigo-500/50 rounded-lg px-2.5 py-1 text-indigo-400 font-bold">
+                <option value="A">Opsi A</option>
+                <option value="B">Opsi B</option>
+                <option value="C" selected>Opsi C</option>
+                <option value="D">Opsi D</option>
+                <option value="E">Opsi E</option>
+              </select>
+            </div>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-300">B</span>
-            <input type="text" id="manualOptB" required placeholder="Teks opsi B" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2 text-white">
+          <div class="space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-300">A</span>
+              <input type="text" id="manualOptA" placeholder="Teks opsi A" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2 text-white">
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-300">B</span>
+              <input type="text" id="manualOptB" placeholder="Teks opsi B" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2 text-white">
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-300">C</span>
+              <input type="text" id="manualOptC" placeholder="Teks opsi C" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2 text-white">
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-300">D</span>
+              <input type="text" id="manualOptD" placeholder="Teks opsi D" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2 text-white">
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-300">E</span>
+              <input type="text" id="manualOptE" placeholder="Teks opsi E" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2 text-white">
+            </div>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-300">C</span>
-            <input type="text" id="manualOptC" required placeholder="Teks opsi C" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2 text-white">
+        </div>
+
+        <!-- 2. SECTION: MCQ COMPLEX (PILIHAN GANDA KOMPLEKS - MULTI JAWABAN) -->
+        <div id="formSection_mcq_complex" class="hidden space-y-3">
+          <label class="block font-semibold text-purple-300">Pilihan Jawaban & Centang Kunci yang Benar (Bisa lebih dari 1):</label>
+          <div class="space-y-2">
+            <div class="flex items-center gap-2">
+              <label class="flex items-center gap-1.5 cursor-pointer bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700">
+                <input type="checkbox" id="complexKeyA" class="rounded accent-purple-600">
+                <span class="font-bold text-[11px] text-purple-300">A</span>
+              </label>
+              <input type="text" id="complexOptA" placeholder="Teks opsi A" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2 text-white">
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="flex items-center gap-1.5 cursor-pointer bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700">
+                <input type="checkbox" id="complexKeyB" class="rounded accent-purple-600">
+                <span class="font-bold text-[11px] text-purple-300">B</span>
+              </label>
+              <input type="text" id="complexOptB" placeholder="Teks opsi B" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2 text-white">
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="flex items-center gap-1.5 cursor-pointer bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700">
+                <input type="checkbox" id="complexKeyC" class="rounded accent-purple-600">
+                <span class="font-bold text-[11px] text-purple-300">C</span>
+              </label>
+              <input type="text" id="complexOptC" placeholder="Teks opsi C" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2 text-white">
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="flex items-center gap-1.5 cursor-pointer bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700">
+                <input type="checkbox" id="complexKeyD" class="rounded accent-purple-600">
+                <span class="font-bold text-[11px] text-purple-300">D</span>
+              </label>
+              <input type="text" id="complexOptD" placeholder="Teks opsi D" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2 text-white">
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="flex items-center gap-1.5 cursor-pointer bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700">
+                <input type="checkbox" id="complexKeyE" class="rounded accent-purple-600">
+                <span class="font-bold text-[11px] text-purple-300">E</span>
+              </label>
+              <input type="text" id="complexOptE" placeholder="Teks opsi E" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2 text-white">
+            </div>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-300">D</span>
-            <input type="text" id="manualOptD" required placeholder="Teks opsi D" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2 text-white">
+        </div>
+
+        <!-- 3. SECTION: TRUE / FALSE (PERNYATAAN BENAR / SALAH) -->
+        <div id="formSection_true_false" class="hidden space-y-3">
+          <div class="flex items-center justify-between">
+            <label class="block font-semibold text-amber-300">Daftar Pernyataan & Kunci Nilai Kebenaran:</label>
+            <button type="button" onclick="addTrueFalseStatementRow()" class="text-xs px-2.5 py-1 rounded-lg bg-amber-600/20 text-amber-300 border border-amber-500/30 hover:bg-amber-600/30 transition">
+              <i class="fa-solid fa-plus"></i> Tambah Pernyataan
+            </button>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center font-bold text-[11px] text-slate-300">E</span>
-            <input type="text" id="manualOptE" required placeholder="Teks opsi E" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2 text-white">
+          <div id="trueFalseContainer" class="space-y-2">
+            <!-- Dynamic statement rows -->
+          </div>
+        </div>
+
+        <!-- 4. SECTION: MATCHING (MENJODOHKAN) -->
+        <div id="formSection_matching" class="hidden space-y-3">
+          <div class="flex items-center justify-between">
+            <label class="block font-semibold text-cyan-300">Pasangan Menjodohkan (Premis Kiri & Pasangan Kanan):</label>
+            <button type="button" onclick="addMatchingPairRow()" class="text-xs px-2.5 py-1 rounded-lg bg-cyan-600/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-600/30 transition">
+              <i class="fa-solid fa-plus"></i> Tambah Pasangan
+            </button>
+          </div>
+          <div id="matchingPairsContainer" class="space-y-2">
+            <!-- Dynamic matching rows -->
+          </div>
+        </div>
+
+        <!-- 5. SECTION: SHORT ESSAY (ISIAN SINGKAT) -->
+        <div id="formSection_short_essay" class="hidden space-y-3">
+          <label class="block font-semibold text-emerald-300">Kata Kunci Jawaban Benar (Pisahkan dengan koma jika ada beberapa sinonim/variasi):</label>
+          <input type="text" id="shortEssayKeys" placeholder="Contoh: dua, 2, kedua, hukum kedua" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500">
+          <p class="text-[11px] text-slate-400">Pemeriksaan jawaban siswa bersifat fleksibel dan toleran huruf besar/kecil.</p>
+        </div>
+
+        <!-- 6. SECTION: LONG ESSAY (URAIAN / ESAI PANJANG DENGAN AI) -->
+        <div id="formSection_long_essay" class="hidden space-y-3 bg-slate-950/40 p-3.5 rounded-xl border border-indigo-500/30">
+          <div class="flex items-center gap-2 text-indigo-300 font-bold text-xs mb-1">
+            <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+            <span>Konfigurasi Rubrik Penilaian AI & Jawaban Ideal</span>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Rubrik & Kriteria Penilaian AI:</label>
+            <textarea id="essayRubric" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:border-indigo-500" placeholder="Kriteria penilaian per poin konsep..."></textarea>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Kunci / Contoh Jawaban Ideal:</label>
+            <textarea id="essayIdealAnswer" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:border-indigo-500" placeholder="Jawaban esai lengkap yang dijadikan acuan ideal..."></textarea>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-300 mb-1">Kata Kunci Esensial (Pisahkan koma):</label>
+              <input type="text" id="essayKeywords" placeholder="Contoh: hukum kedua, kompresor, kondensor, COP" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-white">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-300 mb-1">Skor Maksimal Esai:</label>
+              <input type="number" id="essayMaxScore" value="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-white font-mono">
+            </div>
           </div>
         </div>
 
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Pembahasan / Rubrik Penjelasan</label>
-          <textarea id="manualExplanation" rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-indigo-500" placeholder="Penjelasan mengapa kunci jawaban tersebut benar..."></textarea>
+          <label class="block font-semibold text-slate-300 mb-1">Pembahasan / Penjelasan Kunci Jawaban</label>
+          <textarea id="manualExplanation" rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-indigo-500" placeholder="Penjelasan mengapa jawaban tersebut benar..."></textarea>
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
@@ -2081,6 +2161,106 @@
           <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition shadow-lg shadow-indigo-600/30">Simpan Soal ke Bank</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL TEST AI ESSAY (UJI KOREKSI ESAI AI) ==================== -->
+  <div id="modalTestAIEssay" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-indigo-500/40 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <h4 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> Uji Coba Koreksi Jawaban Esai Berbasis AI
+        </h4>
+        <button onclick="closeModal('modalTestAIEssay')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="bg-slate-950/70 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
+        <div class="text-indigo-300 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-circle-question"></i> Stimulus / Pertanyaan Esai:</div>
+        <div id="testAIEssayStem" class="text-slate-200 leading-relaxed"></div>
+        <div class="pt-2 border-t border-slate-800 text-[11px] text-slate-400" id="testAIEssayRubric"></div>
+      </div>
+
+      <div class="space-y-2 text-xs">
+        <label class="block font-semibold text-slate-300">Contoh Jawaban Siswa untuk Diuji:</label>
+        <textarea id="testAIEssayStudentInput" rows="5" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-indigo-500 font-normal leading-relaxed custom-scrollbar" placeholder="Ketik atau tempelkan contoh jawaban siswa di sini untuk dinilai AI..."></textarea>
+      </div>
+
+      <div class="flex items-center justify-between pt-2">
+        <button type="button" onclick="loadSampleAnswerForTest()" class="text-xs text-indigo-400 hover:text-indigo-300 underline font-medium">
+          Gunakan Contoh Jawaban Siswa
+        </button>
+        <button type="button" id="btnRunTestAIEssay" onclick="executeTestAIEssay()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs transition flex items-center gap-2 shadow-lg shadow-indigo-600/30">
+          <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Jalankan Penilaian AI
+        </button>
+      </div>
+
+      <!-- Hasil Evaluasi AI -->
+      <div id="testAIResultContainer" class="hidden mt-4 p-4 rounded-xl bg-slate-950 border border-indigo-500/40 space-y-3 text-xs">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-white">Hasil Analisis AI:</span>
+            <span id="testAIScoreBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold font-mono"></span>
+          </div>
+          <span id="testAIWordCount" class="text-[11px] text-slate-400 font-mono"></span>
+        </div>
+        <div id="testAIFeedback" class="text-slate-200 bg-slate-900 p-3 rounded-lg border border-slate-800 leading-relaxed"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px]">
+          <div class="p-2.5 bg-emerald-950/30 border border-emerald-500/30 rounded-lg">
+            <strong class="text-emerald-400 block mb-1">Kelebihan Jawaban:</strong>
+            <ul id="testAIStrengths" class="list-disc pl-4 text-emerald-200/90 space-y-0.5"></ul>
+          </div>
+          <div class="p-2.5 bg-amber-950/30 border border-amber-500/30 rounded-lg">
+            <strong class="text-amber-400 block mb-1">Rekomendasi / Konsep Kurang:</strong>
+            <ul id="testAISuggestions" class="list-disc pl-4 text-amber-200/90 space-y-0.5"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DETAIL NILAI & LEMBAR JAWABAN SISWA (DENGAN KOREKSI ESAI AI) ==================== -->
+  <div id="modalStudentScoreDetail" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-3xl w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto custom-scrollbar">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div>
+          <h4 id="detailModalStudentName" class="text-base font-bold text-white flex items-center gap-2">
+            Lembar Jawaban Siswa
+          </h4>
+          <p id="detailModalStudentMeta" class="text-xs text-slate-400 mt-0.5">NISN: - • Kelas: - • Jadwal Ujian: -</p>
+        </div>
+        <button onclick="closeModal('modalStudentScoreDetail')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- Ringkasan Skor -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-center">
+          <span class="text-[10px] text-slate-400 block uppercase">Nilai Total</span>
+          <span id="detailModalScore" class="text-xl font-bold font-mono text-emerald-400">0</span>
+        </div>
+        <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-center">
+          <span class="text-[10px] text-slate-400 block uppercase">Status KKM</span>
+          <span id="detailModalStatus" class="text-xs font-bold">TUNTAS</span>
+        </div>
+        <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-center">
+          <span class="text-[10px] text-slate-400 block uppercase">Soal Terjawab</span>
+          <span id="detailModalAnswered" class="text-base font-bold font-mono text-indigo-400">0 / 0</span>
+        </div>
+        <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-center">
+          <span class="text-[10px] text-slate-400 block uppercase">Pelanggaran Tab</span>
+          <span id="detailModalViolations" class="text-base font-bold font-mono text-rose-400">0x</span>
+        </div>
+      </div>
+
+      <!-- Daftar Respon Soal Siswa -->
+      <div class="space-y-4 pt-2">
+        <div class="flex items-center justify-between">
+          <h5 class="text-xs font-bold uppercase tracking-wider text-slate-400">Rincian Per Butir Soal (Standar TKA)</h5>
+          <span class="text-[11px] text-indigo-400 flex items-center gap-1"><i class="fa-solid fa-robot"></i> Asistensi Koreksi AI Aktif</span>
+        </div>
+        <div id="detailModalQuestionsList" class="space-y-3">
+          <!-- Populated by viewStudentScoreDetail -->
+        </div>
+      </div>
     </div>
   </div>
 
@@ -2983,6 +3163,9 @@
       // Sinkronisasi data profil sekolah & master siswa untuk cetak kartu ujian
       fetchSchoolProfile();
       fetchMasterStudents();
+      fetchQuestionBanks().then(() => {
+        viewQuestionList(currentActiveBankId || 1);
+      });
 
       // Auto-update live monitoring sesi ujian siswa secara realtime (setiap 2 detik)
       fetchProctorSessions();
@@ -3040,6 +3223,11 @@
       }
       if (tabName === 'siswa') {
         fetchMasterStudents();
+      }
+      if (tabName === 'bank-soal') {
+        fetchQuestionBanks().then(() => {
+          viewQuestionList(currentActiveBankId || 1);
+        });
       }
 
       const titleMap = {
@@ -3114,46 +3302,723 @@
       } catch (err) { alert(err.message); }
     };
 
-    // Tambah Soal Manual
-    window.handleSaveManualQuestion = function(e) {
-      e.preventDefault();
-      const stem = document.getElementById('manualStem').value;
-      const optA = document.getElementById('manualOptA').value;
-      const optB = document.getElementById('manualOptB').value;
-      const optC = document.getElementById('manualOptC').value;
-      const optD = document.getElementById('manualOptD').value;
-      const optE = document.getElementById('manualOptE').value;
-      const key = document.getElementById('manualCorrectAnswer').value;
-      const cog = document.getElementById('manualCogLevel').value;
+    // ==============================================================
+    // MANAJEMEN BANK SOAL & ASESMEN TKA SMA/SMK DENGAN KOREKSI AI
+    // ==============================================================
+    let currentActiveBankId = 1;
+    let cachedQuestionBanks = [];
+    let currentTestEssayQuestion = null;
 
+    // Load Bank Soal dari API Server
+    window.fetchQuestionBanks = async function() {
+      try {
+        const res = await fetch('/api/v1/cbt/question-banks');
+        if (!res.ok) return;
+        const json = await res.json();
+        cachedQuestionBanks = json.data || [];
+        renderBankSoalGrid(cachedQuestionBanks);
+        populateBankSelectDropdown(cachedQuestionBanks);
+      } catch (err) {
+        console.warn('Gagal memuat bank soal:', err);
+      }
+    };
+
+    function populateBankSelectDropdown(banks) {
+      const select = document.getElementById('manualBankId');
+      if (!select || !banks || banks.length === 0) return;
+      select.innerHTML = banks.map(b => `<option value="${b.id}" ${b.id === currentActiveBankId ? 'selected' : ''}>${b.id}. ${b.title} (${b.subject})</option>`).join('');
+    }
+
+    function renderBankSoalGrid(banks) {
+      const grid = document.getElementById('bankSoalGrid');
+      if (!grid) return;
+      if (!banks || banks.length === 0) {
+        grid.innerHTML = `<div class="col-span-full p-8 text-center text-slate-500">Belum ada bank soal tersedia.</div>`;
+        return;
+      }
+
+      const typeLabels = {
+        'mcq': 'PG',
+        'mcq_complex': 'Kompleks',
+        'true_false': 'B/S',
+        'matching': 'Jodohkan',
+        'short_essay': 'Isian',
+        'long_essay': 'Esai AI'
+      };
+
+      grid.innerHTML = banks.map(b => {
+        const isActive = (b.id === currentActiveBankId);
+        const typesList = (b.question_types || ['mcq']).map(t => typeLabels[t] || t).join(', ');
+        const activeRing = isActive 
+          ? 'border-indigo-500 shadow-xl shadow-indigo-600/20 ring-2 ring-indigo-500/40 bg-slate-900' 
+          : 'border-slate-800 hover:border-slate-700 bg-slate-900';
+
+        return `
+          <div class="${activeRing} rounded-2xl p-5 shadow-lg flex flex-col justify-between transition group relative">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase">${b.subject}</span>
+                <span class="text-xs text-slate-400"><strong class="text-white">${b.question_count || 0}</strong> Butir Soal</span>
+              </div>
+              <h4 class="text-base font-bold text-white mb-1 group-hover:text-indigo-300 transition">${b.title}</h4>
+              <p class="text-xs text-slate-400 mb-2">Pengampu: ${b.teacher || 'Guru'} • ${b.target_class || 'Semua Kelas'}</p>
+              <div class="mb-4">
+                <span class="inline-block text-[10px] font-mono px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400">
+                  <i class="fa-solid fa-layer-group text-indigo-400 mr-1"></i>Format: ${typesList}
+                </span>
+              </div>
+            </div>
+            <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <button onclick="viewQuestionList(${b.id})" class="px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 font-bold flex items-center gap-1.5 transition">
+                <i class="fa-regular fa-eye text-indigo-400"></i> Kelola Butir Soal
+              </button>
+              <div class="flex items-center gap-2">
+                <button onclick="openAddQuestionModalCurrentBank(${b.id})" class="text-slate-400 hover:text-white px-2.5 py-1.5 rounded-lg bg-slate-800 transition flex items-center gap-1">
+                  <i class="fa-solid fa-plus text-indigo-400"></i> Soal
+                </button>
+                <button onclick="handleDeleteCard(this, 'Bank Soal')" class="text-rose-400 hover:text-rose-300 px-2.5 py-1.5 rounded-lg bg-rose-600/10 border border-rose-500/20 transition flex items-center gap-1">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Tampilkan Butir Soal untuk Bank Tertentu (Memperbaiki "Kelola Butir Soal belum bisa di klik")
+    window.viewQuestionList = async function(bankId) {
+      currentActiveBankId = bankId || 1;
+      try {
+        const res = await fetch(`/api/v1/cbt/question-banks/${currentActiveBankId}`);
+        if (!res.ok) throw new Error('Bank soal tidak ditemukan');
+        const json = await res.json();
+        const bank = json.data;
+
+        // Update styling bank cards
+        renderBankSoalGrid(cachedQuestionBanks);
+
+        // Update Header & Badge
+        const titleEl = document.getElementById('activeBankTitle');
+        const subEl = document.getElementById('activeBankSubtitle');
+        const countBadge = document.getElementById('activeBankCountBadge');
+
+        if (titleEl) titleEl.innerText = `Daftar Butir Soal: ${bank.title}`;
+        if (subEl) subEl.innerText = `${bank.subject} • Pengampu: ${bank.teacher || 'Guru'} • ${bank.questions.length} Butir Soal Terdaftar`;
+        if (countBadge) countBadge.innerText = `${bank.questions.length} Butir Soal Aktif`;
+
+        // Render Butir Soal
+        renderQuestionsContainer(bank);
+
+        // Smooth scroll ke bagian butir soal
+        const detailCard = document.getElementById('questionsDetailCard');
+        if (detailCard) {
+          detailCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } catch (err) {
+        console.error('Gagal memuat butir soal:', err);
+      }
+    };
+
+    function renderQuestionsContainer(bank) {
       const container = document.getElementById('questionsListContainer');
-      const item = document.createElement('div');
-      item.className = 'p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2 relative group';
-      item.innerHTML = `
-        <div class="flex items-center justify-between text-xs">
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-white bg-slate-800 px-2 py-0.5 rounded">Baru</span>
-            <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold text-[10px]">${cog}</span>
+      if (!container) return;
+      const questions = bank.questions || [];
+
+      if (questions.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center text-slate-500 border border-dashed border-slate-800 rounded-xl">
+            <i class="fa-solid fa-folder-open text-3xl mb-2 block text-slate-600"></i>
+            Bank soal ini belum memiliki butir soal. Silakan klik tombol <strong>Tambah Soal</strong> di atas.
           </div>
-          <div class="flex items-center gap-3">
-            <span class="text-emerald-400 font-bold">Kunci: ${key}</span>
-            <button onclick="handleDeleteCard(this, 'Butir Soal')" class="text-rose-400 hover:text-rose-300 p-1 rounded hover:bg-rose-600/20 transition flex items-center gap-1 text-[11px]" title="Hapus Soal Ini">
-              <i class="fa-regular fa-trash-can"></i> Hapus
-            </button>
+        `;
+        return;
+      }
+
+      const typeMeta = {
+        'mcq': { name: 'Pilihan Ganda (Tunggal)', badge: 'bg-blue-500/20 text-blue-300 border-blue-500/30' },
+        'mcq_complex': { name: 'PG Kompleks (Multi Jawaban)', badge: 'bg-purple-500/20 text-purple-300 border-purple-500/30' },
+        'true_false': { name: 'Benar / Salah (Matrix)', badge: 'bg-amber-500/20 text-amber-300 border-amber-500/30' },
+        'matching': { name: 'Menjodohkan (Matching)', badge: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' },
+        'short_essay': { name: 'Isian Singkat', badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' },
+        'long_essay': { name: 'Uraian / Esai Panjang (Koreksi AI)', badge: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30 ring-1 ring-amber-400/40' }
+      };
+
+      container.innerHTML = questions.map((q, qIdx) => {
+        const meta = typeMeta[q.type] || { name: q.type, badge: 'bg-slate-800 text-slate-300 border-slate-700' };
+
+        // Detail tampilan konten opsi/stimulus berdasarkan tipe soal
+        let bodyHtml = '';
+        if (q.type === 'mcq') {
+          const opts = q.options || [];
+          bodyHtml = `
+            <div class="text-[11px] text-slate-400 pl-4 border-l-2 border-indigo-500/40 space-y-1">
+              ${opts.map(o => {
+                const isKey = (o.id === q.answer);
+                return `<div class="${isKey ? 'text-emerald-400 font-bold' : ''}"><strong>${o.id}.</strong> ${o.text} ${isKey ? '(Kunci Jawaban)' : ''}</div>`;
+              }).join('')}
+            </div>
+          `;
+        } else if (q.type === 'mcq_complex') {
+          const opts = q.options || [];
+          const correctArr = Array.isArray(q.answer) ? q.answer : [q.answer];
+          bodyHtml = `
+            <div class="text-[11px] text-slate-400 pl-4 border-l-2 border-purple-500/40 space-y-1">
+              ${opts.map(o => {
+                const isKey = correctArr.includes(o.id);
+                return `<div class="${isKey ? 'text-purple-300 font-bold flex items-center gap-1.5' : 'flex items-center gap-1.5'}">
+                  <i class="fa-solid ${isKey ? 'fa-square-check text-purple-400' : 'fa-square text-slate-600'}"></i>
+                  <span>[${o.id}] ${o.text} ${isKey ? '<span class="text-emerald-400 text-[10px] ml-1">✓ Kunci</span>' : ''}</span>
+                </div>`;
+              }).join('')}
+            </div>
+          `;
+        } else if (q.type === 'true_false') {
+          const statements = q.statements || [];
+          bodyHtml = `
+            <div class="text-[11px] text-slate-300 pl-4 border-l-2 border-amber-500/40 space-y-1.5">
+              ${statements.map((s, idx) => {
+                const isBenar = (s.key === 'B');
+                return `<div class="flex items-center justify-between p-1.5 rounded bg-slate-900/60 border border-slate-800">
+                  <span>${idx + 1}. ${s.text}</span>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isBenar ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'}">Kunci: ${s.key === 'B' ? 'BENAR' : 'SALAH'}</span>
+                </div>`;
+              }).join('')}
+            </div>
+          `;
+        } else if (q.type === 'matching') {
+          const premises = q.premises || [];
+          const targets = q.targets || [];
+          const ansMap = q.answer || {};
+          bodyHtml = `
+            <div class="text-[11px] text-slate-300 pl-4 border-l-2 border-cyan-500/40 space-y-1.5">
+              ${premises.map((p, idx) => {
+                const targetKey = ansMap[p.id] || ansMap[idx] || '-';
+                const targetObj = targets.find(t => t.id === targetKey);
+                return `<div class="flex items-center justify-between p-1.5 rounded bg-slate-900/60 border border-slate-800">
+                  <span>${p.text}</span>
+                  <span class="text-cyan-400 font-bold flex items-center gap-1">➔ [${targetKey}] ${targetObj ? targetObj.text : ''}</span>
+                </div>`;
+              }).join('')}
+            </div>
+          `;
+        } else if (q.type === 'short_essay') {
+          const keys = q.answer_keys || [];
+          bodyHtml = `
+            <div class="text-[11px] pl-4 border-l-2 border-emerald-500/40 space-y-1">
+              <span class="text-slate-400">Kunci Jawaban Isian: </span>
+              <span class="px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold font-mono">${keys.join(' / ')}</span>
+            </div>
+          `;
+        } else if (q.type === 'long_essay') {
+          bodyHtml = `
+            <div class="text-[11px] pl-4 border-l-2 border-indigo-500/40 space-y-2 bg-slate-900/40 p-3 rounded-xl border border-slate-800">
+              <div>
+                <strong class="text-indigo-300 block mb-0.5">Pedoman Rubrik AI & Kriteria Penilaian:</strong>
+                <p class="text-slate-300 whitespace-pre-line leading-relaxed">${q.rubric || 'Penilaian berdasarkan kedalaman uraian dan ketepatan konsep.'}</p>
+              </div>
+              <div class="pt-2 border-t border-slate-800">
+                <strong class="text-emerald-400 block mb-0.5">Contoh Jawaban Ideal:</strong>
+                <p class="text-slate-400 italic">${q.ideal_answer || '-'}</p>
+              </div>
+              <div class="flex items-center justify-between pt-1">
+                <span class="text-amber-300 font-mono text-[10px]">Kata Kunci: ${(q.keywords || []).join(', ') || '-'}</span>
+                <button type="button" onclick="openTestAIEssayModal(${bank.id}, ${q.id})" class="px-3 py-1 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-[11px] transition flex items-center gap-1.5 shadow-md shadow-indigo-600/30">
+                  <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Uji Koreksi AI
+                </button>
+              </div>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="p-5 bg-slate-950/60 rounded-2xl border border-slate-800 space-y-3 relative group hover:border-slate-700 transition">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-bold text-white bg-slate-800 px-2.5 py-0.5 rounded-lg border border-slate-700 font-mono">No. ${qIdx + 1}</span>
+                <span class="px-2.5 py-0.5 rounded-lg font-bold text-[10px] border ${meta.badge}">${meta.name}</span>
+                <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] font-mono">Bloom: ${q.cog || 'C2'}</span>
+                <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] font-mono">Bobot: ${q.weight || 1.0}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="handleDeleteQuestionFromBank(${bank.id}, ${q.id})" class="text-rose-400 hover:text-rose-300 px-2.5 py-1 rounded-lg bg-rose-600/10 border border-rose-500/20 transition flex items-center gap-1 text-[11px]" title="Hapus Butir Soal Ini">
+                  <i class="fa-regular fa-trash-can"></i> Hapus
+                </button>
+              </div>
+            </div>
+
+            <div class="text-xs text-slate-200 leading-relaxed">${q.stem}</div>
+            ${bodyHtml}
+
+            ${q.explanation ? `
+              <div class="text-[11px] text-slate-400 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800 flex items-start gap-2">
+                <i class="fa-solid fa-lightbulb text-amber-400 shrink-0 mt-0.5"></i>
+                <div><strong>Pembahasan:</strong> ${q.explanation}</div>
+              </div>
+            ` : ''}
           </div>
-        </div>
-        <div class="text-xs text-slate-200">${stem}</div>
-        <div class="text-[11px] text-slate-400 pl-4 border-l-2 border-indigo-500/40 space-y-0.5">
-          <div>A. ${optA}</div>
-          <div>B. ${optB}</div>
-          <div>C. ${optC}</div>
-          <div>D. ${optD}</div>
-          <div>E. ${optE}</div>
-        </div>
+        `;
+      }).join('');
+    }
+
+    // Modal Tambah Soal Manual: Pergantian Tipe Soal
+    window.openAddQuestionModalCurrentBank = function(bankId) {
+      const bId = bankId || currentActiveBankId || 1;
+      const bankSelect = document.getElementById('manualBankId');
+      if (bankSelect) bankSelect.value = String(bId);
+      openModal('modalAddQuestionManual');
+    };
+
+    window.handleQuestionTypeChange = function(type) {
+      const sections = ['mcq', 'mcq_complex', 'true_false', 'matching', 'short_essay', 'long_essay'];
+      sections.forEach(s => {
+        const el = document.getElementById(`formSection_${s}`);
+        if (el) {
+          if (s === type) el.classList.remove('hidden');
+          else el.classList.add('hidden');
+        }
+      });
+
+      // Default rows jika kosong
+      if (type === 'true_false') {
+        const container = document.getElementById('trueFalseContainer');
+        if (container && container.children.length === 0) {
+          addTrueFalseStatementRow('Pernyataan 1 mengenai konsep dasar...', 'B');
+          addTrueFalseStatementRow('Pernyataan 2 mengenai penerapan...', 'S');
+        }
+      } else if (type === 'matching') {
+        const container = document.getElementById('matchingPairsContainer');
+        if (container && container.children.length === 0) {
+          addMatchingPairRow('Premis Konsep A', 'Pilihan Pasangan A');
+          addMatchingPairRow('Premis Konsep B', 'Pilihan Pasangan B');
+        }
+      }
+    };
+
+    // Dinamis True/False Rows
+    window.addTrueFalseStatementRow = function(text = '', key = 'B') {
+      const container = document.getElementById('trueFalseContainer');
+      if (!container) return;
+      const idx = container.children.length;
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-2 p-2 bg-slate-950 border border-slate-800 rounded-xl';
+      row.innerHTML = `
+        <span class="w-5 font-bold text-slate-400 font-mono">${idx + 1}.</span>
+        <input type="text" class="tf-statement-text flex-1 bg-transparent border-0 text-white text-xs focus:outline-none" placeholder="Ketik kalimat pernyataan..." value="${text}">
+        <select class="tf-statement-key bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs font-bold text-amber-400">
+          <option value="B" ${key === 'B' ? 'selected' : ''}>Benar (B)</option>
+          <option value="S" ${key === 'S' ? 'selected' : ''}>Salah (S)</option>
+        </select>
+        <button type="button" onclick="this.closest('.flex').remove()" class="text-rose-400 hover:text-rose-300 px-2 py-1"><i class="fa-solid fa-xmark"></i></button>
       `;
-      container.prepend(item);
-      closeModal('modalAddQuestionManual');
-      alert('Butir soal baru berhasil ditambahkan ke bank soal!');
+      container.appendChild(row);
+    };
+
+    // Dinamis Matching Rows
+    window.addMatchingPairRow = function(left = '', right = '') {
+      const container = document.getElementById('matchingPairsContainer');
+      if (!container) return;
+      const idx = container.children.length;
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-2 p-2 bg-slate-950 border border-slate-800 rounded-xl';
+      row.innerHTML = `
+        <span class="w-5 font-bold text-slate-400 font-mono">${idx + 1}.</span>
+        <input type="text" class="match-left-text flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white text-xs" placeholder="Premis di sebelah kiri..." value="${left}">
+        <span class="text-cyan-400 font-bold">➔</span>
+        <input type="text" class="match-right-text flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white text-xs" placeholder="Pilihan di sebelah kanan..." value="${right}">
+        <button type="button" onclick="this.closest('.flex').remove()" class="text-rose-400 hover:text-rose-300 px-2 py-1"><i class="fa-solid fa-xmark"></i></button>
+      `;
+      container.appendChild(row);
+    };
+
+    // Simpan Butir Soal Baru Mendukung Seluruh Format TKA
+    window.handleSaveManualQuestion = async function(e) {
+      e.preventDefault();
+      const bankId = parseInt(document.getElementById('manualBankId').value, 10) || currentActiveBankId || 1;
+      const qType = document.getElementById('manualQuestionType').value;
+      const stem = document.getElementById('manualStem').value.trim();
+      const cog = document.getElementById('manualCogLevel').value;
+      const weight = parseFloat(document.getElementById('manualWeight').value) || 1.0;
+      const explanation = document.getElementById('manualExplanation').value.trim();
+
+      const payload = {
+        type: qType,
+        cog: cog,
+        stem: stem,
+        weight: weight,
+        explanation: explanation
+      };
+
+      if (qType === 'mcq') {
+        payload.options = [
+          { id: 'A', text: document.getElementById('manualOptA').value.trim() },
+          { id: 'B', text: document.getElementById('manualOptB').value.trim() },
+          { id: 'C', text: document.getElementById('manualOptC').value.trim() },
+          { id: 'D', text: document.getElementById('manualOptD').value.trim() },
+          { id: 'E', text: document.getElementById('manualOptE').value.trim() }
+        ];
+        payload.answer = document.getElementById('manualCorrectAnswer').value;
+      } else if (qType === 'mcq_complex') {
+        payload.options = [
+          { id: 'A', text: document.getElementById('complexOptA').value.trim() },
+          { id: 'B', text: document.getElementById('complexOptB').value.trim() },
+          { id: 'C', text: document.getElementById('complexOptC').value.trim() },
+          { id: 'D', text: document.getElementById('complexOptD').value.trim() },
+          { id: 'E', text: document.getElementById('complexOptE').value.trim() }
+        ];
+        const checkedKeys = [];
+        ['A', 'B', 'C', 'D', 'E'].forEach(l => {
+          const chk = document.getElementById(`complexKey${l}`);
+          if (chk && chk.checked) checkedKeys.push(l);
+        });
+        payload.answer = checkedKeys.length > 0 ? checkedKeys : ['A'];
+      } else if (qType === 'true_false') {
+        const rows = document.querySelectorAll('#trueFalseContainer > div');
+        const statements = [];
+        const ansObj = {};
+        rows.forEach((r, idx) => {
+          const t = r.querySelector('.tf-statement-text')?.value.trim() || `Pernyataan #${idx + 1}`;
+          const k = r.querySelector('.tf-statement-key')?.value || 'B';
+          statements.push({ id: idx, text: t, key: k });
+          ansObj[idx] = k;
+        });
+        payload.statements = statements;
+        payload.answer = ansObj;
+      } else if (qType === 'matching') {
+        const rows = document.querySelectorAll('#matchingPairsContainer > div');
+        const premises = [];
+        const targets = [];
+        const ansObj = {};
+        rows.forEach((r, idx) => {
+          const targetLetter = String.fromCharCode(65 + idx);
+          const leftText = r.querySelector('.match-left-text')?.value.trim() || `Premis ${idx + 1}`;
+          const rightText = r.querySelector('.match-right-text')?.value.trim() || `Pilihan ${targetLetter}`;
+          premises.push({ id: idx, text: leftText });
+          targets.push({ id: targetLetter, text: rightText });
+          ansObj[idx] = targetLetter;
+        });
+        payload.premises = premises;
+        payload.targets = targets;
+        payload.answer = ansObj;
+      } else if (qType === 'short_essay') {
+        const rawKeys = document.getElementById('shortEssayKeys').value.trim();
+        payload.answer_keys = rawKeys.split(',').map(s => s.trim()).filter(Boolean);
+      } else if (qType === 'long_essay') {
+        payload.rubric = document.getElementById('essayRubric').value.trim();
+        payload.ideal_answer = document.getElementById('essayIdealAnswer').value.trim();
+        payload.max_score = parseInt(document.getElementById('essayMaxScore').value, 10) || 100;
+        const kwRaw = document.getElementById('essayKeywords').value.trim();
+        payload.keywords = kwRaw.split(',').map(s => s.trim()).filter(Boolean);
+      }
+
+      try {
+        const res = await fetch(`/api/v1/cbt/question-banks/${bankId}/add-question`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Gagal menyimpan butir soal');
+
+        closeModal('modalAddQuestionManual');
+        alert(json.message || 'Butir soal berhasil ditambahkan ke bank soal!');
+        await fetchQuestionBanks();
+        await viewQuestionList(bankId);
+      } catch (err) {
+        alert('Gagal menambah butir soal: ' + err.message);
+      }
+    };
+
+    // Hapus Butir Soal dari Bank
+    window.handleDeleteQuestionFromBank = async function(bankId, qId) {
+      if (!confirm(`Apakah Anda yakin ingin menghapus Butir Soal No. ${qId}?`)) return;
+      try {
+        const res = await fetch(`/api/v1/cbt/question-banks/${bankId}/delete-question/${qId}`, {
+          method: 'POST'
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+        alert(json.message || 'Butir soal berhasil dihapus!');
+        await fetchQuestionBanks();
+        await viewQuestionList(bankId);
+      } catch (err) {
+        alert('Gagal menghapus butir soal: ' + err.message);
+      }
+    };
+
+    // ==============================================================
+    // MODAL UJI COBA KOREKSI ESAI AI (INTERAKTIF UNTUK GURU)
+    // ==============================================================
+    window.openTestAIEssayModal = async function(bankId, qId) {
+      try {
+        const res = await fetch(`/api/v1/cbt/question-banks/${bankId}`);
+        const json = await res.json();
+        const bank = json.data;
+        const q = (bank.questions || []).find(item => item.id === qId);
+        if (!q) return;
+
+        currentTestEssayQuestion = q;
+        document.getElementById('testAIEssayStem').innerHTML = q.stem;
+        document.getElementById('testAIEssayRubric').innerText = `Rubrik: ${q.rubric || 'Penilaian pemahaman konsep dan alur penjelasan.'}\nKata Kunci Kriteria: ${(q.keywords || []).join(', ')}`;
+        document.getElementById('testAIEssayStudentInput').value = '';
+        document.getElementById('testAIResultContainer').classList.add('hidden');
+
+        openModal('modalTestAIEssay');
+      } catch (err) {
+        alert('Gagal memuat detail esai: ' + err.message);
+      }
+    };
+
+    window.loadSampleAnswerForTest = function() {
+      if (!currentTestEssayQuestion) return;
+      const sample = currentTestEssayQuestion.ideal_answer || 
+        'Mesin pendingin bekerja memindahkan kalor dari suhu dingin ke suhu hangat menggunakan kerja kompresor sesuai Hukum Kedua Termodinamika. Zat pendingin mengalir melalui evaporator lalu dinaikkan tekanannya dan melepaskan kalor di kondensor dengan nilai COP tinggi.';
+      document.getElementById('testAIEssayStudentInput').value = sample;
+    };
+
+    window.executeTestAIEssay = async function() {
+      if (!currentTestEssayQuestion) return;
+      const studentInput = document.getElementById('testAIEssayStudentInput').value.trim();
+      if (!studentInput) {
+        alert('Silakan ketik atau tempelkan contoh jawaban siswa terlebih dahulu.');
+        return;
+      }
+
+      const btn = document.getElementById('btnRunTestAIEssay');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Memproses Koreksi AI...`;
+
+      try {
+        const res = await fetch('/api/v1/cbt/ai/grade-essay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question_stem: currentTestEssayQuestion.stem,
+            rubric: currentTestEssayQuestion.rubric,
+            ideal_answer: currentTestEssayQuestion.ideal_answer,
+            student_answer: studentInput,
+            keywords: currentTestEssayQuestion.keywords,
+            max_score: currentTestEssayQuestion.max_score || 100
+          })
+        });
+
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+        const evalData = json.data;
+
+        const resBox = document.getElementById('testAIResultContainer');
+        resBox.classList.remove('hidden');
+
+        const badge = document.getElementById('testAIScoreBadge');
+        badge.innerText = `Skor: ${evalData.score} / ${evalData.max_score} (${evalData.grade_letter})`;
+        badge.className = evalData.score >= 75
+          ? 'px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+          : 'px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-rose-500/20 text-rose-300 border border-rose-500/30';
+
+        document.getElementById('testAIWordCount').innerText = `${evalData.analysis.word_count || 0} Kata`;
+        document.getElementById('testAIFeedback').innerText = evalData.feedback;
+
+        const elStrengths = document.getElementById('testAIStrengths');
+        elStrengths.innerHTML = (evalData.analysis.strengths || []).map(s => `<li>${s}</li>`).join('');
+
+        const elSugg = document.getElementById('testAISuggestions');
+        elSugg.innerHTML = (evalData.analysis.suggestions || []).map(s => `<li>${s}</li>`).join('');
+      } catch (err) {
+        alert('Gagal menjalankan koreksi AI: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Jalankan Penilaian AI`;
+      }
+    };
+
+    // Buat Bank Soal Baru
+    window.handleCreateBankSubmit = async function() {
+      const title = document.getElementById('bankTitle').value.trim();
+      const subj = document.getElementById('bankSubject').value.trim();
+      if (!title || !subj) {
+        alert('Mohon lengkapi Judul dan Mata Pelajaran bank soal.');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/v1/cbt/question-banks/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: title,
+            subject: subj,
+            teacher: 'Drs. Budi Pratama, M.Pd.',
+            target_class: 'Semua Kelas',
+            questions: []
+          })
+        });
+        const json = await res.json();
+        closeModal('modalCreateBank');
+        alert(json.message || `Bank soal "${title}" berhasil dibuat!`);
+        await fetchQuestionBanks();
+        if (json.data && json.data.id) {
+          await viewQuestionList(json.data.id);
+        }
+      } catch (err) {
+        alert('Gagal membuat bank soal: ' + err.message);
+      }
+    };
+
+    // ==============================================================
+    // KOREKSI ESAI MASSAL & RINCIAN LEMBAR JAWABAN SISWA (TAB NILAI)
+    // ==============================================================
+    window.handleBatchGradeEssaysWithAI = async function() {
+      const schId = getNilaiSelectedScheduleId() || 1;
+      if (!confirm(`Jalankan asistensi AI untuk mengoreksi seluruh lembar jawaban esai siswa pada jadwal #${schId}?`)) return;
+
+      try {
+        const res = await fetch('/api/v1/cbt/ai/batch-grade-essays', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ schedule_id: schId })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+        alert(json.message || 'Koreksi esai via AI selesai diproses!');
+        await fetchNilaiSessions();
+      } catch (err) {
+        alert('Gagal koreksi massal AI: ' + err.message);
+      }
+    };
+
+    // Tampilkan Modal Rincian Lembar Jawaban Siswa & Koreksi Esai AI
+    window.viewStudentScoreDetail = function(username) {
+      const student = lastNilaiSessionsData.find(s => s.username === username);
+      if (!student) return;
+
+      const schInfo = lastNilaiScheduleInfo || { id: 1, title: 'UAS Fisika Peminatan XII' };
+      const questions = lastNilaiQuestions || [];
+      const userAnswers = student.answers || {};
+
+      document.getElementById('detailModalStudentName').innerText = `${student.full_name} (${student.username})`;
+      document.getElementById('detailModalStudentMeta').innerText = `NISN: ${student.nisn || '-'} • Kelas: ${student.class_name} • Jadwal: ${schInfo.title}`;
+
+      const scoreEl = document.getElementById('detailModalScore');
+      scoreEl.innerText = (student.score || 0).toFixed(1);
+      scoreEl.className = (student.score || 0) >= 75 ? 'text-xl font-bold font-mono text-emerald-400' : 'text-xl font-bold font-mono text-rose-400';
+
+      const statEl = document.getElementById('detailModalStatus');
+      statEl.innerText = student.is_passed ? 'TUNTAS' : 'REMEDIAL';
+      statEl.className = student.is_passed ? 'text-xs font-bold text-emerald-400' : 'text-xs font-bold text-rose-400';
+
+      document.getElementById('detailModalAnswered').innerText = `${student.answered_count || 0} / ${questions.length}`;
+      document.getElementById('detailModalViolations').innerText = `${student.tab_violations || 0}x`;
+
+      const listContainer = document.getElementById('detailModalQuestionsList');
+      if (!listContainer) return;
+
+      listContainer.innerHTML = questions.map((q, idx) => {
+        const ansObj = userAnswers[q.id];
+        const studentAns = ansObj ? ansObj.a : undefined;
+        const hasAnswered = (studentAns !== undefined && studentAns !== null && studentAns !== '');
+
+        if (q.type === 'long_essay') {
+          const aiScore = ansObj ? (ansObj.ai_score !== undefined ? ansObj.ai_score : '-') : '-';
+          const feedback = ansObj ? (ansObj.ai_feedback || 'Belum ada ulasan AI.') : 'Belum dinilai.';
+
+          return `
+            <div class="p-4 bg-slate-950 border border-indigo-500/30 rounded-xl space-y-3 text-xs">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-white bg-slate-800 px-2.5 py-0.5 rounded font-mono">Soal #${idx + 1}</span>
+                  <span class="px-2 py-0.5 rounded font-bold text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Uraian / Esai Panjang AI</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-mono font-bold text-emerald-400">Skor Esai AI: <span id="studentEssayScoreBadge_${student.id}_${q.id}">${aiScore}</span> / ${q.max_score || 100}</span>
+                </div>
+              </div>
+              <div class="text-slate-300 font-medium">${q.stem}</div>
+              <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 space-y-1">
+                <div class="text-[10px] uppercase font-bold text-slate-400">Jawaban Siswa:</div>
+                <div class="text-slate-200 leading-relaxed font-normal">${hasAnswered ? studentAns : '<em class="text-slate-500">Lembar jawaban kosong</em>'}</div>
+              </div>
+              <div class="bg-slate-900/80 p-3 rounded-lg border border-indigo-500/20 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold text-indigo-300 flex items-center gap-1"><i class="fa-solid fa-robot"></i> Analisis & Ulasan AI:</span>
+                  <button type="button" onclick="gradeStudentEssayNow(${schInfo.id}, ${student.id}, ${q.id})" class="text-[10px] px-2.5 py-1 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition flex items-center gap-1 shadow-md shadow-indigo-600/30">
+                    <i class="fa-solid fa-arrows-rotate"></i> Koreksi Ulang AI
+                  </button>
+                </div>
+                <div id="studentEssayFeedback_${student.id}_${q.id}" class="text-slate-300 text-[11px] leading-relaxed">${feedback}</div>
+              </div>
+            </div>
+          `;
+        }
+
+        // Tipe MCQ / Complex / B/S / Matching / Short Essay
+        let displayStudentAns = '-';
+        if (Array.isArray(studentAns)) {
+          displayStudentAns = studentAns.join(', ');
+        } else if (typeof studentAns === 'object' && studentAns !== null) {
+          displayStudentAns = Object.entries(studentAns).map(([k, v]) => `[${k}]=${v}`).join(', ');
+        } else if (hasAnswered) {
+          displayStudentAns = String(studentAns);
+        }
+
+        return `
+          <div class="p-3.5 bg-slate-950 border border-slate-800 rounded-xl space-y-2 text-xs">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-white bg-slate-800 px-2 py-0.5 rounded font-mono">Soal #${idx + 1}</span>
+                <span class="px-2 py-0.5 rounded font-bold text-[10px] bg-slate-800 text-slate-300 uppercase">${q.type}</span>
+              </div>
+              <span class="text-[11px] font-mono text-slate-400">Bobot: ${q.weight || 1.0}</span>
+            </div>
+            <div class="text-slate-300">${q.stem}</div>
+            <div class="flex items-center justify-between pt-1 border-t border-slate-900 text-[11px]">
+              <div>Jawaban Siswa: <strong class="text-white font-mono bg-slate-900 px-2 py-0.5 rounded">${displayStudentAns}</strong></div>
+              <div>Kunci: <span class="text-emerald-400 font-mono font-bold">${Array.isArray(q.answer) ? q.answer.join(', ') : (typeof q.answer === 'object' ? JSON.stringify(q.answer) : (q.answer || (q.answer_keys || []).join('/')))}</span></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      openModal('modalStudentScoreDetail');
+    };
+
+    window.gradeStudentEssayNow = async function(schId, studentId, qId) {
+      const student = lastNilaiSessionsData.find(s => s.id === studentId);
+      if (!student) return;
+      const q = (lastNilaiQuestions || []).find(item => item.id === qId);
+      if (!q) return;
+      const ansObj = (student.answers || {})[qId];
+      const studentText = ansObj ? ansObj.a : '';
+
+      try {
+        const res = await fetch('/api/v1/cbt/ai/grade-essay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            schedule_id: schId,
+            student_id: studentId,
+            question_id: qId,
+            question_stem: q.stem,
+            rubric: q.rubric,
+            ideal_answer: q.ideal_answer,
+            student_answer: studentText,
+            keywords: q.keywords,
+            max_score: q.max_score || 100
+          })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+        const evalData = json.data;
+
+        const badge = document.getElementById(`studentEssayScoreBadge_${studentId}_${qId}`);
+        if (badge) badge.innerText = evalData.score;
+        const fb = document.getElementById(`studentEssayFeedback_${studentId}_${qId}`);
+        if (fb) fb.innerText = evalData.feedback;
+
+        alert(`AI selesai mengoreksi esai: Skor ${evalData.score}/${evalData.max_score} (${evalData.grade_letter})`);
+        await fetchNilaiSessions();
+      } catch (err) {
+        alert('Gagal koreksi esai AI: ' + err.message);
+      }
     };
 
     // Universal Delete Handlers
@@ -4199,14 +5064,6 @@
       }
     };
 
-    // Buat Bank Soal
-    window.handleCreateBankSubmit = function() {
-      const title = document.getElementById('bankTitle').value;
-      const subj = document.getElementById('bankSubject').value;
-      closeModal('modalCreateBank');
-      alert(`Bank soal "${title}" (${subj}) berhasil dibuat!`);
-    };
-
     // ==============================================================
     // LIVE PROCTOR MONITORING & REALTIME AUTO-UPDATE (SUPER LIGHTWEIGHT)
     // ==============================================================
@@ -4777,26 +5634,6 @@
         `;
       }).join('');
     }
-
-    // Modal / Popup Rincian Lembar Jawaban Siswa
-    window.viewStudentScoreDetail = function(username) {
-      const student = lastNilaiSessionsData.find(s => s.username === username);
-      if (!student) return;
-
-      const keys = lastNilaiAnswerKeys || { 1: 'C', 2: 'B', 3: 'C', 4: 'B', 5: 'C' };
-      const userAnswers = student.answers || {};
-
-      let detailHtml = `Rincian Hasil Pengerjaan Siswa:\nNama: ${student.full_name} (${student.username})\nKelas: ${student.class_name}\nNilai: ${student.score} (Benar: ${student.correct_count}, Salah: ${student.wrong_count})\nStatus: ${student.is_passed ? 'TUNTAS' : 'REMIDIAL'}\n\n`;
-
-      Object.keys(keys).forEach(qId => {
-        const key = keys[qId];
-        const studentAns = userAnswers[qId] ? userAnswers[qId].a : '-';
-        const isRight = studentAns === key;
-        detailHtml += `Soal #${qId}: Jawaban Siswa = [${studentAns}], Kunci = [${key}] -> ${isRight ? '✓ BENAR' : '✗ SALAH'}\n`;
-      });
-
-      alert(detailHtml);
-    };
 
     // ==============================================================
     // EKSPOR REKAP NILAI & ANALISIS BUTIR SOAL LENGKAP (EXCEL / .XLS)

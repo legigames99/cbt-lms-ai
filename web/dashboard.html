@@ -236,7 +236,7 @@
         </div>
         <div>
           <h1 class="font-bold text-sm text-white tracking-wide">CBT & LMS AI</h1>
-          <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">High-Concurrency 1.700</p>
+          <p class="text-[10px] text-indigo-400 uppercase tracking-wider font-semibold">Engine CBT & LMS AI</p>
         </div>
       </div>
 
@@ -365,7 +365,7 @@
           <div>
             <h3 class="text-xl font-bold text-white mb-1">Selamat Datang di Portal CBT & LMS Terintegrasi AI</h3>
             <p class="text-xs text-slate-400 max-w-2xl leading-relaxed">
-              Arsitektur Modular Monolith siap melayani 1.700 siswa secara bersamaan di atas server 4 Core CPU & 4GB RAM. Gunakan menu di sidebar untuk mengunggah soal, menjadwalkan ujian, dan memantau siswa secara langsung.
+              Sistem CBT & LMS siap melayani ujian serentak berkecepatan tinggi dengan enkripsi paket soal AES-256 dan pemantauan realtime. Gunakan menu di sidebar untuk mengunggah soal, mengatur jadwal ujian, dan memantau siswa secara langsung.
             </p>
           </div>
           <div class="hidden md:flex gap-3">
@@ -378,15 +378,15 @@
           </div>
         </div>
 
-        <!-- 4 Kotak Statistik Utama -->
+        <!-- 4 Kotak Statistik Utama (Live Terkoneksi ke Database Siswa & Jadwal) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
             <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
               <span>Siswa Terdaftar</span>
               <i class="fa-solid fa-user-graduate text-indigo-400"></i>
             </div>
-            <div id="statTotalStudents" class="text-3xl font-extrabold text-white font-mono">1.700</div>
-            <div class="text-[11px] text-slate-500 mt-1">Aktif di 32 Kelas Paralel</div>
+            <div id="statTotalStudents" class="text-3xl font-extrabold text-white font-mono">15</div>
+            <div id="statTotalStudentsSub" class="text-[11px] text-slate-400 mt-1">Aktif di database</div>
           </div>
 
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
@@ -394,8 +394,8 @@
               <span>Total Bank Soal</span>
               <i class="fa-solid fa-folder-open text-blue-400"></i>
             </div>
-            <div id="statTotalBanks" class="text-3xl font-extrabold text-white font-mono">12</div>
-            <div class="text-[11px] text-slate-500 mt-1">Total 650 Butir Soal</div>
+            <div id="statTotalBanks" class="text-3xl font-extrabold text-white font-mono">3</div>
+            <div id="statTotalBanksSub" class="text-[11px] text-slate-400 mt-1">Bank Soal Terdaftar</div>
           </div>
 
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
@@ -404,7 +404,7 @@
               <i class="fa-solid fa-clock-rotate-left text-amber-400"></i>
             </div>
             <div id="statActiveSchedules" class="text-3xl font-extrabold text-white font-mono">1</div>
-            <div class="text-[11px] text-amber-400 font-medium mt-1">Token: FISIKA26</div>
+            <div id="statActiveSchedulesSub" class="text-[11px] text-emerald-400 font-medium mt-1">Jadwal Aktif</div>
           </div>
 
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
@@ -413,7 +413,7 @@
               <i class="fa-solid fa-wifi text-emerald-400"></i>
             </div>
             <div id="statOnlineStudents" class="text-3xl font-extrabold text-emerald-400 font-mono">0</div>
-            <div class="text-[11px] text-slate-500 mt-1">Sinkronisasi Redis realtime</div>
+            <div class="text-[11px] text-slate-400 mt-1">Sinkronisasi realtime</div>
           </div>
         </div>
 
@@ -3267,6 +3267,28 @@
           updateProctorScheduleDropdown(json.data);
           if (typeof renderProctorHubSchedules === 'function') {
             renderProctorHubSchedules();
+          }
+
+          // Update Kotak Statistik Ujian Aktif di Dashboard Utama
+          const activeSchedules = currentSchedules.filter(s => s.is_active !== false);
+          const elStatActive = document.getElementById('statActiveSchedules');
+          if (elStatActive) elStatActive.innerText = activeSchedules.length;
+
+          const elStatActiveSub = document.getElementById('statActiveSchedulesSub');
+          if (elStatActiveSub) {
+            if (activeSchedules.length === 0) {
+              elStatActiveSub.innerText = 'Tidak ada jadwal ujian aktif';
+              elStatActiveSub.className = 'text-[11px] text-slate-500 font-medium mt-1';
+            } else {
+              const first = activeSchedules[0];
+              if (first.token_type === 'none') {
+                elStatActiveSub.innerText = `${activeSchedules.length} Jadwal Aktif (Bebas Token)`;
+                elStatActiveSub.className = 'text-[11px] text-emerald-400 font-medium mt-1';
+              } else {
+                elStatActiveSub.innerText = `Token: ${first.token_code}`;
+                elStatActiveSub.className = 'text-[11px] text-amber-400 font-medium mt-1';
+              }
+            }
           }
         }
       } catch (e) {
@@ -6850,6 +6872,16 @@
           classCounts[c] = (classCounts[c] || 0) + 1;
         });
         const totalAll = masterStudentsList.length;
+
+        // Update Kotak Statistik Siswa Terdaftar di Dashboard Utama secara Dinamis
+        const elStatStudents = document.getElementById('statTotalStudents');
+        if (elStatStudents) {
+          elStatStudents.innerText = totalAll.toLocaleString('id-ID');
+        }
+        const elStatClassSub = document.getElementById('statTotalStudentsSub');
+        if (elStatClassSub) {
+          elStatClassSub.innerText = `Aktif di ${classes.length} Kelas (${classes.join(', ')})`;
+        }
 
         const populateClassOptions = (elemId) => {
           const el = document.getElementById(elemId);

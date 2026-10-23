@@ -228,6 +228,35 @@
       </div>
     </div>
 
+    <!-- ACTION BAR: PENGELOLAAN & PENGHAPUSAN BUTIR SOAL (HAPUS SEMUA / HAPUS SEBAGIAN TERPILIH) -->
+    <div id="bulkActionBar" class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 px-4 shadow-lg flex flex-wrap items-center justify-between gap-3 text-xs no-print">
+      <!-- Sisi Kiri: Checkbox Pilih Semua & Indikator Jumlah Terpilih -->
+      <div class="flex items-center gap-3">
+        <label class="flex items-center gap-2.5 font-semibold text-slate-300 hover:text-white cursor-pointer select-none">
+          <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllQuestions(this.checked)" class="w-4 h-4 rounded accent-indigo-600 cursor-pointer">
+          <span id="selectAllLabel">Pilih Semua Soal</span>
+        </label>
+        <span id="selectedCountBadge" class="hidden px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[11px] font-bold">
+          0 Soal Dipilih
+        </span>
+      </div>
+
+      <!-- Sisi Kanan: Tombol Hapus Sebagian Terpilih & Tombol Hapus Semua -->
+      <div class="flex items-center gap-2.5 flex-wrap">
+        <!-- Tombol Hapus Sebagian (Aktif saat ada soal dicentang) -->
+        <button id="btnBulkDeleteSelected" onclick="handleBulkDeleteSelected()" disabled class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold transition flex items-center gap-2 shadow-lg shadow-rose-600/20 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-rose-600">
+          <i class="fa-regular fa-trash-can"></i>
+          <span id="btnBulkDeleteText">Hapus Soal Terpilih (0)</span>
+        </button>
+
+        <!-- Tombol Kosongkan / Hapus Semua Butir Soal -->
+        <button onclick="handleClearAllQuestions()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-rose-950/50 text-slate-300 hover:text-rose-300 border border-slate-700 hover:border-rose-500/40 font-semibold transition flex items-center gap-2" title="Kosongkan seluruh butir soal pada bank soal ini">
+          <i class="fa-solid fa-trash-can-arrow-up text-rose-400"></i>
+          <span>Kosongkan / Hapus Semua Soal</span>
+        </button>
+      </div>
+    </div>
+
     <!-- QUESTIONS LIST CONTAINER -->
     <div class="space-y-4" id="questionsContainer">
       <div class="p-12 text-center text-slate-500 border border-dashed border-slate-800 rounded-2xl">
@@ -1080,7 +1109,10 @@
           <div class="bg-slate-900 border border-slate-800 hover:border-slate-700/80 rounded-2xl p-5 shadow-lg space-y-3 transition print-card">
             <!-- Card Header -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800/80">
-              <div class="flex items-center gap-2 flex-wrap">
+              <div class="flex items-center gap-2.5 flex-wrap">
+                <label class="flex items-center cursor-pointer select-none" title="Pilih soal ini untuk dihapus sebagian">
+                  <input type="checkbox" class="question-item-checkbox w-4 h-4 rounded accent-indigo-600 cursor-pointer" value="${q.id}" onchange="handleQuestionItemCheckChange()">
+                </label>
                 <span class="w-7 h-7 rounded-lg bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 flex items-center justify-center font-bold text-xs font-mono">
                   #${q.id}
                 </span>
@@ -1390,7 +1422,9 @@
       openModal('modalAddQuestionManual');
     }
 
-    // 10. Delete Question
+    // 10. Manajemen Penghapusan Soal (Hapus Satu-satu, Hapus Sebagian Terpilih, & Hapus Semua)
+
+    // A. Hapus Satu Butir Soal (Per Item)
     async function handleDeleteQuestion(qId) {
       if (!confirm(`Apakah Anda yakin ingin menghapus butir soal #${qId}? Tindakan ini tidak dapat dibatalkan.`)) return;
       try {
@@ -1399,12 +1433,146 @@
         });
         const json = await res.json();
         if (!res.ok) throw new Error(json.message);
-        alert(json.message || 'Butir soal berhasil dihapus!');
         await loadActiveBank(activeBankId);
+        updateBulkDeleteUI();
       } catch (err) {
         alert('Gagal menghapus butir soal: ' + err.message);
       }
     }
+
+    // B. Checkbox "Pilih Semua Soal"
+    window.toggleSelectAllQuestions = function(isChecked) {
+      const checkboxes = document.querySelectorAll('.question-item-checkbox');
+      checkboxes.forEach(cb => {
+        cb.checked = isChecked;
+      });
+      updateBulkDeleteUI();
+    };
+
+    // C. Listener saat checkbox salah satu soal diubah
+    window.handleQuestionItemCheckChange = function() {
+      const allCheckboxes = document.querySelectorAll('.question-item-checkbox');
+      const checkedCount = document.querySelectorAll('.question-item-checkbox:checked').length;
+      const selectAll = document.getElementById('selectAllCheckbox');
+
+      if (selectAll) {
+        selectAll.checked = allCheckboxes.length > 0 && checkedCount === allCheckboxes.length;
+        selectAll.indeterminate = checkedCount > 0 && checkedCount < allCheckboxes.length;
+      }
+
+      updateBulkDeleteUI();
+    };
+
+    // D. Sinkronisasi tampilan tombol "Hapus Soal Terpilih"
+    function updateBulkDeleteUI() {
+      const checkedBoxes = document.querySelectorAll('.question-item-checkbox:checked');
+      const count = checkedBoxes.length;
+
+      const btnBulk = document.getElementById('btnBulkDeleteSelected');
+      const btnText = document.getElementById('btnBulkDeleteText');
+      const badge = document.getElementById('selectedCountBadge');
+
+      if (btnBulk) {
+        btnBulk.disabled = count === 0;
+      }
+      if (btnText) {
+        btnText.innerText = count > 0 ? `Hapus Soal Terpilih (${count})` : 'Hapus Soal Terpilih (0)';
+      }
+      if (badge) {
+        if (count > 0) {
+          badge.innerText = `${count} Soal Dipilih`;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
+    }
+
+    // E. Hapus Sebagian Butir Soal Terpilih (Bulk Delete)
+    window.handleBulkDeleteSelected = async function() {
+      const checkedBoxes = document.querySelectorAll('.question-item-checkbox:checked');
+      const ids = Array.from(checkedBoxes).map(cb => parseInt(cb.value, 10)).filter(Boolean);
+
+      if (ids.length === 0) {
+        alert('Silakan centang satu atau beberapa butir soal yang ingin dihapus terlebih dahulu.');
+        return;
+      }
+
+      const confirmMsg = `PERINGATAN: Anda akan menghapus ${ids.length} butir soal terpilih (ID: #${ids.join(', #')}) dari bank soal ini.\n\nApakah Anda yakin ingin melanjutkan?`;
+      if (!confirm(confirmMsg)) return;
+
+      const btn = document.getElementById('btnBulkDeleteSelected');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menghapus...';
+      }
+
+      try {
+        const res = await fetch(`/api/v1/cbt/question-banks/${activeBankId}/bulk-delete-questions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question_ids: ids })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+
+        alert(json.message || `Berhasil menghapus ${ids.length} butir soal!`);
+        await loadActiveBank(activeBankId);
+      } catch (err) {
+        alert('Gagal menghapus butir soal terpilih: ' + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fa-regular fa-trash-can"></i> <span id="btnBulkDeleteText">Hapus Soal Terpilih (0)</span>';
+        }
+        const selectAll = document.getElementById('selectAllCheckbox');
+        if (selectAll) {
+          selectAll.checked = false;
+          selectAll.indeterminate = false;
+        }
+        updateBulkDeleteUI();
+      }
+    };
+
+    // F. Hapus SEMUA Butir Soal Sekaligus (Kosongkan Bank Soal)
+    window.handleClearAllQuestions = async function() {
+      if (!currentBankData || !currentBankData.questions || currentBankData.questions.length === 0) {
+        alert('Bank soal ini sudah kosong. Tidak ada butir soal untuk dihapus.');
+        return;
+      }
+
+      const totalQ = currentBankData.questions.length;
+      const bankTitle = currentBankData.title || 'Bank Soal';
+
+      const confirmMsg = `⚠️ PERINGATAN KERAS!\n\nApakah Anda yakin ingin MENGHAPUS SEMUA BUTIR SOAL (${totalQ} butir) dari "${bankTitle}"?\n\nBank soal ini akan menjadi KOSONG dan tindakan ini TIDAK DAPAT DIBATALKAN!`;
+      if (!confirm(confirmMsg)) return;
+
+      const doubleCheck = prompt(`Ketik "HAPUS" untuk mengonfirmasi pengosongan seluruh ${totalQ} butir soal:`);
+      if (doubleCheck !== 'HAPUS' && doubleCheck !== 'hapus') {
+        alert('Pengosongan butir soal dibatalkan.');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/v1/cbt/question-banks/${activeBankId}/clear-all-questions`, {
+          method: 'POST'
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+
+        alert(json.message || 'Seluruh butir soal berhasil dikosongkan!');
+        await loadActiveBank(activeBankId);
+      } catch (err) {
+        alert('Gagal mengosongkan bank soal: ' + err.message);
+      } finally {
+        const selectAll = document.getElementById('selectAllCheckbox');
+        if (selectAll) {
+          selectAll.checked = false;
+          selectAll.indeterminate = false;
+        }
+        updateBulkDeleteUI();
+      }
+    };
 
     // 11. Test AI Essay Grader Modal
     function openTestAIEssayModal(bankId, qId) {

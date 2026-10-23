@@ -3492,6 +3492,58 @@ const server = http.createServer(async (req, res) => {
     }
     return sendJSON(404, { status: 'error', message: 'Bank soal atau butir soal tidak ditemukan' });
   }
+// POST /api/v1/cbt/question-banks/:id/bulk-delete-questions (Hapus Sebagian Butir Soal Terpilih)
+  if (pathname.startsWith('/api/v1/cbt/question-banks/') && pathname.endsWith('/bulk-delete-questions') && req.method === 'POST') {
+    const parts = pathname.split('/');
+    const bankId = parseInt(parts[5], 10);
+    const body = await parseBody(req);
+    const ids = Array.isArray(body.question_ids) ? body.question_ids.map(Number) : [];
+
+    const bank = QUESTION_BANKS.find(b => b.id === bankId);
+    if (!bank) {
+      return sendJSON(404, { status: 'error', message: 'Bank soal tidak ditemukan' });
+    }
+
+    if (ids.length === 0) {
+      return sendJSON(400, { status: 'error', message: 'Tidak ada butir soal yang dipilih untuk dihapus' });
+    }
+
+    const beforeCount = (bank.questions || []).length;
+    const deleteSet = new Set(ids);
+    bank.questions = (bank.questions || []).filter(q => !deleteSet.has(Number(q.id)));
+    const deletedCount = beforeCount - bank.questions.length;
+
+    saveQuestionBanksToFile();
+    compileAndEncryptPackage();
+
+    return sendJSON(200, {
+      status: 'success',
+      message: `Berhasil menghapus ${deletedCount} butir soal terpilih dari bank soal!`,
+      data: { deletedCount, remainingCount: bank.questions.length }
+    });
+  }
+
+  // POST /api/v1/cbt/question-banks/:id/clear-all-questions (Hapus SEMUA Butir Soal Sekaligus / Kosongkan Bank)
+  if (pathname.startsWith('/api/v1/cbt/question-banks/') && pathname.endsWith('/clear-all-questions') && req.method === 'POST') {
+    const parts = pathname.split('/');
+    const bankId = parseInt(parts[5], 10);
+    const bank = QUESTION_BANKS.find(b => b.id === bankId);
+    if (!bank) {
+      return sendJSON(404, { status: 'error', message: 'Bank soal tidak ditemukan' });
+    }
+
+    const totalDeleted = (bank.questions || []).length;
+    bank.questions = [];
+
+    saveQuestionBanksToFile();
+    compileAndEncryptPackage();
+
+    return sendJSON(200, {
+      status: 'success',
+      message: `Seluruh butir soal (${totalDeleted} butir) berhasil dikosongkan dari bank soal "${bank.title}"!`,
+      data: { totalDeleted, remainingCount: 0 }
+    });
+  }
 
   // POST /api/v1/cbt/ai/grade-essay (Penilaian Esai Berbasis AI)
   if (pathname === '/api/v1/cbt/ai/grade-essay' && req.method === 'POST') {

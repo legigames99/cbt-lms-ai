@@ -5064,7 +5064,10 @@
       const pct = document.getElementById('aiModalPercent');
 
       const bankId = parseInt(document.getElementById('aiTargetBank')?.value, 10) || 1;
-      const topic = document.getElementById('aiTopicInput')?.value.trim() || 'Hukum Termodinamika & Kalor';
+      const basisRadio = document.querySelector('input[name="aiBasisRadio"]:checked');
+      const basisType = basisRadio ? basisRadio.value : 'materi';
+      const basisText = document.getElementById('aiTopicInput')?.value.trim() || 'Hukum Termodinamika & Kalor';
+      const topic = basisText;
       const questionType = document.getElementById('aiQuestionType')?.value || 'all';
       const cogLevel = document.getElementById('aiCogLevel')?.value || 'mixed';
       const count = parseInt(document.getElementById('aiCountInput')?.value, 10) || 5;

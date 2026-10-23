@@ -505,29 +505,78 @@ function safeParseQuestionsJSON(rawText) {
   const BT3 = String.fromCharCode(96).repeat(3);
   let cleaned = rawText.split(BT3 + 'json').join('').split(BT3).join('').trim();
 
-  // Percobaan 1: Parse langsung
-  try {
-    const parsed = JSON.parse(cleaned);
-    if (Array.isArray(parsed)) return parsed;
-    if (parsed.questions && Array.isArray(parsed.questions)) return parsed.questions;
-  } catch (err1) {
-    // Percobaan 2: Repair jika terpotong di akhir output
-    const lastBrace = cleaned.lastIndexOf('}');
-    if (lastBrace !== -1) {
-      const trimmed = cleaned.substring(0, lastBrace + 1) + ']';
+  // Ekstrak blok array [...] jika ada teks intro/outro dari AI
+  const firstBracket = cleaned.indexOf('[');
+  const lastBracket = cleaned.lastIndexOf(']');
+  let arraySlice = '';
+  if (firstBracket !== -1 && lastBracket > firstBracket) {
+    arraySlice = cleaned.substring(firstBracket, lastBracket + 1);
+  }
+
+  // Percobaan 1: Parse arraySlice atau cleaned langsung
+  const targets = [arraySlice, cleaned].filter(Boolean);
+  for (const t of targets) {
+    try {
+      const parsed = JSON.parse(t);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (parsed.questions && Array.isArray(parsed.questions) && parsed.questions.length > 0) return parsed.questions;
+      if (parsed.soal && Array.isArray(parsed.soal) && parsed.soal.length > 0) return parsed.soal;
+      if (parsed.data && Array.isArray(parsed.data) && parsed.data.length > 0) return parsed.data;
+    } catch (e1) {}
+  }
+
+  // Percobaan 2: Sanitasi kontrol karakter ilegal di dalam string JSON
+  for (const t of targets) {
+    try {
+      const sanitized = t.replace(/[\u0000-\u0009\u000B\u000C\u000E-\u001F]/g, '');
+      const parsed = JSON.parse(sanitized);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (parsed.questions && Array.isArray(parsed.questions)) return parsed.questions;
+      if (parsed.soal && Array.isArray(parsed.soal)) return parsed.soal;
+    } catch (e2) {}
+  }
+
+  // Percobaan 3: Repair jika output terpotong di akhir (truncated JSON)
+  const baseForRepair = arraySlice || cleaned;
+  const lastBrace = baseForRepair.lastIndexOf('}');
+  if (lastBrace !== -1) {
+    const firstBrace = baseForRepair.indexOf('{');
+    if (firstBrace !== -1 && lastBrace > firstBrace) {
+      const trimmed = '[' + baseForRepair.substring(firstBrace, lastBrace + 1) + ']';
       try {
         const repaired = JSON.parse(trimmed);
         if (Array.isArray(repaired) && repaired.length > 0) {
-          console.log(`[Gemini AI] JSON dipulihkan (repaired): Berhasil menyelamatkan ${repaired.length} butir soal lengkap!`);
+          console.log(`[Gemini AI] JSON dipulihkan (repaired truncated): Berhasil menyelamatkan ${repaired.length} butir soal lengkap!`);
           return repaired;
         }
-      } catch (err2) {}
+      } catch (err3) {}
     }
   }
+
+  // Percobaan 4: Ekstraksi objek individu satu per satu dengan regex
+  try {
+    const itemMatches = cleaned.match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g);
+    if (itemMatches && itemMatches.length > 0) {
+      const recovered = [];
+      for (const itemStr of itemMatches) {
+        try {
+          const item = JSON.parse(itemStr);
+          if (item && (item.stem || item.type || item.options)) {
+            recovered.push(item);
+          }
+        } catch (itemErr) {}
+      }
+      if (recovered.length > 0) {
+        console.log(`[Gemini AI] JSON dipulihkan parsial via regex item extractor: ${recovered.length} butir soal berhasil diselamatkan!`);
+        return recovered;
+      }
+    }
+  } catch (err4) {}
+
   return null;
 }
 
-function executeSingleGeminiRequest(endpointModel, apiKey, payloadJson) {
+function executeSingleGeminiRequest(endpointModel, apiKey, payloadJson, timeoutMs = 25000) {
   return new Promise((resolve, reject) => {
     const https = require('https');
     const req = https.request("https://generativelanguage.googleapis.com/v1beta/models/" + endpointModel + ":generateContent?key=" + encodeURIComponent(apiKey), {
@@ -536,7 +585,7 @@ function executeSingleGeminiRequest(endpointModel, apiKey, payloadJson) {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(payloadJson)
       },
-      timeout: 38000
+      timeout: timeoutMs
     }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
@@ -549,6 +598,7 @@ function executeSingleGeminiRequest(endpointModel, apiKey, payloadJson) {
             if (questions && Array.isArray(questions) && questions.length > 0) {
               return resolve(questions);
             }
+            console.warn(`[Gemini AI] Parsing gagal pada output model ${endpointModel} (${rawText ? rawText.length : 0} bytes). Snippet: ${(rawText || '').substring(0, 120)}...`);
             return reject(new Error("Format output JSON tidak dapat diparsing"));
           }
           reject(new Error("Gemini API HTTP " + res.statusCode + ": " + data.substring(0, 160)));
@@ -559,7 +609,7 @@ function executeSingleGeminiRequest(endpointModel, apiKey, payloadJson) {
     });
 
     req.on('error', reject);
-    req.on('timeout', () => { req.destroy(); reject(new Error('Koneksi ke Gemini API timeout (38s)')); });
+    req.on('timeout', () => { req.destroy(); reject(new Error(`Koneksi ke Gemini API (${endpointModel}) timeout (${Math.round(timeoutMs/1000)}s)`)); });
     req.write(payloadJson);
     req.end();
   });
@@ -639,17 +689,20 @@ async function callGoogleGeminiAPI({ apiKey, model, basis_type = 'materi', basis
   const uniqueCandidates = [...new Set(candidateModels)];
 
   let lastError = null;
-  for (const tryModel of uniqueCandidates) {
+  for (let i = 0; i < uniqueCandidates.length; i++) {
+    const tryModel = uniqueCandidates[i];
+    // Model pertama diberi waktu 25s, sedangkan model cadangan (failover) dibatasi 15s agar pengguna tidak menunggu berlarut-larut
+    const timeoutMs = (i === 0) ? 25000 : 15000;
     try {
-      console.log("[Gemini AI] Menghubungi Google Gemini API (" + tryModel + ") - Basis: " + basis_type.toUpperCase() + "...");
-      const questions = await executeSingleGeminiRequest(tryModel, apiKey, payload);
+      console.log(`[Gemini AI] Menghubungi Google Gemini API (${tryModel}, timeout ${Math.round(timeoutMs/1000)}s) - Basis: ${basis_type.toUpperCase()}...`);
+      const questions = await executeSingleGeminiRequest(tryModel, apiKey, payload, timeoutMs);
       if (questions && Array.isArray(questions) && questions.length > 0) {
-        console.log("[Gemini AI] SUKSES! Berhasil mengunduh " + questions.length + " butir soal HOTS dari Google Gemini API (" + tryModel + ").");
+        console.log(`[Gemini AI] SUKSES! Berhasil mengunduh ${questions.length} butir soal HOTS dari Google Gemini API (${tryModel}).`);
         return { questions, usedModel: tryModel };
       }
     } catch (err) {
       lastError = err;
-      console.warn("[Gemini AI] Model " + tryModel + " gagal (" + err.message + "). Mencoba kandidat failover berikutnya...");
+      console.warn(`[Gemini AI] Model ${tryModel} gagal (${err.message}). Mencoba kandidat failover berikutnya...`);
     }
   }
 

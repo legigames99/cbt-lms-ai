@@ -2239,54 +2239,173 @@
     </div>
   </div>
 
-  <!-- ==================== MODAL 3: GENERATOR SOAL AI ==================== -->
-  <div id="modalAIGenerator" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+  <!-- ==================== MODAL 3: GENERATOR SOAL AI (GEMINI FLASH & BYOK) ==================== -->
+  <div id="modalAIGenerator" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto custom-scrollbar">
       <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-        <h4 class="text-sm font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> AI Question Generator (Gemini Engine)
-        </h4>
+        <div>
+          <h4 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> AI Question Generator (Google Gemini Flash & BYOK)
+          </h4>
+          <p class="text-[11px] text-slate-400 mt-0.5">Hasilkan butir soal standar TKA SMA/SMK otomatis dengan model Gemini Flash & pilihan API key.</p>
+        </div>
         <button onclick="closeModal('modalAIGenerator')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="block font-semibold text-slate-300 mb-1">Materi Sumber Pembelajaran</label>
-          <select class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
-            <option>Hukum Termodinamika & Kekekalan Energi (Bab 1)</option>
-          </select>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
+      <div class="space-y-3.5 text-xs">
+        <!-- Target Bank Soal & Materi Pembelajaran -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block font-semibold text-slate-300 mb-1">Jumlah Butir Soal</label>
-            <input type="number" id="aiCountInput" value="5" min="1" max="50" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
+            <label class="block font-semibold text-slate-300 mb-1">Target Bank Soal Tujuan</label>
+            <select id="aiTargetBank" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-medium focus:border-indigo-500">
+              <option value="1">1. Bank Soal Termodinamika & Kalor</option>
+              <option value="2">2. Bank Asesmen Standar TKA SMA & SMK</option>
+              <option value="3">3. Bank Soal Aljabar & Matriks</option>
+              <option value="4">4. Bank Soal Teks Editorial & Puisi</option>
+            </select>
           </div>
           <div>
-            <label class="block font-semibold text-slate-300 mb-1">Model AI</label>
-            <input type="text" value="gemini-2.5-flash" disabled class="w-full bg-slate-950/60 border border-slate-800 rounded-xl p-2.5 text-slate-400">
+            <label class="block font-semibold text-slate-300 mb-1">Materi / Topik Pembelajaran</label>
+            <input type="text" id="aiTopicInput" value="Hukum Termodinamika & Siklus Carnot" placeholder="Contoh: Termodinamika, Aljabar Linear, Teks Biografi" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:border-indigo-500">
           </div>
-        </div>
-        <div>
-          <label class="block font-semibold text-slate-300 mb-1">Instruksi Khusus (Opsional)</label>
-          <textarea id="aiPromptExtra" rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white" placeholder="Contoh: Fokuskan pada soal kontekstual mesin Carnot dan aplikasi industri."></textarea>
         </div>
 
-        <!-- Progress SSE -->
-        <div id="aiModalProgress" class="hidden p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+        <!-- Format Soal CBT & Tingkat Kognitif Bloom -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-indigo-300 mb-1">
+              <i class="fa-solid fa-layer-group text-indigo-400 mr-1"></i>Jenis / Format Soal (Standar CBT & TKA)
+            </label>
+            <select id="aiQuestionType" class="w-full bg-slate-950 border border-indigo-500/40 rounded-xl p-2.5 text-white font-bold text-indigo-300 focus:border-indigo-500">
+              <option value="all" selected>⚡ Campuran Semua Format TKA (Rekomendasi ANBK)</option>
+              <option value="mcq">Pilihan Ganda Tunggal (PG Biasa 5 Opsi)</option>
+              <option value="mcq_complex">Pilihan Ganda Kompleks (Multi-Jawaban)</option>
+              <option value="true_false">Pernyataan Benar / Salah (Matriks B/S)</option>
+              <option value="matching">Menjodohkan (Matching Pairs)</option>
+              <option value="short_essay">Isian Singkat (Short Answer)</option>
+              <option value="long_essay">Uraian / Esai Panjang AI (Rubrik & Jawaban)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Tingkat Kognitif (Taksonomi Bloom)</label>
+            <select id="aiCogLevel" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:border-indigo-500">
+              <option value="mixed" selected>Variasi Bertingkat (C1 s/d C6)</option>
+              <option value="C1">C1 - Mengingat</option>
+              <option value="C2">C2 - Memahami</option>
+              <option value="C3">C3 - Menerapkan</option>
+              <option value="C4">C4 - Menganalisis (HOTS)</option>
+              <option value="C5">C5 - Mengevaluasi (HOTS)</option>
+              <option value="C6">C6 - Mencipta (HOTS)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Jumlah Butir Soal & Pilihan Model AI (Gemini Flash Series) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Jumlah Butir Soal</label>
+            <div class="flex items-center gap-2">
+              <input type="number" id="aiCountInput" value="5" min="1" max="20" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-mono font-bold focus:border-indigo-500">
+              <span class="text-slate-500 text-xs shrink-0">soal (1-20)</span>
+            </div>
+          </div>
+          <div>
+            <label class="block font-semibold text-indigo-300 mb-1">
+              <i class="fa-solid fa-microchip text-indigo-400 mr-1"></i>Pilihan Model AI (Gemini Flash Series)
+            </label>
+            <select id="aiModelSelect" class="w-full bg-slate-950 border border-indigo-500/40 rounded-xl p-2.5 text-white font-medium focus:border-indigo-500">
+              <option value="gemini-3.5-flash-lite">⚡ Gemini 3.5 Flash Lite (Super Cepat & Efisien)</option>
+              <option value="gemini-3.5-flash" selected>🔥 Gemini 3.5 Flash (Keseimbangan Terbaik - Standar)</option>
+              <option value="gemini-3.6-flash">🚀 Gemini 3.6 Flash (Penalaran TKA Ditingkatkan)</option>
+              <option value="gemini-3.7-flash">✨ Gemini 3.7 Flash (Hybrid Reasoning & Multimodal)</option>
+              <option value="gemini-3.8-flash">🌟 Gemini 3.8 Flash (Deep Cognitive & HOTS SMA/SMK)</option>
+              <option value="gemini-2.5-flash">🔹 Gemini 2.5 Flash</option>
+              <option value="gemini-1.5-flash">🔹 Gemini 1.5 Flash (Legacy Stable)</option>
+              <option value="gemini-1.5-pro">🔹 Gemini 1.5 Pro (Deep Analytics)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Konfigurasi Kredensial AI & Konsep BYOK (Bring Your Own Key) -->
+        <div class="bg-slate-950/80 border border-indigo-500/30 rounded-xl p-3.5 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-indigo-300 flex items-center gap-1.5 text-xs">
+              <i class="fa-solid fa-key text-amber-400"></i> Sumber Kredensial & API Key Gemini
+            </span>
+            <span id="aiServerKeyBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">
+              <i class="fa-solid fa-circle-check mr-1"></i>Kunci Server Aktif
+            </span>
+          </div>
+
+          <!-- Radio Switcher: Server Admin Key vs BYOK -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <label class="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-900/60 cursor-pointer hover:border-slate-700 transition">
+              <input type="radio" name="aiApiSourceRadio" value="server" checked onchange="toggleByokMode(false)" class="mt-0.5 accent-indigo-600">
+              <div>
+                <strong class="text-white block text-xs">Kunci API Server (Admin Global)</strong>
+                <p class="text-[10px] text-slate-400 mt-0.5">Menggunakan API Key Gemini sekolah terpusat. Guru langsung pakai tanpa input key.</p>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-900/60 cursor-pointer hover:border-slate-700 transition">
+              <input type="radio" name="aiApiSourceRadio" value="byok" onchange="toggleByokMode(true)" class="mt-0.5 accent-indigo-600">
+              <div>
+                <strong class="text-amber-300 block text-xs">BYOK (Kunci Pribadi Guru)</strong>
+                <p class="text-[10px] text-slate-400 mt-0.5">Gunakan Google Gemini API Key Anda sendiri dari Google AI Studio.</p>
+              </div>
+            </label>
+          </div>
+
+          <!-- BYOK Input Box (Tampil saat opsi BYOK dipilih) -->
+          <div id="byokInputContainer" class="hidden space-y-2 pt-2 border-t border-slate-800/80">
+            <label class="block font-semibold text-slate-300 text-[11px]">Masukkan Google Gemini API Key Anda (BYOK):</label>
+            <div class="flex items-center gap-2">
+              <div class="relative flex-1">
+                <input type="password" id="aiByokKeyInput" placeholder="Tempelkan API Key (AIzaSy...)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-indigo-500">
+                <button type="button" onclick="toggleByokKeyVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white" title="Lihat/Sembunyikan API Key">
+                  <i id="btnByokEyeIcon" class="fa-regular fa-eye"></i>
+                </button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-slate-400">
+              <label class="flex items-center gap-1.5 cursor-pointer">
+                <input type="checkbox" id="aiSaveByokLocal" checked class="rounded accent-indigo-600">
+                <span>Simpan di peramban ini (localStorage)</span>
+              </label>
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline font-semibold flex items-center gap-1">
+                <span>Dapatkan API Key Gratis</span>
+                <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instruksi Khusus (Opsional) -->
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Instruksi Khusus / Konteks Tambahan (Opsional)</label>
+          <textarea id="aiPromptExtra" rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none focus:border-indigo-500" placeholder="Contoh: Fokuskan pada soal kontekstual mesin Carnot, efisiensi energi, dan aplikasi industri modern."></textarea>
+        </div>
+
+        <!-- Progress SSE / Generation Status -->
+        <div id="aiModalProgress" class="hidden p-3 bg-slate-950 rounded-xl border border-indigo-500/40 space-y-2">
           <div class="flex justify-between items-center text-[11px]">
-            <span id="aiModalStatus" class="text-slate-300 font-medium">Menghasilkan soal...</span>
-            <span id="aiModalPercent" class="text-indigo-400 font-bold">0%</span>
+            <span id="aiModalStatus" class="text-slate-300 font-medium flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-notch fa-spin text-indigo-400"></i>
+              <span>Menghubungkan ke Gemini AI Engine...</span>
+            </span>
+            <span id="aiModalPercent" class="text-indigo-400 font-bold font-mono">0%</span>
           </div>
           <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
-            <div id="aiModalBar" class="bg-indigo-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            <div id="aiModalBar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
           </div>
         </div>
       </div>
 
       <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
-        <button onclick="closeModal('modalAIGenerator')" class="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-700 transition">Batal</button>
-        <button id="btnTriggerAI" onclick="triggerAIServer()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-xs font-bold text-white transition shadow-lg shadow-indigo-600/30 flex items-center gap-1.5">
-          <i class="fa-solid fa-robot"></i> Mulai Generate
+        <button type="button" onclick="closeModal('modalAIGenerator')" class="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-700 transition">Batal</button>
+        <button type="button" id="btnTriggerAI" onclick="triggerAIServer()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-xs font-bold text-white transition shadow-lg shadow-indigo-600/30 flex items-center gap-2">
+          <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+          <span>Mulai Generate Soal AI</span>
         </button>
       </div>
     </div>
@@ -3140,6 +3259,26 @@
       fetchMasterStudents();
       fetchQuestionBanks();
 
+      // Inisialisasi Kredensial AI & BYOK
+      const savedByokKey = localStorage.getItem('cbt_user_gemini_key');
+      const byokInput = document.getElementById('aiByokKeyInput');
+      if (savedByokKey && byokInput) byokInput.value = savedByokKey;
+
+      fetch('/api/v1/cbt/ai/config')
+        .then(r => r.json())
+        .then(res => {
+          const badge = document.getElementById('aiServerKeyBadge');
+          if (badge && res.data) {
+            if (res.data.has_server_key) {
+              badge.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-400"></i>Kunci Server Aktif (${res.data.server_key_masked || 'Tersedia'})`;
+              badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold';
+            } else {
+              badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1 text-amber-400"></i>Kunci Server Belum Diatur (Disarankan BYOK)`;
+              badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold';
+            }
+          }
+        }).catch(() => {});
+
       // Auto-update live monitoring sesi ujian siswa secara realtime (setiap 2 detik)
       fetchProctorSessions();
       setInterval(fetchProctorSessions, 2000);
@@ -3296,8 +3435,13 @@
 
     function populateBankSelectDropdown(banks) {
       const select = document.getElementById('manualBankId');
-      if (!select || !banks || banks.length === 0) return;
-      select.innerHTML = banks.map(b => `<option value="${b.id}" ${b.id === currentActiveBankId ? 'selected' : ''}>${b.id}. ${b.title} (${b.subject})</option>`).join('');
+      if (select && banks && banks.length > 0) {
+        select.innerHTML = banks.map(b => `<option value="${b.id}" ${b.id === currentActiveBankId ? 'selected' : ''}>${b.id}. ${b.title} (${b.subject})</option>`).join('');
+      }
+      const aiSelect = document.getElementById('aiTargetBank');
+      if (aiSelect && banks && banks.length > 0) {
+        aiSelect.innerHTML = banks.map(b => `<option value="${b.id}" ${b.id === currentActiveBankId ? 'selected' : ''}>${b.id}. ${b.title} (${b.subject})</option>`).join('');
+      }
     }
 
     function renderBankSoalGrid(banks) {
@@ -3999,6 +4143,28 @@
       alert('Import berhasil! Butir soal telah digabungkan ke dalam bank soal aktif.');
     };
 
+    // Toggle BYOK Mode (Server Key vs BYOK Key)
+    window.toggleByokMode = function(isByok) {
+      const container = document.getElementById('byokInputContainer');
+      if (container) {
+        if (isByok) container.classList.remove('hidden');
+        else container.classList.add('hidden');
+      }
+    };
+
+    window.toggleByokKeyVisibility = function() {
+      const input = document.getElementById('aiByokKeyInput');
+      const icon = document.getElementById('btnByokEyeIcon');
+      if (!input || !icon) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-regular fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-regular fa-eye';
+      }
+    };
+
     // AI Trigger
     window.triggerAIServer = async function() {
       const btn = document.getElementById('btnTriggerAI');
@@ -4007,43 +4173,78 @@
       const st = document.getElementById('aiModalStatus');
       const pct = document.getElementById('aiModalPercent');
 
+      const bankId = parseInt(document.getElementById('aiTargetBank')?.value, 10) || 1;
+      const topic = document.getElementById('aiTopicInput')?.value.trim() || 'Hukum Termodinamika & Kalor';
+      const questionType = document.getElementById('aiQuestionType')?.value || 'all';
+      const cogLevel = document.getElementById('aiCogLevel')?.value || 'mixed';
+      const count = parseInt(document.getElementById('aiCountInput')?.value, 10) || 5;
+      const model = document.getElementById('aiModelSelect')?.value || 'gemini-3.5-flash';
+      const apiSourceRadio = document.querySelector('input[name="aiApiSourceRadio"]:checked');
+      const apiSource = apiSourceRadio ? apiSourceRadio.value : 'server';
+      const byokKey = document.getElementById('aiByokKeyInput')?.value.trim() || '';
+      const saveLocal = document.getElementById('aiSaveByokLocal')?.checked;
+      const promptExtra = document.getElementById('aiPromptExtra')?.value.trim() || '';
+
+      if (apiSource === 'byok' && !byokKey) {
+        alert('Silakan masukkan Google Gemini API Key Anda, atau pilih opsi "Kunci API Server".');
+        return;
+      }
+
+      if (apiSource === 'byok' && saveLocal && byokKey) {
+        localStorage.setItem('cbt_user_gemini_key', byokKey);
+      }
+
       btn.disabled = true;
       prog.classList.remove('hidden');
-      bar.style.width = '20%';
-      pct.innerText = '20%';
-      st.innerText = 'Menghubungkan ke Gemini AI Engine...';
+      bar.style.width = '25%';
+      pct.innerText = '25%';
+      st.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-indigo-400"></i> Menghubungi ${model} Engine...`;
 
       try {
-        const res = await fetch('/api/v1/ai/generate-questions', {
+        setTimeout(() => {
+          if (bar.style.width === '25%') {
+            bar.style.width = '65%';
+            pct.innerText = '65%';
+            st.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-indigo-400"></i> Menyusun butir soal standar TKA (${questionType})...`;
+          }
+        }, 700);
+
+        const res = await fetch('/api/v1/cbt/ai/generate-questions', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-          body: JSON.stringify({ question_count: 5 })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bank_id: bankId,
+            topic: topic,
+            question_type: questionType,
+            cog_level: cogLevel,
+            count: count,
+            model: model,
+            api_source: apiSource,
+            api_key: byokKey,
+            custom_prompt: promptExtra
+          })
         });
+
         const json = await res.json();
-        const ev = new EventSource(json.stream_url);
+        if (!res.ok) throw new Error(json.message || 'Gagal menghasilkan butir soal');
 
-        ev.addEventListener('progress', (e) => {
-          const d = JSON.parse(e.data);
-          bar.style.width = '60%';
-          pct.innerText = '60%';
-          st.innerText = d.message;
-        });
+        bar.style.width = '100%';
+        pct.innerText = '100%';
+        st.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> Selesai! ${json.message}`;
 
-        ev.addEventListener('completed', (e) => {
-          const d = JSON.parse(e.data);
-          bar.style.width = '100%';
-          pct.innerText = '100%';
-          st.innerText = d.message;
-          ev.close();
+        await fetchQuestionBanks();
+
+        setTimeout(() => {
+          closeModal('modalAIGenerator');
           btn.disabled = false;
-          setTimeout(() => {
-            closeModal('modalAIGenerator');
-            alert('5 Soal AI berhasil dibuat dan dimasukkan ke bank soal!');
-          }, 800);
-        });
+          prog.classList.add('hidden');
+          bar.style.width = '0%';
+          alert(json.message || `Berhasil menambahkan ${count} butir soal AI ke Bank Soal!`);
+        }, 800);
       } catch (err) {
         btn.disabled = false;
-        alert(err.message);
+        prog.classList.add('hidden');
+        alert('Gagal generate butir soal: ' + err.message);
       }
     };
 

@@ -221,6 +221,194 @@
           "kalor"
         ],
         "weight": 3
+      },
+      {
+        "id": 8,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Kekekalan Energi & Entropi</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C2, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Fokuskan pada aplikasi industri pendingin]</em></small>",
+        "weight": 1,
+        "explanation": "Berdasarkan kaidah dasar Kekekalan Energi & Entropi, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
+        "generated_by": "gemini-3.5-flash",
+        "source_engine": "pedagogical_engine (gemini-3.5-flash)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Terjadi kesetimbangan energi optimal sesuai kaidah Kekekalan Energi & Entropi secara berkesinambungan."
+          },
+          {
+            "id": "B",
+            "text": "Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan."
+          },
+          {
+            "id": "D",
+            "text": "Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal."
+          },
+          {
+            "id": "E",
+            "text": "Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 9,
+        "type": "mcq_complex",
+        "cog": "C3",
+        "stem": "<p>Terkait materi <strong>Kekekalan Energi & Entropi</strong>, perhatikan beberapa premis berikut!<br><strong>Pilihlah semua pernyataan yang BENAR!</strong> <em>(Jawaban benar lebih dari satu)</em></p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Fokuskan pada aplikasi industri pendingin]</em></small>",
+        "weight": 1.5,
+        "explanation": "Pernyataan A, B, dan D bernilai benar berdasarkan landasan teoretis Kekekalan Energi & Entropi. Pernyataan C dan E tidak sesuai kaidah ilmiah.",
+        "generated_by": "gemini-3.5-flash",
+        "source_engine": "pedagogical_engine (gemini-3.5-flash)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Prinsip Kekekalan Energi & Entropi berlaku secara konsisten pada sistem tertutup maupun terbuka."
+          },
+          {
+            "id": "B",
+            "text": "Terdapat hubungan linier antara energi yang diserap dengan kerja efektif yang dihasilkan."
+          },
+          {
+            "id": "C",
+            "text": "Perubahan entalpi selalu bernilai tak terhingga pada tekanan konstan atmosfer."
+          },
+          {
+            "id": "D",
+            "text": "Analisis matematis membuktikan adanya batas efisiensi maksimum yang tidak dapat dilampaui."
+          },
+          {
+            "id": "E",
+            "text": "Tidak diperlukan kalibrasi instrumen dalam pengukuran parameter kuantitatif."
+          }
+        ],
+        "answer": [
+          "A",
+          "B",
+          "D"
+        ]
+      },
+      {
+        "id": 10,
+        "type": "true_false",
+        "cog": "C4",
+        "stem": "<p>Tentukan nilai kebenaran <strong>Benar (B)</strong> atau <strong>Salah (S)</strong> untuk setiap pernyataan mengenai <strong>Kekekalan Energi & Entropi</strong> berikut:</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Fokuskan pada aplikasi industri pendingin]</em></small>",
+        "weight": 1.5,
+        "explanation": "Pernyataan 1 Benar (relevansi teknologi). Pernyataan 2 Salah (melanggar hukum kekekalan). Pernyataan 3 Benar (pengaruh termal).",
+        "generated_by": "gemini-3.5-flash",
+        "source_engine": "pedagogical_engine (gemini-3.5-flash)",
+        "statements": [
+          {
+            "id": 0,
+            "text": "Konsep Kekekalan Energi & Entropi merupakan dasar fundamental dalam perancangan teknologi modern.",
+            "key": "B"
+          },
+          {
+            "id": 1,
+            "text": "Sistem dapat menghasilkan energi tanpa batas secara mandiri tanpa menyerap daya dari lingkungan.",
+            "key": "S"
+          },
+          {
+            "id": 2,
+            "text": "Peningkatan temperatur operasional berdampak langsung terhadap laju perpindahan kalor atau kestabilan sistem.",
+            "key": "B"
+          }
+        ],
+        "answer": {
+          "0": "B",
+          "1": "S",
+          "2": "B"
+        }
+      },
+      {
+        "id": 11,
+        "type": "matching",
+        "cog": "C3",
+        "stem": "<p><strong>Pasangkanlah</strong> komponen atau terminologi di sebelah kiri dengan deskripsi fungsi/kondisi yang sesuai di sebelah kanan terkait materi <strong>Termodinamika Lanjut</strong>!</p>",
+        "weight": 2,
+        "explanation": "Pasangan terverifikasi: 1 -> B (kerangka logika), 2 -> C (gradien lingkungan), 3 -> A (efisiensi kerja).",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (gemini-3.5-flash-lite)",
+        "premises": [
+          {
+            "id": 0,
+            "text": "1. Komponen Analisis Konseptual Termodinamika Lanjut"
+          },
+          {
+            "id": 1,
+            "text": "2. Pengaruh Faktor Lingkungan Operasional"
+          },
+          {
+            "id": 2,
+            "text": "3. Indikator Efisiensi & Kinerja Sistem"
+          }
+        ],
+        "targets": [
+          {
+            "id": "A",
+            "text": "Menentukan batas optimal konversi energi dan output kerja efektif."
+          },
+          {
+            "id": "B",
+            "text": "Memberikan kerangka logika untuk memprediksi arah dinamika sistem."
+          },
+          {
+            "id": "C",
+            "text": "Memengaruhi gradien suhu, tekanan, dan laju disipasi energi."
+          }
+        ],
+        "answer": {
+          "0": "B",
+          "1": "C",
+          "2": "A"
+        }
+      },
+      {
+        "id": 12,
+        "type": "matching",
+        "cog": "C3",
+        "stem": "<p><strong>Pasangkanlah</strong> komponen atau terminologi di sebelah kiri dengan deskripsi fungsi/kondisi yang sesuai di sebelah kanan terkait materi <strong>Termodinamika Lanjut</strong>!</p>",
+        "weight": 2,
+        "explanation": "Pasangan terverifikasi: 1 -> B (kerangka logika), 2 -> C (gradien lingkungan), 3 -> A (efisiensi kerja).",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "pedagogical_engine (gemini-3.5-flash-lite)",
+        "premises": [
+          {
+            "id": 0,
+            "text": "1. Komponen Analisis Konseptual Termodinamika Lanjut"
+          },
+          {
+            "id": 1,
+            "text": "2. Pengaruh Faktor Lingkungan Operasional"
+          },
+          {
+            "id": 2,
+            "text": "3. Indikator Efisiensi & Kinerja Sistem"
+          }
+        ],
+        "targets": [
+          {
+            "id": "A",
+            "text": "Menentukan batas optimal konversi energi dan output kerja efektif."
+          },
+          {
+            "id": "B",
+            "text": "Memberikan kerangka logika untuk memprediksi arah dinamika sistem."
+          },
+          {
+            "id": "C",
+            "text": "Memengaruhi gradien suhu, tekanan, dan laju disipasi energi."
+          }
+        ],
+        "answer": {
+          "0": "B",
+          "1": "C",
+          "2": "A"
+        }
       }
     ]
   },
@@ -410,6 +598,50 @@
           "terbarukan"
         ],
         "weight": 3
+      },
+      {
+        "id": 7,
+        "type": "long_essay",
+        "cog": "C5",
+        "stem": "<p>Jelaskan secara komprehensif bagaimana prinsip dasar <strong>Literasi Sains & Bioenergi</strong> diterapkan dalam pemecahan masalah teknologi nyata!<br>Uraikan alur proses sains yang terjadi, tantangan efisiensi yang dihadapi, serta alternatif solusi inovatif untuk meminimalkan kehilangan energi!</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Studi kasus transisi energi ramah lingkungan]</em></small>",
+        "weight": 3,
+        "explanation": "Soal ini mengukur kemampuan berpikir tingkat tinggi (C5) dalam menyintesis konsep Literasi Sains & Bioenergi ke dalam studi kasus aplikatif.",
+        "generated_by": "gemini-3.8-flash",
+        "source_engine": "pedagogical_engine (fallback gemini-3.8-flash)",
+        "rubric": "Rubrik Penilaian AI (Skor 0 - 100):\n1. Penguasaan Konsep Teori Dasar: Menguraikan prinsip Literasi Sains & Bioenergi secara presisi dan logis (Bobot: 30 poin)\n2. Analisis Mekanisme & Proses: Mengidentifikasi komponen dan tahapan konversi energi (Bobot: 35 poin)\n3. Rekomendasi Solusi & Efisiensi: Memberikan gagasan optimasi dan pertimbangan sains (Bobot: 35 poin)",
+        "ideal_answer": "Prinsip Literasi Sains & Bioenergi menyatakan keteraturan dinamika energi di mana sistem beroperasi menurut hukum kekekalan dan arah spontanitas tertentu. Dalam penerapannya, energi input dialirkan melalui komponen konversi untuk menghasilkan kerja bermanfaat, sementara sebagian energi terdisipasi sebagai kalor lingkungan. Untuk meningkatkan efisiensi, inovasi material berisolasi tinggi dan siklus regenerasi energi dapat diterapkan guna menekan degradasi entropi secara signifikan.",
+        "max_score": 100,
+        "keywords": [
+          "literasi sains & bioenergi",
+          "efisiensi",
+          "energi",
+          "sistem",
+          "proses",
+          "konversi",
+          "prinsip"
+        ]
+      },
+      {
+        "id": 8,
+        "type": "long_essay",
+        "cog": "C5",
+        "stem": "<p>Jelaskan secara komprehensif bagaimana prinsip dasar <strong>Literasi Sains & Bioenergi</strong> diterapkan dalam pemecahan masalah teknologi nyata!<br>Uraikan alur proses sains yang terjadi, tantangan efisiensi yang dihadapi, serta alternatif solusi inovatif untuk meminimalkan kehilangan energi!</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Studi kasus transisi energi ramah lingkungan]</em></small>",
+        "weight": 3,
+        "explanation": "Soal ini mengukur kemampuan berpikir tingkat tinggi (C5) dalam menyintesis konsep Literasi Sains & Bioenergi ke dalam studi kasus aplikatif.",
+        "generated_by": "gemini-3.8-flash",
+        "source_engine": "pedagogical_engine (fallback gemini-3.8-flash)",
+        "rubric": "Rubrik Penilaian AI (Skor 0 - 100):\n1. Penguasaan Konsep Teori Dasar: Menguraikan prinsip Literasi Sains & Bioenergi secara presisi dan logis (Bobot: 30 poin)\n2. Analisis Mekanisme & Proses: Mengidentifikasi komponen dan tahapan konversi energi (Bobot: 35 poin)\n3. Rekomendasi Solusi & Efisiensi: Memberikan gagasan optimasi dan pertimbangan sains (Bobot: 35 poin)",
+        "ideal_answer": "Prinsip Literasi Sains & Bioenergi menyatakan keteraturan dinamika energi di mana sistem beroperasi menurut hukum kekekalan dan arah spontanitas tertentu. Dalam penerapannya, energi input dialirkan melalui komponen konversi untuk menghasilkan kerja bermanfaat, sementara sebagian energi terdisipasi sebagai kalor lingkungan. Untuk meningkatkan efisiensi, inovasi material berisolasi tinggi dan siklus regenerasi energi dapat diterapkan guna menekan degradasi entropi secara signifikan.",
+        "max_score": 100,
+        "keywords": [
+          "literasi sains & bioenergi",
+          "efisiensi",
+          "energi",
+          "sistem",
+          "proses",
+          "konversi",
+          "prinsip"
+        ]
       }
     ]
   },

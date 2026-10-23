@@ -1954,6 +1954,106 @@
     "teacher": "Drs. Budi Pratama, M.Pd.",
     "target_class": "Semua Kelas",
     "description": "",
-    "questions": []
+    "questions": [
+      {
+        "id": 1,
+        "type": "mcq",
+        "cog": "C3",
+        "stem": "<p>Seorang administrator jaringan sekolah baru saja melakukan pemasangan sistem operasi Ubuntu Server 24.04 LTS. Langkah awal yang harus dilakukan untuk mempersiapkan infrastruktur pemberian alamat IP otomatis kepada klien adalah menginstal paket perangkat lunak layanan DHCP yang paling stabil dan umum digunakan pada sistem operasi tersebut. Perintah manakah yang paling tepat untuk menginstal paket layanan DHCP server tersebut melalui terminal?</p>",
+        "weight": 1,
+        "explanation": "Paket standar yang digunakan untuk membangun layanan DHCP server pada sistem operasi berbasis Debian dan Ubuntu adalah 'isc-dhcp-server'. Pilihan B adalah layanan DNS (BIND9), pilihan C adalah web server (Apache2), pilihan D adalah proxy server (Squid), dan pilihan E adalah FTP server (vsftpd).",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "sudo apt install isc-dhcp-server -y"
+          },
+          {
+            "id": "B",
+            "text": "sudo apt install bind9 -y"
+          },
+          {
+            "id": "C",
+            "text": "sudo apt install apache2 -y"
+          },
+          {
+            "id": "D",
+            "text": "sudo apt install squid -y"
+          },
+          {
+            "id": "E",
+            "text": "sudo apt install vsftpd -y"
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 2,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "<p>Administrator jaringan sedang mengonfigurasi file <code>/etc/dhcp/dhcpd.conf</code> pada Ubuntu Server 24.04 dengan spesifikasi subnet lokal <code>192.168.10.0/24</code>, rentang IP penyewaan (range) dari <code>192.168.10.50</code> hingga <code>192.168.10.150</code>, serta mendefinisikan gateway <code>192.168.10.1</code> dan DNS server <code>8.8.8.8</code>. Setelah file konfigurasi disimpan, layanan gagal berjalan saat diperiksa menggunakan perintah <code>sudo systemctl status isc-dhcp-server</code>. Berdasarkan log sistem, ditemukan galat karena belum mendeklarasikan antarmuka jaringan (interface) yang melayani permintaan DHCP tersebut. Berkas konfigurasi manakah yang harus disunting untuk menentukan interface jaringan (misal: <code>enp0s3</code>) pada Ubuntu Server 24.04?</p>",
+        "weight": 1.5,
+        "explanation": "Pada Ubuntu Server yang menggunakan paket isc-dhcp-server, antarmuka jaringan (interface) tempat DHCP server mendengarkan (listen) permintaan klien harus didefinisikan secara eksplisit di dalam file konfigurasi default sistem yaitu `/etc/default/isc-dhcp-server` pada variabel `INTERVACESv4`.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "/etc/default/isc-dhcp-server"
+          },
+          {
+            "id": "B",
+            "text": "/etc/network/interfaces"
+          },
+          {
+            "id": "C",
+            "text": "/etc/netplan/01-netcfg.yaml"
+          },
+          {
+            "id": "D",
+            "text": "/etc/resolv.conf"
+          },
+          {
+            "id": "E",
+            "text": "/etc/hosts"
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 3,
+        "type": "mcq",
+        "cog": "C5",
+        "stem": "<p>Seorang teknisi jaringan telah selesai menginstal dan mengonfigurasi ISC DHCP Server pada Ubuntu 24.04. Untuk membuktikan bahwa layanan DHCP server berjalan dengan baik dan klien mendapatkan alokasi IP sesuai aturan subnet, teknisi tersebut menghubungkan komputer klien ke jaringan. Namun, pada komputer klien berbasis Linux, alamat IP tidak kunjung didapatkan dan terus berstatus <em>searching/dhcpdiscover</em>. Perintah diagnostik apa yang paling tepat dijalankan di sisi klien untuk melihat proses negosiasi DHCP secara real-time dan mendeteksi letak kegagalan pembuktian koneksi tersebut?</p>",
+        "weight": 2,
+        "explanation": "Perintah `sudo dhclient -v <interface>` pada sisi klien memaksa antarmuka jaringan klien untuk melepaskan konfigurasi lama dan meminta IP baru dari DHCP server secara verbose (menampilkan proses DHCPOFFER, DHCPREQUEST, hingga DHCPACK), sehingga sangat efektif untuk membuktikan dan mendiagnosis keberhasilan komunikasi DHCP.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "sudo dhclient -v <nama_interface_klien>"
+          },
+          {
+            "id": "B",
+            "text": "ping -c 4 127.0.0.1"
+          },
+          {
+            "id": "C",
+            "text": "sudo ufw status verbose"
+          },
+          {
+            "id": "D",
+            "text": "netstat -tulnp"
+          },
+          {
+            "id": "E",
+            "text": "sudo systemctl restart networking"
+          }
+        ],
+        "answer": "A"
+      }
+    ]
   }
 ]

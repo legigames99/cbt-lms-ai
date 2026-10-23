@@ -502,11 +502,31 @@ function sanitizeQuestionText(text) {
 
 function callGoogleGeminiAPI({ apiKey, model, basis_type = 'materi', basis_text = '', topic = '', question_type = 'all', cog_level = 'mixed', count = 5, custom_prompt = '', existing_stems = [] }) {
   return new Promise((resolve, reject) => {
-    let endpointModel = 'gemini-2.5-flash';
-    if (model.includes('flash-lite') || model.includes('3.5-flash-lite')) endpointModel = 'gemini-2.0-flash-lite';
-    else if (model.includes('pro')) endpointModel = 'gemini-1.5-pro';
-    else if (model.includes('1.5-flash')) endpointModel = 'gemini-1.5-flash';
-    else endpointModel = 'gemini-2.5-flash';
+    let endpointModel = 'gemini-3.5-flash';
+    const supportedModels = [
+      'gemini-3.5-flash-lite',
+      'gemini-3.5-flash',
+      'gemini-3.6-flash',
+      'gemini-3.7-flash',
+      'gemini-3.8-flash',
+      'gemini-2.5-flash',
+      'gemini-2.5-pro'
+    ];
+    if (supportedModels.includes(model)) {
+      endpointModel = model;
+    } else if (model && model.includes('flash-lite')) {
+      endpointModel = 'gemini-3.5-flash-lite';
+    } else if (model && model.includes('3.8')) {
+      endpointModel = 'gemini-3.8-flash';
+    } else if (model && model.includes('3.7')) {
+      endpointModel = 'gemini-3.7-flash';
+    } else if (model && model.includes('3.6')) {
+      endpointModel = 'gemini-3.6-flash';
+    } else if (model && model.includes('pro')) {
+      endpointModel = 'gemini-2.5-pro';
+    } else {
+      endpointModel = 'gemini-3.5-flash';
+    }
 
     let basisInstruction = '';
     if (basis_type === 'cp') {
@@ -608,91 +628,48 @@ function generatePedagogicalTKAQuestions({ topic, basis_type = 'materi', basis_t
 
   const coreLabel = (basis_text && basis_text.trim()) ? basis_text.trim() : (topic || 'Kajian Asesmen Pembelajaran');
 
-  // Koleksi 12 Skenario Aplikasi Kontekstual yang Berbeda untuk Anti-Duplikasi
   const scenarios = [
     {
-      domain: 'Siklus Termal & Pembangkit Daya Industri',
-      context: 'efisiensi termal siklus daya tertutup pada turbin industri',
-      mcqQuestion: 'Sebuah instalasi pembangkit daya industri memanfaatkan fluida kerja dengan siklus termodinamika tertutup. Suhu reservoar kalor tinggi dipertahankan pada <strong>650 K</strong> dan reservoar suhu rendah pada <strong>325 K</strong>. Berdasarkan hukum kekekalan energi dan efisiensi termal maksimum Carnot terkait <strong>' + coreLabel + '</strong>, berapakah efisiensi teoritis tertinggi dari sistem konversi energi tersebut, serta apa implikasi fisis jika terjadi rugi-rugi gesekan pada turbin?',
+      domain: `Prinsip Fundamental & Konseptual: ${coreLabel}`,
+      context: `konsep dasar dan prosedur implementasi ${coreLabel}`,
+      mcqQuestion: `Dalam mengimplementasikan dan memahami secara mendalam materi <strong>${coreLabel}</strong>, manakah pernyataan atau langkah analisis teknis/konseptual berikut yang paling tepat dan esensial?`,
       mcqOptions: [
-        { id: 'A', text: 'Efisiensi teoritis maksimum adalah 50%, dan rugi gesekan akan meningkatkan pelepasan kalor disipatif ke lingkungan sehingga efisiensi riil selalu di bawah 50%.' },
-        { id: 'B', text: 'Efisiensi teoritis maksimum adalah 100%, karena energi kalor dapat diubah seluruhnya menjadi kerja mekanik tanpa pelepasan kalor buang.' },
-        { id: 'C', text: 'Efisiensi teoritis adalah 25%, dan rugi gesekan tidak memengaruhi kerja mekanik total fluida kerja.' },
-        { id: 'D', text: 'Efisiensi sistem konstan tanpa dipengaruhi oleh temperatur reservoar pendingin.' },
-        { id: 'E', text: 'Penurunan suhu reservoar dingin akan menurunkan efisiensi konversi sistem secara drastis.' }
+        { id: 'A', text: `Memahami seluruh prinsip fundamental, tahapan konfigurasi/penerapan, serta melakukan verifikasi hasil implementasi secara sistematis.` },
+        { id: 'B', text: `Mengabaikan proses verifikasi dan validasi fungsionalitas setelah implementasi selesai dilakukan.` },
+        { id: 'C', text: `Mengasumsikan bahwa seluruh parameter default sudah optimal tanpa perlu penyesuaian kebutuhan spesifik.` },
+        { id: 'D', text: `Menghilangkan dokumentasi dan logging penanganan kendala teknis saat proses berjalan.` },
+        { id: 'E', text: `Membatasi analisis hanya pada aspek teoritis tanpa mempertimbangkan implikasi praktis di lingkungan kerja.` }
       ],
       mcqAnswer: 'A',
-      mcqExpl: 'Efisiensi maksimum Carnot: η = 1 - (Tc / Th) = 1 - (325 / 650) = 0.50 atau 50%. Sesuai Hukum Kedua Termodinamika, tidak ada mesin riil yang dapat melampaui efisiensi Carnot karena adanya ireversibilitas dan peningkatan entropi.'
+      mcqExpl: `Pada materi ${coreLabel}, pemahaman terhadap konsep fundamental yang diikuti pengujian dan verifikasi bertahap adalah kunci utama keberhasilan implementasi yang terstandar.`
     },
     {
-      domain: 'Sistem Pendingin & Koefisien Performa (COP)',
-      context: 'kinerja mesin pendingin kompresi uap dan penyerapan kalor',
-      mcqQuestion: 'Sebuah sistem pendingin (refrigerator) komersial berbasis siklus kompresi uap dirancang untuk menjaga temperatur ruang penyimpanan beku pada suhu <strong>-10°C</strong> di lingkungan bersuhu <strong>30°C</strong> terkait materi <strong>' + coreLabel + '</strong>. Manakah pernyataan analisis termodinamika yang paling tepat mengenai koefisien performansi (COP) dan kerja listrik yang dibutuhkan kompresor?',
+      domain: `Analisis Pemecahan Masalah & Troubleshooting: ${coreLabel}`,
+      context: `diagnosis kendala, penanganan galat (error handling), dan optimasi ${coreLabel}`,
+      mcqQuestion: `Apabila ditemukan kendala operasional atau ketidaksesuaian output saat menjalankan proses terkait <strong>${coreLabel}</strong>, langkah diagnostik awal yang paling efektif dan terarah adalah...`,
       mcqOptions: [
-        { id: 'A', text: 'Koefisien performansi berbanding terbalik dengan selisih temperatur antara ruang dingin dan lingkungan luar, sehingga semakin panas lingkungan luar, kompresor membutuhkan kerja listrik lebih besar.' },
-        { id: 'B', text: 'Kerja listrik kompresor bernilai nol jika temperatur ruang penyimpanan telah mencapai kesetimbangan termal dengan lingkungan.' },
-        { id: 'C', text: 'Kalor yang dibuang ke lingkungan luar selalu lebih kecil daripada kalor yang diserap dari ruang penyimpanan beku.' },
-        { id: 'D', text: 'Nilai koefisien performansi mesin pendingin selalu bernilai tepat 1,0 pada setiap kondisi operasional.' },
-        { id: 'E', text: 'Sistem dapat memindahkan kalor secara spontan tanpa memerlukan input daya mekanik dari motor eksternal.' }
+        { id: 'A', text: `Melakukan penelusuran log sistem secara cermat, memeriksa keabsahan konfigurasi parameter, dan menguji konektivitas/fungsionalitas layanan.` },
+        { id: 'B', text: `Melakukan restart sistem secara berulang tanpa menganalisis pesan galat yang tercatat.` },
+        { id: 'C', text: `Menghapus seluruh konfigurasi yang ada dan menggantinya dengan template acak tanpa pengujian.` },
+        { id: 'D', text: `Membiarkan pesan error berjalan karena dianggap tidak memengaruhi performa keseluruhan.` },
+        { id: 'E', text: `Menonaktifkan seluruh sistem proteksi dan izin akses agar proses dapat berjalan tanpa hambatan.` }
       ],
       mcqAnswer: 'A',
-      mcqExpl: 'Pada mesin pendingin ideal, COP = Tc / (Th - Tc). Semakin besar beda temperatur antara bagian dalam dan lingkungan luar, COP semakin menurun dan beban kerja kompresor meningkat.'
+      mcqExpl: `Pemeriksaan catatan log sistem dan analisis parameter merupakan metode baku troubleshooting pada ${coreLabel} untuk mengidentifikasi akar permasalahan (root cause).`
     },
     {
-      domain: 'Dinamika Gas Ideal & Usaha Silinder Berpiston',
-      context: 'proses ekspansi kuasistatik gas ideal monoatomik',
-      mcqQuestion: 'Dua mol gas ideal monoatomik mengalami ekspansi isotermik reversibel pada suhu konstan <strong>400 K</strong> sehingga volumenya membesar dari <strong>V₁</strong> menjadi <strong>2V₁</strong> terkait konsep <strong>' + coreLabel + '</strong>. Kesimpulan analisis energi yang tepat mengenai usaha yang dilakukan gas dan perubahan energi dalamnya adalah...',
+      domain: `Verifikasi Kinerja & Validasi Operasional: ${coreLabel}`,
+      context: `pengujian fungsionalitas, efisiensi, dan keandalan sistem ${coreLabel}`,
+      mcqQuestion: `Tahap pembuktian atau pengujian fungsionalitas pada <strong>${coreLabel}</strong> dinyatakan berhasil secara valid apabila memenuhi kriteria berikut, yaitu...`,
       mcqOptions: [
-        { id: 'A', text: 'Perubahan energi dalam bernilai nol (ΔU = 0) dan seluruh kalor yang diserap dari lingkungan diubah sepenuhnya menjadi usaha luar (W = Q = nRT ln 2).' },
-        { id: 'B', text: 'Usaha yang dilakukan gas bernilai nol karena ekspansi berlangsung pada temperatur yang konstan.' },
-        { id: 'C', text: 'Energi dalam gas menyusut sebesar setengah dari nilai energi kinetik molekuler mula-mula.' },
-        { id: 'D', text: 'Tekanan akhir gas berlipat ganda sebanding dengan pertambahan volume yang dialami.' },
-        { id: 'E', text: 'Gas melepaskan kalor ke lingkungan tanpa melakukan interaksi mekanik pada dinding piston.' }
+        { id: 'A', text: `Layanan/konsep memberikan respon sesuai parameter spesifikasi yang ditentukan dan terverifikasi secara valid pada sisi klien/pengguna.` },
+        { id: 'B', text: `Layanan hanya aktif sementara dan berhenti ketika ada permintaan proses dari pengguna lain.` },
+        { id: 'C', text: `Terjadi konflik alokasi sumber daya yang tidak dapat diselesaikan oleh sistem secara otomatis.` },
+        { id: 'D', text: `Tidak ada data atau respons yang dihasilkan dalam rentang waktu toleransi standar.` },
+        { id: 'E', text: `Pengujian hanya dilakukan pada satu skenario keberhasilan tanpa menguji skenario batas (boundary case).` }
       ],
       mcqAnswer: 'A',
-      mcqExpl: 'Pada proses isotermik gas ideal, energi dalam hanya bergantung pada temperatur (ΔU = nCvΔT = 0). Berdasarkan Hukum I Termodinamika (Q = ΔU + W), maka Q = W = nRT ln(V₂/V₁).'
-    },
-    {
-      domain: 'Rekayasa Penukar Kalor (Heat Exchanger) Industri',
-      context: 'efektivitas perpindahan panas konveksi dan konduksi fluida',
-      mcqQuestion: 'Pada sistem penukar kalor tipe aliran berlawanan arah (counter-flow heat exchanger) yang diterapkan dalam <strong>' + coreLabel + '</strong>, laju perpindahan kalor dipengaruhi oleh beda temperatur rata-rata logaritmik (LMTD) dan koefisien perpindahan panas menyeluruh. Manakah konfigurasi teknis yang paling efektif untuk meminimalkan kehilangan energi?',
-      mcqOptions: [
-        { id: 'A', text: 'Mempertahankan pola aliran counter-flow dengan sirip termal (fins) konduktivitas tinggi guna memperluas area kontak dan mempertahankan gradien suhu yang seragam.' },
-        { id: 'B', text: 'Mengubah pola aliran menjadi parallel-flow agar kedua fluida keluar pada temperatur yang tepat sama.' },
-        { id: 'C', text: 'Menggunakan material berisolasi tebal di antara kedua saluran fluida kerja.' },
-        { id: 'D', text: 'Mempercepat laju alir hingga melampaui batas kritis tanpa memperhatikan penurunan tekanan fluida.' },
-        { id: 'E', text: 'Menghilangkan lapisan turbulensi fluida agar aliran bersifat laminer murni tanpa percampuran panas.' }
-      ],
-      mcqAnswer: 'A',
-      mcqExpl: 'Aliran counter-flow memberikan efektivitas termal tertinggi dibanding parallel-flow karena menjaga gradien temperatur yang stabil di sepanjang penukar panas.'
-    },
-    {
-      domain: 'Siklus Stirling & Konversi Energi Ramah Lingkungan',
-      context: 'pemanfaatan sumber energi alternatif terbarukan',
-      mcqQuestion: 'Sebuah mesin siklus Stirling memanfaatkan udara bertekanan sebagai fluida kerja dengan regenerator termal internal terkait kajian <strong>' + coreLabel + '</strong>. Mengapa regenerator termal memegang peranan krusial dalam mendongkrak efisiensi siklus tersebut?',
-      mcqOptions: [
-        { id: 'A', text: 'Regenerator menyimpan kalor selama proses isokhorik pendinginan dan melepaskannya kembali saat proses pemanasan isokhorik, sehingga menekan kebutuhan kalor dari sumber luar.' },
-        { id: 'B', text: 'Regenerator menghilangkan keharusan adanya pembuangan kalor pada reservoar dingin.' },
-        { id: 'C', text: 'Regenerator mempercepat laju pembakaran bahan bakar di dalam ruang silinder kerja.' },
-        { id: 'D', text: 'Regenerator menaikkan tekanan fluida kerja hingga mencapai kondisi superkritis secara spontan.' },
-        { id: 'E', text: 'Regenerator menghentikan peningkatan entropi sistem sehingga efisiensi mencapai 100%.' }
-      ],
-      mcqAnswer: 'A',
-      mcqExpl: 'Regenerator pada mesin Stirling berfungsi sebagai penyimpan energi termal internal bolak-balik (thermal sponge) yang mendekatkan efisiensi teoretis mesin Stirling ke efisiensi Carnot.'
-    },
-    {
-      domain: 'Disipasi Termal & Efisiensi Energi Pusat Komputasi',
-      context: 'manajemen pendinginan server dan termodinamika komputasi',
-      mcqQuestion: 'Sebuah pusat data (data center) mengoperasikan ribuan server komputasi yang menghasilkan beban kalor total <strong>150 kW</strong> secara terus menerus. Ditinjau dari prinsip termodinamika <strong>' + coreLabel + '</strong>, strategi pendinginan presisi manakah yang paling optimal dalam menekan nilai PUE (Power Usage Effectiveness)?',
-      mcqOptions: [
-        { id: 'A', text: 'Menerapkan sistem pendingin cair langsung ke chip (direct-to-chip liquid cooling) dengan penukar kalor pembuang bertingkat untuk menekan konsumsi daya kipas dan kompresor udara.' },
-        { id: 'B', text: 'Meniupkan udara dingin dari chiller konvensional ke seluruh ruangan tanpa penyekatan lorong panas dan dingin.' },
-        { id: 'C', text: 'Menaikkan temperatur ruangan server hingga melebihi batas operasional semikonduktor.' },
-        { id: 'D', text: 'Menonaktifkan sirkulasi fluida pendingin selama jam beban komputasi puncak.' },
-        { id: 'E', text: 'Menggunakan pemanas elektrik tambahan untuk mencegah kondensasi uap air.' }
-      ],
-      mcqAnswer: 'A',
-      mcqExpl: 'Direct liquid cooling menghantarkan kalor langsung dari sumber panas silikon dengan konduktivitas termal fluida cair yang ratusan kali lebih tinggi daripada udara, mereduksi pemborosan energi secara masif.'
+      mcqExpl: `Keberhasilan verifikasi ${coreLabel} dinilai dari tercapainya spesifikasi fungsional dan keabsahan respons layanan kepada pengguna.`
     }
   ];
 
@@ -721,73 +698,66 @@ function generatePedagogicalTKAQuestions({ topic, basis_type = 'materi', basis_t
         break;
 
       case 'mcq_complex':
-        newQ.stem = "<p>Terkait <strong>" + coreLabel + "</strong> dalam domain <strong>" + sc.domain + "</strong>, perhatikan premis-premis fisis berikut!<br><strong>Pilihlah SEMUA pernyataan yang BENAR!</strong> <em>(Jawaban benar dapat lebih dari satu)</em></p>";
+        newQ.stem = "<p>Terkait <strong>" + coreLabel + "</strong>, perhatikan pernyataan-pernyataan analitis berikut!<br><strong>Pilihlah SEMUA pernyataan yang BENAR!</strong> <em>(Jawaban benar dapat lebih dari satu)</em></p>";
         newQ.options = [
-          { id: 'A', text: "Prinsip konservasi energi berlaku universal di mana kalor yang diserap sistem setara dengan akumulasi kerja mekanik dan perubahan energi dalam fluida." },
-          { id: 'B', text: "Efisiensi termal siklus daya berbanding lurus dengan selisih temperatur antara reservoar panas dan dingin." },
-          { id: 'C', text: "Semua proses alami berlangsung spontan menuju keadaan dengan tingkat ketidakteraturan (entropi) total yang lebih tinggi atau tetap." },
-          { id: 'D', text: "Tidak diperlukan fluida kerja dalam perancangan mesin konversi energi termodinamika siklus tertutup." },
-          { id: 'E', text: "Usaha mekanik dapat dihasilkan secara berkesinambungan hanya dengan menyerap kalor dari satu reservoar tunggal tanpa membuang kalor." }
+          { id: 'A', text: "Pemahaman struktur konfigurasi dan parameter kunci merupakan prasyarat mutlak keberhasilan implementasi." },
+          { id: 'B', text: "Pengujian verifikasi pada sisi pengguna/klien membuktikan bahwa layanan telah aktif dan merespons secara akurat." },
+          { id: 'C', text: "Pencatatan log transaksi dan penanganan galat mempermudah pemeliharaan jangka panjang." },
+          { id: 'D', text: "Tidak diperlukan tahapan pengujian apabila konfigurasi telah diselesaikan tanpa pesan kesalahan sintaksis." },
+          { id: 'E', text: "Pengaturan dapat diterapkan tanpa memperhatikan kompatibilitas arsitektur sistem operasi target." }
         ];
         newQ.answer = ['A', 'B', 'C'];
         newQ.weight = 1.5;
-        newQ.explanation = "Pernyataan A, B, dan C benar secara fisis menurut Hukum I dan II Termodinamika. Pernyataan D salah (mutlak perlu fluida kerja). Pernyataan E salah (melanggar Pernyataan Kelvin-Planck).";
+        newQ.explanation = "Pernyataan A, B, dan C benar secara pedagogis dan prosedural. Pernyataan D salah (pengujian wajib). Pernyataan E salah (kompatibilitas mutlak diperhatikan).";
         break;
 
       case 'true_false':
-        newQ.stem = "<p>Berdasarkan kajian ilmiah mengenai <strong>" + coreLabel + "</strong> pada konteks <strong>" + sc.context + "</strong>, tentukan nilai kebenaran <strong>Benar (B)</strong> atau <strong>Salah (S)</strong> untuk setiap pernyataan evaluasi parameter berikut:</p>";
+        newQ.stem = "<p>Berdasarkan kajian teknis mengenai <strong>" + coreLabel + "</strong>, tentukan nilai kebenaran <strong>Benar (B)</strong> atau <strong>Salah (S)</strong> untuk setiap pernyataan evaluasi parameter berikut:</p>";
         newQ.statements = [
-          { id: 0, text: "Peningkatan temperatur kerja reservoar kalor tinggi secara teoritis meningkatkan batas atas efisiensi konversi energi siklus termal.", key: 'B' },
-          { id: 1, text: "Energi kalor dapat berpindah secara spontan dari benda bersuhu lebih rendah ke benda bersuhu lebih tinggi tanpa bantuan usaha eksternal.", key: 'S' },
-          { id: 2, text: "Rugi-rugi gesekan fluida dan pelepasan kalor tak terisolasi merupakan faktor utama penyebab ireversibilitas dalam siklus termodinamika riil.", key: 'B' }
+          { id: 0, text: "Konfigurasi yang tepat harus diikuti dengan restart/reload layanan agar perubahan parameter diterapkan oleh sistem.", key: 'B' },
+          { id: 1, text: "Pengujian pada sisi klien tidak diperlukan apabila status layanan pada server telah aktif (running).", key: 'S' },
+          { id: 2, text: "Pemeriksaan log berkala merupakan prosedur standar untuk memastikan stabilitas dan mendeteksi anomali operasional.", key: 'B' }
         ];
         newQ.answer = { "0": "B", "1": "S", "2": "B" };
         newQ.weight = 1.5;
-        newQ.explanation = "Pernyataan 1 Benar (prinsip efisiensi Carnot). Pernyataan 2 Salah (melanggar Hukum II Termodinamika pernyataan Clausius). Pernyataan 3 Benar (sumber utama disipasi energi riil).";
+        newQ.explanation = "Pernyataan 1 Benar (reload/restart mutlak). Pernyataan 2 Salah (verifikasi klien mutlak). Pernyataan 3 Benar (analisis log esensial).";
         break;
 
       case 'matching':
-        newQ.stem = "<p><strong>Pasangkanlah</strong> terminologi atau konsep analisis pada kolom sebelah kiri dengan deskripsi fungsi/kondisi fisis yang tepat pada kolom sebelah kanan terkait materi <strong>" + coreLabel + "</strong>!</p>";
+        newQ.stem = "<p><strong>Pasangkanlah</strong> tahapan atau konsep teknis pada kolom sebelah kiri dengan deskripsi fungsi yang tepat pada kolom sebelah kanan terkait materi <strong>" + coreLabel + "</strong>!</p>";
         newQ.premises = [
-          { id: 0, text: "1. Proses Isokhorik (Volume Konstan)" },
-          { id: 1, text: "2. Proses Isotermik (Temperatur Konstan)" },
-          { id: 2, text: "3. Proses Adiabatik (Isolasi Termal Sempurna)" }
+          { id: 0, text: "Tahap Instalasi Paket" },
+          { id: 1, text: "Tahap Konfigurasi Parameter" },
+          { id: 2, text: "Tahap Pengujian & Verifikasi" }
         ];
         newQ.targets = [
-          { id: 'A', text: "Tidak ada pertukaran kalor antara sistem dan lingkungan (Q = 0), sehingga kerja mekanik murni mengubah energi dalam sistem." },
-          { id: 'B', text: "Gas tidak melakukan usaha luar (W = 0) dan penambahan kalor sepenuhnya menaikkan energi dalam sistem." },
-          { id: 'C', text: "Perubahan energi dalam bernilai nol (ΔU = 0) pada gas ideal sehingga kalor yang diserap sama persis dengan usaha luar." }
+          { id: 'A', text: "Pemasangan perangkat lunak/modul pendukung ke dalam sistem operasi target." },
+          { id: 'B', text: "Penyesuaian berkas pengaturan (konfigurasi) agar layanan beroperasi sesuai kebutuhan jaringan/sistem." },
+          { id: 'C', text: "Validasi fungsionalitas dan pembuktian penerimaan respon layanan pada sisi pengguna/klien." }
         ];
-        newQ.answer = { "0": "B", "1": "C", "2": "A" };
+        newQ.answer = { "0": "A", "1": "B", "2": "C" };
         newQ.weight = 2.0;
-        newQ.explanation = "Pasangan tepat: 1 -> B (Isokhorik W=0), 2 -> C (Isotermik ΔU=0), 3 -> A (Adiabatik Q=0).";
+        newQ.explanation = "Pasangan konsep-deskripsi mencerminkan urutan baku implementasi: Instalasi -> Konfigurasi -> Verifikasi/Pengujian.";
         break;
 
       case 'short_essay':
-        newQ.stem = "<p>Dalam perancangan sistem konversi termal terkait <strong>" + coreLabel + "</strong>, parameter terukur yang menyatakan rasio antara usaha mekanik bermanfaat yang dihasilkan terhadap total energi kalor yang diserap dinamakan <strong>...</strong></p>";
-        newQ.answer_keys = ['efisiensi', 'efisiensi termal', 'koefisien performansi', 'daya guna', 'thermal efficiency'];
+        newQ.stem = "<p>Sebutkan berkas konfigurasi utama atau perintah diagnostik yang digunakan dalam proses <strong>" + coreLabel + "</strong>!</p>";
+        newQ.answer_keys = ["konfigurasi", "status", "systemctl", "log", "restart"];
         newQ.weight = 1.0;
-        newQ.explanation = "Parameter fundamental efektivitas konversi energi dalam hukum termodinamika dinamakan efisiensi termal (η).";
+        newQ.explanation = "Kata kunci diterima mencakup komponen utama konfigurasi, verifikasi status layanan, dan penelusuran log diagnostik.";
         break;
 
       case 'long_essay':
-        newQ.stem = "<p>Sebuah instalasi industri berencana mengoptimalkan performa energi terkait <strong>" + coreLabel + "</strong> pada konteks <strong>" + sc.context + "</strong>.<br>Uraikan secara ilmiah dan terstruktur:<br>1. Prinsip hukum dasar sains yang mendasari mekanisme konversi energi pada sistem tersebut.<br>2. Faktor-faktor utama yang membatasi efisiensi operasional dan memicu timbulnya entropi/disipasi kalor.<br>3. Solusi rekayasa atau optimasi material yang dapat diterapkan untuk meningkatkan efisiensi dan menekan emisi kalor ke lingkungan!</p>";
-        newQ.rubric = "Rubrik Penilaian AI (Skor 0 - 100):\n1. Penguasaan Konsep Teori Dasar (30 poin): Menguraikan hukum kekekalan energi dan arah spontanitas secara presisi.\n2. Analisis Pembatas Efisiensi (35 poin): Mengidentifikasi batasan efisiensi Carnot, rugi gesekan fluida, dan kebocoran termal.\n3. Rekomendasi Solusi & Rekayasa (35 poin): Memberikan usulan material berinsulasi termal tinggi, siklus pemulihan panas terbuang (waste heat recovery), dan instrumentasi digital presisi.";
-        newQ.ideal_answer = "Sistem beroperasi berdasarkan hukum pertama termodinamika di mana energi tidak dapat diciptakan atau dimusnahkan melainkan dikonversikan. Batasan efisiensi konversi energi ditentukan oleh hukum kedua termodinamika yang menyatakan bahwa kalor tidak dapat diubah seutuhnya menjadi kerja tanpa adanya pelepasan kalor ke reservoar dingin. Untuk mengoptimalkan kinerja sistem, rekayasa dapat mencakup penerapan siklus regeneratif, penggunaan penukar kalor berinsulasi vakum, serta penyesuaian rasio kompresi secara adaptif.";
-        newQ.keywords = ['efisiensi', 'energi', 'kalor', 'sistem', 'proses', 'konversi', 'entropi'];
+      default:
+        newQ.stem = "<p>Uraikan secara komprehensif langkah-langkah metodologis serta analisis pemecahan masalah dalam pelaksanaan <strong>" + coreLabel + "</strong>! Jelaskan potensi kendala yang mungkin terjadi serta solusi teknis yang dapat diterapkan.</p>";
+        newQ.rubric = "Penilaian didasarkan pada:\n1. Kejelasan alur prosedur teknis (35%)\n2. Ketepatan analisis konfigurasi dan perintah kerja (35%)\n3. Kemampuan identifikasi kendala dan formulasi solusi (30%)";
+        newQ.ideal_answer = "Pelaksanaan " + coreLabel + " dimulai dari penyiapan lingkungan kerja, instalasi modul terkait, penyuntingan berkas konfigurasi dengan parameter yang presisi, pengaktifan layanan, hingga verifikasi menyeluruh pada sisi klien. Apabila terjadi kendala, teknisi harus memeriksa berkas log sistem untuk melokalisir sumber masalah sebelum melakukan perbaikan terarah.";
         newQ.max_score = 100;
+        newQ.keywords = ["instalasi", "konfigurasi", "verifikasi", "log", "analisis"];
         newQ.weight = 3.0;
-        newQ.explanation = "Soal ini menguji penalaran sintesis dan pemecahan masalah kontekstual nyata pada materi " + coreLabel + ".";
+        newQ.explanation = "Asesmen esai menuntut pemahaman alur kerja utuh, ketelitian parameter, dan penalaran problem-solving.";
         break;
     }
-
-    if (custom_prompt && custom_prompt.trim()) {
-      newQ.stem += '<br><small class="text-indigo-400"><em>[Konteks Pembelajaran: ' + custom_prompt.trim() + ']</em></small>';
-    }
-
-    // Sanitasi teks dari kebocoran label C2, C3, C4
-    newQ.stem = sanitizeQuestionText(newQ.stem);
-    newQ.explanation = sanitizeQuestionText(newQ.explanation);
 
     result.push(newQ);
   }

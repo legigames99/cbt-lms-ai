@@ -1,0 +1,19 @@
+[
+  { "id": 1, "code": "FIS", "name": "Fisika", "level": "SMA/SMK", "group": "Peminatan MIPA / Teknik" },
+  { "id": 2, "code": "MTK-W", "name": "Matematika Wajib", "level": "SMA/SMK", "group": "Umum" },
+  { "id": 3, "code": "MTK-P", "name": "Matematika Peminatan", "level": "SMA", "group": "Peminatan MIPA" },
+  { "id": 4, "code": "BIND", "name": "Bahasa Indonesia", "level": "SMA/SMK", "group": "Umum" },
+  { "id": 5, "code": "BING", "name": "Bahasa Inggris", "level": "SMA/SMK", "group": "Umum" },
+  { "id": 6, "code": "KIM", "name": "Kimia", "level": "SMA/SMK", "group": "Peminatan MIPA" },
+  { "id": 7, "code": "BIO", "name": "Biologi", "level": "SMA/SMK", "group": "Peminatan MIPA" },
+  { "id": 8, "code": "SEJ", "name": "Sejarah", "level": "SMA/SMK", "group": "Umum" },
+  { "id": 9, "code": "EKO", "name": "Ekonomi", "level": "SMA", "group": "Peminatan IPS" },
+  { "id": 10, "code": "SOS", "name": "Sosiologi", "level": "SMA", "group": "Peminatan IPS" },
+  { "id": 11, "code": "GEO", "name": "Geografi", "level": "SMA", "group": "Peminatan IPS" },
+  { "id": 12, "code": "INF", "name": "Informatika / TIK", "level": "SMA/SMK", "group": "Umum / Pilihan" },
+  { "id": 13, "code": "PPKN", "name": "Pendidikan Pancasila (PPKn)", "level": "SMA/SMK", "group": "Umum" },
+  { "id": 14, "code": "PAI", "name": "Pendidikan Agama & Budi Pekerti", "level": "SMA/SMK", "group": "Umum" },
+  { "id": 15, "code": "PROD-RPL", "name": "Pemrograman & RPL", "level": "SMK", "group": "Kejuruan SMK" },
+  { "id": 16, "code": "PROD-TKJ", "name": "Jaringan Komputer & Telekomunikasi", "level": "SMK", "group": "Kejuruan SMK" },
+  { "id": 17, "code": "TKA", "name": "TKA Campuran (SMA/SMK)", "level": "SMA/SMK", "group": "Asesmen Nasional / TKA" }
+]

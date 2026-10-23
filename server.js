@@ -186,6 +186,63 @@ function loadStudentsFromFile() {
 }
 
 loadStudentsFromFile();
+// ==============================================================
+// PERSISTENSI MASTER MATA PELAJARAN (subjects.json)
+// ==============================================================
+const SUBJECTS_FILE = path.join(__dirname, 'subjects.json');
+let MASTER_SUBJECTS = [];
+
+function saveSubjectsToFile() {
+  try {
+    fs.writeFileSync(SUBJECTS_FILE, JSON.stringify(MASTER_SUBJECTS, null, 2), 'utf8');
+  } catch (e) {
+    console.error('Failed to save subjects.json:', e.message);
+  }
+}
+
+function loadSubjectsFromFile() {
+  try {
+    if (fs.existsSync(SUBJECTS_FILE)) {
+      MASTER_SUBJECTS = JSON.parse(fs.readFileSync(SUBJECTS_FILE, 'utf8'));
+      if (Array.isArray(MASTER_SUBJECTS)) {
+        console.log(`[Master Data] Memuat ${MASTER_SUBJECTS.length} mata pelajaran dari subjects.json`);
+        return;
+      }
+    }
+  } catch (e) {
+    console.error('Failed to load subjects.json:', e.message);
+  }
+}
+loadSubjectsFromFile();
+
+// ==============================================================
+// PERSISTENSI MASTER DATA KELAS & ROMBEL (classes.json)
+// ==============================================================
+const CLASSES_FILE = path.join(__dirname, 'classes.json');
+let MASTER_CLASSES = [];
+
+function saveClassesToFile() {
+  try {
+    fs.writeFileSync(CLASSES_FILE, JSON.stringify(MASTER_CLASSES, null, 2), 'utf8');
+  } catch (e) {
+    console.error('Failed to save classes.json:', e.message);
+  }
+}
+
+function loadClassesFromFile() {
+  try {
+    if (fs.existsSync(CLASSES_FILE)) {
+      MASTER_CLASSES = JSON.parse(fs.readFileSync(CLASSES_FILE, 'utf8'));
+      if (Array.isArray(MASTER_CLASSES)) {
+        console.log(`[Master Data] Memuat ${MASTER_CLASSES.length} kelas dari classes.json`);
+        return;
+      }
+    }
+  } catch (e) {
+    console.error('Failed to load classes.json:', e.message);
+  }
+}
+loadClassesFromFile();
 
 // Profile & Konfigurasi Sekolah (Settings & Kop Kartu Peserta)
 const SCHOOL_PROFILE_PATH = path.join(__dirname, 'school_profile.json');
@@ -1713,9 +1770,154 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+// ==============================================================
+  // ENDPOINTS: MASTER MATA PELAJARAN (MAPEL)
+  // ==============================================================
+  // GET /api/v1/cbt/subjects
+  if (pathname === '/api/v1/cbt/subjects' && req.method === 'GET') {
+    const enriched = MASTER_SUBJECTS.map(s => {
+      const bankCount = QUESTION_BANKS.filter(b => (b.subject || '').toLowerCase().includes(s.name.toLowerCase()) || (b.subject || '').toLowerCase() === s.name.toLowerCase()).length;
+      return {
+        ...s,
+        banks_count: bankCount
+      };
+    });
+    return sendJSON(200, {
+      status: 'success',
+      data: enriched,
+      total: enriched.length
+    });
+  }
+
+  // POST /api/v1/cbt/subjects (Tambah Mapel Baru)
+  if (pathname === '/api/v1/cbt/subjects' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const name = (body.name || '').trim();
+    if (!name) {
+      return sendJSON(400, { status: 'error', message: 'Nama mata pelajaran wajib diisi!' });
+    }
+    const nextId = MASTER_SUBJECTS.length > 0 ? Math.max(...MASTER_SUBJECTS.map(s => s.id || 0)) + 1 : 1;
+    const newSubject = {
+      id: nextId,
+      code: (body.code || name.substring(0, 4).toUpperCase()).trim(),
+      name: name,
+      level: (body.level || 'SMA/SMK').trim(),
+      group: (body.group || 'Umum').trim()
+    };
+    MASTER_SUBJECTS.push(newSubject);
+    saveSubjectsToFile();
+    return sendJSON(200, {
+      status: 'success',
+      message: `Mata pelajaran "${newSubject.name}" berhasil ditambahkan!`,
+      data: newSubject
+    });
+  }
+
+  // POST /api/v1/cbt/subjects/delete atau DELETE /api/v1/cbt/subjects/:id
+  if ((pathname === '/api/v1/cbt/subjects/delete' && req.method === 'POST') || (pathname.startsWith('/api/v1/cbt/subjects/') && req.method === 'DELETE')) {
+    let subId = null;
+    if (req.method === 'DELETE') {
+      subId = parseInt(pathname.split('/').pop(), 10);
+    } else {
+      const body = await parseBody(req);
+      subId = parseInt(body.id, 10);
+    }
+    const idx = MASTER_SUBJECTS.findIndex(s => s.id === subId);
+    if (idx !== -1) {
+      const removed = MASTER_SUBJECTS.splice(idx, 1)[0];
+      saveSubjectsToFile();
+      return sendJSON(200, { status: 'success', message: `Mata pelajaran "${removed.name}" berhasil dihapus.` });
+    }
+    return sendJSON(404, { status: 'error', message: 'Mata pelajaran tidak ditemukan' });
+  }
+
+  // ==============================================================
+  // ENDPOINTS: MASTER DATA KELAS & ROMBEL
+  // ==============================================================
+  // GET /api/v1/cbt/classes
+  if (pathname === '/api/v1/cbt/classes' && req.method === 'GET') {
+    const enriched = MASTER_CLASSES.map(c => {
+      const studentsInClass = USERS.filter(u => u.role === 'student' && (u.class_name || '').trim().toLowerCase() === c.name.trim().toLowerCase());
+      return {
+        ...c,
+        student_count: studentsInClass.length
+      };
+    });
+    return sendJSON(200, {
+      status: 'success',
+      data: enriched,
+      total: enriched.length
+    });
+  }
+
+  // POST /api/v1/cbt/classes (Tambah Kelas Baru)
+  if (pathname === '/api/v1/cbt/classes' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const name = (body.name || '').trim();
+    if (!name) {
+      return sendJSON(400, { status: 'error', message: 'Nama kelas wajib diisi!' });
+    }
+    const existing = MASTER_CLASSES.find(c => c.name.toLowerCase() === name.toLowerCase());
+    if (existing) {
+      return sendJSON(400, { status: 'error', message: `Kelas "${name}" sudah ada dalam master data!` });
+    }
+    const nextId = MASTER_CLASSES.length > 0 ? Math.max(...MASTER_CLASSES.map(c => c.id || 0)) + 1 : 1;
+    const newClass = {
+      id: nextId,
+      name: name,
+      level: (body.level || (name.startsWith('XII') ? 'XII' : (name.startsWith('XI') ? 'XI' : 'X'))).trim(),
+      major: (body.major || 'Umum').trim(),
+      homeroom: (body.homeroom || '-').trim(),
+      room: (body.room || 'Ruang Teori').trim()
+    };
+    MASTER_CLASSES.push(newClass);
+    saveClassesToFile();
+    return sendJSON(200, {
+      status: 'success',
+      message: `Kelas "${newClass.name}" berhasil ditambahkan!`,
+      data: newClass
+    });
+  }
+
+  // POST /api/v1/cbt/classes/delete atau DELETE /api/v1/cbt/classes/:id
+  if ((pathname === '/api/v1/cbt/classes/delete' && req.method === 'POST') || (pathname.startsWith('/api/v1/cbt/classes/') && req.method === 'DELETE')) {
+    let clsId = null;
+    let clsName = null;
+    if (req.method === 'DELETE') {
+      const param = pathname.split('/').pop();
+      clsId = parseInt(param, 10);
+      if (isNaN(clsId)) clsName = decodeURIComponent(param);
+    } else {
+      const body = await parseBody(req);
+      clsId = parseInt(body.id, 10);
+      clsName = body.name;
+    }
+    const idx = MASTER_CLASSES.findIndex(c => (clsId && c.id === clsId) || (clsName && c.name.toLowerCase() === clsName.toLowerCase()));
+    if (idx !== -1) {
+      const removed = MASTER_CLASSES.splice(idx, 1)[0];
+      saveClassesToFile();
+      return sendJSON(200, { status: 'success', message: `Kelas "${removed.name}" berhasil dihapus.` });
+    }
+    return sendJSON(404, { status: 'error', message: 'Kelas tidak ditemukan' });
+  }
+
+  // GET /api/v1/cbt/classes/:name/students (Daftar Siswa dalam Kelas Tertentu)
+  if (pathname.startsWith('/api/v1/cbt/classes/') && pathname.endsWith('/students') && req.method === 'GET') {
+    const parts = pathname.split('/');
+    const className = decodeURIComponent(parts[parts.length - 2]).trim();
+    const students = USERS.filter(u => u.role === 'student' && (u.class_name || '').trim().toLowerCase() === className.toLowerCase());
+    return sendJSON(200, {
+      status: 'success',
+      class_name: className,
+      data: students,
+      total: students.length
+    });
+  }
+
   // GET /api/v1/master/classes (Daftar Seluruh Kelas Tersedia di Sekolah Termasuk Preset Hingga 36 Kelas)
   if (pathname === '/api/v1/master/classes' && req.method === 'GET') {
     const studentClasses = USERS.filter(u => u.role === 'student' && u.class_name).map(u => u.class_name.trim());
+    const masterClassNames = MASTER_CLASSES.map(c => c.name.trim());
     const scheduleClasses = [];
     SCHEDULES.forEach(s => {
       const norm = normalizeClassTarget(s.class_target);
@@ -1730,7 +1932,7 @@ const server = http.createServer(async (req, res) => {
       }
     });
 
-    const combinedSet = new Set([...studentClasses, ...scheduleClasses, ...presetClasses].filter(Boolean));
+    const combinedSet = new Set([...masterClassNames, ...studentClasses, ...scheduleClasses, ...presetClasses].filter(Boolean));
     const sortedClasses = Array.from(combinedSet).sort((a, b) => a.localeCompare(b, 'id', { numeric: true }));
 
     return sendJSON(200, {

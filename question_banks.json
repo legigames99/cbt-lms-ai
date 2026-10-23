@@ -1937,5 +1937,14 @@
         "answer": "A"
       }
     ]
+  },
+  {
+    "id": 5,
+    "subject": "Kimia",
+    "title": "Bank Soal Kimia Organik & Stoikiometri",
+    "teacher": "Guru Pengampu",
+    "target_class": "XII IPA 1",
+    "description": "",
+    "questions": []
   }
 ]

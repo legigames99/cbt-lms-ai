@@ -277,11 +277,21 @@
           <span>Materi & Penugasan</span>
         </a>
 
-        <div class="pt-3 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Master & Cetak</div>
+        <div class="pt-3 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Master & Akademik</div>
 
         <a href="#siswa" onclick="switchTab('siswa')" id="nav-siswa" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-users w-4 text-center"></i>
-          <span>Data Siswa & Kelas</span>
+          <i class="fa-solid fa-user-graduate w-4 text-center text-indigo-400"></i>
+          <span>Data Siswa</span>
+        </a>
+
+        <a href="#kelas" onclick="switchTab('kelas')" id="nav-kelas" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+          <i class="fa-solid fa-chalkboard-user w-4 text-center text-blue-400"></i>
+          <span>Data Kelas & Rombel</span>
+        </a>
+
+        <a href="#mapel" onclick="switchTab('mapel')" id="nav-mapel" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+          <i class="fa-solid fa-book-bookmark w-4 text-center text-amber-400"></i>
+          <span>Mata Pelajaran (Mapel)</span>
         </a>
 
         <a href="#kartu-peserta" onclick="switchTab('kartu-peserta')" id="nav-kartu-peserta" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
@@ -1060,6 +1070,218 @@
       <!-- ============================================================== -->
       <!-- TAB 8: SERVER & EXAM LOCKDOWN -->
       <!-- ============================================================== -->
+      <!-- ============================================================== -->
+      <!-- TAB 8A: DATA KELAS & ROMBEL (MENU MANDIRI) -->
+      <!-- ============================================================== -->
+      <section id="tab-kelas" class="hidden space-y-6">
+        <!-- Banner Header -->
+        <div class="bg-gradient-to-r from-blue-950/60 via-slate-900 to-indigo-950/40 border border-blue-500/30 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/40 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-chalkboard-user"></i> Master Akademik
+              </span>
+              <span class="text-xs text-slate-500">•</span>
+              <span class="text-xs text-slate-400">Tingkat X, XI, XII & Kejuruan</span>
+            </div>
+            <h3 class="text-xl font-bold text-white flex items-center gap-2.5">
+              <span>Data Kelas & Rombongan Belajar (Rombel)</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              Kelola rombongan belajar sekolah, jurusan, wali kelas, ruang ujian CBT, serta lihat langsung daftar siswa yang terdaftar pada masing-masing kelas.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3 shrink-0 flex-wrap">
+            <button onclick="switchTab('siswa')" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold transition flex items-center gap-2">
+              <i class="fa-solid fa-user-graduate text-indigo-400"></i> Kelola Siswa →
+            </button>
+            <button onclick="openModal('modalAddClass')" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white transition flex items-center gap-2 shadow-lg shadow-blue-600/30">
+              <i class="fa-solid fa-plus"></i> Tambah Kelas Baru
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric Cards Kelas -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+              <span>Total Rombel Kelas</span>
+              <i class="fa-solid fa-chalkboard text-blue-400"></i>
+            </div>
+            <div id="statTotalClasses" class="text-3xl font-extrabold text-white font-mono">0</div>
+            <div class="text-[11px] text-slate-400 mt-1">Kelas aktif di sistem</div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+              <span>Total Siswa Terdaftar</span>
+              <i class="fa-solid fa-users text-indigo-400"></i>
+            </div>
+            <div id="statClassesStudentTotal" class="text-3xl font-extrabold text-indigo-400 font-mono">0</div>
+            <div class="text-[11px] text-slate-400 mt-1">Tersebar di seluruh rombel</div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+              <span>Rata-Rata per Kelas</span>
+              <i class="fa-solid fa-chart-simple text-emerald-400"></i>
+            </div>
+            <div id="statAvgStudentsPerClass" class="text-3xl font-extrabold text-emerald-400 font-mono">0</div>
+            <div class="text-[11px] text-slate-400 mt-1">Siswa / rombongan belajar</div>
+          </div>
+        </div>
+
+        <!-- Filter & Search Bar Kelas -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-3 flex-wrap">
+            <span class="text-slate-400 font-semibold flex items-center gap-1.5">
+              <i class="fa-solid fa-filter text-blue-400"></i> Filter Tingkat:
+            </span>
+            <select id="filterClassLevel" onchange="renderMasterClassesTable()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-white focus:outline-none focus:border-blue-500">
+              <option value="all">Semua Tingkat (X, XI, XII)</option>
+              <option value="X">Kelas X</option>
+              <option value="XI">Kelas XI</option>
+              <option value="XII">Kelas XII</option>
+            </select>
+          </div>
+          <div class="relative w-64">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+            <input type="text" id="searchClassInput" oninput="renderMasterClassesTable()" placeholder="Cari nama kelas, jurusan, wali..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
+          </div>
+        </div>
+
+        <!-- Tabel Master Data Kelas -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl overflow-x-auto">
+          <table class="w-full text-xs text-left">
+            <thead class="text-slate-400 bg-slate-950 uppercase text-[10px] tracking-wider">
+              <tr>
+                <th class="px-4 py-3 rounded-l-lg w-12 text-center">No</th>
+                <th class="px-4 py-3">Nama Rombel / Kelas</th>
+                <th class="px-4 py-3">Tingkat</th>
+                <th class="px-4 py-3">Jurusan / Program Keahlian</th>
+                <th class="px-4 py-3">Wali Kelas</th>
+                <th class="px-4 py-3">Ruang / Lab CBT</th>
+                <th class="px-4 py-3 text-center">Jumlah Siswa</th>
+                <th class="px-4 py-3 rounded-r-lg text-center">Aksi & Data Siswa</th>
+              </tr>
+            </thead>
+            <tbody id="masterClassesTableBody" class="divide-y divide-slate-800 text-slate-300">
+              <!-- Rendered dynamically by fetchMasterClasses() -->
+              <tr>
+                <td colspan="8" class="text-center py-6 text-slate-500">Memuat data kelas...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 8B: MASTER MATA PELAJARAN / MAPEL (MENU MANDIRI) -->
+      <!-- ============================================================== -->
+      <section id="tab-mapel" class="hidden space-y-6">
+        <!-- Banner Header -->
+        <div class="bg-gradient-to-r from-amber-950/60 via-slate-900 to-indigo-950/40 border border-amber-500/30 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-book-bookmark"></i> Kurikulum & Asesmen
+              </span>
+              <span class="text-xs text-slate-500">•</span>
+              <span class="text-xs text-slate-400">Sinkronisasi Otomatis ke Bank Soal</span>
+            </div>
+            <h3 class="text-xl font-bold text-white flex items-center gap-2.5">
+              <span>Master Mata Pelajaran (Mapel)</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              Kelola master mata pelajaran resmi sekolah. Nama mata pelajaran di Bank Soal dan Jadwal Ujian otomatis mengambil dari daftar ini sehingga tidak perlu diketik manual dan bebas kesalahan ketik.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3 shrink-0 flex-wrap">
+            <button onclick="switchTab('bank-soal')" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold transition flex items-center gap-2">
+              <i class="fa-solid fa-box-archive text-amber-400"></i> Kelola Bank Soal →
+            </button>
+            <button onclick="openModal('modalAddSubject')" class="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-xs font-bold text-white transition flex items-center gap-2 shadow-lg shadow-amber-600/30">
+              <i class="fa-solid fa-plus"></i> Tambah Mapel Baru
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric Cards Mapel -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+              <span>Total Mata Pelajaran</span>
+              <i class="fa-solid fa-book-open text-amber-400"></i>
+            </div>
+            <div id="statTotalSubjects" class="text-3xl font-extrabold text-white font-mono">0</div>
+            <div class="text-[11px] text-slate-400 mt-1">Terdaftar di kurikulum</div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+              <span>Bank Soal Terhubung</span>
+              <i class="fa-solid fa-folder-open text-indigo-400"></i>
+            </div>
+            <div id="statSubjectLinkedBanks" class="text-3xl font-extrabold text-indigo-400 font-mono">0</div>
+            <div class="text-[11px] text-slate-400 mt-1">Paket soal aktif</div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+              <span>Kelompok Kurikulum</span>
+              <i class="fa-solid fa-layer-group text-emerald-400"></i>
+            </div>
+            <div id="statSubjectGroups" class="text-3xl font-extrabold text-emerald-400 font-mono">4</div>
+            <div class="text-[11px] text-slate-400 mt-1">Umum, MIPA, IPS & Kejuruan</div>
+          </div>
+        </div>
+
+        <!-- Filter & Search Bar Mapel -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-3 flex-wrap">
+            <span class="text-slate-400 font-semibold flex items-center gap-1.5">
+              <i class="fa-solid fa-filter text-amber-400"></i> Filter Kelompok:
+            </span>
+            <select id="filterSubjectGroup" onchange="renderMasterSubjectsTable()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-white focus:outline-none focus:border-amber-500">
+              <option value="all">Semua Kelompok</option>
+              <option value="Umum">Mata Pelajaran Umum</option>
+              <option value="MIPA">Peminatan MIPA</option>
+              <option value="IPS">Peminatan IPS</option>
+              <option value="Kejuruan">Kejuruan SMK</option>
+            </select>
+          </div>
+          <div class="relative w-64">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+            <input type="text" id="searchSubjectInput" oninput="renderMasterSubjectsTable()" placeholder="Cari nama mapel atau kode..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+
+        <!-- Tabel Master Data Mata Pelajaran -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl overflow-x-auto">
+          <table class="w-full text-xs text-left">
+            <thead class="text-slate-400 bg-slate-950 uppercase text-[10px] tracking-wider">
+              <tr>
+                <th class="px-4 py-3 rounded-l-lg w-12 text-center">No</th>
+                <th class="px-4 py-3">Kode Mapel</th>
+                <th class="px-4 py-3">Nama Mata Pelajaran</th>
+                <th class="px-4 py-3">Jenjang / Tingkat</th>
+                <th class="px-4 py-3">Kelompok Kurikulum</th>
+                <th class="px-4 py-3 text-center">Bank Soal Terhubung</th>
+                <th class="px-4 py-3 rounded-r-lg text-center">Aksi & Buat Bank</th>
+              </tr>
+            </thead>
+            <tbody id="masterSubjectsTableBody" class="divide-y divide-slate-800 text-slate-300">
+              <!-- Rendered dynamically by fetchMasterSubjects() -->
+              <tr>
+                <td colspan="7" class="text-center py-6 text-slate-500">Memuat data mata pelajaran...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <section id="tab-server" class="hidden space-y-6">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex items-center justify-between">
           <div class="flex items-center gap-4">
@@ -3149,6 +3371,96 @@
     </div>
   </div>
 
+  <!-- ==================== MODAL TAMBAH KELAS BARU ==================== -->
+  <div id="modalAddClass" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 text-xs">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <h4 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-chalkboard-user text-blue-400"></i> Tambah Rombel / Kelas Baru
+        </h4>
+        <button onclick="closeModal('modalAddClass')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Nama Kelas / Rombel *</label>
+          <input type="text" id="newClassName" placeholder="Contoh: XII MIPA 3 atau X RPL 2" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-bold">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Tingkat Kelas</label>
+            <select id="newClassLevel" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-medium">
+              <option value="X">Kelas X</option>
+              <option value="XI">Kelas XI</option>
+              <option value="XII" selected>Kelas XII</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Jurusan / Program</label>
+            <input type="text" id="newClassMajor" placeholder="Contoh: MIPA / RPL" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Nama Wali Kelas</label>
+          <input type="text" id="newClassHomeroom" placeholder="Contoh: Nurul Hidayati, S.Pd." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Ruang / Lab Ujian CBT Utama</label>
+          <input type="text" id="newClassRoom" placeholder="Contoh: Ruang Lab Komputer 01" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+        <button onclick="closeModal('modalAddClass')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Batal</button>
+        <button onclick="handleAddClassSubmit()" id="btnSaveNewClass" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition flex items-center gap-1.5 shadow-lg shadow-blue-600/30">
+          <i class="fa-solid fa-plus"></i> Simpan Kelas Baru
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL TAMBAH MATA PELAJARAN BARU ==================== -->
+  <div id="modalAddSubject" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 text-xs">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <h4 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-book-bookmark text-amber-400"></i> Tambah Mata Pelajaran Baru
+        </h4>
+        <button onclick="closeModal('modalAddSubject')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Nama Mata Pelajaran *</label>
+          <input type="text" id="newSubjectName" placeholder="Contoh: Biologi atau Pemrograman Dasar" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-bold">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Kode Mapel</label>
+            <input type="text" id="newSubjectCode" placeholder="Contoh: BIO" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-mono uppercase">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Jenjang</label>
+            <input type="text" id="newSubjectLevel" value="SMA/SMK" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Kelompok Kurikulum</label>
+          <select id="newSubjectGroup" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
+            <option value="Umum">Umum (Wajib Nasional)</option>
+            <option value="Peminatan MIPA">Peminatan MIPA</option>
+            <option value="Peminatan IPS">Peminatan IPS</option>
+            <option value="Kejuruan SMK">Kejuruan / Produktif SMK</option>
+            <option value="Pilihan / Muatan Lokal">Pilihan / Muatan Lokal</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+        <button onclick="closeModal('modalAddSubject')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Batal</button>
+        <button onclick="handleAddSubjectSubmit()" id="btnSaveNewSubject" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold transition flex items-center gap-1.5 shadow-lg shadow-amber-600/30">
+          <i class="fa-solid fa-plus"></i> Simpan Mata Pelajaran
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== MODAL 5: BUAT BANK SOAL BARU ==================== -->
   <div id="modalCreateBank" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 text-xs">
@@ -3160,12 +3472,31 @@
       </div>
       <div class="space-y-3">
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Mata Pelajaran</label>
-          <input type="text" id="bankSubject" placeholder="Contoh: Matematika Wajib XII" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
+          <div class="flex items-center justify-between mb-1">
+            <label class="block font-semibold text-slate-300">Pilih Mata Pelajaran (Master Mapel)</label>
+            <button type="button" onclick="openModal('modalAddSubject')" class="text-[11px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
+              <i class="fa-solid fa-plus text-[10px]"></i> Tambah Mapel Baru
+            </button>
+          </div>
+          <select id="bankSubject" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-medium focus:border-indigo-500">
+            <!-- Populated dynamically from Master Subjects -->
+            <option value="Fisika">Fisika</option>
+            <option value="Matematika Wajib">Matematika Wajib</option>
+            <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+            <option value="Bahasa Inggris">Bahasa Inggris</option>
+          </select>
+          <p class="text-[10px] text-slate-500 mt-1">Nama mata pelajaran diambil otomatis dari Master Mapel sehingga seragam dan terintegrasi.</p>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Target Kelas / Rombel</label>
+          <select id="bankTargetClass" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-medium focus:border-indigo-500">
+            <option value="Semua Kelas">Semua Kelas / Lintas Rombel</option>
+            <!-- Populated dynamically from Master Classes -->
+          </select>
         </div>
         <div>
           <label class="block font-semibold text-slate-300 mb-1">Judul Bank Soal</label>
-          <input type="text" id="bankTitle" placeholder="Contoh: Bank Soal UAS Semester Ganjil" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
+          <input type="text" id="bankTitle" placeholder="Contoh: Bank Soal Penilaian Akhir Semester (PAS)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
         </div>
       </div>
       <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
@@ -3624,6 +3955,8 @@
       // Sinkronisasi data profil sekolah & master siswa untuk cetak kartu ujian
       fetchSchoolProfile();
       fetchMasterStudents();
+      fetchMasterClasses();
+      fetchMasterSubjects();
       fetchQuestionBanks();
 
       // Inisialisasi Kredensial AI & BYOK
@@ -3703,6 +4036,12 @@
       if (tabName === 'siswa') {
         fetchMasterStudents();
       }
+      if (tabName === 'kelas') {
+        fetchMasterClasses();
+      }
+      if (tabName === 'mapel') {
+        fetchMasterSubjects();
+      }
       if (tabName === 'bank-soal') {
         fetchQuestionBanks();
       }
@@ -3717,7 +4056,9 @@
         'monitoring': 'Pengawasan Ujian (Live Proktor)',
         'nilai': 'Hasil & Analisis Nilai',
         'materi': 'Materi Ajar & Penugasan LMS',
-        'siswa': 'Data Siswa & Kelas',
+        'siswa': 'Data Siswa Terdaftar',
+        'kelas': 'Data Kelas & Rombongan Belajar (Rombel)',
+        'mapel': 'Master Mata Pelajaran (Mapel)',
         'kartu-peserta': 'Kartu Peserta Ujian Siswa',
         'server': 'Sistem & Server',
         'pengaturan': 'Pengaturan Profil Sekolah',
@@ -9140,6 +9481,324 @@
 
 
     // ==============================================================
+    // ==============================================================
+    // CONTROLLER: MASTER DATA KELAS & MATA PELAJARAN
+    // ==============================================================
+    let masterClassesData = [];
+    let masterSubjectsData = [];
+
+    window.fetchMasterClasses = async function() {
+      try {
+        const res = await fetch('/api/v1/cbt/classes');
+        const json = await res.json();
+        if (json.status !== 'success') return;
+        masterClassesData = json.data || [];
+
+        // Hitung total statistik
+        const totalClasses = masterClassesData.length;
+        const totalStudents = masterClassesData.reduce((acc, c) => acc + (c.student_count || 0), 0);
+        const avg = totalClasses > 0 ? (totalStudents / totalClasses).toFixed(1) : 0;
+
+        const statTotalCls = document.getElementById('statTotalClasses');
+        if (statTotalCls) statTotalCls.innerText = totalClasses;
+
+        const statTotStd = document.getElementById('statClassesStudentTotal');
+        if (statTotStd) statTotStd.innerText = totalStudents;
+
+        const statAvg = document.getElementById('statAvgStudentsPerClass');
+        if (statAvg) statAvg.innerText = avg;
+
+        renderMasterClassesTable();
+        syncClassesToDropdowns();
+      } catch (err) {
+        console.warn('Gagal memuat master kelas:', err);
+      }
+    };
+
+    window.renderMasterClassesTable = function() {
+      const tbody = document.getElementById('masterClassesTableBody');
+      if (!tbody) return;
+
+      const levelFilter = document.getElementById('filterClassLevel')?.value || 'all';
+      const search = (document.getElementById('searchClassInput')?.value || '').toLowerCase().trim();
+
+      const filtered = masterClassesData.filter(c => {
+        const matchLevel = levelFilter === 'all' || (c.level || '').toUpperCase() === levelFilter.toUpperCase();
+        const matchSearch = !search ||
+          (c.name || '').toLowerCase().includes(search) ||
+          (c.major || '').toLowerCase().includes(search) ||
+          (c.homeroom || '').toLowerCase().includes(search);
+        return matchLevel && matchSearch;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-slate-500">Tidak ada kelas yang sesuai filter.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((c, idx) => {
+        const countBadge = c.student_count > 0
+          ? `<span class="px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 font-bold font-mono border border-indigo-500/30">${c.student_count} Siswa</span>`
+          : `<span class="px-2.5 py-1 rounded-full bg-slate-800 text-slate-500 font-semibold text-[11px]">0 Siswa</span>`;
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="px-4 py-3 text-center text-slate-500 font-mono">${idx + 1}</td>
+            <td class="px-4 py-3 font-bold text-white flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-xs">
+                ${(c.name || '').substring(0, 2)}
+              </span>
+              <span>${c.name}</span>
+            </td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700 font-semibold">${c.level || '-'}</span>
+            </td>
+            <td class="px-4 py-3 text-slate-300">${c.major || 'Umum'}</td>
+            <td class="px-4 py-3 text-slate-300">${c.homeroom || '-'}</td>
+            <td class="px-4 py-3 text-slate-400">${c.room || '-'}</td>
+            <td class="px-4 py-3 text-center">${countBadge}</td>
+            <td class="px-4 py-3 text-center">
+              <div class="flex items-center justify-center gap-2">
+                <button onclick="viewClassStudents('${c.name}')" class="px-2.5 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 font-semibold text-[11px] transition flex items-center gap-1" title="Lihat Siswa Kelas Ini">
+                  <i class="fa-solid fa-users"></i> Lihat Siswa
+                </button>
+                <button onclick="handleDeleteClass(${c.id}, '${c.name}')" class="text-rose-400 hover:text-rose-300 p-1.5 transition" title="Hapus Kelas">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    };
+
+    window.viewClassStudents = function(className) {
+      switchTab('siswa');
+      setTimeout(() => {
+        const filter = document.getElementById('studentClassFilter');
+        if (filter) {
+          filter.value = className;
+          filterStudentsTable();
+        }
+      }, 150);
+    };
+
+    window.handleAddClassSubmit = async function() {
+      const name = (document.getElementById('newClassName')?.value || '').trim();
+      const level = document.getElementById('newClassLevel')?.value || 'XII';
+      const major = (document.getElementById('newClassMajor')?.value || '').trim();
+      const homeroom = (document.getElementById('newClassHomeroom')?.value || '').trim();
+      const room = (document.getElementById('newClassRoom')?.value || '').trim();
+
+      if (!name) {
+        alert('Silakan masukkan nama kelas terlebih dahulu.');
+        document.getElementById('newClassName').focus();
+        return;
+      }
+
+      const btn = document.getElementById('btnSaveNewClass');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/v1/cbt/classes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, level, major, homeroom, room })
+        });
+        const json = await res.json();
+        if (json.status === 'success') {
+          closeModal('modalAddClass');
+          document.getElementById('newClassName').value = '';
+          alert(json.message || 'Kelas berhasil ditambahkan!');
+          await fetchMasterClasses();
+          await fetchMasterStudents();
+        } else {
+          alert('Gagal menambah kelas: ' + json.message);
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    window.handleDeleteClass = async function(id, name) {
+      if (!confirm('Apakah Anda yakin ingin menghapus kelas "' + name + '" dari master kelas?')) return;
+      try {
+        const res = await fetch('/api/v1/cbt/classes/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, name })
+        });
+        const json = await res.json();
+        alert(json.message || 'Kelas berhasil dihapus!');
+        await fetchMasterClasses();
+        await fetchMasterStudents();
+      } catch (err) {
+        alert('Gagal menghapus kelas: ' + err.message);
+      }
+    };
+
+    function syncClassesToDropdowns() {
+      const bankClass = document.getElementById('bankTargetClass');
+      if (bankClass) {
+        bankClass.innerHTML = '<option value="Semua Kelas">Semua Kelas / Lintas Rombel</option>' +
+          masterClassesData.map(c => `<option value="${c.name}">${c.name} (${c.level} ${c.major})</option>`).join('');
+      }
+    }
+
+    // ==============================================================
+    // CONTROLLER: MASTER MATA PELAJARAN (MAPEL)
+    // ==============================================================
+    window.fetchMasterSubjects = async function() {
+      try {
+        const res = await fetch('/api/v1/cbt/subjects');
+        const json = await res.json();
+        if (json.status !== 'success') return;
+        masterSubjectsData = json.data || [];
+
+        const statTotSub = document.getElementById('statTotalSubjects');
+        if (statTotSub) statTotSub.innerText = masterSubjectsData.length;
+
+        const linkedCount = masterSubjectsData.reduce((acc, s) => acc + (s.banks_count || 0), 0);
+        const statLnk = document.getElementById('statSubjectLinkedBanks');
+        if (statLnk) statLnk.innerText = linkedCount;
+
+        renderMasterSubjectsTable();
+        syncSubjectsToBankModal();
+      } catch (err) {
+        console.warn('Gagal memuat master mapel:', err);
+      }
+    };
+
+    window.renderMasterSubjectsTable = function() {
+      const tbody = document.getElementById('masterSubjectsTableBody');
+      if (!tbody) return;
+
+      const groupFilter = document.getElementById('filterSubjectGroup')?.value || 'all';
+      const search = (document.getElementById('searchSubjectInput')?.value || '').toLowerCase().trim();
+
+      const filtered = masterSubjectsData.filter(s => {
+        const matchGroup = groupFilter === 'all' || (s.group || '').toLowerCase().includes(groupFilter.toLowerCase());
+        const matchSearch = !search ||
+          (s.name || '').toLowerCase().includes(search) ||
+          (s.code || '').toLowerCase().includes(search);
+        return matchGroup && matchSearch;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-slate-500">Tidak ada mata pelajaran yang sesuai filter.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((s, idx) => {
+        const bankBadge = (s.banks_count || 0) > 0
+          ? `<span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold font-mono border border-emerald-500/30">${s.banks_count} Bank Soal</span>`
+          : `<span class="px-2.5 py-1 rounded-full bg-slate-800 text-slate-500 font-semibold text-[11px]">0 Bank Soal</span>`;
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="px-4 py-3 text-center text-slate-500 font-mono">${idx + 1}</td>
+            <td class="px-4 py-3 font-mono font-bold text-amber-400">${s.code}</td>
+            <td class="px-4 py-3 font-bold text-white">${s.name}</td>
+            <td class="px-4 py-3 text-slate-300">${s.level || 'SMA/SMK'}</td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700 font-semibold text-[11px]">${s.group || 'Umum'}</span>
+            </td>
+            <td class="px-4 py-3 text-center">${bankBadge}</td>
+            <td class="px-4 py-3 text-center">
+              <div class="flex items-center justify-center gap-2">
+                <button onclick="createBankForSubject('${s.name}')" class="px-2.5 py-1 rounded-lg bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 font-semibold text-[11px] transition flex items-center gap-1" title="Buat Bank Soal untuk Mapel Ini">
+                  <i class="fa-solid fa-plus"></i> Buat Bank Soal
+                </button>
+                <button onclick="handleDeleteSubject(${s.id}, '${s.name}')" class="text-rose-400 hover:text-rose-300 p-1.5 transition" title="Hapus Mapel">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    };
+
+    window.createBankForSubject = function(subjectName) {
+      openModal('modalCreateBank');
+      setTimeout(() => {
+        const subSelect = document.getElementById('bankSubject');
+        if (subSelect) {
+          subSelect.value = subjectName;
+        }
+        const titleInput = document.getElementById('bankTitle');
+        if (titleInput && !titleInput.value) {
+          titleInput.value = 'Bank Soal ' + subjectName + ' TKA';
+        }
+      }, 100);
+    };
+
+    window.syncSubjectsToBankModal = function() {
+      const select = document.getElementById('bankSubject');
+      if (!select) return;
+      const currentVal = select.value;
+      select.innerHTML = masterSubjectsData.map(s => `<option value="${s.name}">${s.name} (${s.code}) - ${s.group}</option>`).join('');
+      if (currentVal && masterSubjectsData.some(s => s.name === currentVal)) {
+        select.value = currentVal;
+      }
+    };
+
+    window.handleAddSubjectSubmit = async function() {
+      const name = (document.getElementById('newSubjectName')?.value || '').trim();
+      const code = (document.getElementById('newSubjectCode')?.value || '').trim();
+      const level = (document.getElementById('newSubjectLevel')?.value || '').trim();
+      const group = document.getElementById('newSubjectGroup')?.value || 'Umum';
+
+      if (!name) {
+        alert('Silakan masukkan nama mata pelajaran terlebih dahulu.');
+        document.getElementById('newSubjectName').focus();
+        return;
+      }
+
+      const btn = document.getElementById('btnSaveNewSubject');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/v1/cbt/subjects', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, code, level, group })
+        });
+        const json = await res.json();
+        if (json.status === 'success') {
+          closeModal('modalAddSubject');
+          document.getElementById('newSubjectName').value = '';
+          document.getElementById('newSubjectCode').value = '';
+          alert(json.message || 'Mata pelajaran berhasil ditambahkan!');
+          await fetchMasterSubjects();
+        } else {
+          alert('Gagal menambah mata pelajaran: ' + json.message);
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    window.handleDeleteSubject = async function(id, name) {
+      if (!confirm('Apakah Anda yakin ingin menghapus mata pelajaran "' + name + '" dari master data?')) return;
+      try {
+        const res = await fetch('/api/v1/cbt/subjects/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, name })
+        });
+        const json = await res.json();
+        alert(json.message || 'Mata pelajaran berhasil dihapus!');
+        await fetchMasterSubjects();
+      } catch (err) {
+        alert('Gagal menghapus mata pelajaran: ' + err.message);
+      }
+    };
+
     // CONTROLLER: PENGATURAN AI & MODEL GEMINI (SERVER & BYOK)
     // ==============================================================
     window.togglePasswordVisibility = function(inputId, btn) {

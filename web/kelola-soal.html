@@ -559,17 +559,50 @@
       </div>
 
       <div class="space-y-3.5 text-xs">
-        <!-- Target Bank Soal & Materi Pembelajaran -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-slate-300 mb-1">Target Bank Soal Tujuan</label>
-            <select id="aiTargetBank" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-medium focus:border-indigo-500">
-              <!-- Populated dynamically -->
-            </select>
+        <!-- Target Bank Soal & Indikator Anti-Duplikasi -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label class="block font-semibold text-slate-300">Target Bank Soal Tujuan</label>
+            <span class="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full flex items-center gap-1 font-semibold">
+              <i class="fa-solid fa-shield-halved"></i> Anti-Duplikasi Otomatis Aktif
+            </span>
           </div>
-          <div>
-            <label class="block font-semibold text-slate-300 mb-1">Materi / Topik Pembelajaran</label>
-            <input type="text" id="aiTopicInput" value="Hukum Termodinamika & Siklus Carnot" placeholder="Contoh: Termodinamika, Teori Kinetik Gas, dll." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:border-indigo-500">
+          <select id="aiTargetBank" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-medium focus:border-indigo-500">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <!-- Basis Acuan Pembuatan Soal (Materi / CP / TP) -->
+        <div class="space-y-2.5 p-3.5 rounded-xl bg-slate-950/70 border border-slate-800">
+          <div class="flex items-center justify-between">
+            <label class="block font-bold text-indigo-300 text-xs">
+              <i class="fa-solid fa-compass-drafting mr-1 text-indigo-400"></i>Basis Acuan Pembuatan Soal
+            </label>
+            <span class="text-[10px] text-slate-400">Pilih salah satu dasar penyusunan</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <label class="flex items-center gap-2 p-2 rounded-lg border border-indigo-500/40 bg-indigo-950/20 cursor-pointer hover:border-indigo-500 transition" id="lblBasisMateri">
+              <input type="radio" name="aiBasisRadio" value="materi" checked onchange="setAIBasisMode('materi')" class="accent-indigo-600">
+              <span class="text-xs font-semibold text-white">Materi Pokok</span>
+            </label>
+            <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-800 bg-slate-900/60 cursor-pointer hover:border-slate-700 transition" id="lblBasisCP">
+              <input type="radio" name="aiBasisRadio" value="cp" onchange="setAIBasisMode('cp')" class="accent-indigo-600">
+              <span class="text-xs font-semibold text-white">Capaian Pembelajaran (CP)</span>
+            </label>
+            <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-800 bg-slate-900/60 cursor-pointer hover:border-slate-700 transition" id="lblBasisTP">
+              <input type="radio" name="aiBasisRadio" value="tp" onchange="setAIBasisMode('tp')" class="accent-indigo-600">
+              <span class="text-xs font-semibold text-white">Tujuan Pembelajaran (TP)</span>
+            </label>
+          </div>
+
+          <!-- Input Dinamis Berdasarkan Basis yang Dipilih -->
+          <div class="pt-1">
+            <label id="aiBasisLabel" class="block font-semibold text-slate-300 mb-1">Materi / Sub-Topik Pembelajaran</label>
+            <textarea id="aiTopicInput" rows="2" placeholder="Contoh: Termodinamika, Teori Kinetik Gas, Efisiensi Mesin Carnot, dll." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white focus:outline-none focus:border-indigo-500 transition leading-relaxed font-sans text-xs">Hukum Termodinamika & Siklus Carnot</textarea>
+            <p id="aiBasisHelpText" class="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
+              <i class="fa-solid fa-circle-info text-indigo-400"></i>
+              <span>AI menyusun butir soal spesifik dan detail tanpa mencantumkan kode C2/C3/C4 pada teks soal siswa.</span>
+            </p>
           </div>
         </div>
 
@@ -1443,6 +1476,51 @@
     };
 
     // 12. Eksekusi Pembuatan Butir Soal via AI (Gemini Flash & BYOK)
+window.setAIBasisMode = function(basis) {
+      const lbl = document.getElementById('aiBasisLabel');
+      const input = document.getElementById('aiTopicInput');
+      const help = document.getElementById('aiBasisHelpText');
+      const lblMateri = document.getElementById('lblBasisMateri');
+      const lblCP = document.getElementById('lblBasisCP');
+      const lblTP = document.getElementById('lblBasisTP');
+
+      const defCls = 'flex items-center gap-2 p-2 rounded-lg border border-slate-800 bg-slate-900/60 cursor-pointer hover:border-slate-700 transition';
+      const actCls = 'flex items-center gap-2 p-2 rounded-lg border border-indigo-500/40 bg-indigo-950/20 cursor-pointer hover:border-indigo-500 transition';
+
+      if (lblMateri) lblMateri.className = defCls;
+      if (lblCP) lblCP.className = defCls;
+      if (lblTP) lblTP.className = defCls;
+
+      if (basis === 'cp') {
+        if (lblCP) lblCP.className = actCls;
+        if (lbl) lbl.innerText = 'Deskripsi Capaian Pembelajaran (CP) Kurikulum Merdeka';
+        if (input) {
+          input.placeholder = 'Contoh: Peserta didik mampu menganalisis keterkaitan hukum termodinamika dengan konversi energi pada mesin pendingin dan teknologi industri ramah lingkungan.';
+          if (input.value === 'Hukum Termodinamika & Siklus Carnot') {
+            input.value = 'Peserta didik mampu menganalisis prinsip kerja mesin kalor, siklus Carnot, dan efisiensi energi serta dampaknya bagi lingkungan.';
+          }
+        }
+        if (help) help.innerHTML = '<i class="fa-solid fa-circle-info text-indigo-400 mr-1"></i>AI menyusun butir soal spesifik berdasarkan Capaian Pembelajaran (CP) tanpa label C2/C3/C4 di teks soal.';
+      } else if (basis === 'tp') {
+        if (lblTP) lblTP.className = actCls;
+        if (lbl) lbl.innerText = 'Tujuan Pembelajaran (TP) Spesifik';
+        if (input) {
+          input.placeholder = 'Contoh: Peserta didik dapat menghitung efisiensi mesin termal dan membandingkan performa siklus Carnot dengan siklus Otto.';
+          if (input.value === 'Hukum Termodinamika & Siklus Carnot' || input.value.includes('Peserta didik mampu')) {
+            input.value = 'Peserta didik dapat menghitung efisiensi mesin termal dan membandingkan performa siklus Carnot dengan siklus Otto.';
+          }
+        }
+        if (help) help.innerHTML = '<i class="fa-solid fa-circle-info text-indigo-400 mr-1"></i>AI menyusun butir soal terarah yang menguji Tujuan Pembelajaran (TP) ini secara spesifik.';
+      } else {
+        if (lblMateri) lblMateri.className = actCls;
+        if (lbl) lbl.innerText = 'Materi Pokok / Sub-Materi Spesifik';
+        if (input) {
+          input.placeholder = 'Contoh: Hukum Termodinamika, Teori Kinetik Gas, Siklus Carnot, Mesin Pendingin, dll.';
+        }
+        if (help) help.innerHTML = '<i class="fa-solid fa-circle-info text-indigo-400 mr-1"></i>AI membuat soal mendalam dan detail menguji materi pokok di atas tanpa menyebutkan C2/C3/C4.';
+      }
+    };
+
     async function handleGenerateQuestionAI() {
       const btn = document.getElementById('btnGenerateAI');
       const prog = document.getElementById('aiModalProgress');
@@ -1491,6 +1569,8 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             bank_id: bankId,
+            basis_type: basisType,
+            basis_text: basisText,
             topic: topic,
             question_type: questionType,
             cog_level: cogLevel,

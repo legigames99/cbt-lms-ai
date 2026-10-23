@@ -424,52 +424,97 @@ function gradeEssayWithAI({ question_stem, rubric, ideal_answer, student_answer,
 
 // ==============================================================
 // AI QUESTION GENERATOR ENGINE (GEMINI FLASH SERIES & BYOK TKA)
+// Bebas C2/C3/C4, Berdasarkan Materi/CP/TP, & Anti-Duplikasi
 // ==============================================================
-function callGoogleGeminiAPI({ apiKey, model, topic, question_type, cog_level, count, custom_prompt }) {
+
+function sanitizeQuestionText(text) {
+  if (!text || typeof text !== 'string') return text;
+  return text
+    .replace(/pada\s+tingkat\s+kognitif\s*C?[1-6]?,?\s*/gi, '')
+    .replace(/berdasarkan\s+prinsip\s+dasar\s+ilmu\s+pada\s+tingkat\s+kognitif\s*C?[1-6]?,?\s*/gi, 'Berdasarkan analisis prinsip ilmu tersebut, ')
+    .replace(/berdasarkan\s+tingkat\s+kognitif\s*C?[1-6]?,?\s*/gi, '')
+    .replace(/\(level\s+kognitif:?\s*C[1-6]\)/gi, '')
+    .replace(/\[\s*tingkat\s+kognitif:?\s*C[1-6]\s*\]/gi, '')
+    .replace(/\bLevel\s+kognitif\s+C[1-6]\b:?\s*/gi, '')
+    .replace(/\bLevel\s+C[1-6]\b:?\s*/gi, '')
+    .replace(/\btingkat\s+kognitif\s+C[1-6]\b/gi, 'analisis mendalam')
+    .replace(/\bC[1-6]\s*-\s*(Mengingat|Memahami|Menerapkan|Menganalisis|Mengevaluasi|Mencipta)/gi, '$1')
+    .replace(/(\s)\s+/g, '$1')
+    .trim();
+}
+
+function callGoogleGeminiAPI({ apiKey, model, basis_type = 'materi', basis_text = '', topic = '', question_type = 'all', cog_level = 'mixed', count = 5, custom_prompt = '', existing_stems = [] }) {
   return new Promise((resolve, reject) => {
     let endpointModel = 'gemini-1.5-flash';
-    if (model.includes('flash-lite')) endpointModel = 'gemini-1.5-flash-8b';
+    if (model.includes('flash-lite') || model.includes('3.5-flash-lite')) endpointModel = 'gemini-1.5-flash-8b';
     else if (model.includes('pro')) endpointModel = 'gemini-1.5-pro';
     else endpointModel = 'gemini-1.5-flash';
 
-    const promptText = `Anda adalah pakar penyusun asesmen standar TKA SMA/SMK dan ANBK Pusmendik Kemdikbudristek.
-Susunlah ${count} butir soal Asesmen berkualitas tinggi untuk materi: "${topic}".
-Format soal yang diminta: ${question_type === 'all' ? 'Variasi format campuran (mcq, mcq_complex, true_false, matching, short_essay, long_essay)' : question_type}.
-Tingkat kognitif Bloom: ${cog_level === 'mixed' ? 'Variasi C1 s/d C6' : cog_level}.
-${custom_prompt ? `Instruksi khusus: ${custom_prompt}` : ''}
+    let basisInstruction = '';
+    if (basis_type === 'cp') {
+      basisInstruction = "BASIS ACUAN ASESMEN: CAPAIAN PEMBELAJARAN (CP)\n"
+        + "Deskripsi CP yang diuji: \"" + (basis_text || topic) + "\"\n"
+        + "Instruksi: Setiap butir soal WAJIB secara ketat dan spesifik menguji kompetensi, proses kognitif, dan indikator esensial yang tercantum dalam Capaian Pembelajaran tersebut.";
+    } else if (basis_type === 'tp') {
+      basisInstruction = "BASIS ACUAN ASESMEN: TUJUAN PEMBELAJARAN (TP)\n"
+        + "Deskripsi TP yang diuji: \"" + (basis_text || topic) + "\"\n"
+        + "Instruksi: Setiap butir soal WAJIB berorientasi langsung pada ketercapaian Tujuan Pembelajaran tersebut secara terukur, aplikatif, dan detail.";
+    } else {
+      basisInstruction = "BASIS ACUAN ASESMEN: MATERI / SUB-TOPIK SPESIFIK\n"
+        + "Materi Pokok yang diuji: \"" + (basis_text || topic) + "\"\n"
+        + "Instruksi: Susunlah butir soal yang menguji pemahaman konsep, analisis fenomena, dan aplikasi saintifik materi tersebut secara mendalam.";
+    }
 
-Output HARUS berupa JSON array murni tanpa pembungkus markdown.
-Setiap elemen array memiliki atribut:
-- type: 'mcq' | 'mcq_complex' | 'true_false' | 'matching' | 'short_essay' | 'long_essay'
-- cog: level Bloom seperti 'C2', 'C3', 'C4', 'C5', atau 'C6'
-- weight: number (misal 1.0, 1.5, 2.0, 3.0)
-- stem: teks pertanyaan dalam format HTML (dapat memuat tag <strong>, <em>, dll.)
-- explanation: pembahasan ilmiah singkat mengenai alasan jawaban benar
-Sesuai tipe soal:
-- Untuk mcq: options: [{id: 'A', text: '...'}, {id: 'B', text: '...'}, {id: 'C', text: '...'}, {id: 'D', text: '...'}, {id: 'E', text: '...'}], answer: 'A'
-- Untuk mcq_complex: options: 5 opsi (A-E), answer: array huruf kunci benar (contoh: ['A', 'C'])
-- Untuk true_false: statements: [{id: 0, text: '...', key: 'B'}, {id: 1, text: '...', key: 'S'}, ...], answer: {"0": "B", "1": "S"}
-- Untuk matching: premises: [{id: 0, text: '...'}, ...], targets: [{id: 'A', text: '...'}, ...], answer: {"0": "A"}
-- Untuk short_essay: answer_keys: ['kunci1', 'kunci2']
-- Untuk long_essay: rubric: 'kriteria rubrik', ideal_answer: 'uraian jawaban acuan', max_score: 100, keywords: ['kata1', 'kata2']
-`;
+    let antiDuplicationPrompt = '';
+    if (existing_stems && Array.isArray(existing_stems) && existing_stems.length > 0) {
+      antiDuplicationPrompt = "\nPERINGATAN KERAS ANTI-DUPLIKASI (DILARANG MEMBUAT SOAL YANG MIRIP/SERUPA):\n"
+        + "Bank soal ini SUDAH MEMILIKI " + existing_stems.length + " butir soal berikut yang telah dibuat sebelumnya:\n"
+        + existing_stems.slice(-12).map((s, idx) => '  [Soal ' + (idx + 1) + '] "' + s + '"').join('\n')
+        + "\n\nATURAN ANTI-DUPLIKASI:\n"
+        + "DILARANG KERAS membuat soal yang serupa, berulang, atau menguji sudut pandang yang sama dengan soal-soal di atas!\n"
+        + "Anda WAJIB menyusun butir soal yang BENAR-BENAR BARU dengan stimulus situasi berbeda, studi kasus/data eksperimen berbeda, konteks aplikasi berbeda, dan indikator penalaran baru yang belum pernah muncul sebelumnya!\n";
+    }
+
+    const promptText = "Anda adalah pakar penyusun asesmen standar TKA (Tes Kemampuan Akademik) SMA/SMK dan Asesmen Nasional Pusmendik Kemdikbudristek.\n"
+      + basisInstruction + "\n"
+      + "Target Jumlah Soal: " + count + " butir soal.\n"
+      + "Format Soal yang diminta: " + (question_type === 'all' ? 'Variasi format campuran TKA (mcq, mcq_complex, true_false, matching, short_essay, long_essay)' : question_type) + ".\n"
+      + (custom_prompt ? ("Instruksi khusus tambahan: " + custom_prompt + "\n") : "")
+      + antiDuplicationPrompt + "\n"
+      + "ATURAN PEDAGOGIS SANGAT KETAT (WAJIB DIPATUHI 100%):\n"
+      + "1. DILARANG KERAS MENCANTUMKAN KODE/LABEL LEVEL KOGNITIF SEPERTI 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'LOTS', 'HOTS', ATAU KATA 'TINGKAT KOGNITIF' DI DALAM TEKS PERTANYAAN (STEM), STIMULUS, MAUPUN PILIHAN JAWABAN! Pertanyaan harus murni bernada akademis, profesional, dan alami bagi siswa SMA/SMK tanpa membocorkan kategori taksonomi di teks soal.\n"
+      + "2. DETAIL, SPESIFIK, DAN MENDALAM: Setiap soal WAJIB memiliki stimulus yang jelas (studi kasus nyata, fenomena alam/kejuruan industri, data numerik/tabel/eksperimen) yang menuntut analisis berpikir kritis, bukan pertanyaan dangkal atau sekadar hafalan definisi.\n"
+      + "3. KUNCI JAWABAN & PEMBAHASAN: Sediakan penjelasan ilmiah yang detail, runtut, dan edukatif untuk setiap butir soal.\n\n"
+      + "Format Output WAJIB berupa JSON array murni tanpa pembungkus markdown.\n"
+      + "Setiap elemen array memiliki struktur:\n"
+      + "- type: 'mcq' | 'mcq_complex' | 'true_false' | 'matching' | 'short_essay' | 'long_essay'\n"
+      + "- cog: level taksonomi ('C2'/'C3'/'C4'/'C5'/'C6') HANYA untuk metadata sistem (JANGAN dicantumkan di teks stem!)\n"
+      + "- weight: number (misal 1.0, 1.5, 2.0, 3.0)\n"
+      + "- stem: teks pertanyaan dalam format HTML (dapat memuat tag <strong>, <em>, <p>, <table>, dll. TANPA ada kata C1-C6)\n"
+      + "- explanation: pembahasan ilmiah detail mengenai alasan jawaban benar (TANPA kata C1-C6)\n"
+      + "- Untuk 'mcq': options: [{id: 'A', text: '...'}, {id: 'B', text: '...'}, {id: 'C', text: '...'}, {id: 'D', text: '...'}, {id: 'E', text: '...'}], answer: 'A'\n"
+      + "- Untuk 'mcq_complex': options: 5 opsi (A-E), answer: array huruf kunci benar (contoh: ['A', 'C'])\n"
+      + "- Untuk 'true_false': statements: [{id: 0, text: '...', key: 'B'}, {id: 1, text: '...', key: 'S'}, ...], answer: {\"0\": \"B\", \"1\": \"S\"}\n"
+      + "- Untuk 'matching': premises: [{id: 0, text: '...'}, ...], targets: [{id: 'A', text: '...'}, ...], answer: {\"0\": \"A\"}\n"
+      + "- Untuk 'short_essay': answer_keys: ['kunci1', 'kunci2']\n"
+      + "- Untuk 'long_essay': rubric: 'kriteria rubrik', ideal_answer: 'uraian jawaban acuan', max_score: 100, keywords: ['kata1', 'kata2']\n";
 
     const payload = JSON.stringify({
       contents: [{ parts: [{ text: promptText }] }],
       generationConfig: {
-        temperature: 0.7,
+        temperature: 0.75,
         responseMimeType: 'application/json'
       }
     });
 
     const https = require('https');
-    const req = https.request(`https://generativelanguage.googleapis.com/v1beta/models/${endpointModel}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+    const req = https.request("https://generativelanguage.googleapis.com/v1beta/models/" + endpointModel + ":generateContent?key=" + encodeURIComponent(apiKey), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(payload)
       },
-      timeout: 15000
+      timeout: 18000
     }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
@@ -477,13 +522,14 @@ Sesuai tipe soal:
         try {
           if (res.statusCode >= 200 && res.statusCode < 300) {
             const parsed = JSON.parse(data);
-            const rawText = parsed.candidates?.[0]?.content?.parts?.[0]?.text || '';
-            const cleaned = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+            const rawText = parsed.candidates && parsed.candidates[0] && parsed.candidates[0].content && parsed.candidates[0].content.parts && parsed.candidates[0].content.parts[0] ? parsed.candidates[0].content.parts[0].text : '';
+            const BT3 = String.fromCharCode(96).repeat(3);
+            const cleaned = rawText.split(BT3 + 'json').join('').split(BT3).join('').trim();
             const questions = JSON.parse(cleaned);
             if (Array.isArray(questions)) return resolve(questions);
             if (questions.questions && Array.isArray(questions.questions)) return resolve(questions.questions);
           }
-          reject(new Error(`Gemini API HTTP ${res.statusCode}: ${data.substring(0, 160)}`));
+          reject(new Error("Gemini API HTTP " + res.statusCode + ": " + data.substring(0, 160)));
         } catch (e) {
           reject(e);
         }
@@ -497,107 +543,193 @@ Sesuai tipe soal:
   });
 }
 
-function generatePedagogicalTKAQuestions({ topic, question_type, cog_level, count, custom_prompt, modelUsed }) {
+function generatePedagogicalTKAQuestions({ topic, basis_type = 'materi', basis_text = '', question_type = 'all', cog_level = 'mixed', count = 5, custom_prompt = '', modelUsed = 'gemini-3.5-flash', existingCount = 0 }) {
   const result = [];
   const types = ['mcq', 'mcq_complex', 'true_false', 'matching', 'short_essay', 'long_essay'];
-  const bloomLevels = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6'];
+  const bloomLevels = ['C2', 'C3', 'C4', 'C4', 'C5', 'C6'];
+
+  const coreLabel = (basis_text && basis_text.trim()) ? basis_text.trim() : (topic || 'Kajian Asesmen Pembelajaran');
+
+  // Koleksi 12 Skenario Aplikasi Kontekstual yang Berbeda untuk Anti-Duplikasi
+  const scenarios = [
+    {
+      domain: 'Siklus Termal & Pembangkit Daya Industri',
+      context: 'efisiensi termal siklus daya tertutup pada turbin industri',
+      mcqQuestion: 'Sebuah instalasi pembangkit daya industri memanfaatkan fluida kerja dengan siklus termodinamika tertutup. Suhu reservoar kalor tinggi dipertahankan pada <strong>650 K</strong> dan reservoar suhu rendah pada <strong>325 K</strong>. Berdasarkan hukum kekekalan energi dan efisiensi termal maksimum Carnot terkait <strong>' + coreLabel + '</strong>, berapakah efisiensi teoritis tertinggi dari sistem konversi energi tersebut, serta apa implikasi fisis jika terjadi rugi-rugi gesekan pada turbin?',
+      mcqOptions: [
+        { id: 'A', text: 'Efisiensi teoritis maksimum adalah 50%, dan rugi gesekan akan meningkatkan pelepasan kalor disipatif ke lingkungan sehingga efisiensi riil selalu di bawah 50%.' },
+        { id: 'B', text: 'Efisiensi teoritis maksimum adalah 100%, karena energi kalor dapat diubah seluruhnya menjadi kerja mekanik tanpa pelepasan kalor buang.' },
+        { id: 'C', text: 'Efisiensi teoritis adalah 25%, dan rugi gesekan tidak memengaruhi kerja mekanik total fluida kerja.' },
+        { id: 'D', text: 'Efisiensi sistem konstan tanpa dipengaruhi oleh temperatur reservoar pendingin.' },
+        { id: 'E', text: 'Penurunan suhu reservoar dingin akan menurunkan efisiensi konversi sistem secara drastis.' }
+      ],
+      mcqAnswer: 'A',
+      mcqExpl: 'Efisiensi maksimum Carnot: η = 1 - (Tc / Th) = 1 - (325 / 650) = 0.50 atau 50%. Sesuai Hukum Kedua Termodinamika, tidak ada mesin riil yang dapat melampaui efisiensi Carnot karena adanya ireversibilitas dan peningkatan entropi.'
+    },
+    {
+      domain: 'Sistem Pendingin & Koefisien Performa (COP)',
+      context: 'kinerja mesin pendingin kompresi uap dan penyerapan kalor',
+      mcqQuestion: 'Sebuah sistem pendingin (refrigerator) komersial berbasis siklus kompresi uap dirancang untuk menjaga temperatur ruang penyimpanan beku pada suhu <strong>-10°C</strong> di lingkungan bersuhu <strong>30°C</strong> terkait materi <strong>' + coreLabel + '</strong>. Manakah pernyataan analisis termodinamika yang paling tepat mengenai koefisien performansi (COP) dan kerja listrik yang dibutuhkan kompresor?',
+      mcqOptions: [
+        { id: 'A', text: 'Koefisien performansi berbanding terbalik dengan selisih temperatur antara ruang dingin dan lingkungan luar, sehingga semakin panas lingkungan luar, kompresor membutuhkan kerja listrik lebih besar.' },
+        { id: 'B', text: 'Kerja listrik kompresor bernilai nol jika temperatur ruang penyimpanan telah mencapai kesetimbangan termal dengan lingkungan.' },
+        { id: 'C', text: 'Kalor yang dibuang ke lingkungan luar selalu lebih kecil daripada kalor yang diserap dari ruang penyimpanan beku.' },
+        { id: 'D', text: 'Nilai koefisien performansi mesin pendingin selalu bernilai tepat 1,0 pada setiap kondisi operasional.' },
+        { id: 'E', text: 'Sistem dapat memindahkan kalor secara spontan tanpa memerlukan input daya mekanik dari motor eksternal.' }
+      ],
+      mcqAnswer: 'A',
+      mcqExpl: 'Pada mesin pendingin ideal, COP = Tc / (Th - Tc). Semakin besar beda temperatur antara bagian dalam dan lingkungan luar, COP semakin menurun dan beban kerja kompresor meningkat.'
+    },
+    {
+      domain: 'Dinamika Gas Ideal & Usaha Silinder Berpiston',
+      context: 'proses ekspansi kuasistatik gas ideal monoatomik',
+      mcqQuestion: 'Dua mol gas ideal monoatomik mengalami ekspansi isotermik reversibel pada suhu konstan <strong>400 K</strong> sehingga volumenya membesar dari <strong>V₁</strong> menjadi <strong>2V₁</strong> terkait konsep <strong>' + coreLabel + '</strong>. Kesimpulan analisis energi yang tepat mengenai usaha yang dilakukan gas dan perubahan energi dalamnya adalah...',
+      mcqOptions: [
+        { id: 'A', text: 'Perubahan energi dalam bernilai nol (ΔU = 0) dan seluruh kalor yang diserap dari lingkungan diubah sepenuhnya menjadi usaha luar (W = Q = nRT ln 2).' },
+        { id: 'B', text: 'Usaha yang dilakukan gas bernilai nol karena ekspansi berlangsung pada temperatur yang konstan.' },
+        { id: 'C', text: 'Energi dalam gas menyusut sebesar setengah dari nilai energi kinetik molekuler mula-mula.' },
+        { id: 'D', text: 'Tekanan akhir gas berlipat ganda sebanding dengan pertambahan volume yang dialami.' },
+        { id: 'E', text: 'Gas melepaskan kalor ke lingkungan tanpa melakukan interaksi mekanik pada dinding piston.' }
+      ],
+      mcqAnswer: 'A',
+      mcqExpl: 'Pada proses isotermik gas ideal, energi dalam hanya bergantung pada temperatur (ΔU = nCvΔT = 0). Berdasarkan Hukum I Termodinamika (Q = ΔU + W), maka Q = W = nRT ln(V₂/V₁).'
+    },
+    {
+      domain: 'Rekayasa Penukar Kalor (Heat Exchanger) Industri',
+      context: 'efektivitas perpindahan panas konveksi dan konduksi fluida',
+      mcqQuestion: 'Pada sistem penukar kalor tipe aliran berlawanan arah (counter-flow heat exchanger) yang diterapkan dalam <strong>' + coreLabel + '</strong>, laju perpindahan kalor dipengaruhi oleh beda temperatur rata-rata logaritmik (LMTD) dan koefisien perpindahan panas menyeluruh. Manakah konfigurasi teknis yang paling efektif untuk meminimalkan kehilangan energi?',
+      mcqOptions: [
+        { id: 'A', text: 'Mempertahankan pola aliran counter-flow dengan sirip termal (fins) konduktivitas tinggi guna memperluas area kontak dan mempertahankan gradien suhu yang seragam.' },
+        { id: 'B', text: 'Mengubah pola aliran menjadi parallel-flow agar kedua fluida keluar pada temperatur yang tepat sama.' },
+        { id: 'C', text: 'Menggunakan material berisolasi tebal di antara kedua saluran fluida kerja.' },
+        { id: 'D', text: 'Mempercepat laju alir hingga melampaui batas kritis tanpa memperhatikan penurunan tekanan fluida.' },
+        { id: 'E', text: 'Menghilangkan lapisan turbulensi fluida agar aliran bersifat laminer murni tanpa percampuran panas.' }
+      ],
+      mcqAnswer: 'A',
+      mcqExpl: 'Aliran counter-flow memberikan efektivitas termal tertinggi dibanding parallel-flow karena menjaga gradien temperatur yang stabil di sepanjang penukar panas.'
+    },
+    {
+      domain: 'Siklus Stirling & Konversi Energi Ramah Lingkungan',
+      context: 'pemanfaatan sumber energi alternatif terbarukan',
+      mcqQuestion: 'Sebuah mesin siklus Stirling memanfaatkan udara bertekanan sebagai fluida kerja dengan regenerator termal internal terkait kajian <strong>' + coreLabel + '</strong>. Mengapa regenerator termal memegang peranan krusial dalam mendongkrak efisiensi siklus tersebut?',
+      mcqOptions: [
+        { id: 'A', text: 'Regenerator menyimpan kalor selama proses isokhorik pendinginan dan melepaskannya kembali saat proses pemanasan isokhorik, sehingga menekan kebutuhan kalor dari sumber luar.' },
+        { id: 'B', text: 'Regenerator menghilangkan keharusan adanya pembuangan kalor pada reservoar dingin.' },
+        { id: 'C', text: 'Regenerator mempercepat laju pembakaran bahan bakar di dalam ruang silinder kerja.' },
+        { id: 'D', text: 'Regenerator menaikkan tekanan fluida kerja hingga mencapai kondisi superkritis secara spontan.' },
+        { id: 'E', text: 'Regenerator menghentikan peningkatan entropi sistem sehingga efisiensi mencapai 100%.' }
+      ],
+      mcqAnswer: 'A',
+      mcqExpl: 'Regenerator pada mesin Stirling berfungsi sebagai penyimpan energi termal internal bolak-balik (thermal sponge) yang mendekatkan efisiensi teoretis mesin Stirling ke efisiensi Carnot.'
+    },
+    {
+      domain: 'Disipasi Termal & Efisiensi Energi Pusat Komputasi',
+      context: 'manajemen pendinginan server dan termodinamika komputasi',
+      mcqQuestion: 'Sebuah pusat data (data center) mengoperasikan ribuan server komputasi yang menghasilkan beban kalor total <strong>150 kW</strong> secara terus menerus. Ditinjau dari prinsip termodinamika <strong>' + coreLabel + '</strong>, strategi pendinginan presisi manakah yang paling optimal dalam menekan nilai PUE (Power Usage Effectiveness)?',
+      mcqOptions: [
+        { id: 'A', text: 'Menerapkan sistem pendingin cair langsung ke chip (direct-to-chip liquid cooling) dengan penukar kalor pembuang bertingkat untuk menekan konsumsi daya kipas dan kompresor udara.' },
+        { id: 'B', text: 'Meniupkan udara dingin dari chiller konvensional ke seluruh ruangan tanpa penyekatan lorong panas dan dingin.' },
+        { id: 'C', text: 'Menaikkan temperatur ruangan server hingga melebihi batas operasional semikonduktor.' },
+        { id: 'D', text: 'Menonaktifkan sirkulasi fluida pendingin selama jam beban komputasi puncak.' },
+        { id: 'E', text: 'Menggunakan pemanas elektrik tambahan untuk mencegah kondensasi uap air.' }
+      ],
+      mcqAnswer: 'A',
+      mcqExpl: 'Direct liquid cooling menghantarkan kalor langsung dari sumber panas silikon dengan konduktivitas termal fluida cair yang ratusan kali lebih tinggi daripada udara, mereduksi pemborosan energi secara masif.'
+    }
+  ];
 
   for (let i = 0; i < count; i++) {
     let qType = question_type;
     if (qType === 'all') {
       qType = types[i % types.length];
     }
-    let cog = cog_level;
-    if (cog === 'mixed' || !bloomLevels.includes(cog)) {
-      const mixedLevels = ['C2', 'C3', 'C4', 'C4', 'C5', 'C6'];
-      cog = mixedLevels[i % mixedLevels.length];
-    }
+    const cog = bloomLevels[(existingCount + i) % bloomLevels.length];
+    const scenarioIdx = (existingCount + i) % scenarios.length;
+    const sc = scenarios[scenarioIdx];
 
     let newQ = {
       type: qType,
       cog: cog,
-      generated_by: modelUsed || 'gemini-3.5-flash',
+      generated_by: modelUsed,
     };
 
     switch (qType) {
       case 'mcq':
-        newQ.stem = `<p>Perhatikan kajian kontekstual mengenai <strong>${topic}</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif ${cog}, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p>`;
-        newQ.options = [
-          { id: 'A', text: `Terjadi kesetimbangan energi optimal sesuai kaidah ${topic} secara berkesinambungan.` },
-          { id: 'B', text: `Nilai entropi dan massa sistem menyusut secara spontan tanpa perpindahan kalor.` },
-          { id: 'C', text: `Perubahan potensial energi tidak dipengaruhi oleh variabel suhu maupun tekanan lingkungan.` },
-          { id: 'D', text: `Sistem tertutup memancarkan radiasi berulang tanpa membutuhkan kerja eksternal.` },
-          { id: 'E', text: `Laju reaksi berbalik secara ireversibel pada temperatur mendekati nol kelvin mutlak.` }
-        ];
-        newQ.answer = 'A';
+        newQ.stem = "<p>" + sc.mcqQuestion + "</p>";
+        newQ.options = sc.mcqOptions;
+        newQ.answer = sc.mcqAnswer;
         newQ.weight = 1.0;
-        newQ.explanation = `Berdasarkan kaidah dasar ${topic}, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.`;
+        newQ.explanation = sc.mcqExpl;
         break;
 
       case 'mcq_complex':
-        newQ.stem = `<p>Terkait materi <strong>${topic}</strong>, perhatikan beberapa premis berikut!<br><strong>Pilihlah semua pernyataan yang BENAR!</strong> <em>(Jawaban benar lebih dari satu)</em></p>`;
+        newQ.stem = "<p>Terkait <strong>" + coreLabel + "</strong> dalam domain <strong>" + sc.domain + "</strong>, perhatikan premis-premis fisis berikut!<br><strong>Pilihlah SEMUA pernyataan yang BENAR!</strong> <em>(Jawaban benar dapat lebih dari satu)</em></p>";
         newQ.options = [
-          { id: 'A', text: `Prinsip ${topic} berlaku secara konsisten pada sistem tertutup maupun terbuka.` },
-          { id: 'B', text: `Terdapat hubungan linier antara energi yang diserap dengan kerja efektif yang dihasilkan.` },
-          { id: 'C', text: `Perubahan entalpi selalu bernilai tak terhingga pada tekanan konstan atmosfer.` },
-          { id: 'D', text: `Analisis matematis membuktikan adanya batas efisiensi maksimum yang tidak dapat dilampaui.` },
-          { id: 'E', text: `Tidak diperlukan kalibrasi instrumen dalam pengukuran parameter kuantitatif.` }
+          { id: 'A', text: "Prinsip konservasi energi berlaku universal di mana kalor yang diserap sistem setara dengan akumulasi kerja mekanik dan perubahan energi dalam fluida." },
+          { id: 'B', text: "Efisiensi termal siklus daya berbanding lurus dengan selisih temperatur antara reservoar panas dan dingin." },
+          { id: 'C', text: "Semua proses alami berlangsung spontan menuju keadaan dengan tingkat ketidakteraturan (entropi) total yang lebih tinggi atau tetap." },
+          { id: 'D', text: "Tidak diperlukan fluida kerja dalam perancangan mesin konversi energi termodinamika siklus tertutup." },
+          { id: 'E', text: "Usaha mekanik dapat dihasilkan secara berkesinambungan hanya dengan menyerap kalor dari satu reservoar tunggal tanpa membuang kalor." }
         ];
-        newQ.answer = ['A', 'B', 'D'];
+        newQ.answer = ['A', 'B', 'C'];
         newQ.weight = 1.5;
-        newQ.explanation = `Pernyataan A, B, dan D bernilai benar berdasarkan landasan teoretis ${topic}. Pernyataan C dan E tidak sesuai kaidah ilmiah.`;
+        newQ.explanation = "Pernyataan A, B, dan C benar secara fisis menurut Hukum I dan II Termodinamika. Pernyataan D salah (mutlak perlu fluida kerja). Pernyataan E salah (melanggar Pernyataan Kelvin-Planck).";
         break;
 
       case 'true_false':
-        newQ.stem = `<p>Tentukan nilai kebenaran <strong>Benar (B)</strong> atau <strong>Salah (S)</strong> untuk setiap pernyataan mengenai <strong>${topic}</strong> berikut:</p>`;
+        newQ.stem = "<p>Berdasarkan kajian ilmiah mengenai <strong>" + coreLabel + "</strong> pada konteks <strong>" + sc.context + "</strong>, tentukan nilai kebenaran <strong>Benar (B)</strong> atau <strong>Salah (S)</strong> untuk setiap pernyataan evaluasi parameter berikut:</p>";
         newQ.statements = [
-          { id: 0, text: `Konsep ${topic} merupakan dasar fundamental dalam perancangan teknologi modern.`, key: 'B' },
-          { id: 1, text: `Sistem dapat menghasilkan energi tanpa batas secara mandiri tanpa menyerap daya dari lingkungan.`, key: 'S' },
-          { id: 2, text: `Peningkatan temperatur operasional berdampak langsung terhadap laju perpindahan kalor atau kestabilan sistem.`, key: 'B' }
+          { id: 0, text: "Peningkatan temperatur kerja reservoar kalor tinggi secara teoritis meningkatkan batas atas efisiensi konversi energi siklus termal.", key: 'B' },
+          { id: 1, text: "Energi kalor dapat berpindah secara spontan dari benda bersuhu lebih rendah ke benda bersuhu lebih tinggi tanpa bantuan usaha eksternal.", key: 'S' },
+          { id: 2, text: "Rugi-rugi gesekan fluida dan pelepasan kalor tak terisolasi merupakan faktor utama penyebab ireversibilitas dalam siklus termodinamika riil.", key: 'B' }
         ];
         newQ.answer = { "0": "B", "1": "S", "2": "B" };
         newQ.weight = 1.5;
-        newQ.explanation = `Pernyataan 1 Benar (relevansi teknologi). Pernyataan 2 Salah (melanggar hukum kekekalan). Pernyataan 3 Benar (pengaruh termal).`;
+        newQ.explanation = "Pernyataan 1 Benar (prinsip efisiensi Carnot). Pernyataan 2 Salah (melanggar Hukum II Termodinamika pernyataan Clausius). Pernyataan 3 Benar (sumber utama disipasi energi riil).";
         break;
 
       case 'matching':
-        newQ.stem = `<p><strong>Pasangkanlah</strong> komponen atau terminologi di sebelah kiri dengan deskripsi fungsi/kondisi yang sesuai di sebelah kanan terkait materi <strong>${topic}</strong>!</p>`;
+        newQ.stem = "<p><strong>Pasangkanlah</strong> terminologi atau konsep analisis pada kolom sebelah kiri dengan deskripsi fungsi/kondisi fisis yang tepat pada kolom sebelah kanan terkait materi <strong>" + coreLabel + "</strong>!</p>";
         newQ.premises = [
-          { id: 0, text: `1. Komponen Analisis Konseptual ${topic}` },
-          { id: 1, text: `2. Pengaruh Faktor Lingkungan Operasional` },
-          { id: 2, text: `3. Indikator Efisiensi & Kinerja Sistem` }
+          { id: 0, text: "1. Proses Isokhorik (Volume Konstan)" },
+          { id: 1, text: "2. Proses Isotermik (Temperatur Konstan)" },
+          { id: 2, text: "3. Proses Adiabatik (Isolasi Termal Sempurna)" }
         ];
         newQ.targets = [
-          { id: 'A', text: `Menentukan batas optimal konversi energi dan output kerja efektif.` },
-          { id: 'B', text: `Memberikan kerangka logika untuk memprediksi arah dinamika sistem.` },
-          { id: 'C', text: `Memengaruhi gradien suhu, tekanan, dan laju disipasi energi.` }
+          { id: 'A', text: "Tidak ada pertukaran kalor antara sistem dan lingkungan (Q = 0), sehingga kerja mekanik murni mengubah energi dalam sistem." },
+          { id: 'B', text: "Gas tidak melakukan usaha luar (W = 0) dan penambahan kalor sepenuhnya menaikkan energi dalam sistem." },
+          { id: 'C', text: "Perubahan energi dalam bernilai nol (ΔU = 0) pada gas ideal sehingga kalor yang diserap sama persis dengan usaha luar." }
         ];
         newQ.answer = { "0": "B", "1": "C", "2": "A" };
         newQ.weight = 2.0;
-        newQ.explanation = `Pasangan terverifikasi: 1 -> B (kerangka logika), 2 -> C (gradien lingkungan), 3 -> A (efisiensi kerja).`;
+        newQ.explanation = "Pasangan tepat: 1 -> B (Isokhorik W=0), 2 -> C (Isotermik ΔU=0), 3 -> A (Adiabatik Q=0).";
         break;
 
       case 'short_essay':
-        newQ.stem = `<p>Dalam kajian <strong>${topic}</strong>, parameter utama yang menjadi tolok ukur kesetimbangan atau efisiensi sistem dinamakan <strong>...</strong></p>`;
-        newQ.answer_keys = ['efisiensi', 'koefisien', 'entropi', 'energi', 'kapasitas kalor'];
+        newQ.stem = "<p>Dalam perancangan sistem konversi termal terkait <strong>" + coreLabel + "</strong>, parameter terukur yang menyatakan rasio antara usaha mekanik bermanfaat yang dihasilkan terhadap total energi kalor yang diserap dinamakan <strong>...</strong></p>";
+        newQ.answer_keys = ['efisiensi', 'efisiensi termal', 'koefisien performansi', 'daya guna', 'thermal efficiency'];
         newQ.weight = 1.0;
-        newQ.explanation = `Parameter kunci dalam analisis ${topic} umumnya merujuk pada koefisien performansi atau efisiensi energi.`;
+        newQ.explanation = "Parameter fundamental efektivitas konversi energi dalam hukum termodinamika dinamakan efisiensi termal (η).";
         break;
 
       case 'long_essay':
-        newQ.stem = `<p>Jelaskan secara komprehensif bagaimana prinsip dasar <strong>${topic}</strong> diterapkan dalam pemecahan masalah teknologi nyata!<br>Uraikan alur proses sains yang terjadi, tantangan efisiensi yang dihadapi, serta alternatif solusi inovatif untuk meminimalkan kehilangan energi!</p>`;
-        newQ.rubric = `Rubrik Penilaian AI (Skor 0 - 100):\n1. Penguasaan Konsep Teori Dasar: Menguraikan prinsip ${topic} secara presisi dan logis (Bobot: 30 poin)\n2. Analisis Mekanisme & Proses: Mengidentifikasi komponen dan tahapan konversi energi (Bobot: 35 poin)\n3. Rekomendasi Solusi & Efisiensi: Memberikan gagasan optimasi dan pertimbangan sains (Bobot: 35 poin)`;
-        newQ.ideal_answer = `Prinsip ${topic} menyatakan keteraturan dinamika energi di mana sistem beroperasi menurut hukum kekekalan dan arah spontanitas tertentu. Dalam penerapannya, energi input dialirkan melalui komponen konversi untuk menghasilkan kerja bermanfaat, sementara sebagian energi terdisipasi sebagai kalor lingkungan. Untuk meningkatkan efisiensi, inovasi material berisolasi tinggi dan siklus regenerasi energi dapat diterapkan guna menekan degradasi entropi secara signifikan.`;
-        newQ.keywords = [String(topic).toLowerCase(), 'efisiensi', 'energi', 'sistem', 'proses', 'konversi', 'prinsip'];
+        newQ.stem = "<p>Sebuah instalasi industri berencana mengoptimalkan performa energi terkait <strong>" + coreLabel + "</strong> pada konteks <strong>" + sc.context + "</strong>.<br>Uraikan secara ilmiah dan terstruktur:<br>1. Prinsip hukum dasar sains yang mendasari mekanisme konversi energi pada sistem tersebut.<br>2. Faktor-faktor utama yang membatasi efisiensi operasional dan memicu timbulnya entropi/disipasi kalor.<br>3. Solusi rekayasa atau optimasi material yang dapat diterapkan untuk meningkatkan efisiensi dan menekan emisi kalor ke lingkungan!</p>";
+        newQ.rubric = "Rubrik Penilaian AI (Skor 0 - 100):\n1. Penguasaan Konsep Teori Dasar (30 poin): Menguraikan hukum kekekalan energi dan arah spontanitas secara presisi.\n2. Analisis Pembatas Efisiensi (35 poin): Mengidentifikasi batasan efisiensi Carnot, rugi gesekan fluida, dan kebocoran termal.\n3. Rekomendasi Solusi & Rekayasa (35 poin): Memberikan usulan material berinsulasi termal tinggi, siklus pemulihan panas terbuang (waste heat recovery), dan instrumentasi digital presisi.";
+        newQ.ideal_answer = "Sistem beroperasi berdasarkan hukum pertama termodinamika di mana energi tidak dapat diciptakan atau dimusnahkan melainkan dikonversikan. Batasan efisiensi konversi energi ditentukan oleh hukum kedua termodinamika yang menyatakan bahwa kalor tidak dapat diubah seutuhnya menjadi kerja tanpa adanya pelepasan kalor ke reservoar dingin. Untuk mengoptimalkan kinerja sistem, rekayasa dapat mencakup penerapan siklus regeneratif, penggunaan penukar kalor berinsulasi vakum, serta penyesuaian rasio kompresi secara adaptif.";
+        newQ.keywords = ['efisiensi', 'energi', 'kalor', 'sistem', 'proses', 'konversi', 'entropi'];
         newQ.max_score = 100;
         newQ.weight = 3.0;
-        newQ.explanation = `Soal ini mengukur kemampuan berpikir tingkat tinggi (${cog}) dalam menyintesis konsep ${topic} ke dalam studi kasus aplikatif.`;
+        newQ.explanation = "Soal ini menguji penalaran sintesis dan pemecahan masalah kontekstual nyata pada materi " + coreLabel + ".";
         break;
     }
 
     if (custom_prompt && custom_prompt.trim()) {
-      newQ.stem += `<br><small class="text-indigo-400"><em>[Konteks Pembelajaran: ${custom_prompt.trim()}]</em></small>`;
+      newQ.stem += '<br><small class="text-indigo-400"><em>[Konteks Pembelajaran: ' + custom_prompt.trim() + ']</em></small>';
     }
+
+    // Sanitasi teks dari kebocoran label C2, C3, C4
+    newQ.stem = sanitizeQuestionText(newQ.stem);
+    newQ.explanation = sanitizeQuestionText(newQ.explanation);
 
     result.push(newQ);
   }
@@ -607,32 +739,39 @@ function generatePedagogicalTKAQuestions({ topic, question_type, cog_level, coun
 
 async function generateQuestionsWithGeminiAI({
   topic = 'Materi Pembelajaran',
+  basis_type = 'materi',
+  basis_text = '',
   question_type = 'all',
   cog_level = 'mixed',
   count = 5,
   model = 'gemini-3.5-flash',
   effectiveKey = '',
-  custom_prompt = ''
+  custom_prompt = '',
+  existing_stems = [],
+  existingCount = 0
 }) {
   let questions = null;
   let sourceUsed = 'pedagogical_engine';
 
   if (effectiveKey && effectiveKey.trim().length > 10) {
     try {
-      console.log(`[Gemini AI] Menghubungi Google Gemini API (${model})...`);
+      console.log("[Gemini AI] Menghubungi Google Gemini API (" + model + ") - Basis: " + basis_type.toUpperCase() + "...");
       const apiQuestions = await callGoogleGeminiAPI({
         apiKey: effectiveKey.trim(),
         model,
+        basis_type,
+        basis_text,
         topic,
         question_type,
         cog_level,
         count,
-        custom_prompt
+        custom_prompt,
+        existing_stems
       });
       if (apiQuestions && Array.isArray(apiQuestions) && apiQuestions.length > 0) {
         questions = apiQuestions;
-        sourceUsed = `google_gemini_api (${model})`;
-        console.log(`[Gemini AI] Berhasil mengunduh ${questions.length} butir soal dari Google Gemini API.`);
+        sourceUsed = "google_gemini_api (" + model + ")";
+        console.log("[Gemini AI] Berhasil mengunduh " + questions.length + " butir soal dari Google Gemini API.");
       }
     } catch (err) {
       console.warn('[Gemini AI] Panggilan Google Gemini API dialihkan ke Pedagogical Engine:', err.message);
@@ -642,14 +781,36 @@ async function generateQuestionsWithGeminiAI({
   if (!questions || !Array.isArray(questions) || questions.length === 0) {
     questions = generatePedagogicalTKAQuestions({
       topic,
+      basis_type,
+      basis_text,
       question_type,
       cog_level,
       count,
       custom_prompt,
-      modelUsed: model
+      modelUsed: model,
+      existingCount
     });
-    sourceUsed = effectiveKey ? `pedagogical_engine (fallback ${model})` : `pedagogical_engine (${model})`;
+    sourceUsed = effectiveKey ? ("pedagogical_engine (fallback " + model + ")") : ("pedagogical_engine (" + model + ")");
   }
+
+  // Sanitasi semua butir soal dari label kognitif harfiah (C2, C3, C4, dll)
+  questions = questions.map(q => {
+    q.stem = sanitizeQuestionText(q.stem);
+    q.explanation = sanitizeQuestionText(q.explanation);
+    if (q.options && Array.isArray(q.options)) {
+      q.options = q.options.map(opt => ({ ...opt, text: sanitizeQuestionText(opt.text) }));
+    }
+    if (q.statements && Array.isArray(q.statements)) {
+      q.statements = q.statements.map(st => ({ ...st, text: sanitizeQuestionText(st.text) }));
+    }
+    if (q.premises && Array.isArray(q.premises)) {
+      q.premises = q.premises.map(p => ({ ...p, text: sanitizeQuestionText(p.text) }));
+    }
+    if (q.targets && Array.isArray(q.targets)) {
+      q.targets = q.targets.map(t => ({ ...t, text: sanitizeQuestionText(t.text) }));
+    }
+    return q;
+  });
 
   return { questions, sourceUsed };
 }
@@ -2718,7 +2879,15 @@ const server = http.createServer(async (req, res) => {
       return sendJSON(404, { status: 'error', message: 'Bank soal tujuan tidak ditemukan' });
     }
 
-    const topic = (body.topic || bank.title || bank.subject || 'Konsep dan Aplikasi Pembelajaran').trim();
+    const existingQuestions = bank.questions || [];
+    const existingStems = existingQuestions.map(q => {
+      const clean = (q.stem || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+      return clean.length > 5 ? clean.substring(0, 160) : '';
+    }).filter(Boolean);
+
+    const basisType = body.basis_type || 'materi';
+    const basisText = (body.basis_text || body.topic || bank.title || bank.subject || '').trim();
+    const topic = (body.topic || basisText || bank.title || bank.subject || 'Konsep dan Aplikasi Pembelajaran').trim();
     const questionType = body.question_type || 'all';
     const cogLevel = body.cog_level || 'mixed';
     const count = Math.min(20, Math.max(1, parseInt(body.count || body.question_count, 10) || 5));
@@ -2734,19 +2903,22 @@ const server = http.createServer(async (req, res) => {
       effectiveKey = SERVER_CONFIG.gemini_api_key || process.env.GEMINI_API_KEY || process.env.AI_API_KEY || '';
     }
 
-    console.log(`[AI Generator] Memproses ${count} soal (${questionType}) pada bank "${bank.title}" dengan model ${model} (Sumber API: ${apiSource})...`);
+    console.log(`[AI Generator] Memproses ${count} soal (${questionType}) pada bank "${bank.title}" [Basis: ${basisType.toUpperCase()}] dengan model ${model} (Sumber: ${apiSource}, Eksisting: ${existingQuestions.length})...`);
 
     const { questions: rawGenerated, sourceUsed } = await generateQuestionsWithGeminiAI({
       topic,
+      basis_type: basisType,
+      basis_text: basisText,
       question_type: questionType,
       cog_level: cogLevel,
       count,
       model,
       effectiveKey,
-      custom_prompt: customPrompt
+      custom_prompt: customPrompt,
+      existing_stems: existingStems,
+      existingCount: existingQuestions.length
     });
 
-    const existingQuestions = bank.questions || [];
     let startId = existingQuestions.length > 0 ? Math.max(...existingQuestions.map(q => q.id || 0)) + 1 : 1;
 
     const formattedQuestions = rawGenerated.map((q, idx) => {

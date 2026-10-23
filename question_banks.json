@@ -226,7 +226,7 @@
         "id": 8,
         "type": "mcq",
         "cog": "C2",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Kekekalan Energi & Entropi</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C2, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Fokuskan pada aplikasi industri pendingin]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Kekekalan Energi & Entropi</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Fokuskan pada aplikasi industri pendingin]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Kekekalan Energi & Entropi, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash",
@@ -409,6 +409,248 @@
           "1": "C",
           "2": "A"
         }
+      },
+      {
+        "id": 13,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "<p>Sebuah instalasi pembangkit daya industri memanfaatkan fluida kerja dengan siklus termodinamika tertutup. Suhu reservoar kalor tinggi dipertahankan pada <strong>650 K</strong> dan reservoar suhu rendah pada <strong>325 K</strong>. Berdasarkan hukum kekekalan energi dan efisiensi termal maksimum Carnot terkait <strong>Siklus Termodinamika Turbin Pembangkit Daya</strong>, berapakah efisiensi teoritis tertinggi dari sistem konversi energi tersebut, serta apa implikasi fisis jika terjadi rugi-rugi gesekan pada turbin?</p>",
+        "weight": 1,
+        "explanation": "Efisiensi maksimum Carnot: η = 1 - (Tc / Th) = 1 - (325 / 650) = 0.50 atau 50%. Sesuai Hukum Kedua Termodinamika, tidak ada mesin riil yang dapat melampaui efisiensi Carnot karena adanya ireversibilitas dan peningkatan entropi.",
+        "generated_by": "gemini-3.5-flash",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Efisiensi teoritis maksimum adalah 50%, dan rugi gesekan akan meningkatkan pelepasan kalor disipatif ke lingkungan sehingga efisiensi riil selalu di bawah 50%."
+          },
+          {
+            "id": "B",
+            "text": "Efisiensi teoritis maksimum adalah 100%, karena energi kalor dapat diubah seluruhnya menjadi kerja mekanik tanpa pelepasan kalor buang."
+          },
+          {
+            "id": "C",
+            "text": "Efisiensi teoritis adalah 25%, dan rugi gesekan tidak memengaruhi kerja mekanik total fluida kerja."
+          },
+          {
+            "id": "D",
+            "text": "Efisiensi sistem konstan tanpa dipengaruhi oleh temperatur reservoar pendingin."
+          },
+          {
+            "id": "E",
+            "text": "Penurunan suhu reservoar dingin akan menurunkan efisiensi konversi sistem secara drastis."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 14,
+        "type": "mcq_complex",
+        "cog": "C3",
+        "stem": "<p>Terkait <strong>Siklus Termodinamika Turbin Pembangkit Daya</strong> dalam domain <strong>Sistem Pendingin & Koefisien Performa (COP)</strong>, perhatikan premis-premis fisis berikut!<br><strong>Pilihlah SEMUA pernyataan yang BENAR!</strong> <em>(Jawaban benar dapat lebih dari satu)</em></p>",
+        "weight": 1.5,
+        "explanation": "Pernyataan A, B, dan C benar secara fisis menurut Hukum I dan II Termodinamika. Pernyataan D salah (mutlak perlu fluida kerja). Pernyataan E salah (melanggar Pernyataan Kelvin-Planck).",
+        "generated_by": "gemini-3.5-flash",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Prinsip konservasi energi berlaku universal di mana kalor yang diserap sistem setara dengan akumulasi kerja mekanik dan perubahan energi dalam fluida."
+          },
+          {
+            "id": "B",
+            "text": "Efisiensi termal siklus daya berbanding lurus dengan selisih temperatur antara reservoar panas dan dingin."
+          },
+          {
+            "id": "C",
+            "text": "Semua proses alami berlangsung spontan menuju keadaan dengan tingkat ketidakteraturan (entropi) total yang lebih tinggi atau tetap."
+          },
+          {
+            "id": "D",
+            "text": "Tidak diperlukan fluida kerja dalam perancangan mesin konversi energi termodinamika siklus tertutup."
+          },
+          {
+            "id": "E",
+            "text": "Usaha mekanik dapat dihasilkan secara berkesinambungan hanya dengan menyerap kalor dari satu reservoar tunggal tanpa membuang kalor."
+          }
+        ],
+        "answer": [
+          "A",
+          "B",
+          "C"
+        ]
+      },
+      {
+        "id": 15,
+        "type": "true_false",
+        "cog": "C4",
+        "stem": "<p>Berdasarkan kajian ilmiah mengenai <strong>Siklus Termodinamika Turbin Pembangkit Daya</strong> pada konteks <strong>proses ekspansi kuasistatik gas ideal monoatomik</strong>, tentukan nilai kebenaran <strong>Benar (B)</strong> atau <strong>Salah (S)</strong> untuk setiap pernyataan evaluasi parameter berikut:</p>",
+        "weight": 1.5,
+        "explanation": "Pernyataan 1 Benar (prinsip efisiensi Carnot). Pernyataan 2 Salah (melanggar Hukum II Termodinamika pernyataan Clausius). Pernyataan 3 Benar (sumber utama disipasi energi riil).",
+        "generated_by": "gemini-3.5-flash",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash)",
+        "statements": [
+          {
+            "id": 0,
+            "text": "Peningkatan temperatur kerja reservoar kalor tinggi secara teoritis meningkatkan batas atas efisiensi konversi energi siklus termal.",
+            "key": "B"
+          },
+          {
+            "id": 1,
+            "text": "Energi kalor dapat berpindah secara spontan dari benda bersuhu lebih rendah ke benda bersuhu lebih tinggi tanpa bantuan usaha eksternal.",
+            "key": "S"
+          },
+          {
+            "id": 2,
+            "text": "Rugi-rugi gesekan fluida dan pelepasan kalor tak terisolasi merupakan faktor utama penyebab ireversibilitas dalam siklus termodinamika riil.",
+            "key": "B"
+          }
+        ],
+        "answer": {
+          "0": "B",
+          "1": "S",
+          "2": "B"
+        }
+      },
+      {
+        "id": 16,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "<p>Pada sistem penukar kalor tipe aliran berlawanan arah (counter-flow heat exchanger) yang diterapkan dalam <strong>Peserta didik mampu menganalisis keterkaitan hukum termodinamika dengan konversi energi pada mesin pendingin dan teknologi industri ramah lingkungan</strong>, laju perpindahan kalor dipengaruhi oleh beda temperatur rata-rata logaritmik (LMTD) dan koefisien perpindahan panas menyeluruh. Manakah konfigurasi teknis yang paling efektif untuk meminimalkan kehilangan energi?</p>",
+        "weight": 1,
+        "explanation": "Aliran counter-flow memberikan efektivitas termal tertinggi dibanding parallel-flow karena menjaga gradien temperatur yang stabil di sepanjang penukar panas.",
+        "generated_by": "gemini-3.5-flash",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Mempertahankan pola aliran counter-flow dengan sirip termal (fins) konduktivitas tinggi guna memperluas area kontak dan mempertahankan gradien suhu yang seragam."
+          },
+          {
+            "id": "B",
+            "text": "Mengubah pola aliran menjadi parallel-flow agar kedua fluida keluar pada temperatur yang tepat sama."
+          },
+          {
+            "id": "C",
+            "text": "Menggunakan material berisolasi tebal di antara kedua saluran fluida kerja."
+          },
+          {
+            "id": "D",
+            "text": "Mempercepat laju alir hingga melampaui batas kritis tanpa memperhatikan penurunan tekanan fluida."
+          },
+          {
+            "id": "E",
+            "text": "Menghilangkan lapisan turbulensi fluida agar aliran bersifat laminer murni tanpa percampuran panas."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 17,
+        "type": "mcq",
+        "cog": "C5",
+        "stem": "<p>Sebuah mesin siklus Stirling memanfaatkan udara bertekanan sebagai fluida kerja dengan regenerator termal internal terkait kajian <strong>Peserta didik mampu menganalisis keterkaitan hukum termodinamika dengan konversi energi pada mesin pendingin dan teknologi industri ramah lingkungan</strong>. Mengapa regenerator termal memegang peranan krusial dalam mendongkrak efisiensi siklus tersebut?</p>",
+        "weight": 1,
+        "explanation": "Regenerator pada mesin Stirling berfungsi sebagai penyimpan energi termal internal bolak-balik (thermal sponge) yang mendekatkan efisiensi teoretis mesin Stirling ke efisiensi Carnot.",
+        "generated_by": "gemini-3.5-flash",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Regenerator menyimpan kalor selama proses isokhorik pendinginan dan melepaskannya kembali saat proses pemanasan isokhorik, sehingga menekan kebutuhan kalor dari sumber luar."
+          },
+          {
+            "id": "B",
+            "text": "Regenerator menghilangkan keharusan adanya pembuangan kalor pada reservoar dingin."
+          },
+          {
+            "id": "C",
+            "text": "Regenerator mempercepat laju pembakaran bahan bakar di dalam ruang silinder kerja."
+          },
+          {
+            "id": "D",
+            "text": "Regenerator menaikkan tekanan fluida kerja hingga mencapai kondisi superkritis secara spontan."
+          },
+          {
+            "id": "E",
+            "text": "Regenerator menghentikan peningkatan entropi sistem sehingga efisiensi mencapai 100%."
+          }
+        ],
+        "answer": "A"
+      },
+      {
+        "id": 18,
+        "type": "mcq_complex",
+        "cog": "C6",
+        "stem": "<p>Terkait <strong>Peserta didik dapat menghitung koefisien performa mesin pendingin dan menganalisis dampaknya terhadap konsumsi energi listrik secara kuantitatif</strong> dalam domain <strong>Disipasi Termal & Efisiensi Energi Pusat Komputasi</strong>, perhatikan premis-premis fisis berikut!<br><strong>Pilihlah SEMUA pernyataan yang BENAR!</strong> <em>(Jawaban benar dapat lebih dari satu)</em></p>",
+        "weight": 1.5,
+        "explanation": "Pernyataan A, B, dan C benar secara fisis menurut Hukum I dan II Termodinamika. Pernyataan D salah (mutlak perlu fluida kerja). Pernyataan E salah (melanggar Pernyataan Kelvin-Planck).",
+        "generated_by": "gemini-3.5-flash",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Prinsip konservasi energi berlaku universal di mana kalor yang diserap sistem setara dengan akumulasi kerja mekanik dan perubahan energi dalam fluida."
+          },
+          {
+            "id": "B",
+            "text": "Efisiensi termal siklus daya berbanding lurus dengan selisih temperatur antara reservoar panas dan dingin."
+          },
+          {
+            "id": "C",
+            "text": "Semua proses alami berlangsung spontan menuju keadaan dengan tingkat ketidakteraturan (entropi) total yang lebih tinggi atau tetap."
+          },
+          {
+            "id": "D",
+            "text": "Tidak diperlukan fluida kerja dalam perancangan mesin konversi energi termodinamika siklus tertutup."
+          },
+          {
+            "id": "E",
+            "text": "Usaha mekanik dapat dihasilkan secara berkesinambungan hanya dengan menyerap kalor dari satu reservoar tunggal tanpa membuang kalor."
+          }
+        ],
+        "answer": [
+          "A",
+          "B",
+          "C"
+        ]
+      },
+      {
+        "id": 19,
+        "type": "mcq_complex",
+        "cog": "C2",
+        "stem": "<p>Terkait <strong>Peserta didik dapat menghitung koefisien performa mesin pendingin dan menganalisis dampaknya terhadap konsumsi energi listrik secara kuantitatif</strong> dalam domain <strong>Siklus Termal & Pembangkit Daya Industri</strong>, perhatikan premis-premis fisis berikut!<br><strong>Pilihlah SEMUA pernyataan yang BENAR!</strong> <em>(Jawaban benar dapat lebih dari satu)</em></p>",
+        "weight": 1.5,
+        "explanation": "Pernyataan A, B, dan C benar secara fisis menurut Hukum I dan II Termodinamika. Pernyataan D salah (mutlak perlu fluida kerja). Pernyataan E salah (melanggar Pernyataan Kelvin-Planck).",
+        "generated_by": "gemini-3.5-flash",
+        "source_engine": "pedagogical_engine (fallback gemini-3.5-flash)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Prinsip konservasi energi berlaku universal di mana kalor yang diserap sistem setara dengan akumulasi kerja mekanik dan perubahan energi dalam fluida."
+          },
+          {
+            "id": "B",
+            "text": "Efisiensi termal siklus daya berbanding lurus dengan selisih temperatur antara reservoar panas dan dingin."
+          },
+          {
+            "id": "C",
+            "text": "Semua proses alami berlangsung spontan menuju keadaan dengan tingkat ketidakteraturan (entropi) total yang lebih tinggi atau tetap."
+          },
+          {
+            "id": "D",
+            "text": "Tidak diperlukan fluida kerja dalam perancangan mesin konversi energi termodinamika siklus tertutup."
+          },
+          {
+            "id": "E",
+            "text": "Usaha mekanik dapat dihasilkan secara berkesinambungan hanya dengan menyerap kalor dari satu reservoar tunggal tanpa membuang kalor."
+          }
+        ],
+        "answer": [
+          "A",
+          "B",
+          "C"
+        ]
       }
     ]
   },
@@ -873,7 +1115,7 @@
         "id": 4,
         "type": "mcq",
         "cog": "C2",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C2, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -906,7 +1148,7 @@
         "id": 5,
         "type": "mcq",
         "cog": "C3",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C3, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -939,7 +1181,7 @@
         "id": 6,
         "type": "mcq",
         "cog": "C4",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -972,7 +1214,7 @@
         "id": 7,
         "type": "mcq",
         "cog": "C4",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1005,7 +1247,7 @@
         "id": 8,
         "type": "mcq",
         "cog": "C5",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C5, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1038,7 +1280,7 @@
         "id": 9,
         "type": "mcq",
         "cog": "C6",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C6, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1071,7 +1313,7 @@
         "id": 10,
         "type": "mcq",
         "cog": "C2",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C2, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1104,7 +1346,7 @@
         "id": 11,
         "type": "mcq",
         "cog": "C3",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C3, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1137,7 +1379,7 @@
         "id": 12,
         "type": "mcq",
         "cog": "C4",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1170,7 +1412,7 @@
         "id": 13,
         "type": "mcq",
         "cog": "C4",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1203,7 +1445,7 @@
         "id": 14,
         "type": "mcq",
         "cog": "C2",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C2, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1236,7 +1478,7 @@
         "id": 15,
         "type": "mcq",
         "cog": "C3",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C3, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1269,7 +1511,7 @@
         "id": 16,
         "type": "mcq",
         "cog": "C4",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1302,7 +1544,7 @@
         "id": 17,
         "type": "mcq",
         "cog": "C4",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1335,7 +1577,7 @@
         "id": 18,
         "type": "mcq",
         "cog": "C5",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C5, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1368,7 +1610,7 @@
         "id": 19,
         "type": "mcq",
         "cog": "C6",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C6, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1401,7 +1643,7 @@
         "id": 20,
         "type": "mcq",
         "cog": "C2",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C2, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1434,7 +1676,7 @@
         "id": 21,
         "type": "mcq",
         "cog": "C3",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C3, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1467,7 +1709,7 @@
         "id": 22,
         "type": "mcq",
         "cog": "C4",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1500,7 +1742,7 @@
         "id": 23,
         "type": "mcq",
         "cog": "C4",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1533,7 +1775,7 @@
         "id": 24,
         "type": "mcq",
         "cog": "C5",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C5, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1566,7 +1808,7 @@
         "id": 25,
         "type": "mcq",
         "cog": "C6",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C6, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1599,7 +1841,7 @@
         "id": 26,
         "type": "mcq",
         "cog": "C2",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C2, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1632,7 +1874,7 @@
         "id": 27,
         "type": "mcq",
         "cog": "C3",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C3, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",
@@ -1665,7 +1907,7 @@
         "id": 28,
         "type": "mcq",
         "cog": "C4",
-        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu pada tingkat kognitif C4, manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
+        "stem": "<p>Perhatikan kajian kontekstual mengenai <strong>Hukum Termodinamika & Siklus Carnot</strong> berikut!<br>Berdasarkan prinsip dasar ilmu manakah kesimpulan yang paling tepat terkait efisiensi dan hukum keteraturannya?</p><br><small class=\"text-indigo-400\"><em>[Konteks Pembelajaran: Sesuaikan dengan topik dan materi pembelajaran]</em></small>",
         "weight": 1,
         "explanation": "Berdasarkan kaidah dasar Hukum Termodinamika & Siklus Carnot, pernyataan A merupakan prinsip keteraturan yang paling valid dan sesuai hukum konservasi sains.",
         "generated_by": "gemini-3.5-flash-lite",

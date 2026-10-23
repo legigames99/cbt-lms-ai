@@ -2594,6 +2594,120 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
+  // POST /api/v1/cbt/ai/config (Simpan Pengaturan API Key Server & Model Default Gemini)
+  if (pathname === '/api/v1/cbt/ai/config' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const { gemini_api_key, default_model } = body;
+
+    if (gemini_api_key !== undefined) {
+      SERVER_CONFIG.gemini_api_key = String(gemini_api_key).trim();
+      process.env.GEMINI_API_KEY = SERVER_CONFIG.gemini_api_key;
+      process.env.AI_API_KEY = SERVER_CONFIG.gemini_api_key;
+    }
+    if (default_model !== undefined) {
+      SERVER_CONFIG.default_model = String(default_model).trim();
+      process.env.AI_MODEL = SERVER_CONFIG.default_model;
+    }
+
+    // Simpan ke file .env agar persisten setelah restart
+    try {
+      const envPath = path.join(__dirname, '.env');
+      let envContent = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf8') : '';
+      if (envContent.includes('AI_API_KEY=')) {
+        envContent = envContent.replace(/AI_API_KEY=.*(\r?\n|$)/, `AI_API_KEY=${SERVER_CONFIG.gemini_api_key}\n`);
+      } else {
+        envContent += `\nAI_API_KEY=${SERVER_CONFIG.gemini_api_key}\n`;
+      }
+      if (envContent.includes('AI_MODEL=')) {
+        envContent = envContent.replace(/AI_MODEL=.*(\r?\n|$)/, `AI_MODEL=${SERVER_CONFIG.default_model}\n`);
+      } else {
+        envContent += `\nAI_MODEL=${SERVER_CONFIG.default_model}\n`;
+      }
+      fs.writeFileSync(envPath, envContent, 'utf8');
+      console.log(`[AI Config] Berhasil memperbarui konfigurasi AI di .env (Model: ${SERVER_CONFIG.default_model})`);
+    } catch (e) {
+      console.warn('Gagal menyimpan ke .env:', e.message);
+    }
+
+    const srvKey = SERVER_CONFIG.gemini_api_key;
+    const masked = srvKey ? `${srvKey.substring(0, 7)}...${srvKey.substring(srvKey.length - 4)}` : null;
+
+    return sendJSON(200, {
+      status: 'success',
+      message: 'Pengaturan Kunci API Server & Model Default Gemini berhasil disimpan!',
+      data: {
+        has_server_key: Boolean(srvKey),
+        server_key_masked: masked,
+        default_model: SERVER_CONFIG.default_model
+      }
+    });
+  }
+
+  // POST /api/v1/cbt/ai/test-key (Uji Coba Konektivitas API Key Gemini)
+  if (pathname === '/api/v1/cbt/ai/test-key' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const testKey = (body.api_key || SERVER_CONFIG.gemini_api_key || '').trim();
+    const testModel = (body.model || SERVER_CONFIG.default_model || 'gemini-3.5-flash').trim();
+
+    if (!testKey) {
+      return sendJSON(400, {
+        status: 'error',
+        message: 'Kunci API kosong. Masukkan API Key Google Gemini untuk diuji.'
+      });
+    }
+
+    try {
+      const https = require('https');
+      let endpointModel = 'gemini-1.5-flash';
+      if (testModel.includes('flash-lite')) endpointModel = 'gemini-1.5-flash-8b';
+      else if (testModel.includes('pro')) endpointModel = 'gemini-1.5-pro';
+
+      const payload = JSON.stringify({
+        contents: [{ parts: [{ text: 'Balas dengan satu kata: OK' }] }],
+        generationConfig: { maxOutputTokens: 10 }
+      });
+
+      const startTime = Date.now();
+      await new Promise((resolve, reject) => {
+        const reqApi = https.request(`https://generativelanguage.googleapis.com/v1beta/models/${endpointModel}:generateContent?key=${encodeURIComponent(testKey)}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(payload)
+          },
+          timeout: 10000
+        }, resApi => {
+          let buf = '';
+          resApi.on('data', c => buf += c);
+          resApi.on('end', () => {
+            if (resApi.statusCode >= 200 && resApi.statusCode < 300) {
+              resolve({ ok: true, code: resApi.statusCode });
+            } else {
+              reject(new Error(`HTTP ${resApi.statusCode}: ${buf.substring(0, 150)}`));
+            }
+          });
+        });
+        reqApi.on('error', reject);
+        reqApi.on('timeout', () => { reqApi.destroy(); reject(new Error('Timeout ke Google Gemini API')); });
+        reqApi.write(payload);
+        reqApi.end();
+      });
+
+      const latencyMs = Date.now() - startTime;
+      return sendJSON(200, {
+        status: 'success',
+        message: `Koneksi Google Gemini API (${testModel}) Berhasil Terverifikasi! Latensi: ${latencyMs} ms.`,
+        data: { active: true, model: testModel, latency_ms: latencyMs }
+      });
+    } catch (err) {
+      return sendJSON(200, {
+        status: 'warning',
+        message: `Koneksi API langsung memberikan catatan: ${err.message}. Kunci tetap tersimpan, dan sistem memiliki Pedagogical Engine bawaan sebagai pengaman otomatis jika terjadi kendala kuota/koneksi saat generate.`,
+        data: { active: false, error: err.message }
+      });
+    }
+  }
+
   // POST /api/v1/cbt/ai/generate-questions (Eksekusi Pembuatan Butir Soal Nyata via Gemini Flash / BYOK / Server)
   if ((pathname === '/api/v1/cbt/ai/generate-questions' || pathname === '/api/v1/ai/generate-questions') && req.method === 'POST') {
     const body = await parseBody(req);

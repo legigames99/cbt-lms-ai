@@ -300,6 +300,12 @@
           <i class="fa-solid fa-school w-4 text-center"></i>
           <span>Pengaturan Sekolah</span>
         </a>
+
+        <a href="#pengaturan-ai" onclick="switchTab('pengaturan-ai')" id="nav-pengaturan-ai" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+          <i class="fa-solid fa-wand-magic-sparkles w-4 text-center text-indigo-400"></i>
+          <span>Pengaturan AI & Model</span>
+          <span class="ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold font-mono">Gemini</span>
+        </a>
       </nav>
     </div>
 
@@ -1319,6 +1325,334 @@
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 11: PENGATURAN AI & MODEL GEMINI (SERVER & BYOK) -->
+      <!-- ============================================================== -->
+      <section id="tab-pengaturan-ai" class="hidden space-y-6">
+        <!-- Banner Header -->
+        <div class="bg-gradient-to-r from-indigo-950/70 via-slate-900 to-purple-950/50 border border-indigo-500/30 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-microchip text-indigo-400"></i> Mesin Kecerdasan Buatan (AI)
+              </span>
+              <span class="text-xs text-slate-500">•</span>
+              <span class="text-xs text-slate-400">Google Gemini Flash Series</span>
+            </div>
+            <h3 class="text-xl font-bold text-white flex items-center gap-2.5">
+              <span>Pengaturan AI, Kredensial & Model Gemini</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              Kelola kredensial resmi Google Gemini API untuk server sekolah, tentukan model default (Gemini 3.5 Flash s/d 3.8 Flash), kelola kebijakan BYOK (Bring Your Own Key) bagi guru, serta uji coba performa AI secara realtime.
+            </p>
+          </div>
+
+          <!-- Status Indikator di Header -->
+          <div class="flex flex-wrap md:flex-col items-start md:items-end gap-2 shrink-0">
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] text-slate-400">Kunci Server:</span>
+              <span id="aiHeaderServerStatus" class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-400 border border-slate-700">
+                <i class="fa-solid fa-spinner fa-spin mr-1"></i> Memeriksa...
+              </span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] text-slate-400">BYOK Lokal:</span>
+              <span id="aiHeaderByokStatus" class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-400 border border-slate-700">
+                Kosong
+              </span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] text-slate-400">Model Aktif:</span>
+              <span id="aiHeaderModelBadge" class="px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+                gemini-3.5-flash
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid 2 Kolom untuk Pengaturan Utama -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          <!-- KARTU 1: KREDENSIAL API SERVER -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-lg font-bold">
+                    <i class="fa-solid fa-key"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-bold text-white">1. Kunci API Server (Admin Global Key)</h4>
+                    <p class="text-[11px] text-slate-400">Tersimpan di file server (<code class="text-indigo-300">.env</code>) untuk akses terpusat seluruh sekolah</p>
+                  </div>
+                </div>
+                <span id="serverKeyStatusBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                  Memuat...
+                </span>
+              </div>
+
+              <!-- Status Box Kunci Server Saat Ini -->
+              <div id="serverKeyInfoBox" class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 mb-4">
+                <div class="text-[11px] text-slate-400 mb-1 flex items-center justify-between">
+                  <span>Status Kunci API Server Terkini:</span>
+                  <span id="serverKeyEnvIndicator" class="font-mono text-[10px] text-slate-500">.env persistence</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-shield-halved text-indigo-400"></i>
+                  <span id="serverKeyMaskedText" class="font-mono text-xs font-bold text-white tracking-wider">
+                    Belum Terkonfigurasi
+                  </span>
+                </div>
+              </div>
+
+              <!-- Input Form API Key Server -->
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
+                    <span>Perbarui Kunci API Server:</span>
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="text-[11px] text-indigo-400 hover:text-indigo-300 hover:underline flex items-center gap-1">
+                      <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Dapatkan API Key Google AI Studio Gratis
+                    </a>
+                  </label>
+                  <div class="relative">
+                    <input type="password" id="serverApiKeyInput" placeholder="Tempel Google Gemini API Key di sini (AIzaSy...)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 pr-10 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono transition">
+                    <button type="button" onclick="togglePasswordVisibility('serverApiKeyInput', this)" class="absolute right-3 top-2.5 text-slate-400 hover:text-white transition">
+                      <i class="fa-regular fa-eye"></i>
+                    </button>
+                  </div>
+                  <p class="text-[10px] text-slate-500 mt-1.5 leading-relaxed">
+                    Kunci ini akan digunakan saat guru atau proktor memilih opsi <b>Gunakan API Server Sekolah</b>. Kunci tersimpan di backend dan tidak akan diekspos ke browser siswa.
+                  </p>
+                </div>
+
+                <!-- Hasil Uji Koneksi Server Key -->
+                <div id="serverKeyTestResult" class="hidden text-xs rounded-xl p-3 border transition"></div>
+              </div>
+            </div>
+
+            <!-- Tombol Aksi Kunci Server -->
+            <div class="pt-5 mt-5 border-t border-slate-800 flex flex-wrap items-center gap-2.5">
+              <button onclick="handleSaveServerKey()" id="btnSaveServerKey" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-indigo-600/20">
+                <i class="fa-solid fa-floppy-disk"></i> Simpan ke Server (.env)
+              </button>
+              <button onclick="handleTestServerKey()" id="btnTestServerKey" class="px-4 py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition flex items-center gap-2">
+                <i class="fa-solid fa-vial-circle-check"></i> Uji Koneksi API
+              </button>
+              <button onclick="handleClearServerKey()" id="btnClearServerKey" class="px-3.5 py-2.5 rounded-xl bg-rose-600/10 hover:bg-rose-600/20 text-rose-400 border border-rose-500/20 text-xs font-semibold transition flex items-center gap-1.5 ml-auto">
+                <i class="fa-regular fa-trash-can"></i> Hapus Key
+              </button>
+            </div>
+          </div>
+
+          <!-- KARTU 2: MODEL DEFAULT GEMINI FLASH SERIES -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center text-lg font-bold">
+                    <i class="fa-solid fa-brain"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-bold text-white">2. Model Default Gemini & Penalaran Soal</h4>
+                    <p class="text-[11px] text-slate-400">Varian model Google Gemini yang otomatis dipakai untuk generate soal & koreksi esai</p>
+                  </div>
+                </div>
+                <span id="currentModelBadge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40">
+                  gemini-3.5-flash
+                </span>
+              </div>
+
+              <!-- Pilihan Model Dropdown -->
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-300 mb-1.5">Pilih Model Default Sistem:</label>
+                  <select id="defaultModelSelect" onchange="handleModelSelectChange(this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition font-mono">
+                    <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash Lite (Super Cepat, Ringan & Hemat Kuota)</option>
+                    <option value="gemini-3.5-flash" selected>Gemini 3.5 Flash (Keseimbangan Terbaik - Standar Rekomendasi)</option>
+                    <option value="gemini-3.6-flash">Gemini 3.6 Flash (Penalaran TKA & Literasi Ditingkatkan)</option>
+                    <option value="gemini-3.7-flash">Gemini 3.7 Flash (Hybrid Reasoning & Soal HOTS Numerasi)</option>
+                    <option value="gemini-3.8-flash">Gemini 3.8 Flash (Deep Cognitive & Multi-Domain SMA/SMK)</option>
+                    <option value="gemini-2.5-flash">Gemini 2.5 Flash (Stabil)</option>
+                    <option value="gemini-1.5-flash">Gemini 1.5 Flash (Legacy)</option>
+                    <option value="gemini-1.5-pro">Gemini 1.5 Pro (Heavy Reasoning)</option>
+                  </select>
+                </div>
+
+                <!-- Info Deskripsi Spesifikasi Model -->
+                <div id="modelSpecsBox" class="p-4 rounded-xl bg-slate-950/70 border border-slate-800 space-y-2.5 text-xs">
+                  <div class="flex items-center justify-between text-slate-300">
+                    <span class="text-slate-400">Karakteristik Model:</span>
+                    <span id="modelCharacteristicText" class="font-semibold text-indigo-300">Generasi Soal Seimbang & Cepat</span>
+                  </div>
+                  <div class="flex items-center justify-between text-slate-300">
+                    <span class="text-slate-400">Format Soal Didukung:</span>
+                    <span class="text-emerald-400 font-semibold">PG, PGK, B/S, Jodohkan, Isian & Esai AI</span>
+                  </div>
+                  <div class="flex items-center justify-between text-slate-300">
+                    <span class="text-slate-400">Koreksi Otomatis Esai:</span>
+                    <span class="text-cyan-400 font-semibold">Evaluasi Semantik & Pembobotan Nilai 0-100</span>
+                  </div>
+                  <div class="flex items-center justify-between text-slate-300">
+                    <span class="text-slate-400">Rata-rata Latensi:</span>
+                    <span id="modelLatencyEstimate" class="font-mono text-amber-300">~1.2 - 2.8 Detik</span>
+                  </div>
+                </div>
+
+                <!-- Fitur AI Matrix -->
+                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                  <div class="p-2.5 rounded-xl bg-slate-950/50 border border-slate-800/80 flex items-center gap-2">
+                    <i class="fa-solid fa-check text-emerald-400"></i>
+                    <span class="text-slate-300">Standar TKA SMA & SMK</span>
+                  </div>
+                  <div class="p-2.5 rounded-xl bg-slate-950/50 border border-slate-800/80 flex items-center gap-2">
+                    <i class="fa-solid fa-check text-emerald-400"></i>
+                    <span class="text-slate-300">Rubrik Esai Terukur</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tombol Aksi Simpan Model -->
+            <div class="pt-5 mt-5 border-t border-slate-800 flex items-center justify-between">
+              <span class="text-[11px] text-slate-500">Tersimpan otomatis ke sistem</span>
+              <button onclick="handleSaveDefaultModel()" id="btnSaveModel" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-blue-600/20">
+                <i class="fa-solid fa-check"></i> Terapkan Model Default
+              </button>
+            </div>
+          </div>
+
+          <!-- KARTU 3: KEBIJAKAN BYOK (BRING YOUR OWN KEY) GURU -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-amber-600/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-lg font-bold">
+                    <i class="fa-solid fa-laptop-code"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-bold text-white">3. Bring Your Own Key (BYOK) Perangkat Ini</h4>
+                    <p class="text-[11px] text-slate-400">Gunakan API Key pribadi Anda pada browser ini tanpa memakai kuota sekolah</p>
+                  </div>
+                </div>
+                <span id="byokBadgeStatus" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                  Tidak Ada
+                </span>
+              </div>
+
+              <!-- Privasi & Keterangan BYOK -->
+              <div class="p-3.5 rounded-xl bg-amber-950/20 border border-amber-500/30 mb-4">
+                <div class="flex items-start gap-2.5">
+                  <i class="fa-solid fa-circle-info text-amber-400 text-sm mt-0.5"></i>
+                  <div class="text-[11px] text-amber-200/90 leading-relaxed">
+                    <b>Privasi Terjamin:</b> Kunci BYOK Anda hanya disimpan di memori browser perangkat ini (<code class="text-amber-300 font-mono">localStorage</code>). Kunci pribadi Anda <b>TIDAK</b> pernah disimpan di database server sekolah.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Input Form BYOK -->
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
+                    <span>Gemini API Key Guru (BYOK):</span>
+                    <span id="byokCurrentMasked" class="text-[10px] font-mono text-slate-400"></span>
+                  </label>
+                  <div class="relative">
+                    <input type="password" id="byokApiKeyInput" placeholder="Tempel Gemini API Key pribadi Anda (AIzaSy...)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 pr-10 text-xs text-white focus:outline-none focus:border-amber-500 font-mono transition">
+                    <button type="button" onclick="togglePasswordVisibility('byokApiKeyInput', this)" class="absolute right-3 top-2.5 text-slate-400 hover:text-white transition">
+                      <i class="fa-regular fa-eye"></i>
+                    </button>
+                  </div>
+                  <p class="text-[10px] text-slate-500 mt-1.5 leading-relaxed">
+                    Setiap kali Anda membuat soal di halaman <b>Kelola Butir Soal</b>, Anda dapat memilih antara Kunci Server atau Kunci BYOK ini.
+                  </p>
+                </div>
+
+                <!-- Hasil Uji Koneksi BYOK -->
+                <div id="byokTestResult" class="hidden text-xs rounded-xl p-3 border transition"></div>
+              </div>
+            </div>
+
+            <!-- Tombol Aksi BYOK -->
+            <div class="pt-5 mt-5 border-t border-slate-800 flex flex-wrap items-center gap-2.5">
+              <button onclick="handleSaveByokKey()" id="btnSaveByokKey" class="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-amber-600/20">
+                <i class="fa-solid fa-floppy-disk"></i> Simpan di Browser Ini
+              </button>
+              <button onclick="handleTestByokKey()" id="btnTestByokKey" class="px-4 py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition flex items-center gap-2">
+                <i class="fa-solid fa-vial-circle-check"></i> Uji Coba BYOK
+              </button>
+              <button onclick="handleRemoveByokKey()" id="btnRemoveByokKey" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-rose-900/40 text-slate-400 hover:text-rose-300 border border-slate-700 text-xs font-semibold transition flex items-center gap-1.5 ml-auto">
+                <i class="fa-regular fa-trash-can"></i> Hapus BYOK
+              </button>
+            </div>
+          </div>
+
+          <!-- KARTU 4: LIVE AI DIAGNOSTIC & PROMPT PLAYGROUND -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-purple-600/20 text-purple-400 border border-purple-500/30 flex items-center justify-center text-lg font-bold">
+                    <i class="fa-solid fa-terminal"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-bold text-white">4. Live AI Diagnostic & Playground</h4>
+                    <p class="text-[11px] text-slate-400">Uji performa, latensi, dan format respon model Gemini secara langsung</p>
+                  </div>
+                </div>
+                <span id="playgroundStatusBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                  Siap
+                </span>
+              </div>
+
+              <!-- Kontrol Playground: Pilihan Sumber Kunci & Model -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-300 mb-1">Sumber API Key:</label>
+                  <select id="playgroundKeySource" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500 font-mono">
+                    <option value="server">Gunakan Kunci Server (.env)</option>
+                    <option value="byok">Gunakan BYOK Browser Ini</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-300 mb-1">Pilih Model Uji:</label>
+                  <select id="playgroundModelSelect" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500 font-mono">
+                    <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite</option>
+                    <option value="gemini-3.5-flash" selected>gemini-3.5-flash</option>
+                    <option value="gemini-3.6-flash">gemini-3.6-flash</option>
+                    <option value="gemini-3.7-flash">gemini-3.7-flash</option>
+                    <option value="gemini-3.8-flash">gemini-3.8-flash</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Input Prompt -->
+              <div class="mb-3">
+                <label class="block text-[11px] font-semibold text-slate-300 mb-1">Prompt Uji Diagnostik:</label>
+                <textarea id="playgroundPromptInput" rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-purple-500 font-mono transition" placeholder="Tulis instruksi pengujian AI...">Buatkan 1 butir soal TKA Matematika SMA level HOTS materi Barisan Geometri lengkap dengan opsi A-E dan kunci jawaban.</textarea>
+              </div>
+
+              <!-- Respons Output Area -->
+              <div>
+                <div class="flex items-center justify-between text-[11px] text-slate-400 mb-1">
+                  <span>Hasil Respon Model AI:</span>
+                  <span id="playgroundLatencyBadge" class="font-mono text-purple-400 font-bold">-</span>
+                </div>
+                <pre id="playgroundOutput" class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-[11px] font-mono text-slate-300 max-h-48 overflow-y-auto whitespace-pre-wrap custom-scrollbar select-text leading-relaxed">Klik tombol "Jalankan Tes Diagnostik AI" di bawah untuk menguji konektivitas model...</pre>
+              </div>
+            </div>
+
+            <!-- Tombol Aksi Playground -->
+            <div class="pt-4 mt-4 border-t border-slate-800 flex items-center justify-between">
+              <span class="text-[11px] text-slate-500">Live JSON & Markdown response</span>
+              <button onclick="handleRunPlayground()" id="btnRunPlayground" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-purple-600/20">
+                <i class="fa-solid fa-bolt"></i> Jalankan Tes Diagnostik AI
+              </button>
             </div>
           </div>
 
@@ -3339,6 +3673,9 @@
       if (tabName === 'bank-soal') {
         fetchQuestionBanks();
       }
+      if (tabName === 'pengaturan-ai') {
+        fetchAISettings();
+      }
 
       const titleMap = {
         'overview': 'Dashboard Utama',
@@ -3350,7 +3687,8 @@
         'siswa': 'Data Siswa & Kelas',
         'kartu-peserta': 'Kartu Peserta Ujian Siswa',
         'server': 'Sistem & Server',
-        'pengaturan': 'Pengaturan Profil Sekolah'
+        'pengaturan': 'Pengaturan Profil Sekolah',
+        'pengaturan-ai': 'Pengaturan AI, Kredensial & Model Gemini'
       };
       document.getElementById('topbarTitle').innerText = titleMap[tabName] || 'Portal CBT & LMS';
     };
@@ -8762,6 +9100,443 @@
         btn.disabled = false;
         btn.innerHTML = `<i class="fa-solid fa-file-import"></i> Mulai Simpan Data ke Sistem`;
         if (status) status.innerText = '';
+      }
+    };
+
+
+    // ==============================================================
+    // CONTROLLER: PENGATURAN AI & MODEL GEMINI (SERVER & BYOK)
+    // ==============================================================
+    window.togglePasswordVisibility = function(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const isPass = input.type === 'password';
+      input.type = isPass ? 'text' : 'password';
+      const icon = btn.querySelector('i');
+      if (icon) {
+        icon.className = isPass ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
+      }
+    };
+
+    window.handleModelSelectChange = function(modelVal) {
+      const charMap = {
+        'gemini-3.5-flash-lite': 'Super Cepat, Paling Ringan & Kuota Paling Irit',
+        'gemini-3.5-flash': 'Keseimbangan Terbaik Kecepatan & Kualitas Pedagogi',
+        'gemini-3.6-flash': 'Penalaran Konteks Teks Panjang & Literasi Menyeluruh',
+        'gemini-3.7-flash': 'Hybrid Reasoning, Logika Kompleks & Soal HOTS Numerasi',
+        'gemini-3.8-flash': 'Deep Cognitive & Multidisiplin Lanjut SMA/SMK',
+        'gemini-2.5-flash': 'Model Stabil Generasi Sebelumnya',
+        'gemini-1.5-flash': 'Model Kompatibilitas Legacy',
+        'gemini-1.5-pro': 'Penalaran Luas dengan Token Output Tinggi'
+      };
+      const latMap = {
+        'gemini-3.5-flash-lite': '~0.8 - 1.5 Detik',
+        'gemini-3.5-flash': '~1.2 - 2.5 Detik',
+        'gemini-3.6-flash': '~1.5 - 2.8 Detik',
+        'gemini-3.7-flash': '~1.8 - 3.5 Detik',
+        'gemini-3.8-flash': '~2.0 - 4.0 Detik'
+      };
+      const charEl = document.getElementById('modelCharacteristicText');
+      if (charEl) charEl.innerText = charMap[modelVal] || 'Standar AI Google Gemini';
+      const latEl = document.getElementById('modelLatencyEstimate');
+      if (latEl) latEl.innerText = latMap[modelVal] || '~1.5 - 3.0 Detik';
+    };
+
+    window.fetchAISettings = async function() {
+      try {
+        const res = await fetch('/api/v1/cbt/ai/config');
+        const json = await res.json();
+        if (json.status !== 'success') return;
+
+        const data = json.data;
+        const hasServerKey = data.has_server_key;
+        const masked = data.server_key_masked;
+        const curModel = data.default_model || 'gemini-3.5-flash';
+
+        // Update Header Badges
+        const hdrSrv = document.getElementById('aiHeaderServerStatus');
+        if (hdrSrv) {
+          hdrSrv.className = hasServerKey
+            ? 'px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+            : 'px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/40';
+          hdrSrv.innerHTML = hasServerKey ? '<i class="fa-solid fa-circle-check mr-1"></i> Server Key: Aktif' : '<i class="fa-solid fa-circle-exclamation mr-1"></i> Server Key: Kosong';
+        }
+
+        const hdrModel = document.getElementById('aiHeaderModelBadge');
+        if (hdrModel) hdrModel.innerText = curModel;
+
+        const curModelBadge = document.getElementById('currentModelBadge');
+        if (curModelBadge) curModelBadge.innerText = curModel;
+
+        // Card 1: Server Key Info
+        const srvBadge = document.getElementById('serverKeyStatusBadge');
+        if (srvBadge) {
+          srvBadge.className = hasServerKey
+            ? 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+            : 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40';
+          srvBadge.innerText = hasServerKey ? 'Terkonfigurasi' : 'Belum Ada';
+        }
+
+        const srvMasked = document.getElementById('serverKeyMaskedText');
+        if (srvMasked) {
+          srvMasked.innerText = hasServerKey ? masked : 'Belum Dikonfigurasi (Server Belum Punya Key)';
+          srvMasked.className = hasServerKey ? 'font-mono text-xs font-bold text-emerald-400 tracking-wider' : 'font-mono text-xs font-semibold text-slate-400';
+        }
+
+        // Card 2: Model select
+        const modelSelect = document.getElementById('defaultModelSelect');
+        if (modelSelect && curModel) {
+          modelSelect.value = curModel;
+          handleModelSelectChange(curModel);
+        }
+
+        const playModelSelect = document.getElementById('playgroundModelSelect');
+        if (playModelSelect && curModel) {
+          playModelSelect.value = curModel;
+        }
+
+        // Card 3: BYOK Status from localStorage
+        syncBYOKUI();
+
+      } catch (err) {
+        console.warn('Gagal memuat konfigurasi AI:', err);
+      }
+    };
+
+    function syncBYOKUI() {
+      const byok = (localStorage.getItem('cbt_byok_gemini_key') || '').trim();
+      const hasByok = Boolean(byok);
+      const maskedByok = hasByok ? byok.substring(0, 6) + '...' + byok.substring(byok.length - 4) : '';
+
+      const hdrByok = document.getElementById('aiHeaderByokStatus');
+      if (hdrByok) {
+        hdrByok.className = hasByok
+          ? 'px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+          : 'px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-400 border border-slate-700';
+        hdrByok.innerHTML = hasByok ? '<i class="fa-solid fa-circle-check mr-1"></i> BYOK: Aktif' : 'BYOK: Nonaktif';
+      }
+
+      const byokBadge = document.getElementById('byokBadgeStatus');
+      if (byokBadge) {
+        byokBadge.className = hasByok
+          ? 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40'
+          : 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700';
+        byokBadge.innerText = hasByok ? 'Tersimpan di Browser' : 'Tidak Ada';
+      }
+
+      const byokMaskedEl = document.getElementById('byokCurrentMasked');
+      if (byokMaskedEl) {
+        byokMaskedEl.innerText = hasByok ? '(Tersimpan: ' + maskedByok + ')' : '';
+      }
+
+      const byokInput = document.getElementById('byokApiKeyInput');
+      if (byokInput && hasByok && !byokInput.value) {
+        byokInput.placeholder = 'Kunci saat ini: ' + maskedByok + ' (Isi untuk mengganti)';
+      }
+    }
+
+    // Aksi 1: Simpan Server API Key
+    window.handleSaveServerKey = async function() {
+      const input = document.getElementById('serverApiKeyInput');
+      const key = (input.value || '').trim();
+      if (!key) {
+        alert('Silakan masukkan Google Gemini API Key terlebih dahulu.');
+        input.focus();
+        return;
+      }
+
+      const btn = document.getElementById('btnSaveServerKey');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+
+      try {
+        const res = await fetch('/api/v1/cbt/ai/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ gemini_api_key: key })
+        });
+        const json = await res.json();
+        if (json.status === 'success') {
+          input.value = '';
+          alert(json.message || 'Kunci API Server berhasil disimpan ke .env!');
+          await fetchAISettings();
+        } else {
+          alert('Gagal menyimpan: ' + (json.message || 'Error server'));
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan ke Server (.env)';
+      }
+    };
+
+    // Aksi 2: Hapus Server API Key
+    window.handleClearServerKey = async function() {
+      if (!confirm('Apakah Anda yakin ingin menghapus Kunci API Server dari .env? Mesin AI akan beralih ke BYOK guru atau mode offline.')) return;
+
+      const btn = document.getElementById('btnClearServerKey');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/v1/cbt/ai/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ gemini_api_key: '' })
+        });
+        const json = await res.json();
+        alert('Kunci API Server berhasil dihapus.');
+        await fetchAISettings();
+      } catch (err) {
+        alert('Gagal menghapus: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    // Aksi 3: Uji Koneksi Server Key
+    window.handleTestServerKey = async function() {
+      const inputKey = (document.getElementById('serverApiKeyInput').value || '').trim();
+      const model = document.getElementById('defaultModelSelect').value || 'gemini-3.5-flash';
+      const resultBox = document.getElementById('serverKeyTestResult');
+      const btn = document.getElementById('btnTestServerKey');
+
+      resultBox.classList.remove('hidden');
+      resultBox.className = 'text-xs rounded-xl p-3 border bg-slate-950 border-slate-700 text-slate-300 flex items-center gap-2';
+      resultBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-indigo-400"></i> Menguji koneksi ke endpoint Google Gemini AI...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/v1/cbt/ai/test-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ api_key: inputKey, model: model })
+        });
+        const json = await res.json();
+
+        if (json.status === 'success') {
+          resultBox.className = 'text-xs rounded-xl p-3.5 border bg-emerald-950/30 border-emerald-500/40 text-emerald-300';
+          resultBox.innerHTML = '<div class="font-bold flex items-center gap-1.5 mb-1"><i class="fa-solid fa-circle-check"></i> ' + json.message + '</div>'
+            + '<div class="text-[11px] text-emerald-400/80">Model: <b>' + json.data.model + '</b> • Latensi: <b>' + json.data.latency_ms + ' ms</b> • HTTP Status: ' + json.data.http_status + '</div>';
+        } else {
+          resultBox.className = 'text-xs rounded-xl p-3.5 border bg-rose-950/30 border-rose-500/40 text-rose-300';
+          resultBox.innerHTML = '<div class="font-bold flex items-center gap-1.5 mb-1"><i class="fa-solid fa-circle-xmark"></i> ' + json.message + '</div>'
+            + '<div class="text-[11px] text-rose-300/80">' + (json.error || 'Pastikan API Key valid dan terdaftar di Google AI Studio.') + '</div>';
+        }
+      } catch (err) {
+        resultBox.className = 'text-xs rounded-xl p-3.5 border bg-rose-950/30 border-rose-500/40 text-rose-300';
+        resultBox.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i> Gagal menghubungi server CBT: ' + err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    // Aksi 4: Simpan Default Model
+    window.handleSaveDefaultModel = async function() {
+      const model = document.getElementById('defaultModelSelect').value;
+      const btn = document.getElementById('btnSaveModel');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menerapkan...';
+
+      try {
+        const res = await fetch('/api/v1/cbt/ai/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ default_model: model })
+        });
+        const json = await res.json();
+        if (json.status === 'success') {
+          alert('Model default berhasil diatur ke ' + model + '!');
+          await fetchAISettings();
+        } else {
+          alert('Gagal menyimpan model: ' + json.message);
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Terapkan Model Default';
+      }
+    };
+
+    // Aksi 5: Simpan BYOK ke localStorage
+    window.handleSaveByokKey = function() {
+      const input = document.getElementById('byokApiKeyInput');
+      const key = (input.value || '').trim();
+      if (!key) {
+        alert('Silakan masukkan Google Gemini API Key pribadi Anda terlebih dahulu.');
+        input.focus();
+        return;
+      }
+
+      localStorage.setItem('cbt_byok_gemini_key', key);
+      input.value = '';
+      syncBYOKUI();
+      alert('Kunci BYOK berhasil disimpan di memori browser perangkat ini!');
+    };
+
+    // Aksi 6: Hapus BYOK dari localStorage
+    window.handleRemoveByokKey = function() {
+      if (!localStorage.getItem('cbt_byok_gemini_key')) {
+        alert('Tidak ada kunci BYOK yang tersimpan di browser ini.');
+        return;
+      }
+      if (confirm('Hapus kunci BYOK dari browser perangkat ini?')) {
+        localStorage.removeItem('cbt_byok_gemini_key');
+        const input = document.getElementById('byokApiKeyInput');
+        if (input) {
+          input.value = '';
+          input.placeholder = 'Tempel Gemini API Key pribadi Anda (AIzaSy...)';
+        }
+        syncBYOKUI();
+        const resBox = document.getElementById('byokTestResult');
+        if (resBox) resBox.classList.add('hidden');
+        alert('Kunci BYOK berhasil dihapus dari browser ini.');
+      }
+    };
+
+    // Aksi 7: Uji Coba BYOK Key
+    window.handleTestByokKey = async function() {
+      let key = (document.getElementById('byokApiKeyInput').value || '').trim();
+      if (!key) {
+        key = (localStorage.getItem('cbt_byok_gemini_key') || '').trim();
+      }
+      if (!key) {
+        alert('Silakan masukkan atau simpan kunci BYOK terlebih dahulu untuk diuji.');
+        document.getElementById('byokApiKeyInput').focus();
+        return;
+      }
+
+      const model = document.getElementById('defaultModelSelect').value || 'gemini-3.5-flash';
+      const resultBox = document.getElementById('byokTestResult');
+      const btn = document.getElementById('btnTestByokKey');
+
+      resultBox.classList.remove('hidden');
+      resultBox.className = 'text-xs rounded-xl p-3 border bg-slate-950 border-slate-700 text-slate-300 flex items-center gap-2';
+      resultBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-amber-400"></i> Menguji kredensial BYOK ke Google Gemini...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/v1/cbt/ai/test-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ api_key: key, model: model })
+        });
+        const json = await res.json();
+
+        if (json.status === 'success') {
+          resultBox.className = 'text-xs rounded-xl p-3.5 border bg-emerald-950/30 border-emerald-500/40 text-emerald-300';
+          resultBox.innerHTML = '<div class="font-bold flex items-center gap-1.5 mb-1"><i class="fa-solid fa-circle-check"></i> ' + json.message + '</div>'
+            + '<div class="text-[11px] text-emerald-400/80">Kunci BYOK Valid • Model: <b>' + json.data.model + '</b> • Latensi: <b>' + json.data.latency_ms + ' ms</b></div>';
+        } else {
+          resultBox.className = 'text-xs rounded-xl p-3.5 border bg-rose-950/30 border-rose-500/40 text-rose-300';
+          resultBox.innerHTML = '<div class="font-bold flex items-center gap-1.5 mb-1"><i class="fa-solid fa-circle-xmark"></i> Kunci BYOK Tidak Valid</div>'
+            + '<div class="text-[11px] text-rose-300/80">' + (json.error || json.message) + '</div>';
+        }
+      } catch (err) {
+        resultBox.className = 'text-xs rounded-xl p-3.5 border bg-rose-950/30 border-rose-500/40 text-rose-300';
+        resultBox.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i> Terjadi kesalahan: ' + err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    // Aksi 8: Live AI Playground Runner
+    window.handleRunPlayground = async function() {
+      const source = document.getElementById('playgroundKeySource').value;
+      const model = document.getElementById('playgroundModelSelect').value;
+      const prompt = (document.getElementById('playgroundPromptInput').value || '').trim();
+      const outputEl = document.getElementById('playgroundOutput');
+      const latencyBadge = document.getElementById('playgroundLatencyBadge');
+      const statusBadge = document.getElementById('playgroundStatusBadge');
+      const btn = document.getElementById('btnRunPlayground');
+
+      if (!prompt) {
+        alert('Silakan tuliskan prompt pengujian terlebih dahulu.');
+        return;
+      }
+
+      let apiKey = '';
+      if (source === 'byok') {
+        apiKey = (localStorage.getItem('cbt_byok_gemini_key') || '').trim();
+        if (!apiKey) {
+          alert('Anda memilih sumber BYOK, namun belum ada kunci BYOK yang disimpan pada browser ini. Silakan masukkan di Kartu 3.');
+          return;
+        }
+      }
+
+      statusBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40';
+      statusBadge.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Memproses';
+      latencyBadge.innerText = 'Menunggu AI...';
+      outputEl.innerText = '// Mengirim request ke Google Gemini (' + model + ' via ' + source.toUpperCase() + ')...\n// Menghubungi API server...';
+      btn.disabled = true;
+
+      const startTime = performance.now();
+
+      try {
+        const payload = {
+          bank_id: 1,
+          topic: prompt,
+          count: 1,
+          question_type: 'mcq',
+          model: model,
+          api_key_source: source,
+          byok_api_key: apiKey
+        };
+
+        const res = await fetch('/api/v1/cbt/ai/generate-questions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const elapsed = Math.round(performance.now() - startTime);
+        latencyBadge.innerText = elapsed + ' ms';
+
+        const json = await res.json();
+
+        if (json.status === 'success') {
+          statusBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40';
+          statusBadge.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Sukses (200 OK)';
+
+          const sampleQ = (json.data && json.data.created_questions && json.data.created_questions[0]) || null;
+          let formattedOutput = '=== [STATUS RESPONSE AI: SUKSES] ===\n';
+          formattedOutput += 'Waktu Eksekusi: ' + elapsed + ' ms\n';
+          formattedOutput += 'Model Digunakan: ' + (json.data?.model_used || model) + '\n';
+          formattedOutput += 'Kredensial Digunakan: ' + (json.data?.api_key_source || source).toUpperCase() + '\n';
+          formattedOutput += 'Format Soal Dibuat: ' + (sampleQ?.type || 'Pilihan Ganda') + '\n';
+          formattedOutput += '-------------------------------------------------------------\n\n';
+
+          if (sampleQ) {
+            formattedOutput += 'PERTANYAAN:\n' + sampleQ.text + '\n\n';
+            if (sampleQ.options && sampleQ.options.length) {
+              formattedOutput += 'PILIHAN JAWABAN:\n';
+              sampleQ.options.forEach(opt => {
+                const marker = opt.is_correct ? ' [✓ KUNCI BENAR]' : '';
+                formattedOutput += '  ' + opt.label + '. ' + opt.text + marker + '\n';
+              });
+              formattedOutput += '\n';
+            }
+            if (sampleQ.explanation) {
+              formattedOutput += 'PEMBAHASAN:\n' + sampleQ.explanation + '\n';
+            }
+          } else {
+            formattedOutput += JSON.stringify(json, null, 2);
+          }
+
+          outputEl.innerText = formattedOutput;
+        } else {
+          statusBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40';
+          statusBadge.innerHTML = '<i class="fa-solid fa-xmark mr-1"></i> Gagal';
+          outputEl.innerText = '=== [ERROR GENERASI AI] ===\n' + (json.message || 'Error tidak diketahui') + '\n\nDetail:\n' + JSON.stringify(json, null, 2);
+        }
+      } catch (err) {
+        statusBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40';
+        statusBadge.innerText = 'Network Error';
+        latencyBadge.innerText = 'Failed';
+        outputEl.innerText = 'Gagal menghubungi server CBT: ' + err.message;
+      } finally {
+        btn.disabled = false;
       }
     };
 

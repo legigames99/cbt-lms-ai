@@ -5183,14 +5183,26 @@
       pct.innerText = '25%';
       st.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-indigo-400"></i> Menghubungi ${model} Engine...`;
 
+      let progressTimer = null;
+      let curPct = 25;
+
       try {
-        setTimeout(() => {
-          if (bar.style.width === '25%') {
-            bar.style.width = '65%';
-            pct.innerText = '65%';
-            st.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-indigo-400"></i> Menyusun butir soal standar TKA (${questionType})...`;
+        progressTimer = setInterval(() => {
+          if (curPct < 90) {
+            curPct += Math.floor(Math.random() * 5) + 3;
+            if (curPct > 90) curPct = 90;
+            bar.style.width = curPct + '%';
+            pct.innerText = curPct + '%';
+
+            if (curPct >= 30 && curPct < 60) {
+              st.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-indigo-400"></i> Menyusun stimulus & skenario pembelajaran (${questionType})...`;
+            } else if (curPct >= 60 && curPct < 80) {
+              st.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-purple-400"></i> Menyelaraskan tingkat kesulitan & kunci jawaban...`;
+            } else if (curPct >= 80) {
+              st.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-emerald-400"></i> Memvalidasi format asesmen & paket CBT...`;
+            }
           }
-        }, 700);
+        }, 1100);
 
         const res = await fetch('/api/v1/cbt/ai/generate-questions', {
           method: 'POST',
@@ -5211,6 +5223,7 @@
         });
 
         const json = await res.json();
+        if (progressTimer) clearInterval(progressTimer);
         if (!res.ok) throw new Error(json.message || 'Gagal menghasilkan butir soal');
 
         bar.style.width = '100%';
@@ -5227,6 +5240,7 @@
           alert(json.message || `Berhasil menambahkan ${count} butir soal AI ke Bank Soal!`);
         }, 800);
       } catch (err) {
+        if (progressTimer) clearInterval(progressTimer);
         btn.disabled = false;
         prog.classList.add('hidden');
         alert('Gagal generate butir soal: ' + err.message);

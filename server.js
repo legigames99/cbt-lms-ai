@@ -887,8 +887,8 @@ async function callGoogleGeminiAPI({ apiKey, model, basis_type = 'materi', basis
   let lastError = null;
   for (let i = 0; i < uniqueCandidates.length; i++) {
     const tryModel = uniqueCandidates[i];
-    // Model pertama diberi waktu 25s, sedangkan model cadangan (failover) dibatasi 15s agar pengguna tidak menunggu berlarut-larut
-    const timeoutMs = (i === 0) ? 25000 : 15000;
+    // Model pertama dibatasi 12s, sedangkan model cadangan (failover) dibatasi 10s agar respon tetap cepat dan pengguna tidak menunggu lama
+    const timeoutMs = (i === 0) ? 12000 : 10000;
     try {
       console.log(`[Gemini AI] Menghubungi Google Gemini API (${tryModel}, timeout ${Math.round(timeoutMs/1000)}s) - Basis: ${basis_type.toUpperCase()}...`);
       const questions = await executeSingleGeminiRequest(tryModel, apiKey, payload, timeoutMs);

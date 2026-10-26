@@ -2057,32 +2057,32 @@
       {
         "id": 1,
         "type": "mcq",
-        "cog": "C3",
-        "stem": "Seorang siswa SMK sedang melakukan instalasi sistem operasi Ubuntu Server 24.04 LTS pada komputer praktik. Pada tahap pemilihan partisi disk, sistem menawarkan opsi 'Guided - use entire disk and set up LVM' (Logical Volume Manager). Apa keuntungan utama bagi teknisi jaringan jika memilih opsi LVM tersebut dibandingkan partisi standar?",
+        "cog": "C2",
+        "stem": "Dalam praktikum administrasi infrastruktur jaringan di kelas XI TKJ, siswa diminta untuk menginstal paket layanan DHCP Server pada sistem operasi Ubuntu Server 24.04. Perintah dasar manakah yang paling tepat digunakan untuk menginstal paket aplikasi DHCP server tersebut melalui terminal?",
         "weight": 1,
-        "explanation": "Logical Volume Manager (LVM) memberikan fleksibilitas tinggi dalam manajemen penyimpanan di Linux. Keuntungan utamanya adalah kemampuan untuk memperbesar atau memperkecil ukuran logical volume secara dinamis saat sistem sedang berjalan (online), sangat berguna untuk direktori seperti /var atau /home yang sering mengalami fluktuasi kebutuhan kapasitas pada server.",
-        "generated_by": "gemini-3.5-flash-lite",
+        "explanation": "Paket standar yang umum digunakan untuk menyediakan layanan DHCP (Dynamic Host Configuration Protocol) pada sistem operasi berbasis Debian/Ubuntu adalah isc-dhcp-server. Pilihan A adalah web server Apache, C adalah DNS server BIND9, D adalah FTP server, dan E adalah proxy server Squid.",
+        "generated_by": "gemini-3.5-flash",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "Mempercepat proses booting sistem operasi secara signifikan melalui kompresi data otomatis pada partisi root."
+            "text": "sudo apt install apache2"
           },
           {
             "id": "B",
-            "text": "Memungkinkan ukuran partisi (seperti /var atau /home) diubah ukurannya secara dinamis (resize) tanpa harus melakukan format ulang."
+            "text": "sudo apt install isc-dhcp-server"
           },
           {
             "id": "C",
-            "text": "Mengaktifkan enkripsi seluruh hard disk secara otomatis menggunakan standar AES-256 untuk keamanan tingkat tinggi."
+            "text": "sudo apt install bind9"
           },
           {
             "id": "D",
-            "text": "Membuat sistem secara otomatis membuat cadangan (backup) data harian ke server cloud eksternal."
+            "text": "sudo apt install vsftpd"
           },
           {
             "id": "E",
-            "text": "Menghilangkan kebutuhan akan partisi swap karena RAM akan dikelola langsung oleh kernel melalui LVM."
+            "text": "sudo apt install squid"
           }
         ],
         "answer": "B"
@@ -2091,31 +2091,31 @@
         "id": 2,
         "type": "mcq",
         "cog": "C3",
-        "stem": "Setelah proses instalasi Ubuntu 24.04 LTS selesai, seorang administrator jaringan ingin melakukan konfigurasi alamat IP statis pada antarmuka jaringan. Pada Ubuntu versi terbaru ini, utilitas jaringan default apa yang digunakan untuk mengatur konfigurasi tersebut melalui berkas teks YAML di direktori <code>/etc/netplan/</code>?",
+        "stem": "Setelah paket layanan DHCP berhasil terpasang di Ubuntu Server 24.04, administrator jaringan harus menentukan antarmuka jaringan (network interface) fisik mana yang akan melayani permintaan IP dari klien. Berkas konfigurasi manakah yang harus disunting untuk mendefinisikan antarmuka tersebut?",
         "weight": 1,
-        "explanation": "Ubuntu mulai versi 18.04 LTS hingga versi terbaru 24.04 LTS menggunakan Netplan sebagai utilitas manajemen konfigurasi jaringan default. Netplan membaca berkas konfigurasi berformat YAML yang terletak di direktori /etc/netplan/ untuk kemudian diterapkan ke backend seperti systemd-networkd atau NetworkManager.",
-        "generated_by": "gemini-3.5-flash-lite",
+        "explanation": "Pada paket isc-dhcp-server di Ubuntu, antarmuka jaringan yang digunakan untuk mendengarkan (listen) permintaan DHCP diatur di dalam berkas /etc/default/isc-dhcp-server pada parameter INTERFACESv4 atau INTERFACESv6. Berkas /etc/dhcp/dhcpd.conf digunakan untuk mengatur range IP dan subnet, sedangkan netplan mengatur alamat IP statis pada server.",
+        "generated_by": "gemini-3.5-flash",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "ifconfig"
+            "text": "/etc/network/interfaces"
           },
           {
             "id": "B",
-            "text": "network-manager"
+            "text": "/etc/dhcp/dhcpd.conf"
           },
           {
             "id": "C",
-            "text": "netplan"
+            "text": "/etc/default/isc-dhcp-server"
           },
           {
             "id": "D",
-            "text": "systemd-resolved"
+            "text": "/etc/netplan/01-netcfg.yaml"
           },
           {
             "id": "E",
-            "text": "dhcpcd"
+            "text": "/etc/resolv.conf"
           }
         ],
         "answer": "C"
@@ -2123,32 +2123,32 @@
       {
         "id": 3,
         "type": "mcq",
-        "cog": "C4",
-        "stem": "Perhatikan cuplikan berkas konfigurasi Netplan berikut pada Ubuntu 24.04 LTS:<br><code>network:\nversion: 2\nethernets:\nenp3s0:\naddresses:\n- 192.168.1.10/24\ngateway4: 192.168.1.1\nnameservers:\naddresses: [8.8.8.8, 8.8.4.4]</code><br>Ketika perintah <code>sudo netplan apply</code> dieksekusi, sistem mengeluarkan pesan peringatan atau galat terkait <code>gateway4</code> yang sudah deprecated (tidak digunakan lagi). Bagaimana format penulisan rute default (gateway) yang benar pada versi Netplan terbaru di Ubuntu 24.04?",
+        "cog": "C3",
+        "stem": "Seorang siswa kelas XI TKJ sedang menyunting berkas konfigurasi utama DHCP di <code>/etc/dhcp/dhcpd.conf</code> pada Ubuntu 24.04. Ia ingin membagikan segmen jaringan dengan alamat network 192.168.10.0 dan subnet mask 255.255.255.0. Penulisan blok deklarasi subnet yang paling tepat adalah...",
         "weight": 1,
-        "explanation": "Pada versi Netplan modern yang digunakan di Ubuntu 24.04, properti 'gateway4' dan 'gateway6' sudah ditinggalkan (deprecated). Standar penulisan rute default yang benar menggunakan blok 'routes' dengan mendefinisikan tujuan 'to: default' dan alamat 'via: [IP Gateway]'.",
-        "generated_by": "gemini-3.5-flash-lite",
+        "explanation": "Dalam sintaks berkas konfigurasi ISC DHCP server (dhcpd.conf), pendefinisian suatu segmen jaringan wajib menggunakan keyword 'subnet' diikuti alamat jaringan dan 'netmask' beserta nilai subnet mask-nya, dilanjutkan dengan kurung kurawal pembuka.",
+        "generated_by": "gemini-3.5-flash",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "Mengganti baris tersebut menjadi <code>default-gateway: [192.168.1.1]</code>"
+            "text": "network 192.168.10.0 netmask 255.255.255.0 { ... }"
           },
           {
             "id": "B",
-            "text": "Mengganti baris tersebut menjadi <code>routes: [{to: default, via: 192.168.1.1}]</code>"
+            "text": "subnet 192.168.10.0 netmask 255.255.255.0 { ... }"
           },
           {
             "id": "C",
-            "text": "Memindahkan alamat gateway ke dalam blok <code>nameservers</code>"
+            "text": "ip dhcp pool 192.168.10.0 { ... }"
           },
           {
             "id": "D",
-            "text": "Menghapus baris gateway dan menggantinya dengan utilitas <code>route add default gw</code>"
+            "text": "range 192.168.10.0 192.168.10.255; { ... }"
           },
           {
             "id": "E",
-            "text": "Menggunakan sintaks lama <code>gateway: 192.168.1.1</code> di bawah blok addresses"
+            "text": "dhcp-range=192.168.10.0,255.255.255.0 { ... }"
           }
         ],
         "answer": "B"
@@ -2156,32 +2156,32 @@
       {
         "id": 4,
         "type": "mcq",
-        "cog": "C3",
-        "stem": "Seorang pengelola lab komputer sekolah ingin mengaktifkan layanan jarak jauh agar dapat meremote Ubuntu Server 24.04 dari komputer klien. Paket perangkat lunak SSH server apa yang harus diinstal melalui manajer paket apt, dan apa perintah untuk memeriksa status layanan tersebut?",
-        "weight": 1,
-        "explanation": "Standar industri untuk akses remote CLI yang aman pada sistem Linux adalah OpenSSH. Paket servernya adalah 'openssh-server' dan layanannya dikelola menggunakan systemd dengan nama layanan 'ssh' (atau sshd), sehingga perintah pengecekan status yang tepat adalah 'sudo systemctl status ssh'.",
-        "generated_by": "gemini-3.5-flash-lite",
+        "cog": "C4",
+        "stem": "Perhatikan cuplikan konfigurasi dalam berkas <code>/etc/dhcp/dhcpd.conf</code> berikut:<br><pre>subnet 192.168.20.0 netmask 255.255.255.0 {\nrange 192.168.20.50 192.168.20.100;\noption routers 192.168.20.1;\noption domain-name-servers 8.8.8.8;\n}</pre><br>Berdasarkan konfigurasi di atas, tindakan apa yang akan dialami oleh komputer klien yang terhubung ke jaringan tersebut?",
+        "weight": 1.5,
+        "explanation": "Parameter 'range 192.168.20.50 192.168.20.100;' berfungsi untuk menentukan rentang (pool) alamat IP yang dapat dipinjamkan secara dinamis kepada komputer klien yang meminta alokasi IP DHCP pada subnet tersebut.",
+        "generated_by": "gemini-3.5-flash",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "Paket: <code>telnetd</code>, Perintah status: <code>service telnet status</code>"
+            "text": "Klien akan mendapatkan alamat IP statis di luar rentang 192.168.20.50."
           },
           {
             "id": "B",
-            "text": "Paket: <code>openssh-server</code>, Perintah status: <code>sudo systemctl status ssh</code>"
+            "text": "Klien akan mendapatkan alamat IP secara dinamis berkisar antara 192.168.20.50 hingga 192.168.20.100."
           },
           {
             "id": "C",
-            "text": "Paket: <code>vsftpd</code>, Perintah status: <code>sudo systemctl status vsftpd</code>"
+            "text": "Klien tidak akan mendapatkan IP karena tidak ada parameter default-lease-time."
           },
           {
             "id": "D",
-            "text": "Paket: <code>remmina</code>, Perintah status: <code>sudo systemctl status remmina</code>"
+            "text": "Klien akan bertindak sebagai router sekunder pada jaringan 192.168.20.1."
           },
           {
             "id": "E",
-            "text": "Paket: <code>xrdp</code>, Perintah status: <code>sudo systemctl status xrdp</code>"
+            "text": "Klien hanya dapat mengakses internet menggunakan DNS lokal server."
           }
         ],
         "answer": "B"
@@ -2189,101 +2189,35 @@
       {
         "id": 5,
         "type": "mcq",
-        "cog": "C4",
-        "stem": "Seorang siswa SMK mendapati bahwa setelah selesai menginstal paket web server Apache di Ubuntu 24.04, situs web tidak dapat diakses dari komputer lain di jaringan lokal. Ketika diperiksa menggunakan perintah <code>sudo ufw status</code>, status firewall aktif (active) namun belum ada aturan untuk lalu lintas web. Tindakan konfigurasi UFW (Uncomplicated Firewall) yang paling tepat agar layanan HTTP dan HTTPS dapat diakses adalah:",
+        "cog": "C3",
+        "stem": "Setelah melakukan perubahan konfigurasi pada layanan DHCP server di Ubuntu 24.04, seorang administrator jaringan harus menerapkan perubahan tersebut agar sistem membaca konfigurasi baru. Perintah manakah yang tepat untuk me-restart layanan DHCP?",
         "weight": 1,
-        "explanation": "UFW menyediakan profil aplikasi yang mempermudah pembukaan port jaringan. Profil 'Apache Full' secara otomatis membuka port 80 (HTTP) dan port 443 (HTTPS). Menonaktifkan firewall secara total bukanlah praktik terbaik keamanan jaringan di lingkungan produksi maupun sekolah.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "options": [
-          {
-            "id": "A",
-            "text": "Menjalankan perintah <code>sudo ufw disable</code> secara permanen untuk mematikan seluruh pengamanan."
-          },
-          {
-            "id": "B",
-            "text": "Menjalankan perintah <code>sudo ufw allow 'Apache Full'</code> untuk membuka port 80 dan 443 sekaligus."
-          },
-          {
-            "id": "C",
-            "text": "Menjalankan perintah <code>sudo ufw allow 22/tcp</code> agar port web terbuka."
-          },
-          {
-            "id": "D",
-            "text": "Menjalankan perintah <code>sudo ufw route default ACCEPT</code> pada konfigurasi sistem."
-          },
-          {
-            "id": "E",
-            "text": "Menghapus total paket ufw menggunakan perintah <code>sudo apt purge ufw</code>."
-          }
-        ],
-        "answer": "B"
-      },
-      {
-        "id": 6,
-        "type": "mcq",
-        "cog": "C2",
-        "stem": "Saat melakukan praktikum Administrasi Sistem Jaringan di laboratorium sekolah, seorang siswa diminta untuk memahami fungsi dari layanan transfer file di dalam server. Layanan manakah yang secara khusus digunakan untuk mengunggah dan mengunduh berkas melalui protokol yang aman (terenkripsi) di lingkungan sistem operasi jaringan Linux?",
-        "weight": 1,
-        "explanation": "SFTP (Secure File Transfer Protocol) adalah protokol yang dirancang untuk melakukan transfer berkas secara aman dengan memanfaatkan lapisan enkripsi dari Secure Shell (SSH), biasanya beroperasi pada port 22. FTP standar (port 21) tidak mengenkripsi data saat dikirimkan, sedangkan Telnet tidak aman karena tidak menggunakan enkripsi, DHCP untuk alokasi IP, dan DNS untuk resolusi nama.",
+        "explanation": "Untuk menerapkan perubahan konfigurasi pada layanan DHCP server, nama layanan systemd yang harus di-restart adalah isc-dhcp-server dengan perintah 'sudo systemctl restart isc-dhcp-server'.",
         "generated_by": "gemini-3.5-flash",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "FTP (File Transfer Protocol) yang menggunakan port 21 tanpa enkripsi data."
+            "text": "sudo systemctl restart networking"
           },
           {
             "id": "B",
-            "text": "SFTP (Secure File Transfer Protocol) yang berjalan di atas protokol SSH pada port 22."
+            "text": "sudo systemctl restart isc-dhcp-server"
           },
           {
             "id": "C",
-            "text": "Telnet yang menyediakan akses terminal teks jarak jauh dengan enkripsi penuh."
+            "text": "sudo systemctl restart apache2"
           },
           {
             "id": "D",
-            "text": "DHCP (Dynamic Host Configuration Protocol) untuk alokasi alamat IP otomatis."
+            "text": "sudo apt update && sudo apt upgrade"
           },
           {
             "id": "E",
-            "text": "DNS (Domain Name System) untuk menerjemahkan nama domain ke alamat IP."
+            "text": "sudo netplan apply"
           }
         ],
         "answer": "B"
-      },
-      {
-        "id": 7,
-        "type": "mcq",
-        "cog": "C2",
-        "stem": "Di dalam topologi jaringan sekolah, sebuah server Debian bertindak sebagai router gateway yang menghubungkan jaringan lokal (LAN) ke internet (WAN). Fitur pada sistem operasi jaringan Linux yang berfungsi untuk meneruskan paket data antar antarmuka jaringan yang berbeda serta melakukan translasi alamat IP lokal ke IP publik disebut...",
-        "weight": 1,
-        "explanation": "IP Forwarding pada kernel Linux mengizinkan sistem untuk meneruskan paket data dari satu antarmuka jaringan ke antarmuka lainnya (berfungsi sebagai router). Sedangkan NAT (Network Address Translation) digunakan untuk menerjemahkan alamat IP lokal privat agar dapat mengakses jaringan internet publik melalui satu IP publik yang dimiliki gateway. Pilihan lain seperti NFS, Samba, dan NTP memiliki fungsi spesifik yang berbeda (sharing berkas dan sinkronisasi waktu).",
-        "generated_by": "gemini-3.5-flash",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "options": [
-          {
-            "id": "A",
-            "text": "Firewall dan Port Forwarding"
-          },
-          {
-            "id": "B",
-            "text": "Network File System (NFS)"
-          },
-          {
-            "id": "C",
-            "text": "IP Forwarding dan NAT (Network Address Translation)"
-          },
-          {
-            "id": "D",
-            "text": "Samba File Server dan Active Directory"
-          },
-          {
-            "id": "E",
-            "text": "Network Time Protocol (NTP) Client"
-          }
-        ],
-        "answer": "C"
       }
     ]
   }

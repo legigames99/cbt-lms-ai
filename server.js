@@ -1771,6 +1771,587 @@ function parseBody(req) {
   });
 }
 
+
+// ==============================================================
+// MODUL EXPORT & IMPORT BUTIR SOAL KE MICROSOFT WORD (.DOCX / .DOC)
+// Pure Node.js Zero-Dependency OpenXML & HTML-Word Engine
+// ==============================================================
+
+function crc32Word(buf) {
+  let crc = ~0;
+  for (let i = 0; i < buf.length; i++) {
+    crc ^= buf[i];
+    for (let j = 0; j < 8; j++) {
+      crc = (crc >>> 1) ^ (-(crc & 1) & 0xedb88320);
+    }
+  }
+  return ~crc >>> 0;
+}
+
+function createZipArchive(files) {
+  const zlib = require('zlib');
+  const localHeaders = [];
+  const centralHeaders = [];
+  let offset = 0;
+
+  for (const file of files) {
+    const nameBuf = Buffer.from(file.name, 'utf8');
+    const rawData = Buffer.isBuffer(file.data) ? file.data : Buffer.from(file.data, 'utf8');
+    const crc = crc32Word(rawData);
+    const compressed = zlib.deflateRawSync(rawData);
+    const useCompressed = compressed.length < rawData.length;
+    const method = useCompressed ? 8 : 0;
+    const body = useCompressed ? compressed : rawData;
+
+    const lh = Buffer.alloc(30 + nameBuf.length);
+    lh.writeUInt32LE(0x04034b50, 0);
+    lh.writeUInt16LE(20, 4);
+    lh.writeUInt16LE(0, 6);
+    lh.writeUInt16LE(method, 8);
+    lh.writeUInt16LE(0, 10);
+    lh.writeUInt16LE(0, 12);
+    lh.writeUInt32LE(crc, 14);
+    lh.writeUInt32LE(body.length, 18);
+    lh.writeUInt32LE(rawData.length, 22);
+    lh.writeUInt16LE(nameBuf.length, 26);
+    lh.writeUInt16LE(0, 28);
+    nameBuf.copy(lh, 30);
+    localHeaders.push(lh, body);
+
+    const ch = Buffer.alloc(46 + nameBuf.length);
+    ch.writeUInt32LE(0x02014b50, 0);
+    ch.writeUInt16LE(20, 4);
+    ch.writeUInt16LE(20, 6);
+    ch.writeUInt16LE(0, 8);
+    ch.writeUInt16LE(method, 10);
+    ch.writeUInt16LE(0, 12);
+    ch.writeUInt16LE(0, 14);
+    ch.writeUInt32LE(crc, 16);
+    ch.writeUInt32LE(body.length, 20);
+    ch.writeUInt32LE(rawData.length, 24);
+    ch.writeUInt16LE(nameBuf.length, 28);
+    ch.writeUInt16LE(0, 30);
+    ch.writeUInt16LE(0, 32);
+    ch.writeUInt16LE(0, 34);
+    ch.writeUInt16LE(0, 36);
+    ch.writeUInt32LE(0, 38);
+    ch.writeUInt32LE(offset, 42);
+    nameBuf.copy(ch, 46);
+    centralHeaders.push(ch);
+
+    offset += lh.length + body.length;
+  }
+
+  const cdOffset = offset;
+  let cdSize = 0;
+  for (const ch of centralHeaders) cdSize += ch.length;
+
+  const eocd = Buffer.alloc(22);
+  eocd.writeUInt32LE(0x06054b50, 0);
+  eocd.writeUInt16LE(0, 4);
+  eocd.writeUInt16LE(0, 6);
+  eocd.writeUInt16LE(files.length, 8);
+  eocd.writeUInt16LE(files.length, 10);
+  eocd.writeUInt32LE(cdSize, 12);
+  eocd.writeUInt32LE(cdOffset, 16);
+  eocd.writeUInt16LE(0, 20);
+
+  return Buffer.concat([...localHeaders, ...centralHeaders, eocd]);
+}
+
+function readZipArchive(buf) {
+  const zlib = require('zlib');
+  const files = {};
+  let offset = 0;
+  while (offset < buf.length - 30) {
+    const sig = buf.readUInt32LE(offset);
+    if (sig !== 0x04034b50) break;
+    const method = buf.readUInt16LE(offset + 8);
+    const compSize = buf.readUInt32LE(offset + 18);
+    const uncompSize = buf.readUInt32LE(offset + 22);
+    const nameLen = buf.readUInt16LE(offset + 26);
+    const extraLen = buf.readUInt16LE(offset + 28);
+    const name = buf.toString('utf8', offset + 30, offset + 30 + nameLen);
+    const dataOffset = offset + 30 + nameLen + extraLen;
+    const compData = buf.subarray(dataOffset, dataOffset + compSize);
+    let data;
+    try {
+      if (method === 8) {
+        data = zlib.inflateRawSync(compData);
+      } else {
+        data = compData;
+      }
+      files[name] = data;
+    } catch (e) {}
+    offset = dataOffset + compSize;
+  }
+  return files;
+}
+
+function extractTextFromWordBuffer(buf) {
+  if (!buf || buf.length === 0) return '';
+  // Check if it is a ZIP (.docx)
+  if (buf.length > 4 && buf.readUInt32LE(0) === 0x04034b50) {
+    const files = readZipArchive(buf);
+    const docXmlBuf = files['word/document.xml'];
+    if (!docXmlBuf) throw new Error('Berkas .docx tidak memiliki word/document.xml');
+    const docXml = docXmlBuf.toString('utf8');
+    
+    const paragraphs = [];
+    const pMatches = docXml.match(/<w:p[\s>](.*?)<\/w:p>/gs) || [];
+    for (const pXml of pMatches) {
+      let pText = '';
+      const tMatches = pXml.match(/<w:t[\s>](.*?)<\/w:t>/gs) || [];
+      for (const tXml of tMatches) {
+        const cleanT = tXml.replace(/<[^>]+>/g, '');
+        pText += cleanT;
+      }
+      if (pText.trim()) {
+        paragraphs.push(pText.trim());
+      }
+    }
+    return paragraphs.join('\n');
+  } else {
+    // Might be HTML or plain text .doc
+    return buf.toString('utf8').replace(/<[^>]+>/g, '\n');
+  }
+}
+
+function xmlEscape(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+function parseQuestionsFromWordText(rawText) {
+  if (!rawText || !rawText.trim()) return [];
+
+  const lines = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').map(l => l.trim()).filter(Boolean);
+  const questions = [];
+  let currentQ = null;
+
+  function finalizeCurrentQ() {
+    if (!currentQ) return;
+    if (currentQ.stem && (currentQ.options.length > 0 || currentQ.answer_keys.length > 0 || currentQ.answer || currentQ.type === 'long_essay')) {
+      if (!currentQ.type) {
+        if (currentQ.options.length > 0) {
+          if (Array.isArray(currentQ.answer) && currentQ.answer.length > 1) {
+            currentQ.type = 'mcq_complex';
+          } else {
+            currentQ.type = 'mcq';
+          }
+        } else if (currentQ.answer_keys.length > 0) {
+          currentQ.type = 'short_essay';
+        } else if (currentQ.statements && currentQ.statements.length > 0) {
+          currentQ.type = 'true_false';
+        } else {
+          currentQ.type = 'short_essay';
+          if (currentQ.answer) currentQ.answer_keys = [currentQ.answer];
+        }
+      }
+
+      if (currentQ.type === 'mcq' && !currentQ.answer && currentQ.options.length > 0) {
+        currentQ.answer = currentQ.options[0].id;
+      }
+      if (currentQ.type === 'short_essay' && currentQ.answer_keys.length === 0) {
+        currentQ.answer_keys = [currentQ.answer || 'kunci jawaban'];
+      }
+      if (!currentQ.weight) {
+        currentQ.weight = (currentQ.type === 'long_essay' ? 3.0 : (currentQ.type === 'matching' ? 2.0 : (currentQ.type === 'mcq_complex' || currentQ.type === 'true_false' ? 1.5 : 1.0)));
+      }
+      if (!currentQ.cog) currentQ.cog = 'C2';
+
+      questions.push(currentQ);
+    }
+    currentQ = null;
+  }
+
+  const qNumberRegex = /^(?:(?:\[SOAL\]|Soal)\s*)?(?:No\.?\s*)?(\d+)[\.\)]\s*(.*)$/i;
+  const optRegex = /^([A-Ea-e])[\.\)]\s*(.*)$/;
+  const keyRegex = /^(?:KUNCI\s*JAWABAN\s*BENAR|KUNCI\s*JAWABAN|KUNCI|JAWABAN|ANSWER|KEY)\s*[:=]\s*(.*)$/i;
+  const explRegex = /^(?:PEMBAHASAN|PENJELASAN|EXPLANATION|ALASAN)\s*[:=]\s*(.*)$/i;
+  const typeRegex = /^(?:TIPE|TYPE|JENIS|FORMAT)\s*[:=]\s*(.*)$/i;
+  const cogRegex = /^(?:KOGNITIF|LEVEL|TINGKAT|COG)\s*[:=]\s*(.*)$/i;
+  const weightRegex = /^(?:BOBOT|WEIGHT|SKOR)\s*[:=]\s*(.*)$/i;
+  const rubricRegex = /^(?:RUBRIK|RUBRIC|KRITERIA)\s*[:=]\s*(.*)$/i;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    const qMatch = line.match(qNumberRegex);
+    if (qMatch) {
+      finalizeCurrentQ();
+      currentQ = {
+        stem: qMatch[2] ? qMatch[2].trim() : '',
+        options: [],
+        answer: null,
+        answer_keys: [],
+        statements: [],
+        premises: [],
+        targets: [],
+        explanation: '',
+        weight: 1.0,
+        cog: 'C2',
+        type: null
+      };
+      continue;
+    }
+
+    if (!currentQ) {
+      if (line.toLowerCase().startsWith('[soal]')) {
+        currentQ = {
+          stem: '',
+          options: [],
+          answer: null,
+          answer_keys: [],
+          statements: [],
+          premises: [],
+          targets: [],
+          explanation: '',
+          weight: 1.0,
+          cog: 'C2',
+          type: null
+        };
+      }
+      continue;
+    }
+
+    const tMatch = line.match(typeRegex);
+    if (tMatch) {
+      const t = tMatch[1].toLowerCase().trim();
+      if (t.includes('kompleks') || t.includes('complex')) currentQ.type = 'mcq_complex';
+      else if (t.includes('ganda') || t.includes('pg') || t.includes('mcq')) currentQ.type = 'mcq';
+      else if (t.includes('isian') || t.includes('short')) currentQ.type = 'short_essay';
+      else if (t.includes('uraian') || t.includes('esai') || t.includes('essay')) currentQ.type = 'long_essay';
+      else if (t.includes('benar') || t.includes('salah') || t.includes('true') || t.includes('bs')) currentQ.type = 'true_false';
+      else if (t.includes('jodoh') || t.includes('matching')) currentQ.type = 'matching';
+      continue;
+    }
+
+    const kMatch = line.match(keyRegex);
+    if (kMatch) {
+      let val = kMatch[1].trim();
+
+      // Check if explanation is in the same line: "KUNCI: B | Pembahasan: ..."
+      if (/\|\s*(?:pembahasan|penjelasan|explanation|alasan)\s*:/i.test(val)) {
+        const pParts = val.split(/\|\s*(?:pembahasan|penjelasan|explanation|alasan)\s*:/i);
+        val = pParts[0].trim();
+        if (pParts[1] && !currentQ.explanation) {
+          currentQ.explanation = pParts[1].trim();
+        }
+      }
+
+      if (val.includes(',') || val.includes('/') || val.includes(';')) {
+        const parts = val.split(/[,/;]/).map(s => s.trim().toUpperCase()).filter(Boolean);
+        if (parts.length > 1 && parts.every(p => /^[A-E]$/.test(p))) {
+          currentQ.answer = parts;
+          currentQ.type = 'mcq_complex';
+        } else {
+          currentQ.answer_keys = val.split(/[,/;]/).map(s => s.trim()).filter(Boolean);
+          if (!currentQ.type) currentQ.type = 'short_essay';
+        }
+      } else if (/^[A-Ea-e]$/.test(val)) {
+        currentQ.answer = val.toUpperCase();
+        if (!currentQ.type) currentQ.type = 'mcq';
+      } else {
+        currentQ.answer = val;
+        currentQ.answer_keys = [val];
+        if (!currentQ.type) currentQ.type = 'short_essay';
+      }
+      continue;
+    }
+
+    const eMatch = line.match(explRegex);
+    if (eMatch) {
+      currentQ.explanation = eMatch[1].trim();
+      continue;
+    }
+
+    const cMatch = line.match(cogRegex);
+    if (cMatch) {
+      const cogVal = cMatch[1].toUpperCase().trim();
+      if (['C1', 'C2', 'C3', 'C4', 'C5', 'C6'].includes(cogVal)) {
+        currentQ.cog = cogVal;
+      }
+      continue;
+    }
+
+    const wMatch = line.match(weightRegex);
+    if (wMatch) {
+      const wVal = parseFloat(wMatch[1].replace(',', '.'));
+      if (!isNaN(wVal) && wVal > 0) currentQ.weight = wVal;
+      continue;
+    }
+
+    const rMatch = line.match(rubricRegex);
+    if (rMatch) {
+      currentQ.rubric = rMatch[1].trim();
+      currentQ.type = 'long_essay';
+      continue;
+    }
+
+    const optMatch = line.match(optRegex);
+    if (optMatch) {
+      currentQ.options.push({
+        id: optMatch[1].toUpperCase(),
+        text: optMatch[2].trim()
+      });
+      continue;
+    }
+
+    if (currentQ.options.length === 0 && !currentQ.answer && currentQ.answer_keys.length === 0) {
+      currentQ.stem += (currentQ.stem ? '<br>' : '') + line;
+    } else if (currentQ.explanation) {
+      currentQ.explanation += ' ' + line;
+    }
+  }
+
+  finalizeCurrentQ();
+  return questions;
+}
+
+function generateDocxDocument({ title, school, subject, teacher, targetClass, questions, includeKeys = true }) {
+  let bodyXml = '';
+
+  bodyXml += `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="28"/><w:color w:val="1e1b4b"/></w:rPr><w:t>${xmlEscape(school || 'SMK NEGERI 5 BANDUNG')}</w:t></w:r></w:p>`;
+  bodyXml += `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="24"/></w:rPr><w:t>${xmlEscape(title || 'NASKAH ASESMEN PEMBELAJARAN')}</w:t></w:r></w:p>`;
+  bodyXml += `<w:p><w:pPr><w:jc w:val="center"/><w:pBdr><w:bottom w:val="single" w:sz="14" w:space="8" w:color="4f46e5"/></w:pBdr></w:pPr><w:r><w:rPr><w:i/><w:sz w:val="20"/><w:color w:val="4b5563"/></w:rPr><w:t>Mata Pelajaran: ${xmlEscape(subject || 'Informatika')} | Kelas: ${xmlEscape(targetClass || 'Semua Kelas')} | Pengampu: ${xmlEscape(teacher || 'Guru Pengampu')}</w:t></w:r></w:p>`;
+  bodyXml += `<w:p><w:r><w:t></w:t></w:r></w:p>`;
+
+  questions.forEach((q, idx) => {
+    const qNum = idx + 1;
+    const cleanStem = (q.stem || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    
+    bodyXml += `<w:p><w:pPr><w:spacing w:before="240" w:after="100"/></w:pPr>`;
+    bodyXml += `<w:r><w:rPr><w:b/></w:rPr><w:t>${qNum}. </w:t></w:r>`;
+    bodyXml += `<w:r><w:t>${xmlEscape(cleanStem)}</w:t></w:r>`;
+    bodyXml += `</w:p>`;
+
+    if (q.type === 'mcq' || q.type === 'mcq_complex') {
+      const opts = q.options || [];
+      opts.forEach(opt => {
+        const cleanOpt = (opt.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="40"/></w:pPr>`;
+        bodyXml += `<w:r><w:rPr><w:b/></w:rPr><w:t>${opt.id}. </w:t></w:r>`;
+        bodyXml += `<w:r><w:t>${xmlEscape(cleanOpt)}</w:t></w:r>`;
+        bodyXml += `</w:p>`;
+      });
+    } else if (q.type === 'true_false') {
+      (q.statements || []).forEach((st, sIdx) => {
+        bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="40"/></w:pPr>`;
+        bodyXml += `<w:r><w:t>[   ] [ B / S ] ${xmlEscape(st.text)}</w:t></w:r>`;
+        bodyXml += `</w:p>`;
+      });
+    } else if (q.type === 'matching') {
+      (q.premises || []).forEach((p, pIdx) => {
+        const target = (q.targets || [])[pIdx];
+        bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="40"/></w:pPr>`;
+        bodyXml += `<w:r><w:t>${pIdx + 1}. ${xmlEscape(p.text)}   ----&gt;   [ ... ] ${target ? xmlEscape(target.text) : ''}</w:t></w:r>`;
+        bodyXml += `</w:p>`;
+      });
+    } else if (q.type === 'short_essay') {
+      bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:i/><w:color w:val="6b7280"/></w:rPr><w:t>Jawaban Singkat: _____________________________________________</w:t></w:r></w:p>`;
+    } else if (q.type === 'long_essay') {
+      bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:i/><w:color w:val="6b7280"/></w:rPr><w:t>Lembar Uraian / Jawaban: [ ............................................................................................................ ]</w:t></w:r></w:p>`;
+    }
+
+    if (includeKeys) {
+      let keyText = '';
+      if (q.type === 'mcq') keyText = q.answer || '-';
+      else if (q.type === 'mcq_complex') keyText = Array.isArray(q.answer) ? q.answer.join(', ') : q.answer;
+      else if (q.type === 'true_false') keyText = (q.statements || []).map(s => s.key).join('-');
+      else if (q.type === 'short_essay') keyText = (q.answer_keys || []).join(' / ');
+      else if (q.type === 'matching') keyText = JSON.stringify(q.answer || {});
+      else if (q.type === 'long_essay') keyText = `Skor Maks: ${q.max_score || 100} | Kata Kunci: ${(q.keywords || []).join(', ')}`;
+
+      bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:pBdr><w:left w:val="single" w:sz="14" w:space="8" w:color="10b981"/></w:pBdr><w:shd w:val="clear" w:color="auto" w:fill="ecfdf5"/><w:spacing w:before="60" w:after="100"/></w:pPr>`;
+      bodyXml += `<w:r><w:rPr><w:b/><w:color w:val="065f46"/></w:rPr><w:t>KUNCI JAWABAN: ${xmlEscape(keyText)}</w:t></w:r>`;
+      if (q.explanation) {
+        bodyXml += `<w:r><w:t> | Pembahasan: ${xmlEscape(q.explanation.replace(/<[^>]+>/g, ' '))}</w:t></w:r>`;
+      }
+      bodyXml += `</w:p>`;
+    }
+  });
+
+  const contentTypesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>`;
+
+  const relsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`;
+
+  const docXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    ${bodyXml}
+    <w:sectPr>
+      <w:pgSz w:w="11906" w:h="16838"/>
+      <w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/>
+    </w:sectPr>
+  </w:body>
+</w:document>`;
+
+  return createZipArchive([
+    { name: '[Content_Types].xml', data: contentTypesXml },
+    { name: '_rels/.rels', data: relsXml },
+    { name: 'word/document.xml', data: docXml }
+  ]);
+}
+
+function generateDocxTemplate() {
+  const sampleQuestions = [
+    {
+      stem: "Layanan jaringan apa yang bertugas memberikan konfigurasi alamat IP secara otomatis kepada komputer klien di laboratorium sekolah?",
+      type: "mcq",
+      options: [
+        { id: "A", text: "DNS (Domain Name System)" },
+        { id: "B", text: "DHCP (Dynamic Host Configuration Protocol)" },
+        { id: "C", text: "FTP (File Transfer Protocol)" },
+        { id: "D", text: "SSH (Secure Shell)" },
+        { id: "E", text: "NTP (Network Time Protocol)" }
+      ],
+      answer: "B",
+      explanation: "DHCP berfungsi mengalokasikan alamat IP dan konfigurasi jaringan lainnya kepada komputer klien secara dinamis."
+    },
+    {
+      stem: "Sebutkan perintah terminal lengkap di Ubuntu 24.04 untuk menginstal paket web server Apache menggunakan manajer paket apt!",
+      type: "short_essay",
+      answer_keys: ["sudo apt install apache2", "apt install apache2", "sudo apt-get install apache2"],
+      explanation: "Perintah standar instalasi Apache pada Ubuntu adalah 'sudo apt install apache2'."
+    },
+    {
+      stem: "Manakah dari protokol berikut yang menggunakan enkripsi data untuk pertukaran data yang aman? (Pilih semua yang benar)",
+      type: "mcq_complex",
+      options: [
+        { id: "A", text: "HTTPS (Port 443)" },
+        { id: "B", text: "HTTP (Port 80)" },
+        { id: "C", text: "SSH (Port 22)" },
+        { id: "D", text: "Telnet (Port 23)" },
+        { id: "E", text: "SFTP (Port 22)" }
+      ],
+      answer: ["A", "C", "E"],
+      explanation: "HTTPS, SSH, dan SFTP menggunakan protokol kriptografi (SSL/TLS dan SSH) untuk mengamankan pertukaran data."
+    }
+  ];
+
+  return generateDocxDocument({
+    title: "TEMPLATE RESMI UPLOAD BUTIR SOAL CBT",
+    school: "SMK NEGERI 5 BANDUNG",
+    subject: "Administrasi Sistem Jaringan / Umum",
+    teacher: "Tim Asesmen Guru",
+    targetClass: "Semua Kelas",
+    questions: sampleQuestions,
+    includeKeys: true
+  });
+}
+
+function generateWordHtmlDocument({ title, school, subject, teacher, targetClass, questions, includeKeys = true }) {
+  const esc = (s) => (s || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  let qHtml = '';
+
+  questions.forEach((q, idx) => {
+    const qNum = idx + 1;
+    qHtml += `<div style="margin-bottom: 16px; page-break-inside: avoid;">`;
+    qHtml += `<p style="margin: 0 0 6px 0; font-weight: bold;">${qNum}. ${q.stem || ''}</p>`;
+
+    if (q.type === 'mcq' || q.type === 'mcq_complex') {
+      (q.options || []).forEach(opt => {
+        qHtml += `<p style="margin: 0 0 4px 24px;"><strong>${opt.id}.</strong> ${opt.text || ''}</p>`;
+      });
+    } else if (q.type === 'true_false') {
+      qHtml += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse: collapse; margin-left: 24px; margin-bottom: 6px; font-size: 10pt;">`;
+      qHtml += `<tr style="background:#f3f4f6;"><th>No</th><th>Pernyataan</th><th>Benar</th><th>Salah</th></tr>`;
+      (q.statements || []).forEach((st, sIdx) => {
+        qHtml += `<tr><td align="center">${sIdx + 1}</td><td>${st.text}</td><td align="center">[ &nbsp; ]</td><td align="center">[ &nbsp; ]</td></tr>`;
+      });
+      qHtml += `</table>`;
+    } else if (q.type === 'matching') {
+      qHtml += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse: collapse; margin-left: 24px; margin-bottom: 6px; font-size: 10pt;">`;
+      qHtml += `<tr style="background:#f3f4f6;"><th>Premis / Konsep</th><th>Jodohkan dengan</th><th>Pilihan Target</th></tr>`;
+      (q.premises || []).forEach((p, pIdx) => {
+        const target = (q.targets || [])[pIdx];
+        qHtml += `<tr><td>${p.text}</td><td align="center">➔ [ &nbsp;&nbsp;&nbsp; ]</td><td>${target ? `<strong>${target.id}.</strong> ${target.text}` : ''}</td></tr>`;
+      });
+      qHtml += `</table>`;
+    } else if (q.type === 'short_essay') {
+      qHtml += `<p style="margin: 0 0 4px 24px; color: #4b5563;"><em>Jawaban Singkat: _____________________________________________</em></p>`;
+    } else if (q.type === 'long_essay') {
+      qHtml += `<div style="margin: 4px 0 6px 24px; border: 1px dashed #9ca3af; height: 100px; padding: 6px; font-size: 9pt; color: #6b7280;"><em>Lembar Uraian / Jawaban Siswa...</em></div>`;
+    }
+
+    if (includeKeys) {
+      let keyVal = '';
+      if (q.type === 'mcq') keyVal = q.answer || '-';
+      else if (q.type === 'mcq_complex') keyVal = Array.isArray(q.answer) ? q.answer.join(', ') : q.answer;
+      else if (q.type === 'true_false') keyVal = (q.statements || []).map(s => s.key).join('-');
+      else if (q.type === 'short_essay') keyVal = (q.answer_keys || []).join(' / ');
+      else if (q.type === 'matching') keyVal = JSON.stringify(q.answer || {});
+      else if (q.type === 'long_essay') keyVal = `Skor: ${q.max_score || 100} | Kata Kunci: ${(q.keywords || []).join(', ')}`;
+
+      qHtml += `<div style="margin: 6px 0 0 24px; padding: 6px 10px; background: #ecfdf5; border-left: 4px solid #10b981; font-size: 9.5pt; color: #065f46;">`;
+      qHtml += `<strong>KUNCI JAWABAN:</strong> ${keyVal}`;
+      if (q.explanation) {
+        qHtml += ` &bull; <em>Pembahasan: ${q.explanation.replace(/<[^>]+>/g, ' ')}</em>`;
+      }
+      qHtml += `</div>`;
+    }
+    qHtml += `</div>`;
+  });
+
+  return `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+  <head>
+    <meta charset='utf-8'>
+    <title>${esc(title)}</title>
+    <!--[if gte mso 9]>
+    <xml>
+      <w:WordDocument>
+        <w:View>Print</w:View>
+        <w:Zoom>100</w:Zoom>
+      </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+      @page { size: 21.0cm 29.7cm; margin: 2.0cm; mso-header-margin: 36pt; mso-footer-margin: 36pt; }
+      body { font-family: 'Calibri', 'Arial', sans-serif; font-size: 11pt; line-height: 1.35; color: #111827; }
+      table.kop { width: 100%; border-bottom: 3px double #000; margin-bottom: 15px; }
+      table.meta { width: 100%; margin-bottom: 15px; font-size: 10pt; }
+    </style>
+  </head>
+  <body>
+    <table class="kop" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="text-align: center; padding-bottom: 8px;">
+          <h2 style="margin: 0; font-size: 16pt; text-transform: uppercase;">${esc(school || 'SMK NEGERI 5 BANDUNG')}</h2>
+          <h3 style="margin: 2px 0; font-size: 13pt;">${esc(title)}</h3>
+          <p style="margin: 0; font-size: 9.5pt; color: #4b5563;">NASKAH ASESMEN PEMBELAJARAN STANDAR TKA / CBT & LMS AI</p>
+        </td>
+      </tr>
+    </table>
+    <table class="meta" cellpadding="2" cellspacing="0">
+      <tr>
+        <td width="20%"><strong>Mata Pelajaran</strong></td><td width="30%">: ${esc(subject)}</td>
+        <td width="20%"><strong>Kelas / Sasaran</strong></td><td width="30%">: ${esc(targetClass || 'Semua Kelas')}</td>
+      </tr>
+      <tr>
+        <td><strong>Guru Pengampu</strong></td><td>: ${esc(teacher || 'Guru')}</td>
+        <td><strong>Mode Dokumen</strong></td><td>: ${includeKeys ? '<span style="color:#059669;font-weight:bold;">Master Guru (Kunci & Pembahasan)</span>' : 'Naskah Ujian Siswa (Siap Cetak)'}</td>
+      </tr>
+    </table>
+    <hr style="border: 0; border-top: 1px solid #d1d5db; margin-bottom: 16px;"/>
+    ${qHtml}
+  </body>
+  </html>`;
+}
+
 // Server HTTP
 const server = http.createServer(async (req, res) => {
   // CORS Headers
@@ -3759,6 +4340,208 @@ const server = http.createServer(async (req, res) => {
   // ==============================================================
   // API BANK SOAL & ASESMEN TKA SMA/SMK (PG, Kompleks, B/S, Jodoh, Isian, Esai AI)
   // ==============================================================
+
+  // GET /api/v1/cbt/question-banks/template-word (Unduh Template Word .docx / .doc)
+  if ((pathname === '/api/v1/cbt/question-banks/template-word' || pathname === '/api/v1/cbt/questions/template-word') && req.method === 'GET') {
+    const format = parsedUrl.searchParams.get('format') || 'docx';
+    if (format === 'doc') {
+      const htmlDoc = generateWordHtmlDocument({
+        title: "TEMPLATE RESMI UPLOAD BUTIR SOAL CBT",
+        school: schoolProfile.school_name || "SMK NEGERI 5 BANDUNG",
+        subject: "Administrasi Sistem Jaringan / Umum",
+        teacher: "Tim Asesmen Guru",
+        targetClass: "Semua Kelas",
+        questions: [
+          {
+            stem: "Layanan jaringan apa yang bertugas memberikan konfigurasi alamat IP secara otomatis kepada komputer klien?",
+            type: "mcq",
+            options: [
+              { id: "A", text: "DNS (Domain Name System)" },
+              { id: "B", text: "DHCP (Dynamic Host Configuration Protocol)" },
+              { id: "C", text: "FTP (File Transfer Protocol)" },
+              { id: "D", text: "SSH (Secure Shell)" },
+              { id: "E", text: "NTP (Network Time Protocol)" }
+            ],
+            answer: "B",
+            explanation: "DHCP berfungsi mengalokasikan alamat IP secara otomatis."
+          },
+          {
+            stem: "Sebutkan perintah terminal lengkap di Ubuntu untuk menginstal paket web server Apache menggunakan apt!",
+            type: "short_essay",
+            answer_keys: ["sudo apt install apache2", "apt install apache2", "sudo apt-get install apache2"],
+            explanation: "Perintah standar adalah 'sudo apt install apache2'."
+          }
+        ],
+        includeKeys: true
+      });
+      res.writeHead(200, {
+        'Content-Type': 'application/msword; charset=utf-8',
+        'Content-Disposition': 'attachment; filename="Template_Upload_Soal_CBT.doc"',
+        'Content-Length': Buffer.byteLength(htmlDoc, 'utf8')
+      });
+      return res.end(htmlDoc);
+    }
+
+    const docxBuf = generateDocxTemplate();
+    res.writeHead(200, {
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'Content-Disposition': 'attachment; filename="Template_Upload_Soal_CBT.docx"',
+      'Content-Length': docxBuf.length
+    });
+    return res.end(docxBuf);
+  }
+
+  // GET /api/v1/cbt/question-banks/:id/export-word (Export Bank Soal ke Word .docx / .doc)
+  if (pathname.startsWith('/api/v1/cbt/question-banks/') && pathname.endsWith('/export-word') && req.method === 'GET') {
+    const parts = pathname.split('/');
+    const bankId = parseInt(parts[5], 10);
+    const bank = QUESTION_BANKS.find(b => Number(b.id) === Number(bankId));
+    if (!bank) {
+      return sendJSON(404, { status: 'error', message: 'Bank soal tidak ditemukan' });
+    }
+
+    const mode = parsedUrl.searchParams.get('mode') || 'teacher'; // 'teacher' (dengan kunci) vs 'student' (tanpa kunci)
+    const format = parsedUrl.searchParams.get('format') || 'docx'; // 'docx' vs 'doc'
+    const includeKeys = (mode !== 'student');
+    const safeTitle = (bank.title || 'Bank_Soal').replace(/[^a-zA-Z0-9_-]/g, '_');
+
+    if (format === 'doc') {
+      const htmlDoc = generateWordHtmlDocument({
+        title: bank.title,
+        school: schoolProfile.school_name || "SMK NEGERI 5 BANDUNG",
+        subject: bank.subject,
+        teacher: bank.teacher,
+        targetClass: bank.target_class,
+        questions: bank.questions || [],
+        includeKeys
+      });
+      res.writeHead(200, {
+        'Content-Type': 'application/msword; charset=utf-8',
+        'Content-Disposition': `attachment; filename="Bank_Soal_${bank.id}_${safeTitle}_${mode}.doc"`,
+        'Content-Length': Buffer.byteLength(htmlDoc, 'utf8')
+      });
+      return res.end(htmlDoc);
+    }
+
+    const docxBuf = generateDocxDocument({
+      title: bank.title,
+      school: schoolProfile.school_name || "SMK NEGERI 5 BANDUNG",
+      subject: bank.subject,
+      teacher: bank.teacher,
+      targetClass: bank.target_class,
+      questions: bank.questions || [],
+      includeKeys
+    });
+
+    res.writeHead(200, {
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'Content-Disposition': `attachment; filename="Bank_Soal_${bank.id}_${safeTitle}_${mode}.docx"`,
+      'Content-Length': docxBuf.length
+    });
+    return res.end(docxBuf);
+  }
+
+  // POST /api/v1/cbt/question-banks/import-word (Upload & Parse Naskah Word .docx / .doc)
+  if ((pathname === '/api/v1/cbt/question-banks/import-word' || pathname === '/api/v1/cbt/questions/import-word') && req.method === 'POST') {
+    const body = await parseBody(req);
+    const bankId = parseInt(body.bank_id, 10) || 1;
+    const bank = QUESTION_BANKS.find(b => Number(b.id) === Number(bankId)) || QUESTION_BANKS[0];
+
+    let extractedText = '';
+    if (body.file_base64) {
+      try {
+        const cleanBase64 = body.file_base64.replace(/^data:.*?;base64,/, '');
+        const fileBuf = Buffer.from(cleanBase64, 'base64');
+        extractedText = extractTextFromWordBuffer(fileBuf);
+      } catch (err) {
+        return sendJSON(400, { status: 'error', message: 'Gagal membaca berkas Word: ' + err.message });
+      }
+    } else if (body.raw_text) {
+      extractedText = body.raw_text;
+    } else {
+      return sendJSON(400, { status: 'error', message: 'Tidak ada data berkas Word (.docx/.doc) atau teks yang diunggah.' });
+    }
+
+    const parsedQuestions = parseQuestionsFromWordText(extractedText);
+    if (!parsedQuestions || parsedQuestions.length === 0) {
+      return sendJSON(422, {
+        status: 'warning',
+        message: 'Tidak ditemukan format butir soal yang valid dalam dokumen. Pastikan penulisan soal bernomor (1., 2.), memiliki pilihan (A., B., C.), dan baris KUNCI: ...',
+        extracted_text_preview: extractedText.substring(0, 300)
+      });
+    }
+
+    const summary = {
+      total: parsedQuestions.length,
+      mcq: parsedQuestions.filter(q => q.type === 'mcq').length,
+      mcq_complex: parsedQuestions.filter(q => q.type === 'mcq_complex').length,
+      true_false: parsedQuestions.filter(q => q.type === 'true_false').length,
+      matching: parsedQuestions.filter(q => q.type === 'matching').length,
+      short_essay: parsedQuestions.filter(q => q.type === 'short_essay').length,
+      long_essay: parsedQuestions.filter(q => q.type === 'long_essay').length,
+    };
+
+    return sendJSON(200, {
+      status: 'success',
+      message: `Berhasil mengidentifikasi ${parsedQuestions.length} butir soal dari dokumen Word!`,
+      bank_id: bank.id,
+      bank_title: bank.title,
+      total: parsedQuestions.length,
+      summary,
+      questions: parsedQuestions
+    });
+  }
+
+  // POST /api/v1/cbt/question-banks/:id/save-imported-questions (Simpan Butir Soal Terkonfirmasi ke Bank)
+  if (pathname.startsWith('/api/v1/cbt/question-banks/') && pathname.endsWith('/save-imported-questions') && req.method === 'POST') {
+    const parts = pathname.split('/');
+    const bankId = parseInt(parts[5], 10);
+    const bank = QUESTION_BANKS.find(b => Number(b.id) === Number(bankId));
+    if (!bank) {
+      return sendJSON(404, { status: 'error', message: 'Bank soal tujuan tidak ditemukan' });
+    }
+
+    const body = await parseBody(req);
+    const newQuestions = body.questions || [];
+    if (!Array.isArray(newQuestions) || newQuestions.length === 0) {
+      return sendJSON(400, { status: 'error', message: 'Daftar butir soal yang akan disimpan kosong' });
+    }
+
+    const existingQuestions = bank.questions || [];
+    let startId = existingQuestions.length > 0 ? Math.max(...existingQuestions.map(q => q.id || 0)) + 1 : 1;
+
+    const formatted = newQuestions.map((q, idx) => ({
+      id: startId + idx,
+      type: q.type || 'mcq',
+      cog: q.cog || 'C2',
+      stem: sanitizeQuestionText(q.stem || 'Pertanyaan butir soal'),
+      options: normalizeQuestionOptions(q.options),
+      answer: q.answer || (q.options && q.options[0] ? q.options[0].id : null),
+      answer_keys: Array.isArray(q.answer_keys) ? q.answer_keys : [q.answer_keys || ''],
+      statements: normalizeStatements(q.statements),
+      premises: normalizePremises(q.premises),
+      targets: normalizeTargets(q.targets),
+      rubric: q.rubric || '',
+      ideal_answer: q.ideal_answer || '',
+      max_score: Number(q.max_score) || 100,
+      keywords: q.keywords || [],
+      weight: Number(q.weight) || (q.type === 'long_essay' ? 3.0 : (q.type === 'matching' ? 2.0 : (q.type === 'mcq_complex' || q.type === 'true_false' ? 1.5 : 1.0))),
+      explanation: sanitizeQuestionText(q.explanation || 'Pembahasan kunci jawaban terverifikasi.'),
+      generated_by: 'import_word_docx',
+      source_engine: 'word_document_parser'
+    }));
+
+    bank.questions = [...existingQuestions, ...formatted];
+    saveQuestionBanksToFile();
+    compileAndEncryptPackage();
+
+    return sendJSON(200, {
+      status: 'success',
+      message: `Berhasil menambahkan ${formatted.length} butir soal dari berkas Word ke Bank Soal "${bank.title}"!`,
+      added_count: formatted.length,
+      total_questions: bank.questions.length
+    });
+  }
 
   // GET /api/v1/cbt/question-banks (Daftar Semua Bank Soal)
   if (pathname === '/api/v1/cbt/question-banks' && req.method === 'GET') {

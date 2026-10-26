@@ -2212,6 +2212,49 @@
           "apt install apache2",
           "sudo apt-get install apache2"
         ]
+      },
+      {
+        "id": 6,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Perangkat jaringan manakah yang beroperasi pada Lapisan Fisik (Layer 1)?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Hub dan Repeater"
+          },
+          {
+            "id": "B",
+            "text": "Switch Layer 2"
+          },
+          {
+            "id": "C",
+            "text": "Router Gateway"
+          },
+          {
+            "id": "D",
+            "text": "Proxy Server"
+          },
+          {
+            "id": "E",
+            "text": "Firewall SPI"
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [
+          ""
+        ],
+        "statements": null,
+        "premises": null,
+        "targets": null,
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Hub dan repeater bekerja pada Layer 1 (Physical Layer).",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
       }
     ]
   }

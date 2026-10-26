@@ -212,11 +212,31 @@
             <i class="fa-solid fa-plus text-sm"></i>
             <span>Tambah Butir Soal Baru</span>
           </button>
-          <div class="flex items-center gap-2">
-            <button onclick="openModal('modalUploadSoal')" class="flex-1 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-file-excel text-emerald-400"></i> Import
+          <div class="flex items-center gap-2 flex-wrap">
+            <button onclick="openUploadModalKelolaSoal()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-blue-200 border border-blue-500/30 text-xs font-semibold transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-file-word text-blue-400"></i> Import Word / Excel
             </button>
-            <button onclick="openModal('modalAIGenerator')" class="flex-1 px-3 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition flex items-center justify-center gap-1.5">
+            <div class="relative inline-block text-left group">
+              <button type="button" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-blue-300 border border-blue-500/30 text-xs font-semibold transition flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-file-word text-blue-400"></i> Export Word
+                <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+              </button>
+              <div class="hidden group-hover:block absolute right-0 mt-1 w-56 rounded-xl bg-slate-900 border border-slate-800 shadow-2xl py-1 z-50">
+                <a href="javascript:void(0)" onclick="exportKelolaBankWord('teacher', 'docx')" class="block px-4 py-2 text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2 transition">
+                  <i class="fa-solid fa-graduation-cap text-emerald-400"></i>
+                  <div><strong class="block text-white">Naskah Guru (.docx)</strong><span class="text-[10px] text-slate-400">Kunci & Pembahasan Lengkap</span></div>
+                </a>
+                <a href="javascript:void(0)" onclick="exportKelolaBankWord('student', 'docx')" class="block px-4 py-2 text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2 border-t border-slate-800/80 transition">
+                  <i class="fa-solid fa-print text-indigo-400"></i>
+                  <div><strong class="block text-white">Naskah Siswa (.docx)</strong><span class="text-[10px] text-slate-400">Siap Cetak Ujian (Tanpa Kunci)</span></div>
+                </a>
+                <a href="/api/v1/cbt/question-banks/template-word?format=docx" download class="block px-4 py-2 text-xs text-amber-300 hover:bg-slate-800 flex items-center gap-2 border-t border-slate-800/80 transition">
+                  <i class="fa-solid fa-download text-amber-400"></i>
+                  <div><strong class="block text-amber-200">Unduh Template Word</strong><span class="text-[10px] text-slate-400">Format Resmi .docx</span></div>
+                </a>
+              </div>
+            </div>
+            <button onclick="openModal('modalAIGenerator')" class="px-3 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition flex items-center justify-center gap-1.5">
               <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> Buat via AI
             </button>
             <button onclick="window.print()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold transition flex items-center justify-center gap-1.5" title="Cetak / Unduh PDF">
@@ -633,38 +653,107 @@
 
 
   <!-- ============================================================== -->
-  <!-- MODAL 3: IMPORT SOAL (EXCEL / CSV) -->
+  <!-- MODAL 3: IMPORT SOAL (WORD .DOCX / .DOC / EXCEL) -->
   <!-- ============================================================== -->
   <div id="modalUploadSoal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4">
       <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-        <h4 class="text-sm font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-file-excel text-emerald-400"></i> Import Butir Soal (Excel / CSV)
-        </h4>
-        <button onclick="closeModal('modalUploadSoal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center justify-center">
+            <i class="fa-solid fa-file-word text-base"></i>
+          </div>
+          <div>
+            <h4 class="text-sm font-bold text-white">Import Butir Soal ke Bank Soal Ini</h4>
+            <p class="text-[11px] text-slate-400">Mendukung Microsoft Word (.docx / .doc), Excel, atau salin-tempel.</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modalUploadSoal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <!-- Banner Unduh Template Resmi -->
+      <div class="p-3 bg-indigo-950/40 border border-indigo-500/30 rounded-xl flex items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-circle-info text-indigo-400 text-sm"></i>
+          <div>
+            <span class="font-semibold text-indigo-200 block">Belum punya format naskah soal?</span>
+            <span class="text-[10px] text-slate-400">Unduh template Word resmi siap pakai.</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <a href="/api/v1/cbt/question-banks/template-word?format=docx" download class="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[11px] transition flex items-center gap-1 shadow-md shadow-indigo-600/30">
+            <i class="fa-solid fa-download"></i> Template .docx
+          </a>
+          <a href="/api/v1/cbt/question-banks/template-word?format=doc" download class="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] transition">
+            .doc
+          </a>
+        </div>
       </div>
 
       <div class="space-y-3 text-xs">
-        <div class="p-4 border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-xl text-center cursor-pointer transition bg-slate-950/40">
-          <i class="fa-solid fa-cloud-arrow-up text-3xl text-indigo-400 mb-2"></i>
-          <p class="font-medium text-slate-300">Pilih file spreadsheet butir soal (.xlsx / .csv)</p>
-          <p class="text-[10px] text-slate-500 mt-1">Mendukung format standar Kemdikbud & TKA</p>
-          <input type="file" accept=".xlsx,.xls,.csv" class="hidden" id="excelSoalFile" onchange="handleExcelSoalUpload(this)">
-          <button type="button" onclick="document.getElementById('excelSoalFile').click()" class="mt-3 px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-500 transition">
-            Pilih File dari Komputer
-          </button>
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Unggah Berkas Naskah Soal Word (.docx / .doc):</label>
+          <input type="file" id="kelolaWordFileInput" accept=".docx,.doc,.xlsx,.csv,.txt" class="hidden" onchange="handleKelolaWordFileChosen(this)">
+          <div onclick="document.getElementById('kelolaWordFileInput').click()" class="border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-xl p-5 text-center cursor-pointer bg-slate-950/60 transition group">
+            <div class="flex items-center justify-center gap-3 mb-2">
+              <i class="fa-solid fa-file-word text-3xl text-blue-400 group-hover:scale-110 transition"></i>
+              <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-500"></i>
+            </div>
+            <p id="kelolaFileStatusLabel" class="text-xs text-slate-300 font-medium">Klik untuk memilih berkas Word (.docx / .doc) atau drag & drop di sini</p>
+            <p class="text-[10px] text-slate-500 mt-1">Mendukung format .docx standar Word, .doc, dan file teks</p>
+          </div>
         </div>
 
-        <div class="flex items-center justify-between text-[11px] text-slate-400 pt-2">
-          <span>Format yang didukung: XLSX, CSV, JSON</span>
-          <button type="button" onclick="downloadSoalTemplate()" class="text-indigo-400 hover:text-indigo-300 font-semibold underline">
-            Unduh Format Template Excel
-          </button>
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="font-semibold text-slate-300">Atau Tempel Naskah Soal Word Langsung:</label>
+            <span class="text-[10px] text-slate-500">Nomor 1, 2, A-E, KUNCI:</span>
+          </div>
+          <textarea id="kelolaWordRawText" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-mono placeholder:text-slate-600 focus:outline-none focus:border-indigo-500" placeholder="Contoh:&#10;1. Apa fungsi DHCP server?&#10;A. Alokasi IP otomatis&#10;B. Resolusi domain&#10;KUNCI: A&#10;PEMBAHASAN: DHCP mengalokasikan IP otomatis."></textarea>
         </div>
       </div>
 
-      <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
-        <button type="button" onclick="closeModal('modalUploadSoal')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs transition">Batal</button>
+      <div class="flex items-center justify-between pt-3 border-t border-slate-800">
+        <span id="kelolaWordStatusText" class="text-xs text-slate-400 flex items-center gap-1.5"></span>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeModal('modalUploadSoal')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs transition">Batal</button>
+          <button type="button" id="btnProcessKelolaImport" onclick="processKelolaWordImport()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition shadow-lg shadow-indigo-600/30 flex items-center gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+            <span>Ekstrak & Preview Soal</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL PREVIEW HASIL IMPORT SOAL WORD ==================== -->
+  <div id="modalPreviewImportSoal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-3xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
+        <div>
+          <h4 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+            <span>Preview Butir Soal Terdeteksi dari Dokumen Word</span>
+          </h4>
+          <p id="previewKelolaImportSub" class="text-xs text-slate-400 mt-0.5">Tinjau butir soal sebelum disimpan ke Bank Soal ini.</p>
+        </div>
+        <button onclick="closeModal('modalPreviewImportSoal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <!-- Ringkasan Statistik Deteksi -->
+      <div id="previewKelolaSummaryBadges" class="flex flex-wrap items-center gap-2 p-3 bg-slate-950 rounded-xl border border-slate-800 shrink-0 text-xs"></div>
+
+      <!-- Daftar Kartu Soal Hasil Ekstraksi -->
+      <div id="previewKelolaQuestionList" class="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-1"></div>
+
+      <!-- Tombol Aksi Konfirmasi Simpan -->
+      <div class="flex items-center justify-between pt-3 border-t border-slate-800 shrink-0">
+        <button type="button" onclick="closeModal('modalPreviewImportSoal'); openModal('modalUploadSoal');" class="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-700 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-left"></i> Kembali / Ganti File
+        </button>
+        <button type="button" id="btnConfirmKelolaImport" onclick="confirmSaveKelolaImport()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-xs font-bold text-white transition shadow-lg shadow-emerald-600/30 flex items-center gap-2">
+          <i class="fa-solid fa-floppy-disk text-emerald-200"></i>
+          <span>Konfirmasi & Simpan ke Bank Soal</span>
+        </button>
       </div>
     </div>
   </div>
@@ -2074,6 +2163,176 @@ window.setAIBasisMode = function(basis) {
       XLSX.utils.book_append_sheet(wb, ws, "Template_Soal_TKA");
       XLSX.writeFile(wb, "Template_Bank_Soal_TKA.xlsx");
     }
+
+    // ============================================================== //
+    // MODUL WORD (.DOCX / .DOC) EXPORT & IMPORT JAVASCRIPT HANDLERS //
+    // ============================================================== //
+    let kelolaWordBase64 = "";
+    let kelolaWordFileName = "";
+    let kelolaParsedQuestions = [];
+
+    window.openUploadModalKelolaSoal = function() {
+      kelolaWordBase64 = "";
+      kelolaWordFileName = "";
+      const fileInp = document.getElementById("kelolaWordFileInput");
+      if (fileInp) fileInp.value = "";
+      const lbl = document.getElementById("kelolaFileStatusLabel");
+      if (lbl) lbl.innerText = "Klik untuk memilih berkas Word (.docx / .doc) atau drag & drop di sini";
+      const rawTa = document.getElementById("kelolaWordRawText");
+      if (rawTa) rawTa.value = "";
+      const st = document.getElementById("kelolaWordStatusText");
+      if (st) st.innerHTML = "";
+      openModal("modalUploadSoal");
+    };
+
+    window.exportKelolaBankWord = function(mode = "teacher", format = "docx") {
+      const bankId = activeBankId || 1;
+      const downloadUrl = `/api/v1/cbt/question-banks/${bankId}/export-word?mode=${mode}&format=${format}`;
+      const a = document.createElement("a");
+      a.href = downloadUrl;
+      a.download = "";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    };
+
+    window.handleKelolaWordFileChosen = function(input) {
+      if (!input.files || input.files.length === 0) return;
+      const file = input.files[0];
+      kelolaWordFileName = file.name;
+      const lbl = document.getElementById("kelolaFileStatusLabel");
+      if (lbl) {
+        lbl.innerHTML = `<span class="text-emerald-400 font-bold"><i class="fa-solid fa-file-circle-check mr-1"></i> ${file.name}</span> (${(file.size / 1024).toFixed(1)} KB) - Siap diekstrak!`;
+      }
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        kelolaWordBase64 = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+
+    window.processKelolaWordImport = async function() {
+      const bankId = activeBankId || 1;
+      const rawText = document.getElementById("kelolaWordRawText")?.value.trim() || "";
+
+      if (!kelolaWordBase64 && !rawText) {
+        alert("Silakan pilih file Word (.docx / .doc) atau tempelkan teks naskah soal terlebih dahulu.");
+        return;
+      }
+
+      const btn = document.getElementById("btnProcessKelolaImport");
+      const st = document.getElementById("kelolaWordStatusText");
+      btn.disabled = true;
+      st.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-indigo-400"></i> Membaca dan mengurai naskah Word...`;
+
+      try {
+        const res = await fetch("/api/v1/cbt/question-banks/import-word", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            bank_id: bankId,
+            file_name: kelolaWordFileName,
+            file_base64: kelolaWordBase64,
+            raw_text: rawText
+          })
+        });
+
+        const json = await res.json();
+        btn.disabled = false;
+        st.innerHTML = "";
+
+        if (!res.ok) throw new Error(json.message || "Gagal mengurai dokumen Word.");
+
+        kelolaParsedQuestions = json.questions || [];
+        closeModal("modalUploadSoal");
+        renderPreviewKelolaModal(json);
+        openModal("modalPreviewImportSoal");
+      } catch (err) {
+        btn.disabled = false;
+        st.innerHTML = `<span class="text-rose-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ${err.message}</span>`;
+        alert("Kendala import: " + err.message);
+      }
+    };
+
+    function renderPreviewKelolaModal(data) {
+      const sub = document.getElementById("previewKelolaImportSub");
+      if (sub) sub.innerText = `Bank Soal Tujuan: #${data.bank_id} - ${data.bank_title || "Bank Soal Aktif"}`;
+      
+      const badges = document.getElementById("previewKelolaSummaryBadges");
+      if (badges) {
+        const s = data.summary || {};
+        badges.innerHTML = `
+          <span class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">Total: ${s.total || 0} Soal</span>
+          ${s.mcq ? `<span class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/30">Pilihan Ganda: ${s.mcq}</span>` : ""}
+          ${s.mcq_complex ? `<span class="px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30">PG Kompleks: ${s.mcq_complex}</span>` : ""}
+          ${s.short_essay ? `<span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Isian Singkat: ${s.short_essay}</span>` : ""}
+          ${s.true_false ? `<span class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30">Benar/Salah: ${s.true_false}</span>` : ""}
+          ${s.long_essay ? `<span class="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/30">Uraian/Esai: ${s.long_essay}</span>` : ""}
+        `;
+      }
+
+      const list = document.getElementById("previewKelolaQuestionList");
+      if (list) {
+        list.innerHTML = (data.questions || []).map((q, idx) => {
+          let ansDisplay = "";
+          if (q.type === "mcq") ansDisplay = `<span class="font-bold text-emerald-400">Kunci: ${q.answer || "A"}</span>`;
+          else if (q.type === "mcq_complex") ansDisplay = `<span class="font-bold text-emerald-400">Kunci: ${(Array.isArray(q.answer) ? q.answer.join(", ") : q.answer)}</span>`;
+          else if (q.type === "short_essay") ansDisplay = `<span class="font-bold text-emerald-400">Kunci Isian: ${(q.answer_keys || []).join(" / ")}</span>`;
+          else ansDisplay = `<span class="font-bold text-emerald-400">Kunci: ${q.answer || "-"}</span>`;
+
+          return `
+            <div class="p-3.5 bg-slate-950 rounded-xl border border-slate-800 space-y-2 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white">#${idx + 1}. Format: <strong class="text-indigo-400 uppercase">${q.type}</strong> (${q.cog || "C2"})</span>
+                <span class="text-slate-400 text-[11px]">Bobot: ${q.weight || 1.0}</span>
+              </div>
+              <div class="text-slate-200 font-medium leading-relaxed">${q.stem}</div>
+              ${q.options && q.options.length > 0 ? `
+                <div class="space-y-1 pl-3 border-l-2 border-slate-800">
+                  ${q.options.map(opt => `
+                    <div class="text-slate-300"><strong class="text-slate-400">${opt.id}.</strong> ${opt.text}</div>
+                  `).join("")}
+                </div>
+              ` : ""}
+              <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between flex-wrap gap-2 text-[11px]">
+                <div>${ansDisplay}</div>
+                ${q.explanation ? `<div class="text-slate-400 italic">Pembahasan: ${q.explanation}</div>` : ""}
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+    }
+
+    window.confirmSaveKelolaImport = async function() {
+      if (!kelolaParsedQuestions || kelolaParsedQuestions.length === 0) {
+        alert("Tidak ada butir soal yang dapat disimpan.");
+        return;
+      }
+      const btn = document.getElementById("btnConfirmKelolaImport");
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Menyimpan ke Bank Soal...`;
+
+      try {
+        const res = await fetch(`/api/v1/cbt/question-banks/${activeBankId}/save-imported-questions`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ questions: kelolaParsedQuestions })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || "Gagal menyimpan butir soal.");
+
+        closeModal("modalPreviewImportSoal");
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-floppy-disk text-emerald-200"></i> <span>Konfirmasi & Simpan ke Bank Soal</span>`;
+        alert(json.message || `Berhasil menyimpan ${kelolaParsedQuestions.length} butir soal ke Bank Soal!`);
+        await fetchBankDetail();
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-floppy-disk text-emerald-200"></i> <span>Konfirmasi & Simpan ke Bank Soal</span>`;
+        alert("Gagal menyimpan: " + err.message);
+      }
+    };
 
     function handleExcelSoalUpload(input) {
       if (!input.files || input.files.length === 0) return;

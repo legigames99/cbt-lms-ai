@@ -279,8 +279,8 @@
               <button type="button" onclick="wrapText('<s>', '</s>')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 line-through flex items-center gap-1" title="Coret (Strikethrough)"><i class="fa-solid fa-strikethrough text-slate-400"></i> Coret</button>
               <button type="button" onclick="wrapText('<mark>', '</mark>')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-800 flex items-center gap-1" title="Sorot Kuning (Highlight)"><i class="fa-solid fa-highlighter text-amber-400"></i> Sorot Teks</button>
               <span class="w-px h-5 bg-slate-800 mx-1"></span>
-              <button type="button" onclick="wrapText('<p>', '</p>')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1" title="Bungkus Paragraf"><i class="fa-solid fa-paragraph text-cyan-400"></i> Paragraf &lt;p&gt;</button>
-              <button type="button" onclick="insertSnippet('<br>\n')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1" title="Ganti Baris"><i class="fa-solid fa-arrow-turn-down text-cyan-400"></i> Baris Baru &lt;br&gt;</button>
+              <button type="button" onclick="insertSnippet('\n\n')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1" title="Paragraf Baru (Enter 2x)"><i class="fa-solid fa-paragraph text-cyan-400"></i> Paragraf Baru</button>
+              <button type="button" onclick="insertSnippet('\n')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1" title="Pindah Baris (Enter)"><i class="fa-solid fa-arrow-turn-down text-cyan-400"></i> Pindah Baris</button>
               <button type="button" onclick="insertSnippet('\n<ol class=\'list-decimal pl-5 space-y-1 my-2\'>\n  <li>Poin pertama</li>\n  <li>Poin kedua</li>\n  <li>Poin ketiga</li>\n</ol>\n')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1" title="Daftar Nomor (1, 2, 3)"><i class="fa-solid fa-list-ol text-emerald-400"></i> Daftar Nomor</button>
               <button type="button" onclick="insertSnippet('\n<ul class=\'list-disc pl-5 space-y-1 my-2\'>\n  <li>Poin butir A</li>\n  <li>Poin butir B</li>\n</ul>\n')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1" title="Daftar Bullet (•)"><i class="fa-solid fa-list-ul text-emerald-400"></i> Daftar Bullet</button>
               <button type="button" onclick="wrapText('<blockquote>', '</blockquote>')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1" title="Kutipan Kasus"><i class="fa-solid fa-quote-left text-purple-400"></i> Kutipan</button>
@@ -872,8 +872,8 @@
 
       document.getElementById('inputCogLevel').value = q.cog || 'C2';
       document.getElementById('inputWeight').value = q.weight !== undefined ? q.weight : 1.0;
-      document.getElementById('inputStem').value = q.stem || '';
-      document.getElementById('inputExplanation').value = q.explanation || '';
+      document.getElementById('inputStem').value = htmlToCleanEditorText(q.stem || '');
+      document.getElementById('inputExplanation').value = htmlToCleanEditorText(q.explanation || '');
 
       // Deteksi format konten & aktifkan tab toolbar yang paling relevan otomatis
       const stemText = q.stem || '';
@@ -908,7 +908,7 @@
         ['A', 'B', 'C', 'D', 'E'].forEach((letter, idx) => {
           const o = opts.find(x => x.id === letter) || opts[idx];
           const el = document.getElementById(`mcqOpt${letter}`);
-          if (el) el.value = o ? (o.text || '') : '';
+          if (el) el.value = htmlToCleanEditorText(o ? (o.text || '') : '');
         });
         const correctKey = q.answer || 'A';
         const rBtn = document.querySelector(`input[name="mcqCorrectKey"][value="${correctKey}"]`);
@@ -921,7 +921,7 @@
           const o = opts.find(x => x.id === letter) || opts[idx];
           const tEl = document.getElementById(`complexOptText_${letter}`);
           const cEl = document.getElementById(`complexOptCheck_${letter}`);
-          if (tEl) tEl.value = o ? (o.text || '') : '';
+          if (tEl) tEl.value = htmlToCleanEditorText(o ? (o.text || '') : '');
           if (cEl) cEl.checked = ansList.includes(letter) || (o && ansList.includes(o.id));
         });
       } else if (qType === 'true_false') {
@@ -935,7 +935,7 @@
             if (!key && q.answer && typeof q.answer === 'object') {
               key = q.answer[stId] !== undefined ? q.answer[stId] : q.answer[idx];
             }
-            addTrueFalseRow(st.text || '', key || 'B');
+            addTrueFalseRow(htmlToCleanEditorText(st.text || ''), key || 'B');
           });
         } else {
           addTrueFalseRow('', 'B');
@@ -950,7 +950,7 @@
             const pId = p.id !== undefined ? p.id : idx;
             const targetKey = (q.answer && (q.answer[pId] !== undefined ? q.answer[pId] : q.answer[idx])) || String.fromCharCode(65 + idx);
             const tObj = targets.find(t => t.id === targetKey) || targets[idx];
-            addMatchingRow(p.text || '', tObj ? (tObj.text || '') : '');
+            addMatchingRow(htmlToCleanEditorText(p.text || ''), htmlToCleanEditorText(tObj ? (tObj.text || '') : ''));
           });
         } else {
           addMatchingRow('', '');
@@ -959,8 +959,8 @@
         const rawKeys = Array.isArray(q.answer_keys) ? q.answer_keys.join(', ') : (q.answer_keys || '');
         document.getElementById('inputShortEssayKeys').value = rawKeys;
       } else if (qType === 'long_essay') {
-        document.getElementById('inputEssayRubric').value = q.rubric || '';
-        document.getElementById('inputEssayIdeal').value = q.ideal_answer || '';
+        document.getElementById('inputEssayRubric').value = htmlToCleanEditorText(q.rubric || '');
+        document.getElementById('inputEssayIdeal').value = htmlToCleanEditorText(q.ideal_answer || '');
         document.getElementById('inputEssayMaxScore').value = q.max_score || 100;
         const rawKws = Array.isArray(q.keywords) ? q.keywords.join(', ') : (q.keywords || '');
         document.getElementById('inputEssayKeywords').value = rawKws;
@@ -1102,19 +1102,44 @@
       });
     }
 
-    // 8b. Pembersih & Perapih Format Teks (Membersihkan tag <br><br> menjadi baris enter baru)
+    // 8a. Konversi HTML ke Teks Editor Bersih (Menghilangkan semua tag <br> dan <p>, menjadikannya enter alami)
+    function htmlToCleanEditorText(str) {
+      if (!str) return '';
+      let s = str;
+      // Konversi <br><br> bertumpuk atau dengan spasi ke dua enter (\n\n)
+      s = s.replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '\n\n');
+      // Konversi sisa <br> ke satu enter (\n)
+      s = s.replace(/<br\s*\/?>/gi, '\n');
+      // Konversi penutup </p> diikuti pembuka <p> ke dua enter (\n\n)
+      s = s.replace(/<\/p>\s*<p[^>]*>/gi, '\n\n');
+      // Hapus pembungkus <p[^>]*> di awal dan </p> di akhir
+      s = s.replace(/^<p[^>]*>/i, '').replace(/<\/p>$/i, '');
+      return s.trim();
+    }
+
+    // 8b. Konversi Teks Editor Bersih ke Format HTML (Untuk simpan ke database & live preview)
+    function editorTextToCleanHtml(str) {
+      if (!str) return '';
+      // Jangan sentuh newline di dalam tag blok kode / terminal / tabel
+      const parts = str.split(/(<pre[\s\S]*?<\/pre>|<div class="terminal-box"[\s\S]*?<\/div>\s*<\/div>|<table[\s\S]*?<\/table>)/i);
+      return parts.map(part => {
+        if (/^<(pre|div|table)/i.test(part.trim())) {
+          return part;
+        }
+        let text = part.replace(/\r\n/g, '\n');
+        // Double enter -> <br><br>
+        text = text.replace(/\n\s*\n/g, '<br><br>');
+        // Single enter -> <br>
+        text = text.replace(/\n/g, '<br>');
+        return text;
+      }).join('');
+    }
+
+    // 8c. Pembersih & Perapih Format Teks Manual
     function cleanRawBrTags() {
       const textarea = document.getElementById('inputStem');
       if (!textarea) return;
-      let val = textarea.value;
-      if (!val) return;
-
-      // Konversi tag <br><br> bertumpuk menjadi enter ganda
-      val = val.replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '\n\n');
-      // Konversi sisa <br> menjadi enter tunggal
-      val = val.replace(/<br\s*\/?>/gi, '\n');
-
-      textarea.value = val;
+      textarea.value = htmlToCleanEditorText(textarea.value);
       updateLivePreview();
     }
 
@@ -1350,12 +1375,7 @@
       // Stem Live Render
       const stemPreviewEl = document.getElementById('previewStemHTML');
       if (stemRaw.trim()) {
-        let renderedStem = stemRaw;
-        // Jika guru mengetik baris baru enter biasa tanpa tag blok HTML, konversi menjadi paragraf & <br> rapi
-        if (!/<(p|div|table|pre|ul|ol|blockquote)[^>]*>/i.test(renderedStem)) {
-          renderedStem = renderedStem.split(/\n\s*\n/).map(p => `<p class="my-1.5">${p.replace(/\n/g, '<br>')}</p>`).join('');
-        }
-        stemPreviewEl.innerHTML = renderedStem;
+        stemPreviewEl.innerHTML = editorTextToCleanHtml(stemRaw);
         if (currentTextDir === 'rtl') {
           stemPreviewEl.setAttribute('dir', 'rtl');
           stemPreviewEl.classList.add('font-arabic');
@@ -1456,7 +1476,7 @@
       const explEl = document.getElementById('previewExplanationHTML');
       if (explRaw.trim()) {
         explBox.classList.remove('hidden');
-        explEl.innerHTML = explRaw;
+        explEl.innerHTML = editorTextToCleanHtml(explRaw);
       } else {
         explBox.classList.add('hidden');
       }
@@ -1492,9 +1512,9 @@
       const payload = {
         type: qType,
         cog: cog,
-        stem: stem,
+        stem: editorTextToCleanHtml(stem),
         weight: weight,
-        explanation: explanation
+        explanation: editorTextToCleanHtml(explanation)
       };
 
       if (qType === 'mcq') {

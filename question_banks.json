@@ -2218,6 +2218,72 @@
           }
         ],
         "answer": "B"
+      },
+      {
+        "id": 6,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Saat melakukan praktikum Administrasi Sistem Jaringan di laboratorium sekolah, seorang siswa diminta untuk memahami fungsi dari layanan transfer file di dalam server. Layanan manakah yang secara khusus digunakan untuk mengunggah dan mengunduh berkas melalui protokol yang aman (terenkripsi) di lingkungan sistem operasi jaringan Linux?",
+        "weight": 1,
+        "explanation": "SFTP (Secure File Transfer Protocol) adalah protokol yang dirancang untuk melakukan transfer berkas secara aman dengan memanfaatkan lapisan enkripsi dari Secure Shell (SSH), biasanya beroperasi pada port 22. FTP standar (port 21) tidak mengenkripsi data saat dikirimkan, sedangkan Telnet tidak aman karena tidak menggunakan enkripsi, DHCP untuk alokasi IP, dan DNS untuk resolusi nama.",
+        "generated_by": "gemini-3.5-flash",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "FTP (File Transfer Protocol) yang menggunakan port 21 tanpa enkripsi data."
+          },
+          {
+            "id": "B",
+            "text": "SFTP (Secure File Transfer Protocol) yang berjalan di atas protokol SSH pada port 22."
+          },
+          {
+            "id": "C",
+            "text": "Telnet yang menyediakan akses terminal teks jarak jauh dengan enkripsi penuh."
+          },
+          {
+            "id": "D",
+            "text": "DHCP (Dynamic Host Configuration Protocol) untuk alokasi alamat IP otomatis."
+          },
+          {
+            "id": "E",
+            "text": "DNS (Domain Name System) untuk menerjemahkan nama domain ke alamat IP."
+          }
+        ],
+        "answer": "B"
+      },
+      {
+        "id": 7,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Di dalam topologi jaringan sekolah, sebuah server Debian bertindak sebagai router gateway yang menghubungkan jaringan lokal (LAN) ke internet (WAN). Fitur pada sistem operasi jaringan Linux yang berfungsi untuk meneruskan paket data antar antarmuka jaringan yang berbeda serta melakukan translasi alamat IP lokal ke IP publik disebut...",
+        "weight": 1,
+        "explanation": "IP Forwarding pada kernel Linux mengizinkan sistem untuk meneruskan paket data dari satu antarmuka jaringan ke antarmuka lainnya (berfungsi sebagai router). Sedangkan NAT (Network Address Translation) digunakan untuk menerjemahkan alamat IP lokal privat agar dapat mengakses jaringan internet publik melalui satu IP publik yang dimiliki gateway. Pilihan lain seperti NFS, Samba, dan NTP memiliki fungsi spesifik yang berbeda (sharing berkas dan sinkronisasi waktu).",
+        "generated_by": "gemini-3.5-flash",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Firewall dan Port Forwarding"
+          },
+          {
+            "id": "B",
+            "text": "Network File System (NFS)"
+          },
+          {
+            "id": "C",
+            "text": "IP Forwarding dan NAT (Network Address Translation)"
+          },
+          {
+            "id": "D",
+            "text": "Samba File Server dan Active Directory"
+          },
+          {
+            "id": "E",
+            "text": "Network Time Protocol (NTP) Client"
+          }
+        ],
+        "answer": "C"
       }
     ]
   }

@@ -3170,10 +3170,40 @@
           </div>
         </div>
 
-        <!-- Instruksi Khusus (Opsional) -->
-        <div>
-          <label class="block font-semibold text-slate-300 mb-1">Instruksi Khusus / Konteks Tambahan (Opsional)</label>
-          <textarea id="aiPromptExtra" rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none focus:border-indigo-500" placeholder="Contoh: Fokuskan pada soal kontekstual mesin Carnot, efisiensi energi, dan aplikasi industri modern."></textarea>
+        <!-- Instruksi Khusus & Target Siswa (Prioritas Tertinggi AI) -->
+        <div class="bg-slate-900/40 p-3 rounded-xl border border-slate-800/80">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="font-semibold text-slate-200 text-xs flex items-center gap-1.5">
+              <i class="fa-solid fa-graduation-cap text-indigo-400"></i>
+              <span>Instruksi Khusus & Target Siswa</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-normal">Prioritas Utama AI</span>
+            </label>
+            <span class="text-[10px] text-slate-400">Menentukan tingkat kesulitan & gaya bahasa</span>
+          </div>
+          <textarea id="aiPromptExtra" rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white text-xs focus:outline-none focus:border-indigo-500 placeholder:text-slate-600 transition" placeholder="Contoh: Soal untuk siswa SMK Kelas XI TKJ, tingkat kesulitan sedang/dasar, gunakan bahasa yang mudah dipahami dan fokus ke konsep dasar praktikum lab sekolah."></textarea>
+          
+          <!-- Preset Cepat Jenjang & Kesulitan -->
+          <div class="flex flex-wrap items-center gap-1.5 mt-2">
+            <span class="text-[10px] text-slate-400 flex items-center gap-1">
+              <i class="fa-solid fa-bolt text-amber-400 text-[9px]"></i>
+              <span>Preset Cepat:</span>
+            </span>
+            <button type="button" onclick="setAiPromptPreset('smk_xi')" class="px-2 py-0.5 rounded-lg bg-indigo-950/70 hover:bg-indigo-900 border border-indigo-700/50 text-[10px] text-indigo-300 font-medium transition flex items-center gap-1">
+              <span>🎓 SMK Kelas XI (Sedang / Lab)</span>
+            </button>
+            <button type="button" onclick="setAiPromptPreset('smk_x')" class="px-2 py-0.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] text-slate-300 transition flex items-center gap-1">
+              <span>🌱 SMK Kelas X (Dasar / Pemula)</span>
+            </button>
+            <button type="button" onclick="setAiPromptPreset('smk_xii')" class="px-2 py-0.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] text-slate-300 transition flex items-center gap-1">
+              <span>🚀 SMK Kelas XII (Uji Kompetensi)</span>
+            </button>
+            <button type="button" onclick="setAiPromptPreset('mudah')" class="px-2 py-0.5 rounded-lg bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-700/50 text-[10px] text-emerald-300 transition flex items-center gap-1">
+              <span>✨ Mudah / Konsep Dasar</span>
+            </button>
+            <button type="button" onclick="setAiPromptPreset('clear')" class="px-1.5 py-0.5 rounded-lg bg-slate-900/60 hover:bg-slate-800 text-[10px] text-slate-400 transition" title="Kosongkan instruksi khusus">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
         </div>
 
         <!-- Progress SSE / Generation Status -->
@@ -5082,6 +5112,24 @@
         if (isByok) container.classList.remove('hidden');
         else container.classList.add('hidden');
       }
+    };
+
+    window.setAiPromptPreset = function(preset) {
+      const ta = document.getElementById('aiPromptExtra');
+      if (!ta) return;
+      if (preset === 'clear') {
+        ta.value = '';
+        ta.focus();
+        return;
+      }
+      const presets = {
+        'smk_xi': 'Soal setara siswa SMK Kelas XI (Fase F). Tingkat kesulitan sedang, bahasa komunikatif, fokus pada konsep dasar dan langkah praktikum lab sekolah.',
+        'smk_x': 'Soal untuk siswa SMK Kelas X (Fase E). Tingkat kesulitan dasar / pengenalan materi, gunakan istilah yang umum dan mudah dipahami siswa pemula.',
+        'smk_xii': 'Soal untuk siswa SMK Kelas XII (Persiapan Uji Kompetensi Kejuruan). Tingkat kesulitan menengah-terapan, berorientasi pemecahan masalah praktis di dunia kerja.',
+        'mudah': 'Tingkat kesulitan mudah s/d sedang. Fokuskan pada pemahaman konsep inti dan fungsi dasar, hindari skenario yang terlalu rumit.'
+      };
+      ta.value = presets[preset] || '';
+      ta.focus();
     };
 
     window.toggleByokKeyVisibility = function() {

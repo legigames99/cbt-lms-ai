@@ -808,41 +808,64 @@ async function callGoogleGeminiAPI({ apiKey, model, basis_type = 'materi', basis
       + "\n\nATURAN ANTI-DUPLIKASI: Dilarang keras membuat soal yang serupa atau menguji sudut pandang yang sama dengan soal-soal di atas! Buat stimulus dan skenario baru!\n";
   }
 
+  const cogGuides = {
+    'C1': 'TARGET TINGKAT KOGNITIF: C1 (Mengingat / Knowledge). Pertanyaan berfokus pada pengenalan istilah dasar, definisi fungsi utama, dan pengenalan konsep tanpa penalaran berbelit-belit.',
+    'C2': 'TARGET TINGKAT KOGNITIF: C2 (Memahami / Comprehension). Pertanyaan berfokus pada pemahaman konsep, alur prinsip kerja dasar, dan perbandingan fungsi yang mudah dipahami siswa sekolah.',
+    'C3': 'TARGET TINGKAT KOGNITIF: C3 (Menerapkan / Application). Pertanyaan berfokus pada penerapan prosedur praktikum laboratorium sekolah dan penggunaan perintah/sintaks dasar yang umum dipelajari siswa.',
+    'C4': 'TARGET TINGKAT KOGNITIF: C4 (Menganalisis / Analysis). Pertanyaan berupa analisis skenario praktikum terarah dan troubleshooting wajar setingkat siswa sekolah.',
+    'C5': 'TARGET TINGKAT KOGNITIF: C5 (Mengevaluasi / Evaluation). Pertanyaan mengevaluasi pilihan solusi terbaik dalam skenario praktikum terarah.',
+    'C6': 'TARGET TINGKAT KOGNITIF: C6 (Mencipta / Creation). Pertanyaan merancang langkah-langkah solusi atau konfigurasi sederhana.',
+    'mixed': 'TARGET TINGKAT KOGNITIF: Variasi bertingkat seimbang dan realistis (dominan C2 Memahami & C3 Menerapkan praktikum sekolah, diselingi C4 Analisis terarah yang sesuai daya nalar siswa).'
+  };
+  const cogInstruction = cogGuides[cog_level] || cogGuides['mixed'];
+
+  let teacherCustomSection = '';
+  if (custom_prompt && custom_prompt.trim()) {
+    teacherCustomSection = "\n======================================================\n"
+      + "INSTRUKSI KHUSUS & TARGET SISWA DARI GURU (PRIORITAS TERTINGGI):\n"
+      + "\"" + custom_prompt.trim() + "\"\n"
+      + "PEDOMAN KETAT MENGENAI INSTRUKSI GURU DI ATAS:\n"
+      + "1. Instruksi guru di atas MEMILIKI WEWENANG TERTINGGI (OVERRIDE). Wajib dipatuhi sepenuhnya!\n"
+      + "2. Jika guru menyebut jenjang sasaran (misal: 'anak SMK kelas XI', 'SMA kelas X', 'Fase E/F', 'tingkat pemula/dasar/sedang'), TINGKAT KESULITAN WAJIB DITURUNKAN dan DISESUAIKAN agar realistis bagi siswa seusia tersebut.\n"
+      + "3. DILARANG KERAS membuat soal yang terlalu rumit, setingkat insinyur senior/enterprise (seperti sintaks deprecation YAML sistem rilis terbaru, internal kernel/LVM lanjut, BGP/OSPF rumit, dsb.), KECUALI secara eksplisit diminta oleh guru.\n"
+      + "4. Fokuskan materi pada silabus pembelajaran standar dan praktikum laboratorium yang biasa dipelajari siswa di sekolah.\n"
+      + "======================================================\n";
+  }
+
   const promptText = "Anda adalah pakar penyusun asesmen standar TKA (Tes Kemampuan Akademik) SMA/SMK dan Asesmen Nasional Pusmendik Kemdikbudristek.\n"
+    + teacherCustomSection + "\n"
     + basisInstruction + "\n"
     + "Target Jumlah Soal: " + count + " butir soal.\n"
     + "Format Soal yang diminta: " + (question_type === 'all' ? 'Variasi format campuran TKA (mcq, mcq_complex, true_false, matching, short_essay, long_essay)' : question_type) + ".\n"
-    + (custom_prompt ? ("Instruksi khusus tambahan guru: " + custom_prompt + "\n") : "")
+    + cogInstruction + "\n"
     + antiDuplicationPrompt + "\n"
-    + "STANDAR KUALITAS SOAL TINGKAT TINGGI (HOTS - HIGHER ORDER THINKING SKILLS):\n"
-    + "1. DEKOMPOSISI MATERI SECARA MENDALAM (BUKAN SOAL ROBOTIK):\n"
-    + "   DILARANG KERAS hanya mengulang-ulang frasa nama topik/CP secara dangkal di setiap soal! Anda WAJIB membedah materi ini ke dalam aspek teknis riil, arsitektur, parameter spesifik, konfigurasi, protokol, error log, dan metodologi pemecahan masalah (troubleshooting).\n"
-    + "   - Contoh jika topik berkaitan dengan Web Server: Uji analisis error log HTTP (502 Bad Gateway, 504 Gateway Timeout, 403 Forbidden, 404), konfigurasi VirtualHost/ServerBlock Nginx/Apache, integrasi SSL/TLS (Let's Encrypt), Reverse Proxy & load balancing, penanganan izin berkas (chmod 755 / chown www-data), soket PHP-FPM, optimasi worker processes, dsb.\n"
-    + "   - Contoh jika topik Jaringan Komputer: Uji analisis packet capture, subnetting VLSM/CIDR, DHCP lease & relay, routing OSPF/BGP, firewall IPTables/NAT, DNS zone records, dsb.\n"
-    + "   - Contoh jika topik Sains/Umum: Uji analisis data eksperimen tabel, grafik perbandingan dua variabel, studi kasus fenomena nyata industri/lingkungan.\n\n"
-    + "2. STIMULUS RIIL & KONTEKSTUAL DI SETIAP BUTIR SOAL:\n"
-    + "   Setiap butir soal WAJIB menyajikan stimulus yang kaya informasi sebelum pertanyaan diajukan (bisa berupa cuplikan file konfigurasi di tag <code>, potongan error log sistem, tabel data spesifikasi, atau narasi problem solving teknisi di lapangan).\n"
-    + "   Pertanyaan harus menguji penalaran: akar masalah (root cause), perbaikan konfigurasi, atau analisis implikasi teknis.\n\n"
+    + "STANDAR KUALITAS SOAL TKA (TES KEMAMPUAN AKADEMIK & ASESMEN SEKOLAH):\n"
+    + "1. KONTEKSTUAL & REALISTIS SESUAI TINGKAT PESERTA DIDIK:\n"
+    + "   Sajikan skenario atau stimulus kontekstual yang relevan dengan modul ajar, kurikulum sekolah, atau praktikum laboratorium komputer/sains.\n"
+    + "   Bahasa soal harus komunikatif, jelas, baku, dan mudah dicerna oleh siswa sekolah.\n"
+    + "2. STIMULUS JELAS & EDUKATIF:\n"
+    + "   Setiap butir soal dilengkapi stimulus pengantar yang terarah (bisa berupa skenario praktikum, cuplikan berkas konfigurasi/perintah di tag <code>, tabel data, atau deskripsi kasus singkat).\n"
+    + "   Pertanyaan menguji pemahaman konsep, alur implementasi, atau analisis masalah secara terukur sesuai target kognitif siswa.\n"
     + "3. ATURAN BEBAS LABEL KOGNITIF (SANGAT KETAT):\n"
-    + "   DILARANG KERAS MENCANTUMKAN KODE/LABEL 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'LOTS', 'HOTS', ATAU KATA 'TINGKAT KOGNITIF' DI DALAM TEKS PERTANYAAN (STEM), STIMULUS, MAUPUN OPSI JAWABAN! Pertanyaan harus murni bernada akademis, profesional, dan alami bagi siswa SMA/SMK.\n\n"
+    + "   DILARANG KERAS MENCANTUMKAN KODE/LABEL 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'LOTS', 'HOTS', ATAU KATA 'TINGKAT KOGNITIF' DI DALAM TEKS PERTANYAAN (STEM), STIMULUS, MAUPUN OPSI JAWABAN! Pertanyaan harus murni bernada akademis, profesional, dan alami bagi siswa SMA/SMK.\n"
     + "4. KUNCI JAWABAN & PEMBAHASAN ANALITIS LENGKAP:\n"
-    + "   Sertakan pembahasan ilmiah yang detail, runtut, dan edukatif yang mengupas tuntas alasan teknis kunci jawaban benar dan mengapa distraktor lainnya salah.\n\n"
+    + "   Sertakan pembahasan edukatif yang runtut dan jelas, menjelaskan alasan kunci jawaban benar dan mengapa distraktor lainnya keliru dengan bahasa yang mendidik bagi siswa.\n\n"
     + "Format Output WAJIB berupa JSON array murni tanpa pembungkus markdown [ ... ].\n"
     + "STRUKTUR DATA JSON SPESIFIK BERDASARKAN TIPE SOAL (DILARANG TERTUKAR / DILARANG KOSONG):\n\n"
     + "1. JIKA TYPE 'mcq' (Pilihan Ganda Tunggal 5 Opsi):\n"
-    + "   {\"type\": \"mcq\", \"cog\": \"C4\", \"weight\": 1.0, \"stem\": \"stimulus HTML dan pertanyaan...\", \"options\": [{\"id\": \"A\", \"text\": \"...\"}, {\"id\": \"B\", \"text\": \"...\"}, {\"id\": \"C\", \"text\": \"...\"}, {\"id\": \"D\", \"text\": \"...\"}, {\"id\": \"E\", \"text\": \"...\"}], \"answer\": \"A\", \"explanation\": \"pembahasan ilmiah detail...\"}\n\n"
+    + "   {\"type\": \"mcq\", \"cog\": \"" + (cog_level === 'mixed' ? 'C3' : cog_level) + "\", \"weight\": 1.0, \"stem\": \"stimulus HTML dan pertanyaan...\", \"options\": [{\"id\": \"A\", \"text\": \"...\"}, {\"id\": \"B\", \"text\": \"...\"}, {\"id\": \"C\", \"text\": \"...\"}, {\"id\": \"D\", \"text\": \"...\"}, {\"id\": \"E\", \"text\": \"...\"}], \"answer\": \"A\", \"explanation\": \"pembahasan edukatif detail...\"}\n\n"
     + "2. JIKA TYPE 'mcq_complex' (Pilihan Ganda Kompleks - Multi Jawaban Benar):\n"
-    + "   {\"type\": \"mcq_complex\", \"cog\": \"C4\", \"weight\": 1.5, \"stem\": \"stimulus HTML dan pertanyaan (Pilih semua jawaban yang benar)...\", \"options\": [{\"id\": \"A\", \"text\": \"...\"}, {\"id\": \"B\", \"text\": \"...\"}, {\"id\": \"C\", \"text\": \"...\"}, {\"id\": \"D\", \"text\": \"...\"}, {\"id\": \"E\", \"text\": \"...\"}], \"answer\": [\"A\", \"C\"], \"explanation\": \"pembahasan...\"}\n\n"
+    + "   {\"type\": \"mcq_complex\", \"cog\": \"" + (cog_level === 'mixed' ? 'C3' : cog_level) + "\", \"weight\": 1.5, \"stem\": \"stimulus HTML dan pertanyaan (Pilih semua jawaban yang benar)...\", \"options\": [{\"id\": \"A\", \"text\": \"...\"}, {\"id\": \"B\", \"text\": \"...\"}, {\"id\": \"C\", \"text\": \"...\"}, {\"id\": \"D\", \"text\": \"...\"}, {\"id\": \"E\", \"text\": \"...\"}], \"answer\": [\"A\", \"C\"], \"explanation\": \"pembahasan...\"}\n\n"
     + "3. JIKA TYPE 'true_false' (Pernyataan Matriks Benar / Salah):\n"
     + "   Setiap butir WAJIB memiliki minimal 3 pernyataan analitis teknis di array 'statements' lengkap dengan key 'B' atau 'S'!\n"
-    + "   {\"type\": \"true_false\", \"cog\": \"C4\", \"weight\": 1.5, \"stem\": \"stimulus HTML dan instruksi evaluasi kebenaran...\", \"statements\": [{\"id\": 0, \"text\": \"Pernyataan evaluasi spesifik 1...\", \"key\": \"B\"}, {\"id\": 1, \"text\": \"Pernyataan evaluasi spesifik 2...\", \"key\": \"S\"}, {\"id\": 2, \"text\": \"Pernyataan evaluasi spesifik 3...\", \"key\": \"B\"}], \"answer\": {\"0\": \"B\", \"1\": \"S\", \"2\": \"B\"}, \"explanation\": \"pembahasan rinci setiap pernyataan...\"}\n\n"
+    + "   {\"type\": \"true_false\", \"cog\": \"" + (cog_level === 'mixed' ? 'C3' : cog_level) + "\", \"weight\": 1.5, \"stem\": \"stimulus HTML dan instruksi evaluasi kebenaran...\", \"statements\": [{\"id\": 0, \"text\": \"Pernyataan evaluasi spesifik 1...\", \"key\": \"B\"}, {\"id\": 1, \"text\": \"Pernyataan evaluasi spesifik 2...\", \"key\": \"S\"}, {\"id\": 2, \"text\": \"Pernyataan evaluasi spesifik 3...\", \"key\": \"B\"}], \"answer\": {\"0\": \"B\", \"1\": \"S\", \"2\": \"B\"}, \"explanation\": \"pembahasan rinci setiap pernyataan...\"}\n\n"
     + "4. JIKA TYPE 'matching' (Menjodohkan Premis Kiri dengan Target Kanan):\n"
     + "   Setiap butir WAJIB memiliki minimal 3-4 pasang konsep/parameter di 'premises' dan 'targets', TIDAK BOLEH bernilai kosong atau teks placeholder!\n"
-    + "   {\"type\": \"matching\", \"cog\": \"C4\", \"weight\": 2.0, \"stem\": \"Cocokkan parameter/istilah di sebelah kiri dengan fungsi/deskripsi di sebelah kanan:\", \"premises\": [{\"id\": 0, \"text\": \"Parameter / Istilah Teknis 1\"}, {\"id\": 1, \"text\": \"Parameter / Istilah Teknis 2\"}, {\"id\": 2, \"text\": \"Parameter / Istilah Teknis 3\"}], \"targets\": [{\"id\": \"A\", \"text\": \"Deskripsi atau Fungsi Solusi A\"}, {\"id\": \"B\", \"text\": \"Deskripsi atau Fungsi Solusi B\"}, {\"id\": \"C\", \"text\": \"Deskripsi atau Fungsi Solusi C\"}], \"answer\": {\"0\": \"A\", \"1\": \"B\", \"2\": \"C\"}, \"explanation\": \"pembahasan relasi pasangan benar...\"}\n\n"
+    + "   {\"type\": \"matching\", \"cog\": \"" + (cog_level === 'mixed' ? 'C3' : cog_level) + "\", \"weight\": 2.0, \"stem\": \"Cocokkan parameter/istilah di sebelah kiri dengan fungsi/deskripsi di sebelah kanan:\", \"premises\": [{\"id\": 0, \"text\": \"Parameter / Istilah Teknis 1\"}, {\"id\": 1, \"text\": \"Parameter / Istilah Teknis 2\"}, {\"id\": 2, \"text\": \"Parameter / Istilah Teknis 3\"}], \"targets\": [{\"id\": \"A\", \"text\": \"Deskripsi atau Fungsi Solusi A\"}, {\"id\": \"B\", \"text\": \"Deskripsi atau Fungsi Solusi B\"}, {\"id\": \"C\", \"text\": \"Deskripsi atau Fungsi Solusi C\"}], \"answer\": {\"0\": \"A\", \"1\": \"B\", \"2\": \"C\"}, \"explanation\": \"pembahasan relasi pasangan benar...\"}\n\n"
     + "5. JIKA TYPE 'short_essay' (Isian Singkat):\n"
-    + "   {\"type\": \"short_essay\", \"cog\": \"C3\", \"weight\": 1.0, \"stem\": \"stimulus dan pertanyaan isian terarah...\", \"answer_keys\": [\"kata kunci utama\", \"sinonim istilah 2\"], \"explanation\": \"pembahasan...\"}\n\n"
+    + "   {\"type\": \"short_essay\", \"cog\": \"" + (cog_level === 'mixed' ? 'C2' : cog_level) + "\", \"weight\": 1.0, \"stem\": \"stimulus dan pertanyaan isian terarah...\", \"answer_keys\": [\"kata kunci utama\", \"sinonim istilah 2\"], \"explanation\": \"pembahasan...\"}\n\n"
     + "6. JIKA TYPE 'long_essay' (Uraian / Esai Komprehensif AI):\n"
-    + "   {\"type\": \"long_essay\", \"cog\": \"C5\", \"weight\": 3.0, \"stem\": \"stimulus skenario studi kasus dan instruksi uraian...\", \"rubric\": \"Kriteria penilaian rubrik berbobot (35% identifikasi, 35% analisis teknis, 30% solusi)...\", \"ideal_answer\": \"Uraian jawaban model komprehensif dan runtut...\", \"keywords\": [\"istilah1\", \"istilah2\", \"istilah3\"], \"max_score\": 100, \"explanation\": \"pembahasan intisari esai...\"}\n";
+    + "   {\"type\": \"long_essay\", \"cog\": \"" + (cog_level === 'mixed' ? 'C4' : cog_level) + "\", \"weight\": 3.0, \"stem\": \"stimulus skenario studi kasus dan instruksi uraian...\", \"rubric\": \"Kriteria penilaian rubrik berbobot (35% identifikasi, 35% analisis teknis, 30% solusi)...\", \"ideal_answer\": \"Uraian jawaban model komprehensif dan runtut...\", \"keywords\": [\"istilah1\", \"istilah2\", \"istilah3\"], \"max_score\": 100, \"explanation\": \"pembahasan intisari esai...\"}\n";
 
   const payload = JSON.stringify({
     contents: [{ parts: [{ text: promptText }] }],
@@ -939,7 +962,7 @@ function generatePedagogicalTKAQuestions({ topic, basis_type = 'materi', basis_t
     if (qType === 'all') {
       qType = types[i % types.length];
     }
-    const cog = bloomLevels[(existingCount + i) % bloomLevels.length];
+    const cog = (cog_level && cog_level !== 'mixed') ? cog_level : bloomLevels[(existingCount + i) % bloomLevels.length];
     const scenarioIdx = (existingCount + i) % scenarios.length;
     const sc = scenarios[scenarioIdx];
 

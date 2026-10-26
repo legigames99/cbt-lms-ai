@@ -640,11 +640,10 @@
     // 1. Inisialisasi Halaman
     document.addEventListener('DOMContentLoaded', async () => {
       parseUrlParameters();
-      await fetchAllBanks();
       initializeComplexOptions();
       initializeDefaultDynamicRows();
       setupPasteListener();
-      updateLivePreview();
+      await fetchAllBanks();
     });
 
     // 2. Parse URL Params (?bank_id=1&question_id=3)
@@ -660,7 +659,7 @@
       if (btnBack) btnBack.href = `/kelola-soal?bank_id=${activeBankId}`;
     }
 
-    // 3. Ambil Semua Data Bank Soal dari Server
+    // 3. Ambil Semua Data Bank Soal dari Server (Daftar ringkas untuk dropdown)
     async function fetchAllBanks() {
       try {
         const res = await fetch('/api/v1/cbt/question-banks');
@@ -669,95 +668,171 @@
 
         const select = document.getElementById('inputBankId');
         select.innerHTML = allQuestionBanks.map(b => 
-          `<option value="${b.id}" ${b.id === activeBankId ? 'selected' : ''}>#${b.id} - ${b.title} (${b.subject || 'Umum'})</option>`
+          `<option value="${b.id}" ${Number(b.id) === Number(activeBankId) ? 'selected' : ''}>#${b.id} - ${b.title} (${b.subject || 'Umum'})</option>`
         ).join('');
 
-        const currentBank = allQuestionBanks.find(b => b.id === activeBankId) || allQuestionBanks[0];
-        if (currentBank) {
-          activeBankId = currentBank.id;
-          document.getElementById('headerBankTitle').innerText = `#${currentBank.id} - ${currentBank.title}`;
-          
-          if (editingQuestionId) {
-            loadQuestionToEdit(currentBank, editingQuestionId);
-          }
+        if (allQuestionBanks.length > 0 && !allQuestionBanks.some(b => Number(b.id) === Number(activeBankId))) {
+          activeBankId = allQuestionBanks[0].id;
         }
+
+        // Ambil data bank soal aktif secara lengkap (termasuk questions)
+        await loadActiveBankDetail();
       } catch (err) {
         console.error('Gagal memuat bank soal:', err);
       }
     }
 
-    // 4. Muat Data Soal Jika Mode Edit
+    // 4. Ambil Detail Lengkap Bank Soal Aktif
+    async function loadActiveBankDetail() {
+      if (!activeBankId) return;
+      try {
+        const res = await fetch(`/api/v1/cbt/question-banks/${activeBankId}`);
+        const json = await res.json();
+        const currentBank = json.data;
+        if (!currentBank) return;
+
+        document.getElementById('headerBankTitle').innerText = `#${currentBank.id} - ${currentBank.title}`;
+        const btnBack = document.getElementById('btnBackToBank');
+        if (btnBack) btnBack.href = `/kelola-soal?bank_id=${currentBank.id}`;
+
+        if (editingQuestionId) {
+          loadQuestionToEdit(currentBank, editingQuestionId);
+        } else {
+          document.getElementById('badgeEditorMode').innerText = 'Tambah Baru';
+          document.getElementById('badgeEditorMode').className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+          document.getElementById('pageTitle').innerHTML = `<i class="fa-solid fa-file-pen text-indigo-400"></i> Tambah Butir Soal Baru`;
+          document.getElementById('previewQNumber').innerText = (currentBank.questions?.length || 0) + 1;
+
+          const btnSaveClose = document.getElementById('btnSaveClose');
+          if (btnSaveClose) btnSaveClose.innerHTML = `<i class="fa-solid fa-check"></i> Simpan & Selesai`;
+          const btnSaveKeep = document.getElementById('btnSaveKeep');
+          if (btnSaveKeep) btnSaveKeep.classList.remove('hidden');
+
+          updateLivePreview();
+        }
+      } catch (err) {
+        console.error('Gagal memuat detail bank soal aktif:', err);
+      }
+    }
+
+    // 5. Muat Data Soal Jika Mode Edit
     function loadQuestionToEdit(bank, qId) {
       if (!bank || !bank.questions) return;
-      const q = bank.questions.find(item => item.id === qId);
-      if (!q) return;
+      const q = bank.questions.find(item => Number(item.id) === Number(qId));
+      if (!q) {
+        console.warn(`Soal #${qId} tidak ditemukan pada bank #${bank.id}`);
+        document.getElementById('badgeEditorMode').innerText = `Soal #${qId} Tidak Ditemukan`;
+        document.getElementById('badgeEditorMode').className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30';
+        return;
+      }
 
       document.getElementById('badgeEditorMode').innerText = `Edit Soal #${q.id}`;
       document.getElementById('badgeEditorMode').className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30';
       document.getElementById('pageTitle').innerHTML = `<i class="fa-solid fa-file-pen text-amber-400"></i> Edit Butir Soal #${q.id}`;
       document.getElementById('previewQNumber').innerText = q.id;
 
-      document.getElementById('inputQuestionType').value = q.type || 'mcq';
-      handleTypeChange(q.type || 'mcq');
+      // Update tombol aksi ke mode edit
+      const btnSaveClose = document.getElementById('btnSaveClose');
+      if (btnSaveClose) {
+        btnSaveClose.innerHTML = `<i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan Perubahan`;
+      }
+      const btnSaveKeep = document.getElementById('btnSaveKeep');
+      if (btnSaveKeep) {
+        btnSaveKeep.classList.add('hidden');
+      }
+
+      const qType = q.type || 'mcq';
+      document.getElementById('inputQuestionType').value = qType;
+      handleTypeChange(qType, false); // false = jangan overwrite bobot yang sudah tersimpan
 
       document.getElementById('inputCogLevel').value = q.cog || 'C2';
-      document.getElementById('inputWeight').value = q.weight || 1.0;
+      document.getElementById('inputWeight').value = q.weight !== undefined ? q.weight : 1.0;
       document.getElementById('inputStem').value = q.stem || '';
       document.getElementById('inputExplanation').value = q.explanation || '';
 
       // Deteksi bahasa Arab dari teks stem
       if (/[\u0600-\u06FF]/.test(q.stem || '')) {
         setTextDirection('rtl');
+      } else {
+        setTextDirection('ltr');
       }
 
-      // Populate opsi sesuai tipe
-      if (q.type === 'mcq') {
+      // Deteksi jika stem mengandung gambar
+      const imgMatch = (q.stem || '').match(/<img[^>]+src=["']([^"']+)["']/i);
+      if (imgMatch && imgMatch[1]) {
+        showStemImagePreview(imgMatch[1]);
+      } else {
+        removeStemImage();
+      }
+
+      // Populate opsi dan kunci sesuai tipe soal
+      if (qType === 'mcq') {
         const opts = q.options || [];
-        opts.forEach(o => {
-          const el = document.getElementById(`mcqOpt${o.id}`);
-          if (el) el.value = o.text || '';
+        ['A', 'B', 'C', 'D', 'E'].forEach((letter, idx) => {
+          const o = opts.find(x => x.id === letter) || opts[idx];
+          const el = document.getElementById(`mcqOpt${letter}`);
+          if (el) el.value = o ? (o.text || '') : '';
         });
-        const rBtn = document.querySelector(`input[name="mcqCorrectKey"][value="${q.answer || 'A'}"]`);
+        const correctKey = q.answer || 'A';
+        const rBtn = document.querySelector(`input[name="mcqCorrectKey"][value="${correctKey}"]`);
         if (rBtn) rBtn.checked = true;
-      } else if (q.type === 'mcq_complex') {
+      } else if (qType === 'mcq_complex') {
         const opts = q.options || [];
         const ansList = Array.isArray(q.answer) ? q.answer : [q.answer];
-        opts.forEach((o, idx) => {
-          const letter = String.fromCharCode(65 + idx);
+        initializeComplexOptions();
+        ['A', 'B', 'C', 'D', 'E'].forEach((letter, idx) => {
+          const o = opts.find(x => x.id === letter) || opts[idx];
           const tEl = document.getElementById(`complexOptText_${letter}`);
           const cEl = document.getElementById(`complexOptCheck_${letter}`);
-          if (tEl) tEl.value = o.text || '';
-          if (cEl) cEl.checked = ansList.includes(letter) || ansList.includes(o.id);
+          if (tEl) tEl.value = o ? (o.text || '') : '';
+          if (cEl) cEl.checked = ansList.includes(letter) || (o && ansList.includes(o.id));
         });
-      } else if (q.type === 'true_false') {
+      } else if (qType === 'true_false') {
         const container = document.getElementById('trueFalseContainer');
         container.innerHTML = '';
-        (q.statements || []).forEach(st => {
-          addTrueFalseRow(st.text, st.key || (q.answer && q.answer[st.id]) || 'B');
-        });
-      } else if (q.type === 'matching') {
+        const statements = q.statements || [];
+        if (statements.length > 0) {
+          statements.forEach((st, idx) => {
+            const stId = st.id !== undefined ? st.id : idx;
+            let key = st.key;
+            if (!key && q.answer && typeof q.answer === 'object') {
+              key = q.answer[stId] !== undefined ? q.answer[stId] : q.answer[idx];
+            }
+            addTrueFalseRow(st.text || '', key || 'B');
+          });
+        } else {
+          addTrueFalseRow('', 'B');
+        }
+      } else if (qType === 'matching') {
         const container = document.getElementById('matchingContainer');
         container.innerHTML = '';
         const premises = q.premises || [];
         const targets = q.targets || [];
-        premises.forEach((p, idx) => {
-          const targetKey = (q.answer && q.answer[p.id]) || String.fromCharCode(65 + idx);
-          const tObj = targets.find(t => t.id === targetKey);
-          addMatchingRow(p.text, tObj ? tObj.text : '');
-        });
-      } else if (q.type === 'short_essay') {
-        document.getElementById('inputShortEssayKeys').value = (q.answer_keys || []).join(', ');
-      } else if (q.type === 'long_essay') {
+        if (premises.length > 0) {
+          premises.forEach((p, idx) => {
+            const pId = p.id !== undefined ? p.id : idx;
+            const targetKey = (q.answer && (q.answer[pId] !== undefined ? q.answer[pId] : q.answer[idx])) || String.fromCharCode(65 + idx);
+            const tObj = targets.find(t => t.id === targetKey) || targets[idx];
+            addMatchingRow(p.text || '', tObj ? (tObj.text || '') : '');
+          });
+        } else {
+          addMatchingRow('', '');
+        }
+      } else if (qType === 'short_essay') {
+        const rawKeys = Array.isArray(q.answer_keys) ? q.answer_keys.join(', ') : (q.answer_keys || '');
+        document.getElementById('inputShortEssayKeys').value = rawKeys;
+      } else if (qType === 'long_essay') {
         document.getElementById('inputEssayRubric').value = q.rubric || '';
         document.getElementById('inputEssayIdeal').value = q.ideal_answer || '';
         document.getElementById('inputEssayMaxScore').value = q.max_score || 100;
-        document.getElementById('inputEssayKeywords').value = (q.keywords || []).join(', ');
+        const rawKws = Array.isArray(q.keywords) ? q.keywords.join(', ') : (q.keywords || '');
+        document.getElementById('inputEssayKeywords').value = rawKws;
       }
 
       updateLivePreview();
     }
 
-    // 5. Inisialisasi Kompleks Opsi A-E
+    // 6. Inisialisasi Kompleks Opsi A-E
     function initializeComplexOptions() {
       const container = document.getElementById('complexOptionsContainer');
       const letters = ['A', 'B', 'C', 'D', 'E'];
@@ -774,7 +849,7 @@
       `).join('');
     }
 
-    // 6. Inisialisasi Baris Default untuk B/S dan Matching
+    // 7. Inisialisasi Baris Default untuk B/S dan Matching
     function initializeDefaultDynamicRows() {
       const tfContainer = document.getElementById('trueFalseContainer');
       if (tfContainer && tfContainer.children.length === 0) {
@@ -798,7 +873,7 @@
       row.className = 'flex items-center gap-2 p-2 bg-slate-950/80 border border-slate-800 rounded-xl';
       row.innerHTML = `
         <span class="w-5 font-bold text-slate-400 font-mono text-center">${idx + 1}.</span>
-        <input type="text" class="tf-text flex-1 bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-white text-xs focus:border-amber-500" placeholder="Pernyataan yang dievaluasi..." value="${text}" oninput="updateLivePreview()">
+        <input type="text" class="tf-text flex-1 bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-white text-xs focus:border-amber-500" placeholder="Pernyataan yang dievaluasi..." oninput="updateLivePreview()">
         <div class="flex items-center gap-1 shrink-0">
           <label class="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-xs cursor-pointer flex items-center gap-1">
             <input type="radio" name="tf_key_${idx}" value="B" ${key === 'B' ? 'checked' : ''} onchange="updateLivePreview()" class="text-emerald-500">
@@ -811,6 +886,7 @@
         </div>
         <button type="button" onclick="this.closest('.flex').remove(); updateLivePreview();" class="text-rose-400 hover:text-rose-300 px-2 py-1" title="Hapus Baris"><i class="fa-solid fa-xmark"></i></button>
       `;
+      row.querySelector('.tf-text').value = text;
       container.appendChild(row);
       updateLivePreview();
     }
@@ -823,43 +899,52 @@
       row.className = 'flex items-center gap-2 p-2 bg-slate-950/80 border border-slate-800 rounded-xl';
       row.innerHTML = `
         <span class="w-5 font-bold text-slate-400 font-mono text-center">${idx + 1}.</span>
-        <input type="text" class="match-left flex-1 bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-white text-xs focus:border-cyan-500" placeholder="Premis di sebelah kiri..." value="${left}" oninput="updateLivePreview()">
+        <input type="text" class="match-left flex-1 bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-white text-xs focus:border-cyan-500" placeholder="Premis di sebelah kiri..." oninput="updateLivePreview()">
         <span class="text-cyan-400 font-bold">&rarr;</span>
         <span class="text-cyan-300 font-bold font-mono text-xs">${targetLetter}.</span>
-        <input type="text" class="match-right flex-1 bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-white text-xs focus:border-cyan-500" placeholder="Pilihan di sebelah kanan (${targetLetter})..." value="${right}" oninput="updateLivePreview()">
+        <input type="text" class="match-right flex-1 bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-white text-xs focus:border-cyan-500" placeholder="Pilihan di sebelah kanan (${targetLetter})..." oninput="updateLivePreview()">
         <button type="button" onclick="this.closest('.flex').remove(); updateLivePreview();" class="text-rose-400 hover:text-rose-300 px-2 py-1" title="Hapus Baris"><i class="fa-solid fa-xmark"></i></button>
       `;
+      row.querySelector('.match-left').value = left;
+      row.querySelector('.match-right').value = right;
       container.appendChild(row);
       updateLivePreview();
     }
 
-    // 7. Penggantian Tipe Soal
-    function handleTypeChange(qType) {
+    // 8. Penggantian Tipe Soal
+    function handleTypeChange(qType, shouldResetWeight = true) {
       const sections = ['mcq', 'mcq_complex', 'true_false', 'matching', 'short_essay', 'long_essay'];
       sections.forEach(s => {
         const el = document.getElementById(`formSection_${s}`);
         if (el) el.classList.toggle('hidden', s !== qType);
       });
 
-      // Update bobot standar rekomendasi jika belum diubah guru
-      const weightEl = document.getElementById('inputWeight');
-      if (weightEl) {
-        if (qType === 'long_essay') weightEl.value = '3.0';
-        else if (qType === 'matching') weightEl.value = '2.0';
-        else if (qType === 'mcq_complex' || qType === 'true_false') weightEl.value = '1.5';
-        else weightEl.value = '1.0';
+      // Update bobot standar rekomendasi hanya jika diminta user
+      if (shouldResetWeight) {
+        const weightEl = document.getElementById('inputWeight');
+        if (weightEl) {
+          if (qType === 'long_essay') weightEl.value = '3.0';
+          else if (qType === 'matching') weightEl.value = '2.0';
+          else if (qType === 'mcq_complex' || qType === 'true_false') weightEl.value = '1.5';
+          else weightEl.value = '1.0';
+        }
       }
 
       updateLivePreview();
     }
 
-    function handleBankChange(newBankId) {
+    async function handleBankChange(newBankId) {
       activeBankId = parseInt(newBankId, 10);
-      const b = allQuestionBanks.find(x => x.id === activeBankId);
-      if (b) {
-        document.getElementById('headerBankTitle').innerText = `#${b.id} - ${b.title}`;
-        document.getElementById('btnBackToBank').href = `/kelola-soal?bank_id=${b.id}`;
-      }
+      editingQuestionId = null; // Reset mode edit ketika ganti bank soal
+      const url = new URL(window.location);
+      url.searchParams.set('bank_id', activeBankId);
+      url.searchParams.delete('question_id');
+      window.history.replaceState({}, '', url);
+
+      const select = document.getElementById('inputBankId');
+      if (select) select.value = activeBankId;
+
+      await loadActiveBankDetail();
     }
 
     // 8. Toolbar Tab Switcher
@@ -985,10 +1070,26 @@
       insertSnippet(imgTag);
     }
 
+    function showStemImagePreview(url) {
+      currentUploadedImageUrl = url;
+      const box = document.getElementById('stemImagePreviewBox');
+      const img = document.getElementById('stemImagePreviewImg');
+      const filenameEl = document.getElementById('stemImageFileName');
+      const urlEl = document.getElementById('stemImageUrl');
+      if (box && img) {
+        box.classList.remove('hidden');
+        img.src = url;
+        if (filenameEl) filenameEl.innerText = url.split('/').pop() || 'gambar_soal.png';
+        if (urlEl) urlEl.innerText = url;
+      }
+    }
+
     function removeStemImage() {
       currentUploadedImageUrl = '';
-      document.getElementById('stemImagePreviewBox').classList.add('hidden');
-      document.getElementById('stemImagePreviewImg').src = '';
+      const box = document.getElementById('stemImagePreviewBox');
+      const img = document.getElementById('stemImagePreviewImg');
+      if (box) box.classList.add('hidden');
+      if (img) img.src = '';
     }
 
     // Paste listener (Ctrl+V) untuk paste gambar dari clipboard

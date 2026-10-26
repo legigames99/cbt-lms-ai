@@ -3590,7 +3590,7 @@ const server = http.createServer(async (req, res) => {
     const parts = pathname.split('/');
     const lastPart = parts[parts.length - 1];
     const bankId = parseInt(lastPart === 'questions' ? parts[parts.length - 2] : lastPart, 10);
-    const bank = QUESTION_BANKS.find(b => b.id === bankId) || QUESTION_BANKS[0];
+    const bank = QUESTION_BANKS.find(b => Number(b.id) === Number(bankId));
     if (!bank) {
       return sendJSON(404, { status: 'error', message: 'Bank soal tidak ditemukan' });
     }
@@ -3623,7 +3623,7 @@ const server = http.createServer(async (req, res) => {
   if (pathname.startsWith('/api/v1/cbt/question-banks/') && pathname.endsWith('/add-question') && req.method === 'POST') {
     const parts = pathname.split('/');
     const bankId = parseInt(parts[5], 10);
-    const bank = QUESTION_BANKS.find(b => b.id === bankId) || QUESTION_BANKS[0];
+    const bank = QUESTION_BANKS.find(b => Number(b.id) === Number(bankId));
     if (!bank) {
       return sendJSON(404, { status: 'error', message: 'Bank soal tidak ditemukan' });
     }
@@ -3679,9 +3679,9 @@ const server = http.createServer(async (req, res) => {
     const parts = pathname.split('/');
     const bankId = parseInt(parts[5], 10);
     const qId = parseInt(parts[7], 10);
-    const bank = QUESTION_BANKS.find(b => b.id === bankId) || QUESTION_BANKS[0];
+    const bank = QUESTION_BANKS.find(b => Number(b.id) === Number(bankId));
     if (bank && bank.questions) {
-      const qIndex = bank.questions.findIndex(q => q.id === qId);
+      const qIndex = bank.questions.findIndex(q => Number(q.id) === Number(qId));
       if (qIndex !== -1) {
         const body = await parseBody(req);
         const existingQ = bank.questions[qIndex];
@@ -3690,7 +3690,7 @@ const server = http.createServer(async (req, res) => {
           type: body.type || existingQ.type,
           cog: body.cog || existingQ.cog || 'C2',
           stem: body.stem || existingQ.stem,
-          weight: Number(body.weight) || existingQ.weight || 1.0,
+          weight: Number(body.weight) !== undefined && !isNaN(Number(body.weight)) ? Number(body.weight) : (existingQ.weight || 1.0),
           explanation: body.explanation !== undefined ? body.explanation : existingQ.explanation,
         };
         if (updatedQuestion.type === 'mcq') {
@@ -3728,9 +3728,9 @@ const server = http.createServer(async (req, res) => {
     const parts = pathname.split('/');
     const bankId = parseInt(parts[5], 10);
     const qId = parseInt(parts[7], 10);
-    const bank = QUESTION_BANKS.find(b => b.id === bankId) || QUESTION_BANKS[0];
+    const bank = QUESTION_BANKS.find(b => Number(b.id) === Number(bankId));
     if (bank && bank.questions) {
-      bank.questions = bank.questions.filter(q => q.id !== qId);
+      bank.questions = bank.questions.filter(q => Number(q.id) !== Number(qId));
       saveQuestionBanksToFile();
       compileAndEncryptPackage();
       return sendJSON(200, { status: 'success', message: `Butir soal #${qId} berhasil dihapus dari bank soal!` });

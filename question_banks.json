@@ -2093,29 +2093,29 @@
         "cog": "C4",
         "stem": "Seorang siswa kelas XI TKJ diminta mengonfigurasi akses SSH tanpa password (key-based authentication) dari klien Linux ke server jarak jauh. Siswa tersebut telah menjalankan perintah <code>ssh-keygen -t rsa -b 4096</code> pada mesin klien. Manakah dari pernyataan berikut yang merupakan langkah lanjutan yang benar dan aman? (Pilih dua jawaban yang benar)",
         "weight": 1.5,
-        "explanation": "Penggunaan SSH key memerlukan transfer kunci PUBLIK (bukan privat) ke server, yang dapat dilakukan secara mudah via perintah `ssh-copy-id`. Selain itu, OpenSSH server sangat ketat terhadap izin berkas; jika direktori `.ssh` atau `authorized_keys` terlalu longgar (misalnya bisa ditulis oleh grup atauothers), server akan menolak autentikasi kunci tersebut demi alasan keamanan.",
+        "explanation": "Kunci publik disalin ke authorized_keys dengan izin chmod 600.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "Menyalin berkas kunci publik (id_rsa.pub) ke direktori tujuan di server menggunakan perintah <code>ssh-copy-id</code>."
+            "text": "Menyalin berkas id_rsa.pub ke ~/.ssh/authorized_keys di server target."
           },
           {
             "id": "B",
-            "text": "Menyalin berkas kunci privat (id_rsa) ke direktori <code>/home/user/.ssh/authorized_keys</code> di server."
+            "text": "Mengirim berkas private key id_rsa ke server target."
           },
           {
             "id": "C",
-            "text": "Memastikan direktori <code>~/.ssh</code> di server memiliki hak akses (permissions) 700 dan berkas <code>authorized_keys</code> memiliki hak akses 600."
+            "text": "Mengatur izin berkas ~/.ssh/authorized_keys menjadi 600 di server target."
           },
           {
             "id": "D",
-            "text": "Mengubah parameter konfigurasi server <code>PasswordAuthentication yes</code> menjadi wajib diaktifkan agar kunci publik berfungsi."
+            "text": "Mengubah izin berkas id_rsa menjadi 777 agar dapat dibaca semua pengguna."
           },
           {
             "id": "E",
-            "text": "Menghapus berkas kunci privat di mesin klien segera setelah proses transfer kunci selesai dilakukan."
+            "text": "Menonaktifkan layanan firewall di klien dan server."
           }
         ],
         "answer": [
@@ -2375,6 +2375,169 @@
           "1": "A",
           "2": "C"
         }
+      },
+      {
+        "id": 11,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "Seorang siswa SMK kelas XI sedang menguji koneksi SSH dari komputer klien ke server praktikum Debian. Saat perintah <code>ssh -v student@192.168.10.50</code> dieksekusi, terminal menampilkan proses negosiasi hingga tahap <code>debug1: SSH2_MSG_SERVICE_REQUEST received: ssh-userauth</code>. Namun, proses terhenti dan klien mendapati penolakan izin masuk meskipun kombinasi username dan password sudah diketik dengan benar.<br><br>Berdasarkan cuplikan log debug tersebut dan analisis arsitektur protokol SSH, tahapan manakah yang mengalami kegagalan dan parameter apa yang paling mungkin salah dikonfigurasi di sisi server (<code>/etc/ssh/sshd_config</code>)?",
+        "weight": 1,
+        "explanation": "Pesan debug 'SSH2_MSG_SERVICE_REQUEST received: ssh-userauth' menandakan bahwa fase pertukaran kunci (Key Exchange) dan verifikasi identitas server (Host Key Verification) telah BERHASIL diselesaikan. Proses selanjutnya adalah memasuki fase otentikasi pengguna (user authentication). Jika pada tahap ini akses ditolak meskipun kredensial benar, penyebab utamanya adalah mekanisme otentikasi kata sandi dinonaktifkan secara eksplisit pada file konfigurasi server melalui parameter 'PasswordAuthentication no'.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Kegagalan pada pertukaran kunci Diffie-Hellman karena parameter KexAlgorithms tidak kompatibel."
+          },
+          {
+            "id": "B",
+            "text": "Kegagalan pada verifikasi sandi karena parameter PasswordAuthentication bernilai no."
+          },
+          {
+            "id": "C",
+            "text": "Kegagalan pada validasi alamat IP karena larutan AllowUsers tidak menyertakan subnet klien."
+          },
+          {
+            "id": "D",
+            "text": "Kegagalan pada dekripsi HostKey karena sidik jari server (fingerprint) berubah di sisi klien."
+          },
+          {
+            "id": "E",
+            "text": "Kegagalan pada negosiasi versi protokol karena server memaksa penggunaan SSH versi 1."
+          }
+        ],
+        "answer": "B"
+      },
+      {
+        "id": 12,
+        "type": "mcq_complex",
+        "cog": "C4",
+        "stem": "Dalam sebuah skenario praktik jaringan komputer di SMK, seorang guru meminta para siswa kelas XI untuk mengamankan akses layanan SSH pada server Ubuntu dari ancaman <i>brute-force attack</i>. Siswa diberikan beberapa opsi tindakan pengerasan (hardening).<br><br>Pilihlah <strong>dua</strong> tindakan konfigurasi yang paling efektif dan benar untuk diterapkan pada file <code>/etc/ssh/sshd_config</code> guna meminimalisir risiko serangan tersebut!",
+        "weight": 1.5,
+        "explanation": "Pilihan A (mengubah port default) mengurangi serangan otomatis (botnet scanner) yang menargetkan port 22 secara membabi buta. Pilihan C (menggunakan SSH key-based auth dan mematikan password auth) adalah praktik pengerasan standar industri yang menutup celah brute-force sandi secara total karena kunci kriptografi asimetris jauh lebih aman dibanding string password. Pilihan B, D, dan E justru menurunkan tingkat keamanan server.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Mengubah port default SSH dari port 22 ke port lain yang tidak umum (misal: port 2222)."
+          },
+          {
+            "id": "B",
+            "text": "Mengaktifkan parameter PermitRootLogin yes agar administrator mudah memantau aktivitas root."
+          },
+          {
+            "id": "C",
+            "text": "Menerapkan otentikasi berbasis kunci publik (PubkeyAuthentication yes) dan menonaktifkan otentikasi sandi (PasswordAuthentication no)."
+          },
+          {
+            "id": "D",
+            "text": "Mengizinkan semua pengguna sistem melakukan koneksi jarak jauh tanpa terkecuali menggunakan perintah AllowUsers *."
+          },
+          {
+            "id": "E",
+            "text": "Mengaktifkan kembali protokol usang X11Forwarding untuk mempermudah eksekusi aplikasi grafis."
+          }
+        ],
+        "answer": [
+          "A",
+          "C"
+        ]
+      },
+      {
+        "id": 13,
+        "type": "true_false",
+        "cog": "C4",
+        "stem": "Seorang teknisi jaringan sedang membandingkan karakteristik operasional antara protokol <strong>Telnet</strong> dan <strong>SSH (Secure Shell)</strong> untuk keperluan manajemen jarak jauh perangkat jaringan di sekolah. Evaluasi kebenaran dari pernyataan teknis berikut:",
+        "weight": 1.5,
+        "explanation": "Pernyataan 0 benar karena Telnet tidak menyediakan mekanisme enkripsi sama sekali. Pernyataan 1 salah karena SSH bekerja pada Layer Aplikasi (Application Layer) dalam model OSI dan menggunakan protokol TCP pada port 22 di Transport Layer, bukan Data Link Layer. Pernyataan 2 benar karena arsitektur SSH menggabungkan kriptografi simetris dan asimetris demi efisiensi dan keamanan tingkat tinggi.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "statements": [
+          {
+            "id": 0,
+            "text": "Protokol Telnet mengirimkan seluruh data, termasuk username dan password, dalam bentuk teks biasa (plaintext) yang sangat rentan terhadap teknik penyadapan paket (packet sniffing) seperti Wireshark.",
+            "key": "B"
+          },
+          {
+            "id": 1,
+            "text": "SSH beroperasi secara eksklusif pada Layer 2 (Data Link Layer) dalam model OSI untuk memastikan enkripsi langsung pada perangkat keras jaringan.",
+            "key": "S"
+          },
+          {
+            "id": 2,
+            "text": "SSH menerapkan mekanisme enkripsi simetris (seperti AES) untuk pengiriman data sesi dan enkripsi asimetris (seperti RSA/Ed25519) untuk proses otentikasi awal serta pertukaran kunci.",
+            "key": "B"
+          }
+        ],
+        "answer": {
+          "0": "B",
+          "1": "S",
+          "2": "B"
+        }
+      },
+      {
+        "id": 14,
+        "type": "matching",
+        "cog": "C4",
+        "stem": "Cocokkan parameter atau direktif konfigurasi SSH Server di sebelah kiri dengan fungsi atau dampak operasionalnya pada sistem di sebelah kanan:",
+        "weight": 2,
+        "explanation": "Parameter 'PermitRootLogin prohibit-password' mengizinkan root login khusus via public key auth. 'X11Forwarding no' menonaktifkan penerusan tampilan grafis X11 untuk menghemat sumber daya dan memperketat keamanan. 'MaxAuthTries 3' membatasi percobaan otentikasi guna meredam serangan percobaan sandi berulang.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "premises": [
+          {
+            "id": 0,
+            "text": "PermitRootLogin prohibit-password"
+          },
+          {
+            "id": 1,
+            "text": "X11Forwarding no"
+          },
+          {
+            "id": 2,
+            "text": "MaxAuthTries 3"
+          }
+        ],
+        "targets": [
+          {
+            "id": "A",
+            "text": "Membatasi jumlah maksimum percobaan login yang salah per koneksi sebelum sesi diputus secara paksa oleh server."
+          },
+          {
+            "id": "B",
+            "text": "Melarang pengguna melakukan eksekusi aplikasi berbasis antarmuka grafis (GUI) jarak jauh melalui saluran terowongan SSH."
+          },
+          {
+            "id": "C",
+            "text": "Mengizinkan akun superuser (root) masuk ke sistem hanya jika menggunakan metode kunci publik, melarang login root via sandi."
+          },
+          {
+            "id": "D",
+            "text": "Memaksa enkripsi data sesi menggunakan algoritma DES 56-bit demi kompatibilitas perangkat lawas."
+          }
+        ],
+        "answer": {
+          "0": "C",
+          "1": "B",
+          "2": "A"
+        }
+      },
+      {
+        "id": 15,
+        "type": "short_essay",
+        "cog": "C3",
+        "stem": "Sebutkan nama utilitas baris perintah (command line utility) standar berbasis paket OpenSSH yang digunakan untuk menyalin berkas secara aman dari komputer lokal ke server remote melalui protokol SSH pada sistem operasi Linux.",
+        "weight": 1,
+        "explanation": "Utilitas standar yang digunakan untuk menyalin berkas melalui protokol SSH adalah 'scp' (Secure Copy Protocol) atau 'sftp' (Secure File Transfer Protocol). Perintah scp memanfaatkan enkripsi SSH secara langsung untuk mentransfer file antar host di jaringan secara aman.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "answer_keys": [
+          "scp",
+          "secure copy",
+          "sftp"
+        ]
       }
     ]
   }

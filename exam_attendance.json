@@ -4,47 +4,92 @@
       "1001": {
         "status": "hadir",
         "reason": "",
-        "note": ""
+        "note": "Selesai mengerjakan ujian",
+        "is_manual": false
       },
       "1002": {
         "status": "hadir",
         "reason": "",
-        "note": ""
+        "note": "Sedang mengerjakan ujian",
+        "is_manual": false
       },
       "1003": {
         "status": "hadir",
         "reason": "",
-        "note": ""
+        "note": "Selesai mengerjakan ujian",
+        "is_manual": false
       },
       "1004": {
-        "status": "hadir",
-        "reason": "",
-        "note": ""
+        "status": "tidak_hadir",
+        "reason": "Alpa",
+        "note": "Belum login / belum mengerjakan ujian",
+        "is_manual": false
       },
       "1005": {
         "status": "hadir",
         "reason": "",
-        "note": ""
+        "note": "Selesai mengerjakan ujian",
+        "is_manual": false
       },
       "1006": {
         "status": "hadir",
         "reason": "",
-        "note": ""
+        "note": "Selesai mengerjakan ujian",
+        "is_manual": false
       },
       "1007": {
         "status": "hadir",
         "reason": "",
-        "note": ""
+        "note": "Selesai mengerjakan ujian",
+        "is_manual": false
       },
       "1008": {
         "status": "hadir",
         "reason": "",
-        "note": ""
+        "note": "Selesai mengerjakan ujian",
+        "is_manual": false
       },
       "1009": {
         "status": "hadir",
         "reason": "",
-        "note": ""
+        "note": "Sedang mengerjakan ujian",
+        "is_manual": false
+      },
+      "1010": {
+        "status": "tidak_hadir",
+        "reason": "Alpa",
+        "note": "Belum login / belum mengerjakan ujian",
+        "is_manual": false
+      },
+      "1011": {
+        "status": "tidak_hadir",
+        "reason": "Alpa",
+        "note": "Belum login / belum mengerjakan ujian",
+        "is_manual": false
+      },
+      "1012": {
+        "status": "hadir",
+        "reason": "",
+        "note": "Selesai mengerjakan ujian",
+        "is_manual": false
+      },
+      "1013": {
+        "status": "hadir",
+        "reason": "",
+        "note": "Selesai mengerjakan ujian",
+        "is_manual": false
+      },
+      "1014": {
+        "status": "hadir",
+        "reason": "",
+        "note": "Selesai mengerjakan ujian",
+        "is_manual": false
+      },
+      "1015": {
+        "status": "hadir",
+        "reason": "",
+        "note": "Selesai mengerjakan ujian",
+        "is_manual": false
       }
     },
     "classes_meta": {
@@ -54,10 +99,10 @@
         "end_time": "09:00 WIB",
         "room": "Ruang Lab Komputer 01",
         "session": "Sesi 1",
-        "proctor_1_name": "",
-        "proctor_1_nip": "",
-        "proctor_2_name": "",
-        "proctor_2_nip": "",
+        "proctor_1_name": "Dra. Hj. Siti Aminah, M.Pd.",
+        "proctor_1_nip": "19680512 199403 2 004",
+        "proctor_2_name": "Rahmat Hidayat, S.Pd.",
+        "proctor_2_nip": "19820719 200801 1 009",
         "notes": "Pelaksanaan ujian berlangsung tertib, aman, dan lancar.",
         "updated_at": 1793000514475
       },
@@ -88,5 +133,101 @@
       "notes": "Pelaksanaan ujian berlangsung tertib, aman, dan lancar.",
       "updated_at": 1793000981043
     }
+  },
+  "2": {
+    "students": {
+      "1001": {
+        "status": "hadir",
+        "reason": "",
+        "note": "Sedang mengerjakan ujian",
+        "is_manual": false
+      },
+      "1002": {
+        "status": "hadir",
+        "reason": "",
+        "note": "Selesai mengerjakan ujian",
+        "is_manual": false
+      },
+      "1003": {
+        "status": "hadir",
+        "reason": "",
+        "note": "Sedang mengerjakan ujian",
+        "is_manual": false
+      },
+      "1004": {
+        "status": "hadir",
+        "reason": "",
+        "note": "Selesai mengerjakan ujian",
+        "is_manual": false
+      },
+      "1005": {
+        "status": "hadir",
+        "reason": "",
+        "note": "Selesai mengerjakan ujian",
+        "is_manual": false
+      },
+      "1006": {
+        "status": "hadir",
+        "reason": "",
+        "note": "Sedang mengerjakan ujian",
+        "is_manual": false
+      },
+      "1007": {
+        "status": "tidak_hadir",
+        "reason": "Alpa",
+        "note": "Belum login / belum mengerjakan ujian",
+        "is_manual": false
+      },
+      "1008": {
+        "status": "tidak_hadir",
+        "reason": "Alpa",
+        "note": "Belum login / belum mengerjakan ujian",
+        "is_manual": false
+      },
+      "1009": {
+        "status": "hadir",
+        "reason": "",
+        "note": "Selesai mengerjakan ujian",
+        "is_manual": false
+      },
+      "1010": {
+        "status": "hadir",
+        "reason": "",
+        "note": "Selesai mengerjakan ujian",
+        "is_manual": false
+      },
+      "1011": {
+        "status": "hadir",
+        "reason": "",
+        "note": "Selesai mengerjakan ujian",
+        "is_manual": false
+      },
+      "1012": {
+        "status": "hadir",
+        "reason": "",
+        "note": "Selesai mengerjakan ujian",
+        "is_manual": false
+      },
+      "1013": {
+        "status": "hadir",
+        "reason": "",
+        "note": "Sedang mengerjakan ujian",
+        "is_manual": false
+      },
+      "1014": {
+        "status": "tidak_hadir",
+        "reason": "Alpa",
+        "note": "Belum login / belum mengerjakan ujian",
+        "is_manual": false
+      },
+      "1015": {
+        "status": "tidak_hadir",
+        "reason": "Alpa",
+        "note": "Belum login / belum mengerjakan ujian",
+        "is_manual": false
+      }
+    },
+    "classes_meta": {},
+    "default_meta": {}
   }
 }

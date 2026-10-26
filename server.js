@@ -1793,14 +1793,20 @@ function initSampleStudentSessions() {
       }
 
       if (!studentSessions[sessionKey]) {
-        const isCompleted = sch.is_active === false || (st.id % 6 !== 0);
+        // Distribusi realistis: sebagian sudah submit, sebagian sedang mengerjakan, sebagian belum login
+        const stateSeed = (st.id + sch.id * 3) % 7;
+        let sessStatus = 'not_started';
+        if (stateSeed <= 3) sessStatus = 'submitted';
+        else if (stateSeed <= 4) sessStatus = 'in_progress';
+        else sessStatus = 'not_started'; // Siswa belum login ke CBT
+
         studentSessions[sessionKey] = {
-          status: isCompleted ? 'submitted' : 'in_progress',
-          started_at: '21 Okt 2026 07.30.00 WIB',
-          submitted_at: isCompleted ? `21 Okt 2026 08.${20 + (st.id % 35)}.12 WIB` : null,
+          status: sessStatus,
+          started_at: sessStatus !== 'not_started' ? '21 Okt 2026 07.30.00 WIB' : null,
+          submitted_at: sessStatus === 'submitted' ? `21 Okt 2026 08.${20 + (st.id % 35)}.12 WIB` : null,
           tab_violations: (st.id % 4 === 0) ? (st.id % 3) + 1 : 0,
           ip_address: `192.168.1.${100 + (st.id % 100)}`,
-          answers: studentAnswersStore[sessionKey],
+          answers: sessStatus !== 'not_started' ? (studentAnswersStore[sessionKey] || {}) : {},
         };
       }
     }
@@ -3510,15 +3516,56 @@ const server = http.createServer(async (req, res) => {
     }
 
     const classQuery = (parsedUrl.searchParams.get('class') || 'all').trim();
+    const isSync = parsedUrl.searchParams.get('sync') === '1' || parsedUrl.searchParams.get('auto') === 'true';
     const { classes: availableClasses } = getStudentsForSchedule(sch, 'all');
     const { students: targetStudents } = getStudentsForSchedule(sch, classQuery);
 
-    const schAttendance = EXAM_ATTENDANCE[schId] || { students: {}, classes_meta: {}, default_meta: {} };
-    const savedMeta = (schAttendance.classes_meta && schAttendance.classes_meta[classQuery]) || schAttendance.default_meta || {};
-    const studentStatuses = schAttendance.students || {};
+    if (!EXAM_ATTENDANCE[schId]) {
+      EXAM_ATTENDANCE[schId] = { students: {}, classes_meta: {}, default_meta: {} };
+    }
+    const schAttendance = EXAM_ATTENDANCE[schId];
+    if (!schAttendance.students) schAttendance.students = {};
+    if (!schAttendance.classes_meta) schAttendance.classes_meta = {};
+    if (!schAttendance.default_meta) schAttendance.default_meta = {};
 
+    const savedMeta = (schAttendance.classes_meta && schAttendance.classes_meta[classQuery]) || schAttendance.default_meta || {};
+    const studentStatuses = schAttendance.students;
+
+    let hasChanges = false;
     const populatedStudents = targetStudents.map(st => {
-      const rec = studentStatuses[st.id] || { status: 'hadir', reason: '', note: '' };
+      const sessionKey = `${schId}_${st.id}`;
+      const sess = studentSessions[sessionKey];
+      // Siswa dianggap hadir jika sudah login dan mengerjakan ujian (status in_progress atau submitted atau ada started_at)
+      const hasWorked = sess && (sess.status === 'in_progress' || sess.status === 'submitted' || !!sess.started_at);
+      const isSubmitted = sess && sess.status === 'submitted';
+      const isInProgress = sess && sess.status === 'in_progress';
+
+      let rec = studentStatuses[st.id];
+
+      // Jika sync=1 ATAU siswa belum ada rekaman ATAU rekaman sebelumnya bukan manual override:
+      // Tentukan otomatis:
+      // - jika login & mengerjakan -> 'hadir'
+      // - jika belum login / belum mulai -> 'tidak_hadir' (reason: 'Alpa')
+      if (!rec || isSync || !rec.is_manual) {
+        if (hasWorked) {
+          rec = {
+            status: 'hadir',
+            reason: '',
+            note: isSubmitted ? 'Selesai mengerjakan ujian' : 'Sedang mengerjakan ujian',
+            is_manual: false
+          };
+        } else {
+          rec = {
+            status: 'tidak_hadir',
+            reason: 'Alpa',
+            note: 'Belum login / belum mengerjakan ujian',
+            is_manual: false
+          };
+        }
+        studentStatuses[st.id] = rec;
+        hasChanges = true;
+      }
+
       return {
         id: st.id,
         username: st.username,
@@ -3530,11 +3577,19 @@ const server = http.createServer(async (req, res) => {
         gender: st.gender || 'Laki-laki',
         room: st.room || 'Ruang Lab Komputer 01',
         session: st.session || 'Sesi 1 (07:30 - 09:30)',
-        status: rec.status || 'hadir',
-        reason: rec.reason || '',
-        note: rec.note || ''
+        status: rec.status || (hasWorked ? 'hadir' : 'tidak_hadir'),
+        reason: rec.reason || (!hasWorked ? 'Alpa' : ''),
+        note: rec.note || '',
+        session_status: sess ? sess.status : 'not_started',
+        started_at: sess ? sess.started_at : null,
+        submitted_at: sess ? sess.submitted_at : null,
+        is_manual: rec.is_manual === true
       };
     });
+
+    if (hasChanges) {
+      saveExamAttendanceToFile();
+    }
 
     const total = populatedStudents.length;
     const present = populatedStudents.filter(s => s.status === 'hadir').length;
@@ -3594,7 +3649,8 @@ const server = http.createServer(async (req, res) => {
         EXAM_ATTENDANCE[schId].students[stId] = {
           status: val.status === 'tidak_hadir' ? 'tidak_hadir' : 'hadir',
           reason: String(val.reason || '').trim(),
-          note: String(val.note || '').trim()
+          note: String(val.note || '').trim(),
+          is_manual: true
         };
       }
     }
@@ -3904,6 +3960,22 @@ const server = http.createServer(async (req, res) => {
     };
 
     activeExamStudents.add(uid);
+
+    // Otomatis tandai absensi siswa: Hadir (Sedang Mengerjakan)
+    try {
+      if (!EXAM_ATTENDANCE[curSch.id]) EXAM_ATTENDANCE[curSch.id] = { students: {}, classes_meta: {}, default_meta: {} };
+      if (!EXAM_ATTENDANCE[curSch.id].students) EXAM_ATTENDANCE[curSch.id].students = {};
+      EXAM_ATTENDANCE[curSch.id].students[uid] = {
+        status: 'hadir',
+        reason: '',
+        note: 'Sedang mengerjakan ujian',
+        is_manual: false
+      };
+      saveExamAttendanceToFile();
+    } catch (e) {
+      console.error('[Attendance] Gagal auto-update kehadiran saat start:', e.message);
+    }
+
     return sendJSON(200, {
       status: 'success',
       data: {
@@ -3975,6 +4047,21 @@ const server = http.createServer(async (req, res) => {
     };
 
     activeExamStudents.delete(uid);
+
+    // Otomatis tandai absensi siswa: Hadir (Selesai Mengerjakan)
+    try {
+      if (!EXAM_ATTENDANCE[curSch.id]) EXAM_ATTENDANCE[curSch.id] = { students: {}, classes_meta: {}, default_meta: {} };
+      if (!EXAM_ATTENDANCE[curSch.id].students) EXAM_ATTENDANCE[curSch.id].students = {};
+      EXAM_ATTENDANCE[curSch.id].students[uid] = {
+        status: 'hadir',
+        reason: '',
+        note: 'Selesai mengerjakan ujian',
+        is_manual: false
+      };
+      saveExamAttendanceToFile();
+    } catch (e) {
+      console.error('[Attendance] Gagal auto-update kehadiran saat finish:', e.message);
+    }
 
     return sendJSON(200, {
       status: 'success',

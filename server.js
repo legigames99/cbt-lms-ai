@@ -2114,13 +2114,18 @@ function parseQuestionsFromWordText(rawText) {
   return questions;
 }
 
-function generateDocxDocument({ title, school, subject, teacher, targetClass, questions, includeKeys = true }) {
+function generateDocxDocument({ title, school, subject, teacher, targetClass, questions, includeKeys = true, includeExplanation = true, includeHeader = true }) {
   let bodyXml = '';
 
-  bodyXml += `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="28"/><w:color w:val="1e1b4b"/></w:rPr><w:t>${xmlEscape(school || 'SMK NEGERI 5 BANDUNG')}</w:t></w:r></w:p>`;
-  bodyXml += `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="24"/></w:rPr><w:t>${xmlEscape(title || 'NASKAH ASESMEN PEMBELAJARAN')}</w:t></w:r></w:p>`;
-  bodyXml += `<w:p><w:pPr><w:jc w:val="center"/><w:pBdr><w:bottom w:val="single" w:sz="14" w:space="8" w:color="4f46e5"/></w:pBdr></w:pPr><w:r><w:rPr><w:i/><w:sz w:val="20"/><w:color w:val="4b5563"/></w:rPr><w:t>Mata Pelajaran: ${xmlEscape(subject || 'Informatika')} | Kelas: ${xmlEscape(targetClass || 'Semua Kelas')} | Pengampu: ${xmlEscape(teacher || 'Guru Pengampu')}</w:t></w:r></w:p>`;
-  bodyXml += `<w:p><w:r><w:t></w:t></w:r></w:p>`;
+  if (includeHeader) {
+    bodyXml += `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="28"/><w:color w:val="1e1b4b"/></w:rPr><w:t>${xmlEscape(school || 'SMK NEGERI 5 BANDUNG')}</w:t></w:r></w:p>`;
+    bodyXml += `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="24"/></w:rPr><w:t>${xmlEscape(title || 'NASKAH ASESMEN PEMBELAJARAN')}</w:t></w:r></w:p>`;
+    bodyXml += `<w:p><w:pPr><w:jc w:val="center"/><w:pBdr><w:bottom w:val="single" w:sz="14" w:space="8" w:color="4f46e5"/></w:pBdr></w:pPr><w:r><w:rPr><w:i/><w:sz w:val="20"/><w:color w:val="4b5563"/></w:rPr><w:t>Mata Pelajaran: ${xmlEscape(subject || 'Informatika')} | Kelas: ${xmlEscape(targetClass || 'Semua Kelas')} | Pengampu: ${xmlEscape(teacher || 'Guru Pengampu')}</w:t></w:r></w:p>`;
+    bodyXml += `<w:p><w:r><w:t></w:t></w:r></w:p>`;
+  } else {
+    bodyXml += `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="24"/></w:rPr><w:t>${xmlEscape(title || 'NASKAH ASESMEN PEMBELAJARAN')}</w:t></w:r></w:p>`;
+    bodyXml += `<w:p><w:r><w:t></w:t></w:r></w:p>`;
+  }
 
   questions.forEach((q, idx) => {
     const qNum = idx + 1;
@@ -2170,7 +2175,7 @@ function generateDocxDocument({ title, school, subject, teacher, targetClass, qu
 
       bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:pBdr><w:left w:val="single" w:sz="14" w:space="8" w:color="10b981"/></w:pBdr><w:shd w:val="clear" w:color="auto" w:fill="ecfdf5"/><w:spacing w:before="60" w:after="100"/></w:pPr>`;
       bodyXml += `<w:r><w:rPr><w:b/><w:color w:val="065f46"/></w:rPr><w:t>KUNCI JAWABAN: ${xmlEscape(keyText)}</w:t></w:r>`;
-      if (q.explanation) {
+      if (includeExplanation && q.explanation) {
         bodyXml += `<w:r><w:t> | Pembahasan: ${xmlEscape(q.explanation.replace(/<[^>]+>/g, ' '))}</w:t></w:r>`;
       }
       bodyXml += `</w:p>`;
@@ -2254,7 +2259,7 @@ function generateDocxTemplate() {
   });
 }
 
-function generateWordHtmlDocument({ title, school, subject, teacher, targetClass, questions, includeKeys = true }) {
+function generateWordHtmlDocument({ title, school, subject, teacher, targetClass, questions, includeKeys = true, includeExplanation = true, includeHeader = true }) {
   const esc = (s) => (s || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   let qHtml = '';
 
@@ -2299,13 +2304,49 @@ function generateWordHtmlDocument({ title, school, subject, teacher, targetClass
 
       qHtml += `<div style="margin: 6px 0 0 24px; padding: 6px 10px; background: #ecfdf5; border-left: 4px solid #10b981; font-size: 9.5pt; color: #065f46;">`;
       qHtml += `<strong>KUNCI JAWABAN:</strong> ${keyVal}`;
-      if (q.explanation) {
+      if (includeExplanation && q.explanation) {
         qHtml += ` &bull; <em>Pembahasan: ${q.explanation.replace(/<[^>]+>/g, ' ')}</em>`;
       }
       qHtml += `</div>`;
     }
     qHtml += `</div>`;
   });
+
+  let modeDesc = 'Naskah Ujian Siswa (Siap Cetak)';
+  if (includeKeys) {
+    modeDesc = includeExplanation ? '<span style="color:#059669;font-weight:bold;">Master Guru (Kunci & Pembahasan)</span>' : '<span style="color:#059669;font-weight:bold;">Master Guru (Kunci Saja / Ringkas)</span>';
+  }
+
+  let headerHtml = '';
+  if (includeHeader) {
+    headerHtml = `
+    <table class="kop" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="text-align: center; padding-bottom: 8px;">
+          <h2 style="margin: 0; font-size: 16pt; text-transform: uppercase;">${esc(school || 'SMK NEGERI 5 BANDUNG')}</h2>
+          <h3 style="margin: 2px 0; font-size: 13pt;">${esc(title)}</h3>
+          <p style="margin: 0; font-size: 9.5pt; color: #4b5563;">NASKAH ASESMEN PEMBELAJARAN STANDAR TKA / CBT & LMS AI</p>
+        </td>
+      </tr>
+    </table>
+    <table class="meta" cellpadding="2" cellspacing="0">
+      <tr>
+        <td width="20%"><strong>Mata Pelajaran</strong></td><td width="30%">: ${esc(subject)}</td>
+        <td width="20%"><strong>Kelas / Sasaran</strong></td><td width="30%">: ${esc(targetClass || 'Semua Kelas')}</td>
+      </tr>
+      <tr>
+        <td><strong>Guru Pengampu</strong></td><td>: ${esc(teacher || 'Guru')}</td>
+        <td><strong>Mode Dokumen</strong></td><td>: ${modeDesc}</td>
+      </tr>
+    </table>
+    <hr style="border: 0; border-top: 1px solid #d1d5db; margin-bottom: 16px;"/>`;
+  } else {
+    headerHtml = `
+    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #374151; padding-bottom: 8px;">
+      <h3 style="margin: 0; font-size: 14pt;">${esc(title || 'NASKAH ASESMEN')}</h3>
+      <p style="margin: 4px 0 0 0; font-size: 10pt; color: #4b5563;">${modeDesc}</p>
+    </div>`;
+  }
 
   return `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
   <head>
@@ -2327,26 +2368,8 @@ function generateWordHtmlDocument({ title, school, subject, teacher, targetClass
     </style>
   </head>
   <body>
-    <table class="kop" cellpadding="0" cellspacing="0">
-      <tr>
-        <td style="text-align: center; padding-bottom: 8px;">
-          <h2 style="margin: 0; font-size: 16pt; text-transform: uppercase;">${esc(school || 'SMK NEGERI 5 BANDUNG')}</h2>
-          <h3 style="margin: 2px 0; font-size: 13pt;">${esc(title)}</h3>
-          <p style="margin: 0; font-size: 9.5pt; color: #4b5563;">NASKAH ASESMEN PEMBELAJARAN STANDAR TKA / CBT & LMS AI</p>
-        </td>
-      </tr>
-    </table>
-    <table class="meta" cellpadding="2" cellspacing="0">
-      <tr>
-        <td width="20%"><strong>Mata Pelajaran</strong></td><td width="30%">: ${esc(subject)}</td>
-        <td width="20%"><strong>Kelas / Sasaran</strong></td><td width="30%">: ${esc(targetClass || 'Semua Kelas')}</td>
-      </tr>
-      <tr>
-        <td><strong>Guru Pengampu</strong></td><td>: ${esc(teacher || 'Guru')}</td>
-        <td><strong>Mode Dokumen</strong></td><td>: ${includeKeys ? '<span style="color:#059669;font-weight:bold;">Master Guru (Kunci & Pembahasan)</span>' : 'Naskah Ujian Siswa (Siap Cetak)'}</td>
-      </tr>
-    </table>
-    <hr style="border: 0; border-top: 1px solid #d1d5db; margin-bottom: 16px;"/>
+    ${headerHtml}
+    ${qHtml}
     ${qHtml}
   </body>
   </html>`;
@@ -4400,10 +4423,31 @@ const server = http.createServer(async (req, res) => {
       return sendJSON(404, { status: 'error', message: 'Bank soal tidak ditemukan' });
     }
 
-    const mode = parsedUrl.searchParams.get('mode') || 'teacher'; // 'teacher' (dengan kunci) vs 'student' (tanpa kunci)
+    const mode = parsedUrl.searchParams.get('mode') || 'teacher'; // 'teacher' | 'teacher_compact' | 'student'
     const format = parsedUrl.searchParams.get('format') || 'docx'; // 'docx' vs 'doc'
-    const includeKeys = (mode !== 'student');
+    
+    let includeKeys = (mode !== 'student');
+    if (parsedUrl.searchParams.has('include_keys')) {
+      includeKeys = parsedUrl.searchParams.get('include_keys') === '1' || parsedUrl.searchParams.get('include_keys') === 'true';
+    }
+
+    let includeExplanation = (mode === 'teacher');
+    if (parsedUrl.searchParams.has('include_expl')) {
+      includeExplanation = parsedUrl.searchParams.get('include_expl') === '1' || parsedUrl.searchParams.get('include_expl') === 'true';
+    }
+
+    let includeHeader = true;
+    if (parsedUrl.searchParams.has('include_header')) {
+      includeHeader = parsedUrl.searchParams.get('include_header') === '1' || parsedUrl.searchParams.get('include_header') === 'true';
+    }
+
     const safeTitle = (bank.title || 'Bank_Soal').replace(/[^a-zA-Z0-9_-]/g, '_');
+    let labelMode = 'Guru_Lengkap';
+    if (!includeKeys) {
+      labelMode = 'Siswa';
+    } else if (!includeExplanation) {
+      labelMode = 'Guru_Kunci_Saja';
+    }
 
     if (format === 'doc') {
       const htmlDoc = generateWordHtmlDocument({
@@ -4413,11 +4457,13 @@ const server = http.createServer(async (req, res) => {
         teacher: bank.teacher,
         targetClass: bank.target_class,
         questions: bank.questions || [],
-        includeKeys
+        includeKeys,
+        includeExplanation,
+        includeHeader
       });
       res.writeHead(200, {
         'Content-Type': 'application/msword; charset=utf-8',
-        'Content-Disposition': `attachment; filename="Bank_Soal_${bank.id}_${safeTitle}_${mode}.doc"`,
+        'Content-Disposition': `attachment; filename="Bank_Soal_${bank.id}_${safeTitle}_${labelMode}.doc"`,
         'Content-Length': Buffer.byteLength(htmlDoc, 'utf8')
       });
       return res.end(htmlDoc);
@@ -4430,12 +4476,14 @@ const server = http.createServer(async (req, res) => {
       teacher: bank.teacher,
       targetClass: bank.target_class,
       questions: bank.questions || [],
-      includeKeys
+      includeKeys,
+      includeExplanation,
+      includeHeader
     });
 
     res.writeHead(200, {
       'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'Content-Disposition': `attachment; filename="Bank_Soal_${bank.id}_${safeTitle}_${mode}.docx"`,
+      'Content-Disposition': `attachment; filename="Bank_Soal_${bank.id}_${safeTitle}_${labelMode}.docx"`,
       'Content-Length': docxBuf.length
     });
     return res.end(docxBuf);

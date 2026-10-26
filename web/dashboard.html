@@ -516,26 +516,9 @@
             <button onclick="openUploadModalForBank()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-blue-200 border border-blue-500/30 transition flex items-center gap-2">
               <i class="fa-solid fa-file-word text-blue-400"></i> Import Word / Excel
             </button>
-            <div class="relative inline-block text-left group">
-              <button type="button" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-blue-300 border border-blue-500/30 transition flex items-center gap-2">
+            <button type="button" onclick="openExportWordModal()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-blue-300 border border-blue-500/30 transition flex items-center gap-2 shadow-sm">
                 <i class="fa-solid fa-file-word text-blue-400"></i> Export Word
-                <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
               </button>
-              <div class="hidden group-hover:block absolute right-0 mt-1 w-56 rounded-xl bg-slate-900 border border-slate-800 shadow-2xl py-1 z-50">
-                <a href="javascript:void(0)" onclick="exportActiveBankWord('teacher', 'docx')" class="block px-4 py-2 text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2 transition">
-                  <i class="fa-solid fa-graduation-cap text-emerald-400"></i>
-                  <div><strong class="block text-white">Naskah Guru (.docx)</strong><span class="text-[10px] text-slate-400">Kunci & Pembahasan Lengkap</span></div>
-                </a>
-                <a href="javascript:void(0)" onclick="exportActiveBankWord('student', 'docx')" class="block px-4 py-2 text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2 border-t border-slate-800/80 transition">
-                  <i class="fa-solid fa-print text-indigo-400"></i>
-                  <div><strong class="block text-white">Naskah Siswa (.docx)</strong><span class="text-[10px] text-slate-400">Siap Cetak Ujian (Tanpa Kunci)</span></div>
-                </a>
-                <a href="/api/v1/cbt/question-banks/template-word?format=docx" download class="block px-4 py-2 text-xs text-amber-300 hover:bg-slate-800 flex items-center gap-2 border-t border-slate-800/80 transition">
-                  <i class="fa-solid fa-download text-amber-400"></i>
-                  <div><strong class="block text-amber-200">Unduh Template Word</strong><span class="text-[10px] text-slate-400">Format Resmi .docx</span></div>
-                </a>
-              </div>
-            </div>
             <button onclick="openModal('modalAddQuestionManual')" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition flex items-center gap-2">
               <i class="fa-solid fa-pen-to-square text-blue-400"></i> Tambah Soal Manual
             </button>
@@ -2660,6 +2643,142 @@
   </div>
 
   <!-- ==================== MODAL 1: UPLOAD / IMPORT SOAL (WORD .DOCX / .DOC / EXCEL) ==================== -->
+  
+  <!-- ============================================================== -->
+  <!-- MODAL: EXPORT NASKAH SOAL KE WORD (.DOCX / .DOC) -->
+  <!-- ============================================================== -->
+  <div id="modalExportWord" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto custom-scrollbar">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center justify-center">
+            <i class="fa-solid fa-file-word text-lg"></i>
+          </div>
+          <div>
+            <h4 class="text-sm font-bold text-white">Export Naskah Soal ke Microsoft Word</h4>
+            <p class="text-[11px] text-slate-400">Pilih profil naskah, kelengkapan (kunci, pembahasan, kop), & format dokumen.</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modalExportWord')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <!-- PILIHAN PROFIL NASKAH CEPAT -->
+      <div class="space-y-2">
+        <label class="block text-xs font-bold text-slate-300">Pilih Profil Dokumen:</label>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <!-- Preset 1: Guru Lengkap -->
+          <div id="presetCard_teacher" onclick="setExportWordPreset('teacher')" class="p-3 rounded-xl border border-indigo-500 bg-indigo-950/40 cursor-pointer hover:border-indigo-400 transition flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <i class="fa-solid fa-graduation-cap text-emerald-400 text-sm"></i>
+                <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-semibold">Master</span>
+              </div>
+              <strong class="text-xs text-white block">Guru Lengkap</strong>
+              <p class="text-[10px] text-slate-400 mt-1 leading-tight">Kunci & pembahasan lengkap disertakan.</p>
+            </div>
+          </div>
+
+          <!-- Preset 2: Guru Ringkas (Kunci Saja, Tanpa Pembahasan) -->
+          <div id="presetCard_teacher_compact" onclick="setExportWordPreset('teacher_compact')" class="p-3 rounded-xl border border-slate-800 bg-slate-950/40 cursor-pointer hover:border-indigo-400 transition flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <i class="fa-solid fa-key text-amber-400 text-sm"></i>
+                <span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-semibold">Ringkas</span>
+              </div>
+              <strong class="text-xs text-white block">Kunci Saja</strong>
+              <p class="text-[10px] text-slate-400 mt-1 leading-tight">Kunci jawaban ADA, pembahasan DIHILANGKAN.</p>
+            </div>
+          </div>
+
+          <!-- Preset 3: Siswa (Tanpa Kunci) -->
+          <div id="presetCard_student" onclick="setExportWordPreset('student')" class="p-3 rounded-xl border border-slate-800 bg-slate-950/40 cursor-pointer hover:border-indigo-400 transition flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <i class="fa-solid fa-print text-indigo-400 text-sm"></i>
+                <span class="text-[9px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded font-semibold">Ujian</span>
+              </div>
+              <strong class="text-xs text-white block">Naskah Siswa</strong>
+              <p class="text-[10px] text-slate-400 mt-1 leading-tight">Siap cetak ujian kertas (tanpa kunci & pembahasan).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KUSTOMISASI KONTEN (CHECKBOXES) -->
+      <div class="p-3.5 bg-slate-950/70 border border-slate-800 rounded-xl space-y-2.5">
+        <label class="block text-xs font-bold text-slate-300">Sesuaikan Kelengkapan Soal:</label>
+        
+        <label class="flex items-start gap-2.5 cursor-pointer">
+          <input type="checkbox" id="exportWordIncludeKeys" onchange="onExportKeysToggled()" checked class="mt-0.5 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-0">
+          <div class="text-xs">
+            <span class="text-slate-200 font-semibold block">Sertakan Kunci Jawaban</span>
+            <span class="text-[11px] text-slate-400">Menampilkan baris KUNCI JAWABAN untuk seluruh butir soal (PG, B/S, Menjodohkan, Esai).</span>
+          </div>
+        </label>
+
+        <label class="flex items-start gap-2.5 cursor-pointer">
+          <input type="checkbox" id="exportWordIncludeExpl" checked class="mt-0.5 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-0">
+          <div class="text-xs">
+            <span class="text-slate-200 font-semibold block">Sertakan Pembahasan Soal</span>
+            <span class="text-[11px] text-slate-400">Hilangkan centang jika Anda tidak ingin pembahasan dimasukkan ke dalam format Word.</span>
+          </div>
+        </label>
+
+        <label class="flex items-start gap-2.5 cursor-pointer">
+          <input type="checkbox" id="exportWordIncludeHeader" checked class="mt-0.5 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-0">
+          <div class="text-xs">
+            <span class="text-slate-200 font-semibold block">Sertakan Kop Sekolah & Informasi Asesmen</span>
+            <span class="text-[11px] text-slate-400">Menyertakan kop sekolah, nama mapel, kelas, dan nama guru pengampu.</span>
+          </div>
+        </label>
+      </div>
+
+      <!-- FORMAT BERKAS -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-bold text-slate-300">Format Berkas:</label>
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <label class="flex items-center gap-2 p-2.5 rounded-xl border border-indigo-500/40 bg-indigo-950/20 cursor-pointer">
+            <input type="radio" name="exportWordFormat" value="docx" checked class="text-indigo-600 bg-slate-900 border-slate-700 focus:ring-0">
+            <div>
+              <strong class="text-white block font-semibold">Microsoft Word (.docx)</strong>
+              <span class="text-[10px] text-slate-400">Word 2007+, Office 365, Google Docs</span>
+            </div>
+          </label>
+          <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-800 bg-slate-950/40 cursor-pointer">
+            <input type="radio" name="exportWordFormat" value="doc" class="text-indigo-600 bg-slate-900 border-slate-700 focus:ring-0">
+            <div>
+              <strong class="text-white block font-semibold">Word Dokumen (.doc)</strong>
+              <span class="text-[10px] text-slate-400">Kompatibilitas Word Lawas / HTML</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- LINK TEMPLATE DOWNLOAD -->
+      <div class="flex items-center justify-between p-2.5 bg-slate-800/50 border border-slate-700/60 rounded-xl text-xs">
+        <div class="flex items-center gap-2 text-slate-300">
+          <i class="fa-solid fa-file-arrow-down text-amber-400"></i>
+          <span>Perlu berkas template untuk membuat soal baru?</span>
+        </div>
+        <a href="/api/v1/cbt/question-banks/template-word?format=docx" download class="text-indigo-400 hover:text-indigo-300 font-semibold underline text-[11px]">
+          Unduh Template (.docx)
+        </a>
+      </div>
+
+      <!-- FOOTER BUTTONS -->
+      <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+        <button type="button" onclick="closeModal('modalExportWord')" class="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-700 transition">
+          Batal
+        </button>
+        <button type="button" id="btnDoExportWord" onclick="submitExportWord()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-xs font-bold text-white transition shadow-lg shadow-blue-600/30 flex items-center gap-2">
+          <i class="fa-solid fa-download"></i>
+          <span>Unduh Berkas Word</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
   <div id="modalUploadSoal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4">
       <div class="flex items-center justify-between pb-3 border-b border-slate-800">
@@ -5225,15 +5344,75 @@
       openModal("modalUploadSoal");
     };
 
-    window.exportActiveBankWord = function(mode = "teacher", format = "docx") {
+    window.openExportWordModal = function() {
+      setExportWordPreset('teacher');
+      openModal('modalExportWord');
+    };
+
+    window.setExportWordPreset = function(preset) {
+      const chkKeys = document.getElementById("exportWordIncludeKeys");
+      const chkExpl = document.getElementById("exportWordIncludeExpl");
+      const chkHeader = document.getElementById("exportWordIncludeHeader");
+
+      ['teacher', 'teacher_compact', 'student'].forEach(p => {
+        const el = document.getElementById("presetCard_" + p);
+        if (el) {
+          if (p === preset) {
+            el.className = "p-3 rounded-xl border border-indigo-500 bg-indigo-950/40 cursor-pointer hover:border-indigo-400 transition flex flex-col justify-between";
+          } else {
+            el.className = "p-3 rounded-xl border border-slate-800 bg-slate-950/40 cursor-pointer hover:border-indigo-400 transition flex flex-col justify-between";
+          }
+        }
+      });
+
+      if (preset === 'teacher') {
+        if (chkKeys) chkKeys.checked = true;
+        if (chkExpl) { chkExpl.checked = true; chkExpl.disabled = false; }
+      } else if (preset === 'teacher_compact') {
+        if (chkKeys) chkKeys.checked = true;
+        if (chkExpl) { chkExpl.checked = false; chkExpl.disabled = false; }
+      } else if (preset === 'student') {
+        if (chkKeys) chkKeys.checked = false;
+        if (chkExpl) { chkExpl.checked = false; chkExpl.disabled = true; }
+      }
+      if (chkHeader) chkHeader.checked = true;
+    };
+
+    window.onExportKeysToggled = function() {
+      const chkKeys = document.getElementById("exportWordIncludeKeys");
+      const chkExpl = document.getElementById("exportWordIncludeExpl");
+      if (chkExpl) {
+        if (!chkKeys.checked) {
+          chkExpl.checked = false;
+          chkExpl.disabled = true;
+        } else {
+          chkExpl.disabled = false;
+        }
+      }
+    };
+
+    window.submitExportWord = function() {
       const bankId = currentActiveBankId || 1;
-      const downloadUrl = `/api/v1/cbt/question-banks/${bankId}/export-word?mode=${mode}&format=${format}`;
+      const chkKeys = document.getElementById("exportWordIncludeKeys")?.checked ?? true;
+      const chkExpl = document.getElementById("exportWordIncludeExpl")?.checked ?? true;
+      const chkHeader = document.getElementById("exportWordIncludeHeader")?.checked ?? true;
+      const format = document.querySelector('input[name="exportWordFormat"]:checked')?.value || 'docx';
+
+      const mode = (!chkKeys) ? 'student' : (!chkExpl ? 'teacher_compact' : 'teacher');
+      const downloadUrl = `/api/v1/cbt/question-banks/${bankId}/export-word?mode=${mode}&include_keys=${chkKeys ? 1 : 0}&include_expl=${chkExpl ? 1 : 0}&include_header=${chkHeader ? 1 : 0}&format=${format}`;
+
       const a = document.createElement("a");
       a.href = downloadUrl;
       a.download = "";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+
+      closeModal('modalExportWord');
+    };
+
+    window.exportActiveBankWord = function(mode = "teacher", format = "docx") {
+      openExportWordModal();
     };
 
     window.handleWordFileChosen = function(input) {

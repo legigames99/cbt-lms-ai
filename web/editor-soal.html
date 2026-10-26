@@ -489,78 +489,78 @@
             <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 rounded-lg">1 Kunci Benar</span>
           </div>
 
-          <div class="space-y-2.5 text-xs">
+          <div class="space-y-3 text-xs">
             <!-- Opsi A -->
-            <div class="flex items-start gap-2.5 p-2 bg-slate-950/80 rounded-xl border border-slate-800/80">
+            <div class="flex items-start gap-3 p-3 bg-slate-950/80 rounded-xl border border-slate-800/80">
               <label class="flex items-center gap-1.5 pt-2 cursor-pointer">
                 <input type="radio" name="mcqCorrectKey" value="A" checked onchange="updateLivePreview()" class="w-4 h-4 text-indigo-600 bg-slate-900 border-slate-700 focus:ring-indigo-500">
-                <span class="w-6 h-6 rounded-lg bg-indigo-600/20 text-indigo-300 font-bold flex items-center justify-center">A</span>
+                <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-300 font-bold flex items-center justify-center text-xs">A</span>
               </label>
-              <div class="flex-1 space-y-1">
-                <textarea id="mcqOptA" rows="1" oninput="updateLivePreview()" placeholder="Teks opsi jawaban A..." class="w-full bg-slate-900 border border-slate-700/80 rounded-lg p-2 text-white text-xs focus:border-indigo-500"></textarea>
+              <div class="flex-1 space-y-1.5">
+                <textarea id="mcqOptA" rows="3" oninput="autoResizeTextarea(this); updateLivePreview();" placeholder="Teks opsi jawaban A (bisa beberapa baris / penjelasan panjang)..." class="w-full bg-slate-900 border border-slate-700/80 rounded-xl p-3 text-white text-xs sm:text-sm leading-relaxed min-h-[76px] resize-y custom-scrollbar focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition"></textarea>
                 <div class="flex items-center gap-2 text-[11px]">
                   <input type="file" id="fileOptA" accept="image/*" class="hidden" onchange="uploadOptionImage(event, 'mcqOptA')">
-                  <button type="button" onclick="document.getElementById('fileOptA').click()" class="text-slate-400 hover:text-cyan-400 transition flex items-center gap-1"><i class="fa-regular fa-image"></i> Sisipkan Gambar Opsi</button>
+                  <button type="button" onclick="document.getElementById('fileOptA').click()" class="text-slate-400 hover:text-cyan-400 transition flex items-center gap-1"><i class="fa-regular fa-image"></i> Sisipkan Gambar Opsi A</button>
                 </div>
               </div>
             </div>
 
             <!-- Opsi B -->
-            <div class="flex items-start gap-2.5 p-2 bg-slate-950/80 rounded-xl border border-slate-800/80">
+            <div class="flex items-start gap-3 p-3 bg-slate-950/80 rounded-xl border border-slate-800/80">
               <label class="flex items-center gap-1.5 pt-2 cursor-pointer">
                 <input type="radio" name="mcqCorrectKey" value="B" onchange="updateLivePreview()" class="w-4 h-4 text-indigo-600 bg-slate-900 border-slate-700 focus:ring-indigo-500">
-                <span class="w-6 h-6 rounded-lg bg-indigo-600/20 text-indigo-300 font-bold flex items-center justify-center">B</span>
+                <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-300 font-bold flex items-center justify-center text-xs">B</span>
               </label>
-              <div class="flex-1 space-y-1">
-                <textarea id="mcqOptB" rows="1" oninput="updateLivePreview()" placeholder="Teks opsi jawaban B..." class="w-full bg-slate-900 border border-slate-700/80 rounded-lg p-2 text-white text-xs focus:border-indigo-500"></textarea>
+              <div class="flex-1 space-y-1.5">
+                <textarea id="mcqOptB" rows="3" oninput="autoResizeTextarea(this); updateLivePreview();" placeholder="Teks opsi jawaban B (bisa beberapa baris / penjelasan panjang)..." class="w-full bg-slate-900 border border-slate-700/80 rounded-xl p-3 text-white text-xs sm:text-sm leading-relaxed min-h-[76px] resize-y custom-scrollbar focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition"></textarea>
                 <div class="flex items-center gap-2 text-[11px]">
                   <input type="file" id="fileOptB" accept="image/*" class="hidden" onchange="uploadOptionImage(event, 'mcqOptB')">
-                  <button type="button" onclick="document.getElementById('fileOptB').click()" class="text-slate-400 hover:text-cyan-400 transition flex items-center gap-1"><i class="fa-regular fa-image"></i> Sisipkan Gambar Opsi</button>
+                  <button type="button" onclick="document.getElementById('fileOptB').click()" class="text-slate-400 hover:text-cyan-400 transition flex items-center gap-1"><i class="fa-regular fa-image"></i> Sisipkan Gambar Opsi B</button>
                 </div>
               </div>
             </div>
 
             <!-- Opsi C -->
-            <div class="flex items-start gap-2.5 p-2 bg-slate-950/80 rounded-xl border border-slate-800/80">
+            <div class="flex items-start gap-3 p-3 bg-slate-950/80 rounded-xl border border-slate-800/80">
               <label class="flex items-center gap-1.5 pt-2 cursor-pointer">
                 <input type="radio" name="mcqCorrectKey" value="C" onchange="updateLivePreview()" class="w-4 h-4 text-indigo-600 bg-slate-900 border-slate-700 focus:ring-indigo-500">
-                <span class="w-6 h-6 rounded-lg bg-indigo-600/20 text-indigo-300 font-bold flex items-center justify-center">C</span>
+                <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-300 font-bold flex items-center justify-center text-xs">C</span>
               </label>
-              <div class="flex-1 space-y-1">
-                <textarea id="mcqOptC" rows="1" oninput="updateLivePreview()" placeholder="Teks opsi jawaban C..." class="w-full bg-slate-900 border border-slate-700/80 rounded-lg p-2 text-white text-xs focus:border-indigo-500"></textarea>
+              <div class="flex-1 space-y-1.5">
+                <textarea id="mcqOptC" rows="3" oninput="autoResizeTextarea(this); updateLivePreview();" placeholder="Teks opsi jawaban C (bisa beberapa baris / penjelasan panjang)..." class="w-full bg-slate-900 border border-slate-700/80 rounded-xl p-3 text-white text-xs sm:text-sm leading-relaxed min-h-[76px] resize-y custom-scrollbar focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition"></textarea>
                 <div class="flex items-center gap-2 text-[11px]">
                   <input type="file" id="fileOptC" accept="image/*" class="hidden" onchange="uploadOptionImage(event, 'mcqOptC')">
-                  <button type="button" onclick="document.getElementById('fileOptC').click()" class="text-slate-400 hover:text-cyan-400 transition flex items-center gap-1"><i class="fa-regular fa-image"></i> Sisipkan Gambar Opsi</button>
+                  <button type="button" onclick="document.getElementById('fileOptC').click()" class="text-slate-400 hover:text-cyan-400 transition flex items-center gap-1"><i class="fa-regular fa-image"></i> Sisipkan Gambar Opsi C</button>
                 </div>
               </div>
             </div>
 
             <!-- Opsi D -->
-            <div class="flex items-start gap-2.5 p-2 bg-slate-950/80 rounded-xl border border-slate-800/80">
+            <div class="flex items-start gap-3 p-3 bg-slate-950/80 rounded-xl border border-slate-800/80">
               <label class="flex items-center gap-1.5 pt-2 cursor-pointer">
                 <input type="radio" name="mcqCorrectKey" value="D" onchange="updateLivePreview()" class="w-4 h-4 text-indigo-600 bg-slate-900 border-slate-700 focus:ring-indigo-500">
-                <span class="w-6 h-6 rounded-lg bg-indigo-600/20 text-indigo-300 font-bold flex items-center justify-center">D</span>
+                <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-300 font-bold flex items-center justify-center text-xs">D</span>
               </label>
-              <div class="flex-1 space-y-1">
-                <textarea id="mcqOptD" rows="1" oninput="updateLivePreview()" placeholder="Teks opsi jawaban D..." class="w-full bg-slate-900 border border-slate-700/80 rounded-lg p-2 text-white text-xs focus:border-indigo-500"></textarea>
+              <div class="flex-1 space-y-1.5">
+                <textarea id="mcqOptD" rows="3" oninput="autoResizeTextarea(this); updateLivePreview();" placeholder="Teks opsi jawaban D (bisa beberapa baris / penjelasan panjang)..." class="w-full bg-slate-900 border border-slate-700/80 rounded-xl p-3 text-white text-xs sm:text-sm leading-relaxed min-h-[76px] resize-y custom-scrollbar focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition"></textarea>
                 <div class="flex items-center gap-2 text-[11px]">
                   <input type="file" id="fileOptD" accept="image/*" class="hidden" onchange="uploadOptionImage(event, 'mcqOptD')">
-                  <button type="button" onclick="document.getElementById('fileOptD').click()" class="text-slate-400 hover:text-cyan-400 transition flex items-center gap-1"><i class="fa-regular fa-image"></i> Sisipkan Gambar Opsi</button>
+                  <button type="button" onclick="document.getElementById('fileOptD').click()" class="text-slate-400 hover:text-cyan-400 transition flex items-center gap-1"><i class="fa-regular fa-image"></i> Sisipkan Gambar Opsi D</button>
                 </div>
               </div>
             </div>
 
             <!-- Opsi E -->
-            <div class="flex items-start gap-2.5 p-2 bg-slate-950/80 rounded-xl border border-slate-800/80">
+            <div class="flex items-start gap-3 p-3 bg-slate-950/80 rounded-xl border border-slate-800/80">
               <label class="flex items-center gap-1.5 pt-2 cursor-pointer">
                 <input type="radio" name="mcqCorrectKey" value="E" onchange="updateLivePreview()" class="w-4 h-4 text-indigo-600 bg-slate-900 border-slate-700 focus:ring-indigo-500">
-                <span class="w-6 h-6 rounded-lg bg-indigo-600/20 text-indigo-300 font-bold flex items-center justify-center">E</span>
+                <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-300 font-bold flex items-center justify-center text-xs">E</span>
               </label>
-              <div class="flex-1 space-y-1">
-                <textarea id="mcqOptE" rows="1" oninput="updateLivePreview()" placeholder="Teks opsi jawaban E..." class="w-full bg-slate-900 border border-slate-700/80 rounded-lg p-2 text-white text-xs focus:border-indigo-500"></textarea>
+              <div class="flex-1 space-y-1.5">
+                <textarea id="mcqOptE" rows="3" oninput="autoResizeTextarea(this); updateLivePreview();" placeholder="Teks opsi jawaban E (bisa beberapa baris / penjelasan panjang)..." class="w-full bg-slate-900 border border-slate-700/80 rounded-xl p-3 text-white text-xs sm:text-sm leading-relaxed min-h-[76px] resize-y custom-scrollbar focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition"></textarea>
                 <div class="flex items-center gap-2 text-[11px]">
                   <input type="file" id="fileOptE" accept="image/*" class="hidden" onchange="uploadOptionImage(event, 'mcqOptE')">
-                  <button type="button" onclick="document.getElementById('fileOptE').click()" class="text-slate-400 hover:text-cyan-400 transition flex items-center gap-1"><i class="fa-regular fa-image"></i> Sisipkan Gambar Opsi</button>
+                  <button type="button" onclick="document.getElementById('fileOptE').click()" class="text-slate-400 hover:text-cyan-400 transition flex items-center gap-1"><i class="fa-regular fa-image"></i> Sisipkan Gambar Opsi E</button>
                 </div>
               </div>
             </div>
@@ -691,7 +691,7 @@
           </div>
         </div>
 
-        <textarea id="inputExplanation" rows="3" oninput="updateLivePreview()" placeholder="Tuliskan pembahasan ilmiah detail mengapa kunci jawaban tersebut benar dan alternatif lain salah..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white text-xs leading-relaxed focus:border-indigo-500"></textarea>
+        <textarea id="inputExplanation" rows="3" oninput="autoResizeTextarea(this); updateLivePreview()" placeholder="Tuliskan pembahasan ilmiah detail mengapa kunci jawaban tersebut benar dan alternatif lain salah..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white text-xs sm:text-sm leading-relaxed min-h-[85px] resize-y custom-scrollbar focus:border-indigo-500 transition"></textarea>
       </div>
 
     </div>
@@ -777,6 +777,7 @@
       setupPasteListener();
       switchToolbarTab('normal');
       initEditorHistory();
+      autoResizeAllOptionTextareas();
       await fetchAllBanks();
     });
 
@@ -976,21 +977,22 @@
         document.getElementById('inputEssayKeywords').value = rawKws;
       }
 
+      autoResizeAllOptionTextareas();
       updateLivePreview();
     }
 
-    // 6. Inisialisasi Kompleks Opsi A-E
+    // 6. Inisialisasi Kompleks Opsi A-E (Tinggi kotak lega untuk teks panjang)
     function initializeComplexOptions() {
       const container = document.getElementById('complexOptionsContainer');
       const letters = ['A', 'B', 'C', 'D', 'E'];
       container.innerHTML = letters.map(letter => `
-        <div class="flex items-start gap-2.5 p-2 bg-slate-950/80 rounded-xl border border-slate-800/80">
+        <div class="flex items-start gap-3 p-3 bg-slate-950/80 rounded-xl border border-slate-800/80">
           <label class="flex items-center gap-1.5 pt-2 cursor-pointer">
             <input type="checkbox" id="complexOptCheck_${letter}" onchange="updateLivePreview()" class="w-4 h-4 text-purple-600 bg-slate-900 border-slate-700 rounded focus:ring-purple-500">
-            <span class="w-6 h-6 rounded-lg bg-purple-600/20 text-purple-300 font-bold flex items-center justify-center">${letter}</span>
+            <span class="w-7 h-7 rounded-lg bg-purple-600/20 text-purple-300 font-bold flex items-center justify-center text-xs">${letter}</span>
           </label>
-          <div class="flex-1 space-y-1">
-            <textarea id="complexOptText_${letter}" rows="1" oninput="updateLivePreview()" placeholder="Pernyataan / opsi ${letter}..." class="w-full bg-slate-900 border border-slate-700/80 rounded-lg p-2 text-white text-xs focus:border-purple-500"></textarea>
+          <div class="flex-1 space-y-1.5">
+            <textarea id="complexOptText_${letter}" rows="3" oninput="autoResizeTextarea(this); updateLivePreview();" placeholder="Pernyataan / opsi ${letter} (bisa beberapa baris / penjelasan panjang)..." class="w-full bg-slate-900 border border-slate-700/80 rounded-xl p-3 text-white text-xs sm:text-sm leading-relaxed min-h-[76px] resize-y custom-scrollbar focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition"></textarea>
           </div>
         </div>
       `).join('');
@@ -1017,24 +1019,26 @@
       const container = document.getElementById('trueFalseContainer');
       const idx = container.children.length;
       const row = document.createElement('div');
-      row.className = 'flex items-center gap-2 p-2 bg-slate-950/80 border border-slate-800 rounded-xl';
+      row.className = 'flex items-start gap-2.5 p-2.5 bg-slate-950/80 border border-slate-800 rounded-xl';
       row.innerHTML = `
-        <span class="w-5 font-bold text-slate-400 font-mono text-center">${idx + 1}.</span>
-        <input type="text" class="tf-text flex-1 bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-white text-xs focus:border-amber-500" placeholder="Pernyataan yang dievaluasi..." oninput="updateLivePreview()">
-        <div class="flex items-center gap-1 shrink-0">
-          <label class="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-xs cursor-pointer flex items-center gap-1">
+        <span class="w-6 font-bold text-slate-400 font-mono text-center pt-2.5 text-xs">${idx + 1}.</span>
+        <textarea rows="2" class="tf-text flex-1 bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 text-white text-xs sm:text-sm leading-relaxed min-h-[58px] resize-y focus:border-amber-500 transition custom-scrollbar" placeholder="Pernyataan yang dievaluasi (bisa beberapa baris)..." oninput="autoResizeTextarea(this); updateLivePreview()"></textarea>
+        <div class="flex items-center gap-1 shrink-0 pt-2">
+          <label class="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs cursor-pointer flex items-center gap-1.5 hover:border-emerald-500 transition">
             <input type="radio" name="tf_key_${idx}" value="B" ${key === 'B' ? 'checked' : ''} onchange="updateLivePreview()" class="text-emerald-500">
             <span class="text-emerald-400 font-bold">B</span>
           </label>
-          <label class="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-xs cursor-pointer flex items-center gap-1">
+          <label class="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs cursor-pointer flex items-center gap-1.5 hover:border-rose-500 transition">
             <input type="radio" name="tf_key_${idx}" value="S" ${key === 'S' ? 'checked' : ''} onchange="updateLivePreview()" class="text-rose-500">
             <span class="text-rose-400 font-bold">S</span>
           </label>
         </div>
-        <button type="button" onclick="this.closest('.flex').remove(); updateLivePreview();" class="text-rose-400 hover:text-rose-300 px-2 py-1" title="Hapus Baris"><i class="fa-solid fa-xmark"></i></button>
+        <button type="button" onclick="this.closest('.flex').remove(); updateLivePreview();" class="text-rose-400 hover:text-rose-300 p-2 pt-2.5" title="Hapus Baris"><i class="fa-solid fa-xmark"></i></button>
       `;
-      row.querySelector('.tf-text').value = text;
+      const tfText = row.querySelector('.tf-text');
+      tfText.value = text;
       container.appendChild(row);
+      autoResizeTextarea(tfText);
       updateLivePreview();
     }
 
@@ -1043,19 +1047,41 @@
       const idx = container.children.length;
       const targetLetter = String.fromCharCode(65 + idx);
       const row = document.createElement('div');
-      row.className = 'flex items-center gap-2 p-2 bg-slate-950/80 border border-slate-800 rounded-xl';
+      row.className = 'flex items-start gap-2.5 p-2.5 bg-slate-950/80 border border-slate-800 rounded-xl';
       row.innerHTML = `
-        <span class="w-5 font-bold text-slate-400 font-mono text-center">${idx + 1}.</span>
-        <input type="text" class="match-left flex-1 bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-white text-xs focus:border-cyan-500" placeholder="Premis di sebelah kiri..." oninput="updateLivePreview()">
-        <span class="text-cyan-400 font-bold">&rarr;</span>
-        <span class="text-cyan-300 font-bold font-mono text-xs">${targetLetter}.</span>
-        <input type="text" class="match-right flex-1 bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-white text-xs focus:border-cyan-500" placeholder="Pilihan di sebelah kanan (${targetLetter})..." oninput="updateLivePreview()">
-        <button type="button" onclick="this.closest('.flex').remove(); updateLivePreview();" class="text-rose-400 hover:text-rose-300 px-2 py-1" title="Hapus Baris"><i class="fa-solid fa-xmark"></i></button>
+        <span class="w-6 font-bold text-slate-400 font-mono text-center pt-2.5 text-xs">${idx + 1}.</span>
+        <textarea rows="2" class="match-left flex-1 bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 text-white text-xs sm:text-sm leading-relaxed min-h-[58px] resize-y focus:border-cyan-500 transition custom-scrollbar" placeholder="Premis di sebelah kiri..." oninput="autoResizeTextarea(this); updateLivePreview()"></textarea>
+        <span class="text-cyan-400 font-bold pt-3">&rarr;</span>
+        <span class="text-cyan-300 font-bold font-mono text-xs pt-3">${targetLetter}.</span>
+        <textarea rows="2" class="match-right flex-1 bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 text-white text-xs sm:text-sm leading-relaxed min-h-[58px] resize-y focus:border-cyan-500 transition custom-scrollbar" placeholder="Pilihan di sebelah kanan (${targetLetter})..." oninput="autoResizeTextarea(this); updateLivePreview()"></textarea>
+        <button type="button" onclick="this.closest('.flex').remove(); updateLivePreview();" class="text-rose-400 hover:text-rose-300 p-2 pt-2.5" title="Hapus Baris"><i class="fa-solid fa-xmark"></i></button>
       `;
-      row.querySelector('.match-left').value = left;
-      row.querySelector('.match-right').value = right;
+      const matchL = row.querySelector('.match-left');
+      const matchR = row.querySelector('.match-right');
+      matchL.value = left;
+      matchR.value = right;
       container.appendChild(row);
+      autoResizeTextarea(matchL);
+      autoResizeTextarea(matchR);
       updateLivePreview();
+    }
+
+    // Auto-Resize Helper untuk semua kotak opsi jawaban
+    function autoResizeTextarea(el) {
+      if (!el) return;
+      el.style.height = 'auto';
+      const minH = parseInt(window.getComputedStyle(el).minHeight, 10) || 58;
+      el.style.height = Math.max(minH, el.scrollHeight + 2) + 'px';
+    }
+
+    function autoResizeAllOptionTextareas() {
+      ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+        const mcqEl = document.getElementById(`mcqOpt${letter}`);
+        if (mcqEl) autoResizeTextarea(mcqEl);
+        const compEl = document.getElementById(`complexOptText_${letter}`);
+        if (compEl) autoResizeTextarea(compEl);
+      });
+      document.querySelectorAll('.tf-text, .match-left, .match-right').forEach(el => autoResizeTextarea(el));
     }
 
     // 8. Penggantian Tipe Soal

@@ -12435,7 +12435,6 @@
       const getVal = (id, fallback) => (document.getElementById(id)?.value || fallback || '').trim();
       const rawExamDate = getVal('baExamDate', att.exam_date || 'Senin, 26 Oktober 2026');
       
-      // Pisahkan Hari dan Tanggal bila format "Senin, 26 Oktober 2026"
       let dayName = 'Senin';
       let dateStr = '26 Oktober 2026';
       if (rawExamDate.includes(',')) {
@@ -12461,7 +12460,6 @@
       const present = students.filter(s => s.status === 'hadir').length;
       const absent = students.filter(s => s.status === 'tidak_hadir').length;
 
-      // Data Identitas Sekolah & Wilayah dari Pengaturan
       const cityName = (sp.city || 'KOTA BANDUNG').toUpperCase();
       const schoolName = (sp.name || 'SMKN 5 BANDUNG').toUpperCase();
       const cityCode = '01';
@@ -12469,12 +12467,11 @@
       const serverId = (students[0]?.server || 'K02010105-AJ6K');
       const logoUrl = sp.logo_url || '/static/uploads/logo_sekolah_1792567623623.png';
 
-      // Judul Asesmen
       const assessmentTitle = (sch.title || sp.exam_title_2 || 'TES KEMAMPUAN AKADEMIK SMK').toUpperCase();
       const examYear = (sp.academic_year ? sp.academic_year.split('/')[0] : '2026');
 
       container.innerHTML = `
-        <div class="official-a4-page" style="border: 2px solid #000; padding: 18px 24px; min-height: 980px; box-sizing: border-box; background: #ffffff; color: #000; font-family: Arial, Helvetica, sans-serif; line-height: 1.35;">
+        <div class="official-a4-page" style="border: 2px solid #000; padding: 18px 24px; min-height: 980px; box-sizing: border-box; background: #ffffff; color: #000000; font-family: Arial, Helvetica, sans-serif; line-height: 1.35;">
           <!-- HEADER KOP & JUDUL DAFTAR HADIR -->
           <table style="width: 100%; border-collapse: collapse; border: none; margin-bottom: 8px;">
             <tr>
@@ -12482,21 +12479,21 @@
                 <img src="${logoUrl}" style="width: 68px; height: 68px; object-fit: contain;" alt="Logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/9/9c/Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg'">
               </td>
               <td style="vertical-align: top; text-align: center; border: none; padding-right: 75px;">
-                <div style="font-size: 15px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: #000;">
+                <div style="font-size: 15px; font-weight: bold; letter-spacing: 0.5px; text-transform: uppercase; color: #000000;">
                   DAFTAR HADIR PESERTA
                 </div>
-                <div style="font-size: 14px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: #000; margin-top: 1px;">
+                <div style="font-size: 14px; font-weight: bold; letter-spacing: 0.5px; text-transform: uppercase; color: #000000; margin-top: 1px;">
                   ${assessmentTitle}
                 </div>
-                <div style="font-size: 14px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: #000; margin-top: 1px;">
+                <div style="font-size: 14px; font-weight: bold; letter-spacing: 0.5px; text-transform: uppercase; color: #000000; margin-top: 1px;">
                   TAHUN ${examYear}
                 </div>
               </td>
             </tr>
           </table>
 
-          <!-- GRID IDENTITAS UJIAN BERGARIS BAWAH HITAM (PERSIS CONTOH GAMBAR) -->
-          <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; font-weight: bold; margin-bottom: 12px; color: #000;">
+          <!-- GRID IDENTITAS UJIAN BERGARIS BAWAH HITAM -->
+          <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; font-weight: bold; margin-bottom: 12px; color: #000000;">
             <tr>
               <td style="width: 135px; padding: 2.5px 0;">KOTA/KABUPATEN</td>
               <td style="width: 12px; padding: 2.5px 0;">:</td>
@@ -12549,8 +12546,8 @@
             </tr>
           </table>
 
-          <!-- TABEL DAFTAR HADIR (HEADER KHAKI #dcd6c0, ZIG-ZAG 1... / ...2 & STATUS KEHADIRAN) -->
-          <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; border: 1.5px solid #000; color: #000;">
+          <!-- TABEL DAFTAR HADIR -->
+          <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; border: 1.5px solid #000; color: #000000;">
             <thead>
               <tr style="background-color: #dcd6c0; font-weight: bold; text-align: center; height: 26px;">
                 <th style="border: 1px solid #000; width: 34px; padding: 4px;">No.</th>
@@ -12568,32 +12565,26 @@
                 const unameDisplay = st.exam_no || st.username || ('K02010105' + String(st.id).padStart(5, '0'));
 
                 return `
-                  <tr style="height: 25px; background: ${isPresent ? '#ffffff' : '#fef2f2'};">
+                  <tr style="height: 25px; background: #ffffff;">
                     <td style="border: 1px solid #000; text-align: center;">${num}</td>
-                    <td style="border: 1px solid #000; padding: 2px 6px; font-family: Arial, sans-serif;">${unameDisplay}</td>
-                    <td style="border: 1px solid #000; padding: 2px 8px; font-weight: 600; text-transform: uppercase;">
-                      ${isPresent ? st.full_name : `<span style="text-decoration: line-through; color: #b91c1c;">${st.full_name}</span>`}
+                    <td style="border: 1px solid #000; padding: 2px 6px;">${unameDisplay}</td>
+                    <td style="border: 1px solid #000; padding: 2px 8px; font-weight: normal; text-transform: uppercase;">
+                      ${st.full_name}
                     </td>
                     <td style="border: 1px solid #000; padding: 2px 10px; vertical-align: middle;">
-                      ${isPresent ? (
-                        !isEven ? `
-                          <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <span style="font-weight: bold;">${num}.</span>
-                            <span style="font-size: 9.5px; color: #15803d; font-weight: 700; background: #dcfce7; padding: 1px 6px; border-radius: 4px;">Hadir</span>
-                          </div>
-                        ` : `
-                          <div style="display: flex; align-items: center; justify-content: space-between; padding-left: 45%;">
-                            <span style="font-weight: bold;">${num}.</span>
-                            <span style="font-size: 9.5px; color: #15803d; font-weight: 700; background: #dcfce7; padding: 1px 6px; border-radius: 4px;">Hadir</span>
-                          </div>
-                        `
-                      ) : `
-                        <div style="text-align: center; font-weight: 800; font-size: 10px; color: #b91c1c; background: #fee2e2; padding: 2px 0; border: 1px dashed #ef4444; letter-spacing: 0.3px;">
-                          TIDAK HADIR (${(st.reason || 'ALPA').toUpperCase()})
+                      ${!isEven ? `
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                          <span style="font-weight: bold;">${num}.</span>
+                          <span style="font-size: 10.5px;">${isPresent ? 'Hadir' : 'Tidak Hadir'}</span>
+                        </div>
+                      ` : `
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding-left: 48%;">
+                          <span style="font-weight: bold;">${num}.</span>
+                          <span style="font-size: 10.5px;">${isPresent ? 'Hadir' : 'Tidak Hadir'}</span>
                         </div>
                       `}
                     </td>
-                    <td style="border: 1px solid #000; text-align: center; font-size: 10px; ${!isPresent ? 'color: #b91c1c; font-weight: bold;' : ''}">
+                    <td style="border: 1px solid #000; text-align: center; font-size: 10px;">
                       ${!isPresent ? (st.reason || 'Alpa') : ''}
                     </td>
                   </tr>
@@ -12603,7 +12594,7 @@
           </table>
 
           <!-- KETERANGAN BAWAH -->
-          <div style="font-size: 9.5px; margin-top: 6px; line-height: 1.4; color: #000;">
+          <div style="font-size: 9.5px; margin-top: 6px; line-height: 1.4; color: #000000;">
             <div style="font-weight: bold; font-style: italic;">Keterangan :</div>
             <div style="padding-left: 2px;">1. Dibuat rangkap 3 (tiga), masing-masing untuk sekolah, kota/kab dan Provinsi.</div>
             <div style="padding-left: 2px;">2. Pengawas ruang menyilang Nama Peserta yang tidak hadir.</div>
@@ -12611,11 +12602,11 @@
           </div>
 
           <!-- KOTAK REKAPITULASI (KIRI) & TANDA TANGAN (KANAN) -->
-          <table style="width: 100%; border-collapse: collapse; border: none; margin-top: 10px;">
+          <table style="width: 100%; border-collapse: collapse; border: none; margin-top: 10px; color: #000000;">
             <tr>
               <td style="width: 48%; vertical-align: top; border: none; padding: 0;">
                 <!-- Kotak Rekapitulasi -->
-                <table style="border: 1.5px solid #000; border-collapse: collapse; font-size: 10px; width: 100%; font-weight: bold; background: #fff;">
+                <table style="border: 1.5px solid #000; border-collapse: collapse; font-size: 10px; width: 100%; font-weight: bold; background: #fff; color: #000000;">
                   <tr>
                     <td style="padding: 3.5px 6px; border: none;">Jumlah Peserta yang Seharusnya Hadir</td>
                     <td style="padding: 3.5px 2px; border: none;">:</td>
@@ -12624,7 +12615,7 @@
                   <tr>
                     <td style="padding: 3.5px 6px; border: none;">Jumlah Peserta yang Tidak Hadir</td>
                     <td style="padding: 3.5px 2px; border: none;">:</td>
-                    <td style="padding: 3.5px 8px; border: none; text-align: right; text-decoration: underline; ${absent > 0 ? 'color: #b91c1c;' : ''}">${absent} peserta</td>
+                    <td style="padding: 3.5px 8px; border: none; text-align: right; text-decoration: underline;">${absent} peserta</td>
                   </tr>
                   <tr>
                     <td style="padding: 3.5px 6px; border: none;">Jumlah Peserta Hadir</td>
@@ -12638,7 +12629,7 @@
 
               <td style="width: 48%; vertical-align: top; border: none; padding: 0;">
                 <!-- Tanda Tangan Proktor & Pengawas -->
-                <table style="width: 100%; border-collapse: collapse; border: none; text-align: center; font-size: 10.5px; font-weight: bold;">
+                <table style="width: 100%; border-collapse: collapse; border: none; text-align: center; font-size: 10.5px; font-weight: bold; color: #000000;">
                   <tr>
                     <td style="width: 50%; padding-bottom: 45px; border: none;">Proktor</td>
                     <td style="width: 50%; padding-bottom: 45px; border: none;">Pengawas</td>
@@ -12660,10 +12651,10 @@
             </tr>
           </table>
 
-          <!-- FOOTER RESMI DENGAN KOTAK DI KIRI DAN KANAN (PERSIS CONTOH GAMBAR) -->
+          <!-- FOOTER RESMI DENGAN KOTAK DI KIRI DAN KANAN -->
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 22px;">
             <div style="width: 26px; height: 26px; border: 1.5px solid #000; flex-shrink: 0;"></div>
-            <div style="flex: 1; border: 1.5px solid #000; text-align: center; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; padding: 5px 0; text-transform: uppercase;">
+            <div style="flex: 1; border: 1.5px solid #000; text-align: center; font-size: 11px; font-weight: bold; letter-spacing: 0.5px; padding: 5px 0; text-transform: uppercase;">
               KEMENTERIAN PENDIDIKAN DASAR DAN MENENGAH
             </div>
             <div style="width: 26px; height: 26px; border: 1.5px solid #000; flex-shrink: 0;"></div>

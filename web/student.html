@@ -578,6 +578,16 @@
       }
     };
 
+    function renderFormattedQuestionText(str) {
+      if (!str) return '';
+      let s = str;
+      s = s.replace(/```(?:[a-zA-Z0-9_-]+)?\r?\n?([\s\S]*?)```/g, (m, code) => {
+        return `<pre class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-emerald-400 font-mono text-xs overflow-x-auto my-2"><code>${code.trim()}</code></pre>`;
+      });
+      s = s.replace(/`([^`\r\n]+)`/g, '<code class="bg-slate-950 text-amber-300 px-1.5 py-0.5 rounded border border-slate-800 font-mono text-xs">$1</code>');
+      return s;
+    }
+
     function renderCurrentQuestion() {
       if (!engine || !engine.questions || engine.questions.length === 0) return;
       const q = engine.questions[currentIndex];
@@ -590,7 +600,7 @@
 
       document.getElementById('currentQNumber').innerText = currentIndex + 1;
       document.getElementById('currentQCognitive').innerText = q.cog || 'C2';
-      document.getElementById('qStemHTML').innerHTML = q.stem || '';
+      document.getElementById('qStemHTML').innerHTML = renderFormattedQuestionText(q.stem || '');
 
       const saved = engine.answers[q.id];
       const selectedAns = saved ? saved.a : null;

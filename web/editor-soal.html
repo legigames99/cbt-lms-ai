@@ -261,8 +261,8 @@
             </div>
 
             <!-- Quick Beautifier & Cleaner -->
-            <button type="button" onclick="cleanRawBrTags()" class="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-[11px] font-semibold transition flex items-center gap-1.5 shadow-sm" title="Hapus tag <br><br> yang berantakan dan ubah menjadi enter/baris baru yang rapi">
-              <i class="fa-solid fa-broom text-amber-400"></i> Rapikan Format Teks
+            <button type="button" onclick="cleanRawBrTags()" class="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-[11px] font-semibold transition flex items-center gap-1.5 shadow-sm" title="Hapus tag <code>, <br>, <p> mentah dan jadikan format rapi bebas kode">
+              <i class="fa-solid fa-broom text-amber-400"></i> Bersihkan Tag HTML
             </button>
           </div>
 
@@ -273,10 +273,10 @@
               <span class="text-indigo-400 font-mono text-[10px]">Teks Standar & Narasi Soal</span>
             </div>
             <div class="flex flex-wrap items-center gap-1.5">
-              <button type="button" onclick="wrapText('<strong>', '</strong>')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 font-bold flex items-center gap-1" title="Tebal (Bold)"><i class="fa-solid fa-bold text-indigo-400"></i> Tebal</button>
-              <button type="button" onclick="wrapText('<em>', '</em>')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 italic flex items-center gap-1" title="Miring (Italic)"><i class="fa-solid fa-italic text-indigo-400"></i> Miring</button>
-              <button type="button" onclick="wrapText('<u>', '</u>')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 underline flex items-center gap-1" title="Garis Bawah (Underline)"><i class="fa-solid fa-underline text-indigo-400"></i> Garis Bawah</button>
-              <button type="button" onclick="wrapText('<s>', '</s>')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 line-through flex items-center gap-1" title="Coret (Strikethrough)"><i class="fa-solid fa-strikethrough text-slate-400"></i> Coret</button>
+              <button type="button" onclick="wrapText('**', '**')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 font-bold flex items-center gap-1" title="Tebal (**teks**)"><i class="fa-solid fa-bold text-indigo-400"></i> Tebal</button>
+              <button type="button" onclick="wrapText('*', '*')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 italic flex items-center gap-1" title="Miring (*teks*)"><i class="fa-solid fa-italic text-indigo-400"></i> Miring</button>
+              <button type="button" onclick="wrapText('<u>', '</u>')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 underline flex items-center gap-1" title="Garis Bawah (<u>teks</u>)"><i class="fa-solid fa-underline text-indigo-400"></i> Garis Bawah</button>
+              <button type="button" onclick="wrapText('~~', '~~')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 line-through flex items-center gap-1" title="Coret (~~teks~~)"><i class="fa-solid fa-strikethrough text-slate-400"></i> Coret</button>
               <button type="button" onclick="wrapText('<mark>', '</mark>')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-800 flex items-center gap-1" title="Sorot Kuning (Highlight)"><i class="fa-solid fa-highlighter text-amber-400"></i> Sorot Teks</button>
               <span class="w-px h-5 bg-slate-800 mx-1"></span>
               <button type="button" onclick="insertSnippet('\n\n')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1" title="Paragraf Baru (Enter 2x)"><i class="fa-solid fa-paragraph text-cyan-400"></i> Paragraf Baru</button>
@@ -295,12 +295,12 @@
               <span class="text-emerald-400 font-mono text-[10px]">SMK TI / TKJ / Server</span>
             </div>
             <div class="flex flex-wrap items-center gap-1.5">
-              <button type="button" onclick="wrapText('<code>', '</code>')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-800 font-mono flex items-center gap-1" title="Perintah Singkat (Inline Code)"><i class="fa-solid fa-code text-amber-400"></i> Tag &lt;code&gt;</button>
-              <button type="button" onclick="insertSnippet('<code>sudo tail -f /var/log/auth.log</code>')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-slate-800 font-mono flex items-center gap-1" title="Perintah Linux Terminal"><i class="fa-brands fa-linux text-cyan-400"></i> Perintah CLI</button>
-              <button type="button" onclick="insertSnippet('<code>/etc/ssh/sshd_config</code>')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-slate-800 font-mono flex items-center gap-1" title="File Konfigurasi Server"><i class="fa-regular fa-file-code text-cyan-400"></i> File Konfigurasi</button>
+              <button type="button" onclick="wrapText('`', '`')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-800 font-mono flex items-center gap-1" title="Format Perintah / Kode Singkat (`perintah`)"><i class="fa-solid fa-code text-amber-400"></i> Format `Kode`</button>
+              <button type="button" onclick="insertSnippet('`sudo tail -f /var/log/auth.log`')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-slate-800 font-mono flex items-center gap-1" title="Contoh Perintah CLI Linux"><i class="fa-brands fa-linux text-cyan-400"></i> Perintah CLI</button>
+              <button type="button" onclick="insertSnippet('`/etc/ssh/sshd_config`')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-slate-800 font-mono flex items-center gap-1" title="Contoh File Konfigurasi Server"><i class="fa-regular fa-file-code text-cyan-400"></i> File Konfigurasi</button>
               <button type="button" onclick="insertLinuxTerminalSnippet()" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-emerald-950/60 text-emerald-300 border border-slate-800 hover:border-emerald-500/40 font-mono flex items-center gap-1" title="Kotak Terminal Linux Estetis dengan Window Header"><i class="fa-solid fa-terminal text-emerald-400"></i> Kotak Terminal Linux</button>
-              <button type="button" onclick="insertServerLogSnippet()" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-amber-950/60 text-amber-300 border border-slate-800 hover:border-amber-500/40 font-mono flex items-center gap-1" title="Cuplikan Log Server"><i class="fa-solid fa-receipt text-amber-400"></i> Blok Log Server</button>
-              <button type="button" onclick="insertSnippet('<pre><code class=\'language-bash\'>\n# Skrip Bash / Konfigurasi\nsudo systemctl restart sshd\n</code></pre>')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 font-mono flex items-center gap-1" title="Blok Kode Skrip"><i class="fa-solid fa-file-code text-indigo-400"></i> Blok &lt;pre&gt;&lt;code&gt;</button>
+              <button type="button" onclick="insertServerLogSnippet()" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-amber-950/60 text-amber-300 border border-slate-800 hover:border-amber-500/40 font-mono flex items-center gap-1" title="Cuplikan Blok Log Server"><i class="fa-solid fa-receipt text-amber-400"></i> Blok Log Server</button>
+              <button type="button" onclick="insertSnippet('\n```bash\n# Skrip Bash / Konfigurasi\nsudo systemctl restart sshd\n```\n')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 font-mono flex items-center gap-1" title="Blok Kode Skrip (```kode```)"><i class="fa-solid fa-file-code text-indigo-400"></i> Blok ```Kode```</button>
               <button type="button" onclick="formatSelectionAsTerminalBox()" class="px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 font-bold flex items-center gap-1" title="Sorot teks di bawah lalu klik tombol ini untuk menjadikannya kotak terminal"><i class="fa-solid fa-wand-magic-sparkles text-emerald-400"></i> Jadikan Kotak Terminal</button>
             </div>
           </div>
@@ -460,7 +460,7 @@
           <textarea id="inputStem" rows="6" oninput="updateLivePreview()" onpaste="handleStemPaste(event)" placeholder="Ketik pertanyaan atau stimulus asesmen di sini..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-white leading-relaxed focus:outline-none focus:border-indigo-500 custom-scrollbar text-sm transition"></textarea>
           
           <div class="flex items-center justify-between text-[11px] text-slate-500 mt-1 px-1">
-            <span>Mendukung teks HTML, KaTeX Math ($...$), dan teks Arab. Paste gambar langsung (Ctrl+V) didukung.</span>
+            <span>Gunakan format rapi: `perintah`, ```blok kode```, **tebal**, *miring*, KaTeX Math ($...$), atau Arab tanpa tag HTML mentah. Paste gambar (Ctrl+V) didukung.</span>
             <span id="stemCharCount">0 karakter</span>
           </div>
         </div>
@@ -1102,55 +1102,127 @@
       });
     }
 
-    // 8a. Konversi HTML ke Teks Editor Bersih (Menghilangkan semua tag <br> dan <p>, menjadikannya enter alami)
+    // 8a. Konversi HTML ke Teks Editor Bersih (Menghilangkan semua tag <code>, <pre>, <br>, <p>, dll, menjadikannya format markdown alami)
     function htmlToCleanEditorText(str) {
       if (!str) return '';
       let s = str;
-      // Konversi <br><br> bertumpuk atau dengan spasi ke dua enter (\n\n)
+
+      // 1. Blok kode <pre><code...>...</code></pre> -> ```\n...\n```
+      s = s.replace(/<pre[^>]*><code[^>]*>([\s\S]*?)<\/code><\/pre>/gi, (m, code) => {
+        const clean = code.replace(/<br\s*\/?>/gi, '\n').trim();
+        return '\n```\n' + clean + '\n```\n';
+      });
+
+      // 2. Blok atau inline code <code>...</code>
+      s = s.replace(/<code>([\s\S]*?)<\/code>/gi, (m, code) => {
+        if (code.includes('\n') || /<br\s*\/?>/i.test(code)) {
+          const clean = code.replace(/<br\s*\/?>/gi, '\n').trim();
+          return '\n```\n' + clean + '\n```\n';
+        }
+        return '`' + code.trim() + '`';
+      });
+
+      // 3. Bold <strong> / <b> -> **text**
+      s = s.replace(/<(?:strong|b)>([\s\S]*?)<\/(?:strong|b)>/gi, '**$1**');
+
+      // 4. Italic <em> / <i> -> *text*
+      s = s.replace(/<(?:em|i)>([\s\S]*?)<\/(?:em|i)>/gi, '*$1*');
+
+      // 5. Underline <u> -> __text__
+      s = s.replace(/<u>([\s\S]*?)<\/u>/gi, '__$1__');
+
+      // 6. Strikethrough <s> / <del> -> ~~text~~
+      s = s.replace(/<(?:s|del)>([\s\S]*?)<\/(?:s|del)>/gi, '~~$1~~');
+
+      // 7. Line breaks <br><br> -> \n\n, <br> -> \n
       s = s.replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '\n\n');
-      // Konversi sisa <br> ke satu enter (\n)
       s = s.replace(/<br\s*\/?>/gi, '\n');
-      // Konversi penutup </p> diikuti pembuka <p> ke dua enter (\n\n)
+
+      // 8. Paragraphs <p>...</p>
       s = s.replace(/<\/p>\s*<p[^>]*>/gi, '\n\n');
-      // Hapus pembungkus <p[^>]*> di awal dan </p> di akhir
       s = s.replace(/^<p[^>]*>/i, '').replace(/<\/p>$/i, '');
+
+      // 9. Bersihkan sisa tag code jika ada yang tidak berpasangan
+      s = s.replace(/<\/?code>/gi, '`');
+
+      // 10. Normalisasi spasi dan baris baru berlebih (maksimal 2 newline berturut-turut)
+      s = s.replace(/\n{3,}/g, '\n\n');
+
       return s.trim();
     }
 
     // 8b. Konversi Teks Editor Bersih ke Format HTML (Untuk simpan ke database & live preview)
     function editorTextToCleanHtml(str) {
       if (!str) return '';
-      // Jangan sentuh newline di dalam tag blok kode / terminal / tabel
-      const parts = str.split(/(<pre[\s\S]*?<\/pre>|<div class="terminal-box"[\s\S]*?<\/div>\s*<\/div>|<table[\s\S]*?<\/table>)/i);
+
+      // 1. Konversi blok kode markdown ```...``` menjadi blok <pre><code>...</code></pre>
+      let s = str.replace(/```(?:[a-zA-Z0-9_-]+)?\r?\n?([\s\S]*?)```/g, (m, code) => {
+        const cleanCode = code.replace(/^\n+|\n+$/g, '');
+        return `<pre class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-emerald-400 font-mono text-xs overflow-x-auto my-2"><code>${cleanCode}</code></pre>`;
+      });
+
+      // 2. Proteksi blok HTML yang tidak boleh diubah newlines-nya (pre, terminal-box, table)
+      const parts = s.split(/(<pre[\s\S]*?<\/pre>|<div class="terminal-box"[\s\S]*?<\/div>\s*<\/div>|<table[\s\S]*?<\/table>)/i);
+
       return parts.map(part => {
         if (/^<(pre|div|table)/i.test(part.trim())) {
           return part;
         }
-        let text = part.replace(/\r\n/g, '\n');
-        // Double enter -> <br><br>
+
+        // Proteksi rumus matematika KaTeX ($...$ atau $$...$$) agar simbol seperti * atau _ di dalamnya tidak tersentuh
+        const mathBlocks = [];
+        let text = part.replace(/(\$\$[\s\S]*?\$\$|\$[^$\n]+\$)/g, (m) => {
+          mathBlocks.push(m);
+          return `%%%MATH_BLOCK_${mathBlocks.length - 1}%%%`;
+        });
+
+        // Inline code `code`
+        text = text.replace(/`([^`\r\n]+)`/g, '<code class="bg-slate-950 text-amber-300 px-1.5 py-0.5 rounded border border-slate-800 font-mono text-xs">$1</code>');
+
+        // Bold **text**
+        text = text.replace(/\*\*([^*\r\n]+)\*\*/g, '<strong>$1</strong>');
+
+        // Italic *text*
+        text = text.replace(/(?<!\*)\*([^*\r\n]+)\*(?!\*)/g, '<em>$1</em>');
+
+        // Underline __text__
+        text = text.replace(/__([^_\r\n]+)__/g, '<u>$1</u>');
+
+        // Strikethrough ~~text~~
+        text = text.replace(/~~([^~\r\n]+)~~/g, '<s>$1</s>');
+
+        // Normalisasi enter
+        text = text.replace(/\r\n/g, '\n');
         text = text.replace(/\n\s*\n/g, '<br><br>');
-        // Single enter -> <br>
         text = text.replace(/\n/g, '<br>');
+
+        // Kembalikan rumus matematika KaTeX
+        text = text.replace(/%%%MATH_BLOCK_(\d+)%%%/g, (m, idx) => mathBlocks[idx]);
+
         return text;
       }).join('');
     }
 
-    // 8c. Pembersih & Perapih Format Teks Manual
+    // 8c. Pembersih & Perapih Format Teks Manual (Bebas dari semua tag HTML mentah)
     function cleanRawBrTags() {
       const textarea = document.getElementById('inputStem');
       if (!textarea) return;
       textarea.value = htmlToCleanEditorText(textarea.value);
+      const expl = document.getElementById('inputExplanation');
+      if (expl && expl.value) {
+        expl.value = htmlToCleanEditorText(expl.value);
+      }
       updateLivePreview();
     }
 
-    // 8c. Helper Snippet untuk SMK / TKJ / Jaringan
+    // 8d. Helper Snippet untuk SMK / TKJ / Jaringan
     function insertLinuxTerminalSnippet() {
       const snippet = `\n<div class="terminal-box my-3">\n  <div class="terminal-header">\n    <span class="terminal-dot bg-rose-500"></span>\n    <span class="terminal-dot bg-amber-500"></span>\n    <span class="terminal-dot bg-emerald-500"></span>\n    <span class="text-[10px] text-slate-400 font-mono ml-2">Terminal Linux / SSH</span>\n  </div>\n  <div class="terminal-body">user@server:~$ sudo tail -f /var/log/auth.log\nsshd[1942]: Connection reset by authenticating user admin [preauth]\nsshd[1948]: Failed password for root from 192.168.10.45 port 54321 ssh2</div>\n</div>\n`;
       insertSnippet(snippet);
     }
 
     function insertServerLogSnippet() {
-      const snippet = `\n<pre class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-emerald-400 font-mono text-xs overflow-x-auto my-2"><code>[auth.log] sshd[1942]: Connection reset by authenticating user admin [preauth]\n[auth.log] sshd[1948]: Failed password for root from 192.168.10.45 port 54321 ssh2</code></pre>\n`;
+      const snippet = `\n\`\`\`\n[auth.log] sshd[1942]: Connection reset by authenticating user admin [preauth]\n[auth.log] sshd[1948]: Failed password for root from 192.168.10.45 port 54321 ssh2\n\`\`\`\n`;
       insertSnippet(snippet);
     }
 
@@ -1395,7 +1467,8 @@
         const letters = ['A', 'B', 'C', 'D', 'E'];
         const correctKey = (document.querySelector('input[name="mcqCorrectKey"]:checked')?.value) || 'A';
         letters.forEach(letter => {
-          const val = document.getElementById(`mcqOpt${letter}`)?.value.trim() || `Pilihan jawaban ${letter}`;
+          const rawVal = document.getElementById(`mcqOpt${letter}`)?.value.trim() || `Pilihan jawaban ${letter}`;
+          const val = editorTextToCleanHtml(rawVal);
           const isCorrect = (letter === correctKey);
           const row = document.createElement('div');
           row.className = `p-3 rounded-xl border flex items-center gap-3 transition ${isCorrect ? 'border-emerald-500/60 bg-emerald-950/20' : 'border-slate-800 bg-slate-900/60'}`;
@@ -1409,7 +1482,8 @@
       } else if (qType === 'mcq_complex') {
         const letters = ['A', 'B', 'C', 'D', 'E'];
         letters.forEach(letter => {
-          const val = document.getElementById(`complexOptText_${letter}`)?.value.trim() || `Pernyataan alternatif ${letter}`;
+          const rawVal = document.getElementById(`complexOptText_${letter}`)?.value.trim() || `Pernyataan alternatif ${letter}`;
+          const val = editorTextToCleanHtml(rawVal);
           const isChecked = document.getElementById(`complexOptCheck_${letter}`)?.checked;
           const row = document.createElement('div');
           row.className = `p-3 rounded-xl border flex items-center gap-3 transition ${isChecked ? 'border-purple-500/60 bg-purple-950/20' : 'border-slate-800 bg-slate-900/60'}`;
@@ -1424,7 +1498,7 @@
         const rows = document.querySelectorAll('#trueFalseContainer > div');
         let html = '<div class="space-y-1.5">';
         rows.forEach((r, idx) => {
-          const text = r.querySelector('.tf-text')?.value.trim() || `Pernyataan ${idx + 1}`;
+          const text = editorTextToCleanHtml(r.querySelector('.tf-text')?.value.trim() || `Pernyataan ${idx + 1}`);
           const key = r.querySelector('input[type="radio"]:checked')?.value || 'B';
           html += `
             <div class="flex items-center justify-between gap-3 p-2.5 bg-slate-900/80 rounded-xl border border-slate-800">
@@ -1439,8 +1513,8 @@
         const rows = document.querySelectorAll('#matchingContainer > div');
         let html = '<div class="space-y-1.5">';
         rows.forEach((r, idx) => {
-          const left = r.querySelector('.match-left')?.value.trim() || `Premis ${idx + 1}`;
-          const right = r.querySelector('.match-right')?.value.trim() || `Pilihan ${String.fromCharCode(65 + idx)}`;
+          const left = editorTextToCleanHtml(r.querySelector('.match-left')?.value.trim() || `Premis ${idx + 1}`);
+          const right = editorTextToCleanHtml(r.querySelector('.match-right')?.value.trim() || `Pilihan ${String.fromCharCode(65 + idx)}`);
           html += `
             <div class="flex items-center justify-between gap-2 p-2.5 bg-slate-900/80 rounded-xl border border-slate-800 text-xs">
               <span class="font-medium text-slate-200">${left}</span>
@@ -1519,11 +1593,11 @@
 
       if (qType === 'mcq') {
         payload.options = [
-          { id: 'A', text: document.getElementById('mcqOptA').value.trim() },
-          { id: 'B', text: document.getElementById('mcqOptB').value.trim() },
-          { id: 'C', text: document.getElementById('mcqOptC').value.trim() },
-          { id: 'D', text: document.getElementById('mcqOptD').value.trim() },
-          { id: 'E', text: document.getElementById('mcqOptE').value.trim() }
+          { id: 'A', text: editorTextToCleanHtml(document.getElementById('mcqOptA').value.trim()) },
+          { id: 'B', text: editorTextToCleanHtml(document.getElementById('mcqOptB').value.trim()) },
+          { id: 'C', text: editorTextToCleanHtml(document.getElementById('mcqOptC').value.trim()) },
+          { id: 'D', text: editorTextToCleanHtml(document.getElementById('mcqOptD').value.trim()) },
+          { id: 'E', text: editorTextToCleanHtml(document.getElementById('mcqOptE').value.trim()) }
         ];
         payload.answer = (document.querySelector('input[name="mcqCorrectKey"]:checked')?.value) || 'A';
       } else if (qType === 'mcq_complex') {
@@ -1531,7 +1605,7 @@
         const opts = [];
         const ans = [];
         letters.forEach(letter => {
-          opts.push({ id: letter, text: document.getElementById(`complexOptText_${letter}`).value.trim() });
+          opts.push({ id: letter, text: editorTextToCleanHtml(document.getElementById(`complexOptText_${letter}`).value.trim()) });
           if (document.getElementById(`complexOptCheck_${letter}`).checked) {
             ans.push(letter);
           }
@@ -1543,7 +1617,7 @@
         const statements = [];
         const ansMap = {};
         rows.forEach((r, idx) => {
-          const t = r.querySelector('.tf-text')?.value.trim() || `Pernyataan ${idx + 1}`;
+          const t = editorTextToCleanHtml(r.querySelector('.tf-text')?.value.trim() || `Pernyataan ${idx + 1}`);
           const k = r.querySelector('input[type="radio"]:checked')?.value || 'B';
           statements.push({ id: idx, text: t, key: k });
           ansMap[idx] = k;
@@ -1557,8 +1631,8 @@
         const ansMap = {};
         rows.forEach((r, idx) => {
           const letter = String.fromCharCode(65 + idx);
-          const left = r.querySelector('.match-left')?.value.trim() || `Premis ${idx + 1}`;
-          const right = r.querySelector('.match-right')?.value.trim() || `Pilihan ${letter}`;
+          const left = editorTextToCleanHtml(r.querySelector('.match-left')?.value.trim() || `Premis ${idx + 1}`);
+          const right = editorTextToCleanHtml(r.querySelector('.match-right')?.value.trim() || `Pilihan ${letter}`);
           premises.push({ id: idx, text: left });
           targets.push({ id: letter, text: right });
           ansMap[idx] = letter;

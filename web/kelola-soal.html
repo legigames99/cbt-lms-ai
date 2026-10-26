@@ -1044,6 +1044,16 @@
       document.getElementById('statLong').innerText = questions.filter(q => q.type === 'long_essay').length;
     }
 
+    function formatQuestionText(str) {
+      if (!str) return '';
+      let s = str;
+      s = s.replace(/```(?:[a-zA-Z0-9_-]+)?\r?\n?([\s\S]*?)```/g, (m, code) => {
+        return `<pre class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-emerald-400 font-mono text-xs overflow-x-auto my-2"><code>${code.trim()}</code></pre>`;
+      });
+      s = s.replace(/`([^`\r\n]+)`/g, '<code class="bg-slate-950 text-amber-300 px-1.5 py-0.5 rounded border border-slate-800 font-mono text-xs">$1</code>');
+      return s;
+    }
+
     // 5. Render Questions
     function renderQuestions(questions) {
       const container = document.getElementById('questionsContainer');
@@ -1237,7 +1247,7 @@
 
             <!-- Question Stem -->
             <div class="text-sm text-slate-100 leading-relaxed font-normal pt-1">
-              ${q.stem}
+              ${formatQuestionText(q.stem)}
             </div>
 
             <!-- Body (Options, Match Pairs, Matrix, Rubric) -->
@@ -1247,7 +1257,7 @@
             ${q.explanation ? `
               <div class="text-[11px] text-slate-400 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80 flex items-start gap-2">
                 <i class="fa-solid fa-lightbulb text-amber-400 mt-0.5"></i>
-                <div class="flex-1 leading-relaxed"><strong class="text-slate-300">Pembahasan:</strong> ${q.explanation}</div>
+                <div class="flex-1 leading-relaxed"><strong class="text-slate-300">Pembahasan:</strong> ${formatQuestionText(q.explanation)}</div>
               </div>
             ` : ''}
           </div>

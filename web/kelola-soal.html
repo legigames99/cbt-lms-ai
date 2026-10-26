@@ -2583,13 +2583,15 @@ window.setAIBasisMode = function(basis) {
         btn.disabled = false;
         btn.innerHTML = `<i class="fa-solid fa-floppy-disk text-emerald-200"></i> <span>Konfirmasi & Simpan ke Bank Soal</span>`;
         alert(json.message || `Berhasil menyimpan ${kelolaParsedQuestions.length} butir soal ke Bank Soal!`);
-        await fetchBankDetail();
+        await loadActiveBank(activeBankId);
       } catch (err) {
         btn.disabled = false;
         btn.innerHTML = `<i class="fa-solid fa-floppy-disk text-emerald-200"></i> <span>Konfirmasi & Simpan ke Bank Soal</span>`;
         alert("Gagal menyimpan: " + err.message);
       }
     };
+
+    window.fetchBankDetail = async function() { await loadActiveBank(activeBankId); };
 
     function handleExcelSoalUpload(input) {
       if (!input.files || input.files.length === 0) return;

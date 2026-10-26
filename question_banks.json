@@ -2255,6 +2255,826 @@
         "explanation": "Hub dan repeater bekerja pada Layer 1 (Physical Layer).",
         "generated_by": "import_word_docx",
         "source_engine": "word_document_parser"
+      },
+      {
+        "id": 7,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Sebuah sekolah kejuruan baru saja selesai melakukan instalasi Proxmox VE 8.0 pada server bare-metal menggunakan IP statis lokal 192.168.10.50/24 dengan gateway 192.168.10.1 dan DNS 8.8.8.8 melalui instalasi fisik. Namun, saat teknisi jaringan mencoba mengakses Web GUI melalui browser di laptop klien dengan mengetikkan https://192.168.10.50:8006, browser menampilkan pesan 'ERR_CONNECTION_REFUSED' meskipun kabel fisik terhubung dan lampu indikator menyala. Pengecekan via terminal konsol server menunjukkan bahwa interface vmbr0 belum mendeteksi status UP secara sempurna dan service pveproxy gagal terikat pada port yang sesuai.<br>Berdasarkan analisis skenario tersebut, langkah troubleshooting paling tepat yang harus dilakukan administrator sistem melalui konsol lokal server adalah...",
+        "options": [
+          {
+            "id": "A",
+            "text": "Mengganti port default Proxmox VE dari 8006 ke port 80 agar dapat diakses melalui HTTP biasa tanpa SSL."
+          },
+          {
+            "id": "B",
+            "text": "Memeriksa konfigurasi /etc/network/interfaces untuk memastikan interface fisik (misal: enp3s0) ter-bridge dengan benar ke vmbr0, lalu melakukan restart service networking dan pveproxy."
+          },
+          {
+            "id": "C",
+            "text": "Melakukan reinstall ulang seluruh paket Proxmox VE karena ISO installer yang digunakan sudah korup saat proses burning ke flashdisk."
+          },
+          {
+            "id": "D",
+            "text": "Mengubah konfigurasi DHCP pada router utama agar server Proxmox mendapatkan IP secara dinamis bukan statis."
+          },
+          {
+            "id": "E",
+            "text": "Menonaktifkan firewall pada laptop klien dan membersihkan cache browser agar sertifikat SSL self-signed dapat di-bypass."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 8,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Tim IT sebuah perusahaan rintisan harus mendeploy 20 instance aplikasi web berbasis Node.js yang ringan pada satu server Proxmox VE dengan keterbatasan hardware (RAM 16 GB, CPU 4 Core). Jika menggunakan Virtual Machine (VM) standar, overhead memori untuk menjalankan kernel OS terpisah di setiap VM akan menyebabkan server kehabisan sumber daya (out of memory). Sebaliknya, jika menggunakan Linux Container (LXC), kernel host dibagi bersama namun isolasi proses tetap terjaga.<br>Evaluasi manakah yang paling tepat untuk menentukan jenis teknologi virtualisasi dan alokasi sumber daya di Proxmox VE pada skenario tersebut?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Memilih Virtual Machine (VM) dengan Qemu-guest-agent aktif agar manajemen RAM per VM lebih stabil meskipun memakan resource lebih tinggi."
+          },
+          {
+            "id": "B",
+            "text": "Memilih Linux Container (LXC) unprivileged dengan alokasi RAM dinamis karena menghemat memori overhead dan sangat optimal untuk containerisasi aplikasi microservices sejenis."
+          },
+          {
+            "id": "C",
+            "text": "Menggunakan kombinasi VM berlisensi enterprise dengan disk tipe IDE agar kompatibilitas driver penyimpanan lebih terjamin."
+          },
+          {
+            "id": "D",
+            "text": "Memilih LXC privileged dengan alokasi storage tipe Directory lokal tanpa batasan quota agar proses I/O disk berjalan maksimal."
+          },
+          {
+            "id": "E",
+            "text": "Membuat 20 VM terpisah dengan spesifikasi minimal 1 GB RAM per VM agar isolasi keamanan antar aplikasi web benar-benar sempurna."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 9,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Sebuah sekolah memiliki 3 orang guru pengampu mata pelajaran yang berbeda. Masing-masing guru hanya boleh mengelola VM atau LXC miliknya sendiri tanpa memiliki hak akses untuk melihat, mematikan, atau mengubah konfigurasi VM milik guru lain atau mengubah konfigurasi network host Proxmox VE.<br>Bagaimana skema manajemen User, Role, dan Path Permission yang paling akurat harus diterapkan oleh Administrator Utama (Root) di Proxmox VE?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Memberikan password akun root Proxmox VE kepada ketiga guru secara bersamaan namun dengan perjanjian tertulis untuk tidak saling mengganggu."
+          },
+          {
+            "id": "B",
+            "text": "Membuat Group baru di Linux host, memasukkan semua user ke dalamnya, dan mengubah permission direktori /etc/pve menggunakan chmod 700."
+          },
+          {
+            "id": "C",
+            "text": "Membuat User baru pada realm PVE, membuat Custom Role dengan hak istimewa VM.Allocate, VM.PowerMgmt, dan VM.Config, lalu memberikan ACL pada Path spesifik /vms/{vmid} untuk masing-masing pengguna."
+          },
+          {
+            "id": "D",
+            "text": "Mengaktifkan fitur Two-Factor Authentication (2FA) pada akun root dan membagikan token API master ke setiap guru melalui email."
+          },
+          {
+            "id": "E",
+            "text": "Membuat bridge jaringan terpisah (vmbr1, vmbr2, vmbr3) untuk setiap guru agar isolasi manajemen tercapai secara otomatis."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 10,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Sebuah server basis data kritikal berbasis LXC mengalami crash sistem file setelah melakukan pembaruan paket sistem secara sembarangan oleh pengembang. Sebelum pembaruan dilakukan, sistem telah memiliki dua mekanisme proteksi: 1) Snapshot manual yang diambil 10 menit sebelum pembaruan, dan 2) Backup terjadwal (VZDump berformat tar.zst) yang dibuat secara otomatis oleh Proxmox Backup Server setiap pukul 02.00 dini hari.<br>Tindakan pemulihan (restore/rollback) manakah yang paling efisien dan meminimalkan risiko inkonsistensi data pada kasus tersebut?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Melakukan reinstall ulang Proxmox VE dari awal dan menginstal ulang seluruh dependensi basis data secara manual dari repositori online."
+          },
+          {
+            "id": "B",
+            "text": "Menggunakan file hasil backup VZDump jam 02.00 dini hari meskipun ada data transaksi baru yang masuk antara jam 02.00 hingga waktu kerusakan."
+          },
+          {
+            "id": "C",
+            "text": "Melakukan rollback menggunakan Snapshot manual karena diambil paling mendekati waktu kejadian kerusakan dan langsung memulihkan kondisi memori serta disk ke titik sebelum pembaruan."
+          },
+          {
+            "id": "D",
+            "text": "Menghapus container LXC yang rusak dan membuat container baru kosong tanpa melakukan restore data lama."
+          },
+          {
+            "id": "E",
+            "text": "Mengubah file konfigurasi container secara manual melalui teks editor di host node untuk menghapus log error saja."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 11,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Dalam perancangan infrastruktur server sekolah, seorang administrator jaringan membandingkan penggunaan platform virtualisasi berbasis Type-1 Hypervisor (Proxmox VE langsung di atas hardware server) dengan Type-2 Hypervisor (VirtualBox yang berjalan di atas sistem operasi Windows 11 host). Beban kerja server diproyeksikan sangat tinggi karena melayani 500 siswa secara bersamaan.<br>Berdasarkan analisis arsitektur sistem, mengapa Type-1 Hypervisor jauh lebih unggul dalam hal efisiensi dan performa untuk kebutuhan VPS skala produksi dibandingkan Type-2?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Type-2 Hypervisor membutuhkan spesifikasi RAM yang lebih kecil dibandingkan Type-1 karena didukung oleh fitur GUI Windows."
+          },
+          {
+            "id": "B",
+            "text": "Type-1 Hypervisor berinteraksi langsung dengan hardware tanpa melalui sistem operasi perantara, sehingga overhead sumber daya CPU dan RAM jauh lebih rendah serta latensi I/O lebih kecil."
+          },
+          {
+            "id": "C",
+            "text": "Type-2 Hypervisor memiliki tingkat keamanan yang lebih tinggi karena terlindung di balik firewall sistem operasi desktop host."
+          },
+          {
+            "id": "D",
+            "text": "Type-1 Hypervisor hanya mendukung sistem operasi tamu berbasis Linux open-source dan tidak mendukung sistem operasi Windows Server."
+          },
+          {
+            "id": "E",
+            "text": "Type-2 Hypervisor menggunakan teknologi kernel-based virtual machine yang terintegrasi secara native di dalam BIOS motherboard."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 12,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "SMKN 5 Bandung berencana mendeploy dua layanan server lokal untuk praktikum siswa: 1) Web Server ringan berbasis Alpine Linux yang membutuhkan instansiasi cepat dan efisiensi RAM tinggi, serta 2) Database Server Enterprise berbasis Windows Server 2022 yang memerlukan kernel spesifik dan isolasi hardware penuh. Administrator jaringan sekolah harus memutuskan apakah akan menggunakan Linux Container (LXC) atau Virtual Machine (VM) penuh untuk masing-masing layanan tersebut di dalam cluster Proxmox VE.<br>Berdasarkan skenario di atas, kombinasi arsitektur virtualisasi manakah yang paling tepat dan efisien diterapkan pada Proxmox VE?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Web Server menggunakan LXC karena berbasis sharing kernel host untuk efisiensi sumber daya, sedangkan Database Server menggunakan VM karena membutuhkan kernel mandiri dan emulasi hardware penuh."
+          },
+          {
+            "id": "B",
+            "text": "Keduanya wajib menggunakan VM agar keamanan isolasi data antar layanan lebih terjamin tanpa memedulikan pemborosan kapasitas RAM fisik server."
+          },
+          {
+            "id": "C",
+            "text": "Web Server menggunakan VM untuk menjamin kestabilan jaringan, sedangkan Database Server menggunakan LXC agar proses backup berjalan lebih cepat."
+          },
+          {
+            "id": "D",
+            "text": "Keduanya harus menggunakan LXC karena arsitektur container mendukung instalasi sistem operasi Windows maupun Linux secara bersamaan di dalam satu container."
+          },
+          {
+            "id": "E",
+            "text": "Web Server menggunakan VM berbasis Qemu/KVM agar performa disk I/O lebih lambat namun aman, sedangkan Database Server menggunakan LXC."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 13,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Sebuah tim teknis di lab komputer jaringan SMKN 5 Bandung membagi peran menjadi Guru Pembimbing, Teknisi Infrastruktur, dan Siswa Magang. Teknisi Infrastruktur hanya boleh membuat dan mematikan VM di node tertentu tanpa boleh mengubah konfigurasi jaringan global datacenter. Selain itu, jaringan antar VM pada VLAN berbeda harus diisolasi menggunakan teknik software-defined networking di Proxmox VE.<br>Langkah konfigurasi keamanan dan hak akses apa yang harus diterapkan oleh Administrator Utama (Root) pada Proxmox VE untuk memenuhi skenario tersebut?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Memberikan password akun root Proxmox kepada seluruh tim teknisi agar mereka bebas mengkonfigurasi Linux Bridge dan VLAN tanpa batasan sistem."
+          },
+          {
+            "id": "B",
+            "text": "Membuat Realm dan User baru, mendefinisikan Custom Role dengan privilege VM.PowerMgmt serta VM.Allocate, lalu melakukan Assign Permission pada path /vms/vessel spesifik."
+          },
+          {
+            "id": "C",
+            "text": "Mengaktifkan fitur Firewall pada level Datacenter dan mendisable semua port Linux Bridge agar tidak ada satupun VM yang dapat saling berkomunikasi."
+          },
+          {
+            "id": "D",
+            "text": "Mengubah konfigurasi file /etc/network/interfaces di host utama dengan menghapus seluruh bridge dan menggantinya dengan interface fisik murni."
+          },
+          {
+            "id": "E",
+            "text": "Membuat grup pengguna baru di dalam sistem operasi Linux Debian underlying Proxmox tanpa melalui Web GUI management PVE."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 14,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Seorang administrator jaringan melakukan update sistem operasi pada sebuah VPS produksi di Proxmox VE. Setelah reboot, VPS tersebut mengalami kernel panic dan gagal booting (unbootable). Administrator tersebut sebelumnya telah mengambil dua bentuk data pengaman: 1) Snapshot sesaat sebelum update, dan 2) Full Backup terjadwal (VMA/Tar format) yang disimpan ke storage eksternal semalam.<br>Tindakan pemulihan (recovery) manakah yang paling tepat dan bersih untuk mengembalikan VPS tersebut ke kondisi normal tanpa meninggalkan residu sampah disk yang merusak performa?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Melakukan Rollback menggunakan Snapshot yang diambil sebelum update karena prosesnya instan dan langsung mengembalikan status RAM serta disk ke titik semula."
+          },
+          {
+            "id": "B",
+            "text": "Menginstal ulang seluruh server bare-metal Proxmox VE dari awal menggunakan flashdisk bootable karena sistem sudah mengalami kernel panic total."
+          },
+          {
+            "id": "C",
+            "text": "Melakukan Restore dari file Full Backup mingguan yang memerlukan waktu transfer besar dan menimpa seluruh konfigurasi baru."
+          },
+          {
+            "id": "D",
+            "text": "Membuat VM baru dari awal dan menyalin file konfigurasi secara manual melalui terminal SSH tanpa menggunakan fitur manajemen bawaan."
+          },
+          {
+            "id": "E",
+            "text": "Menghapus virtual disk dari VM tersebut dan membuat storage LVM baru tanpa melakukan tindakan pemulihan data sama sekali."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 15,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "SMKN 5 Bandung akan membangun server Proxmox VE menggunakan 4 buah hard disk berkapasitas sama pada server bare-metal. Server ini akan diandalkan untuk menampung puluhan VPS ujian online yang sangat sensitif terhadap korupsi data akibat potensi mati lampu mendadak di sekolah.<br>Berdasarkan kebutuhan kehandalan data (data integrity) dan proteksi terhadap kegagalan disk, filesystem penyimpanan apa yang paling direkomendasikan saat instalasi Proxmox VE?",
+        "options": [
+          {
+            "id": "A",
+            "text": "EXT4 standar tanpa journaling agar proses tulis dan baca data pada hard disk menjadi jauh lebih cepat tanpa memedulikan risiko kerusakan data."
+          },
+          {
+            "id": "B",
+            "text": "ZFS (ZFS on Linux) dengan konfigurasi RAID 10 atau RAIDZ2 karena memiliki fitur copy-on-write, checksum otomatis, dan perlindungan terhadap bit rot."
+          },
+          {
+            "id": "C",
+            "text": "LVM biasa dengan single disk tanpa proteksi redundansi agar kapasitas total penyimpanan dapat digunakan sepenuhnya secara maksimal."
+          },
+          {
+            "id": "D",
+            "text": "FAT32 karena kompatibel dengan hampir semua jenis sistem operasi lama dan mudah dibaca melalui sistem operasi Windows."
+          },
+          {
+            "id": "E",
+            "text": "Directory storage berbasis jaringan lokal NFS dengan konfigurasi single gateway tanpa sistem cadangan daya UPS."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 16,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Sebuah server Proxmox VE memiliki RAM fisik total sebesar 32 GB. Administrator mengalokasikan RAM total sebesar 40 GB ke seluruh VM yang berjalan (menggunakan teknik overcommitment) dengan mengaktifkan fitur 'Ballooning Device' pada konfigurasi VM agar penggunaan RAM dinamis.<br>Apa konsekuensi teknis utama dan mekanisme kerja dari fitur Memory Ballooning ketika total permintaan RAM dari semua VM melebihi kapasitas RAM fisik server (32 GB)?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Proxmox akan secara otomatis menambah kapasitas fisik RAM server melalui virtualisasi hardware tanpa perlu melakukan upgrade modul RAM fisik."
+          },
+          {
+            "id": "B",
+            "text": "Proxmox akan memerintahkan driver ballooning di dalam guest OS untuk merilis memori yang tidak terpakai kembali ke host, namun jika seluruh VM memakai RAM penuh, host dapat mengalami OOM (Out of Memory) killer atau swapping yang drastis menurunkan performa."
+          },
+          {
+            "id": "C",
+            "text": "Semua VM akan berjalan lebih cepat karena fitur ballooning mempercepat kecepatan transfer clock processor secara otomatis."
+          },
+          {
+            "id": "D",
+            "text": "Fitur ballooning berfungsi untuk mengunci alokasi RAM statis agar tidak dapat diubah-ubah oleh pengguna sistem operasi tamu."
+          },
+          {
+            "id": "E",
+            "text": "Kinerja sistem tidak akan terpengaruh sama sekali karena virtualisasi modern mengabaikan batasan kapasitas RAM fisik pada motherboard."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 17,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Sebuah sekolah kejuruan baru saja selesai melakukan instalasi Proxmox VE 8.0 pada server bare-metal menggunakan IP statis lokal 192.168.10.50/24 dengan gateway 192.168.10.1 dan DNS 8.8.8.8 melalui instalasi fisik. Namun, saat teknisi jaringan mencoba mengakses Web GUI melalui browser di laptop klien dengan mengetikkan https://192.168.10.50:8006, browser menampilkan pesan 'ERR_CONNECTION_REFUSED' meskipun kabel fisik terhubung dan lampu indikator menyala. Pengecekan via terminal konsol server menunjukkan bahwa interface vmbr0 belum mendeteksi status UP secara sempurna dan service pveproxy gagal terikat pada port yang sesuai.<br>Berdasarkan analisis skenario tersebut, langkah troubleshooting paling tepat yang harus dilakukan administrator sistem melalui konsol lokal server adalah...",
+        "options": [
+          {
+            "id": "A",
+            "text": "Mengganti port default Proxmox VE dari 8006 ke port 80 agar dapat diakses melalui HTTP biasa tanpa SSL."
+          },
+          {
+            "id": "B",
+            "text": "Memeriksa konfigurasi /etc/network/interfaces untuk memastikan interface fisik (misal: enp3s0) ter-bridge dengan benar ke vmbr0, lalu melakukan restart service networking dan pveproxy."
+          },
+          {
+            "id": "C",
+            "text": "Melakukan reinstall ulang seluruh paket Proxmox VE karena ISO installer yang digunakan sudah korup saat proses burning ke flashdisk."
+          },
+          {
+            "id": "D",
+            "text": "Mengubah konfigurasi DHCP pada router utama agar server Proxmox mendapatkan IP secara dinamis bukan statis."
+          },
+          {
+            "id": "E",
+            "text": "Menonaktifkan firewall pada laptop klien dan membersihkan cache browser agar sertifikat SSL self-signed dapat di-bypass."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 18,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Tim IT sebuah perusahaan rintisan harus mendeploy 20 instance aplikasi web berbasis Node.js yang ringan pada satu server Proxmox VE dengan keterbatasan hardware (RAM 16 GB, CPU 4 Core). Jika menggunakan Virtual Machine (VM) standar, overhead memori untuk menjalankan kernel OS terpisah di setiap VM akan menyebabkan server kehabisan sumber daya (out of memory). Sebaliknya, jika menggunakan Linux Container (LXC), kernel host dibagi bersama namun isolasi proses tetap terjaga.<br>Evaluasi manakah yang paling tepat untuk menentukan jenis teknologi virtualisasi dan alokasi sumber daya di Proxmox VE pada skenario tersebut?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Memilih Virtual Machine (VM) dengan Qemu-guest-agent aktif agar manajemen RAM per VM lebih stabil meskipun memakan resource lebih tinggi."
+          },
+          {
+            "id": "B",
+            "text": "Memilih Linux Container (LXC) unprivileged dengan alokasi RAM dinamis karena menghemat memori overhead dan sangat optimal untuk containerisasi aplikasi microservices sejenis."
+          },
+          {
+            "id": "C",
+            "text": "Menggunakan kombinasi VM berlisensi enterprise dengan disk tipe IDE agar kompatibilitas driver penyimpanan lebih terjamin."
+          },
+          {
+            "id": "D",
+            "text": "Memilih LXC privileged dengan alokasi storage tipe Directory lokal tanpa batasan quota agar proses I/O disk berjalan maksimal."
+          },
+          {
+            "id": "E",
+            "text": "Membuat 20 VM terpisah dengan spesifikasi minimal 1 GB RAM per VM agar isolasi keamanan antar aplikasi web benar-benar sempurna."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 19,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Sebuah sekolah memiliki 3 orang guru pengampu mata pelajaran yang berbeda. Masing-masing guru hanya boleh mengelola VM atau LXC miliknya sendiri tanpa memiliki hak akses untuk melihat, mematikan, atau mengubah konfigurasi VM milik guru lain atau mengubah konfigurasi network host Proxmox VE.<br>Bagaimana skema manajemen User, Role, dan Path Permission yang paling akurat harus diterapkan oleh Administrator Utama (Root) di Proxmox VE?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Memberikan password akun root Proxmox VE kepada ketiga guru secara bersamaan namun dengan perjanjian tertulis untuk tidak saling mengganggu."
+          },
+          {
+            "id": "B",
+            "text": "Membuat Group baru di Linux host, memasukkan semua user ke dalamnya, dan mengubah permission direktori /etc/pve menggunakan chmod 700."
+          },
+          {
+            "id": "C",
+            "text": "Membuat User baru pada realm PVE, membuat Custom Role dengan hak istimewa VM.Allocate, VM.PowerMgmt, dan VM.Config, lalu memberikan ACL pada Path spesifik /vms/{vmid} untuk masing-masing pengguna."
+          },
+          {
+            "id": "D",
+            "text": "Mengaktifkan fitur Two-Factor Authentication (2FA) pada akun root dan membagikan token API master ke setiap guru melalui email."
+          },
+          {
+            "id": "E",
+            "text": "Membuat bridge jaringan terpisah (vmbr1, vmbr2, vmbr3) untuk setiap guru agar isolasi manajemen tercapai secara otomatis."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 20,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Sebuah server basis data kritikal berbasis LXC mengalami crash sistem file setelah melakukan pembaruan paket sistem secara sembarangan oleh pengembang. Sebelum pembaruan dilakukan, sistem telah memiliki dua mekanisme proteksi: 1) Snapshot manual yang diambil 10 menit sebelum pembaruan, dan 2) Backup terjadwal (VZDump berformat tar.zst) yang dibuat secara otomatis oleh Proxmox Backup Server setiap pukul 02.00 dini hari.<br>Tindakan pemulihan (restore/rollback) manakah yang paling efisien dan meminimalkan risiko inkonsistensi data pada kasus tersebut?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Melakukan reinstall ulang Proxmox VE dari awal dan menginstal ulang seluruh dependensi basis data secara manual dari repositori online."
+          },
+          {
+            "id": "B",
+            "text": "Menggunakan file hasil backup VZDump jam 02.00 dini hari meskipun ada data transaksi baru yang masuk antara jam 02.00 hingga waktu kerusakan."
+          },
+          {
+            "id": "C",
+            "text": "Melakukan rollback menggunakan Snapshot manual karena diambil paling mendekati waktu kejadian kerusakan dan langsung memulihkan kondisi memori serta disk ke titik sebelum pembaruan."
+          },
+          {
+            "id": "D",
+            "text": "Menghapus container LXC yang rusak dan membuat container baru kosong tanpa melakukan restore data lama."
+          },
+          {
+            "id": "E",
+            "text": "Mengubah file konfigurasi container secara manual melalui teks editor di host node untuk menghapus log error saja."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 21,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Dalam perancangan infrastruktur server sekolah, seorang administrator jaringan membandingkan penggunaan platform virtualisasi berbasis Type-1 Hypervisor (Proxmox VE langsung di atas hardware server) dengan Type-2 Hypervisor (VirtualBox yang berjalan di atas sistem operasi Windows 11 host). Beban kerja server diproyeksikan sangat tinggi karena melayani 500 siswa secara bersamaan.<br>Berdasarkan analisis arsitektur sistem, mengapa Type-1 Hypervisor jauh lebih unggul dalam hal efisiensi dan performa untuk kebutuhan VPS skala produksi dibandingkan Type-2?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Type-2 Hypervisor membutuhkan spesifikasi RAM yang lebih kecil dibandingkan Type-1 karena didukung oleh fitur GUI Windows."
+          },
+          {
+            "id": "B",
+            "text": "Type-1 Hypervisor berinteraksi langsung dengan hardware tanpa melalui sistem operasi perantara, sehingga overhead sumber daya CPU dan RAM jauh lebih rendah serta latensi I/O lebih kecil."
+          },
+          {
+            "id": "C",
+            "text": "Type-2 Hypervisor memiliki tingkat keamanan yang lebih tinggi karena terlindung di balik firewall sistem operasi desktop host."
+          },
+          {
+            "id": "D",
+            "text": "Type-1 Hypervisor hanya mendukung sistem operasi tamu berbasis Linux open-source dan tidak mendukung sistem operasi Windows Server."
+          },
+          {
+            "id": "E",
+            "text": "Type-2 Hypervisor menggunakan teknologi kernel-based virtual machine yang terintegrasi secara native di dalam BIOS motherboard."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 22,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "SMKN 5 Bandung berencana mendeploy dua layanan server lokal untuk praktikum siswa: 1) Web Server ringan berbasis Alpine Linux yang membutuhkan instansiasi cepat dan efisiensi RAM tinggi, serta 2) Database Server Enterprise berbasis Windows Server 2022 yang memerlukan kernel spesifik dan isolasi hardware penuh. Administrator jaringan sekolah harus memutuskan apakah akan menggunakan Linux Container (LXC) atau Virtual Machine (VM) penuh untuk masing-masing layanan tersebut di dalam cluster Proxmox VE.<br>Berdasarkan skenario di atas, kombinasi arsitektur virtualisasi manakah yang paling tepat dan efisien diterapkan pada Proxmox VE?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Web Server menggunakan LXC karena berbasis sharing kernel host untuk efisiensi sumber daya, sedangkan Database Server menggunakan VM karena membutuhkan kernel mandiri dan emulasi hardware penuh."
+          },
+          {
+            "id": "B",
+            "text": "Keduanya wajib menggunakan VM agar keamanan isolasi data antar layanan lebih terjamin tanpa memedulikan pemborosan kapasitas RAM fisik server."
+          },
+          {
+            "id": "C",
+            "text": "Web Server menggunakan VM untuk menjamin kestabilan jaringan, sedangkan Database Server menggunakan LXC agar proses backup berjalan lebih cepat."
+          },
+          {
+            "id": "D",
+            "text": "Keduanya harus menggunakan LXC karena arsitektur container mendukung instalasi sistem operasi Windows maupun Linux secara bersamaan di dalam satu container."
+          },
+          {
+            "id": "E",
+            "text": "Web Server menggunakan VM berbasis Qemu/KVM agar performa disk I/O lebih lambat namun aman, sedangkan Database Server menggunakan LXC."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 23,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Sebuah tim teknis di lab komputer jaringan SMKN 5 Bandung membagi peran menjadi Guru Pembimbing, Teknisi Infrastruktur, dan Siswa Magang. Teknisi Infrastruktur hanya boleh membuat dan mematikan VM di node tertentu tanpa boleh mengubah konfigurasi jaringan global datacenter. Selain itu, jaringan antar VM pada VLAN berbeda harus diisolasi menggunakan teknik software-defined networking di Proxmox VE.<br>Langkah konfigurasi keamanan dan hak akses apa yang harus diterapkan oleh Administrator Utama (Root) pada Proxmox VE untuk memenuhi skenario tersebut?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Memberikan password akun root Proxmox kepada seluruh tim teknisi agar mereka bebas mengkonfigurasi Linux Bridge dan VLAN tanpa batasan sistem."
+          },
+          {
+            "id": "B",
+            "text": "Membuat Realm dan User baru, mendefinisikan Custom Role dengan privilege VM.PowerMgmt serta VM.Allocate, lalu melakukan Assign Permission pada path /vms/vessel spesifik."
+          },
+          {
+            "id": "C",
+            "text": "Mengaktifkan fitur Firewall pada level Datacenter dan mendisable semua port Linux Bridge agar tidak ada satupun VM yang dapat saling berkomunikasi."
+          },
+          {
+            "id": "D",
+            "text": "Mengubah konfigurasi file /etc/network/interfaces di host utama dengan menghapus seluruh bridge dan menggantinya dengan interface fisik murni."
+          },
+          {
+            "id": "E",
+            "text": "Membuat grup pengguna baru di dalam sistem operasi Linux Debian underlying Proxmox tanpa melalui Web GUI management PVE."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 24,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Seorang administrator jaringan melakukan update sistem operasi pada sebuah VPS produksi di Proxmox VE. Setelah reboot, VPS tersebut mengalami kernel panic dan gagal booting (unbootable). Administrator tersebut sebelumnya telah mengambil dua bentuk data pengaman: 1) Snapshot sesaat sebelum update, dan 2) Full Backup terjadwal (VMA/Tar format) yang disimpan ke storage eksternal semalam.<br>Tindakan pemulihan (recovery) manakah yang paling tepat dan bersih untuk mengembalikan VPS tersebut ke kondisi normal tanpa meninggalkan residu sampah disk yang merusak performa?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Melakukan Rollback menggunakan Snapshot yang diambil sebelum update karena prosesnya instan dan langsung mengembalikan status RAM serta disk ke titik semula."
+          },
+          {
+            "id": "B",
+            "text": "Menginstal ulang seluruh server bare-metal Proxmox VE dari awal menggunakan flashdisk bootable karena sistem sudah mengalami kernel panic total."
+          },
+          {
+            "id": "C",
+            "text": "Melakukan Restore dari file Full Backup mingguan yang memerlukan waktu transfer besar dan menimpa seluruh konfigurasi baru."
+          },
+          {
+            "id": "D",
+            "text": "Membuat VM baru dari awal dan menyalin file konfigurasi secara manual melalui terminal SSH tanpa menggunakan fitur manajemen bawaan."
+          },
+          {
+            "id": "E",
+            "text": "Menghapus virtual disk dari VM tersebut dan membuat storage LVM baru tanpa melakukan tindakan pemulihan data sama sekali."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 25,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "SMKN 5 Bandung akan membangun server Proxmox VE menggunakan 4 buah hard disk berkapasitas sama pada server bare-metal. Server ini akan diandalkan untuk menampung puluhan VPS ujian online yang sangat sensitif terhadap korupsi data akibat potensi mati lampu mendadak di sekolah.<br>Berdasarkan kebutuhan kehandalan data (data integrity) dan proteksi terhadap kegagalan disk, filesystem penyimpanan apa yang paling direkomendasikan saat instalasi Proxmox VE?",
+        "options": [
+          {
+            "id": "A",
+            "text": "EXT4 standar tanpa journaling agar proses tulis dan baca data pada hard disk menjadi jauh lebih cepat tanpa memedulikan risiko kerusakan data."
+          },
+          {
+            "id": "B",
+            "text": "ZFS (ZFS on Linux) dengan konfigurasi RAID 10 atau RAIDZ2 karena memiliki fitur copy-on-write, checksum otomatis, dan perlindungan terhadap bit rot."
+          },
+          {
+            "id": "C",
+            "text": "LVM biasa dengan single disk tanpa proteksi redundansi agar kapasitas total penyimpanan dapat digunakan sepenuhnya secara maksimal."
+          },
+          {
+            "id": "D",
+            "text": "FAT32 karena kompatibel dengan hampir semua jenis sistem operasi lama dan mudah dibaca melalui sistem operasi Windows."
+          },
+          {
+            "id": "E",
+            "text": "Directory storage berbasis jaringan lokal NFS dengan konfigurasi single gateway tanpa sistem cadangan daya UPS."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
+      },
+      {
+        "id": 26,
+        "type": "mcq",
+        "cog": "C2",
+        "stem": "Sebuah server Proxmox VE memiliki RAM fisik total sebesar 32 GB. Administrator mengalokasikan RAM total sebesar 40 GB ke seluruh VM yang berjalan (menggunakan teknik overcommitment) dengan mengaktifkan fitur 'Ballooning Device' pada konfigurasi VM agar penggunaan RAM dinamis.<br>Apa konsekuensi teknis utama dan mekanisme kerja dari fitur Memory Ballooning ketika total permintaan RAM dari semua VM melebihi kapasitas RAM fisik server (32 GB)?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Proxmox akan secara otomatis menambah kapasitas fisik RAM server melalui virtualisasi hardware tanpa perlu melakukan upgrade modul RAM fisik."
+          },
+          {
+            "id": "B",
+            "text": "Proxmox akan memerintahkan driver ballooning di dalam guest OS untuk merilis memori yang tidak terpakai kembali ke host, namun jika seluruh VM memakai RAM penuh, host dapat mengalami OOM (Out of Memory) killer atau swapping yang drastis menurunkan performa."
+          },
+          {
+            "id": "C",
+            "text": "Semua VM akan berjalan lebih cepat karena fitur ballooning mempercepat kecepatan transfer clock processor secara otomatis."
+          },
+          {
+            "id": "D",
+            "text": "Fitur ballooning berfungsi untuk mengunci alokasi RAM statis agar tidak dapat diubah-ubah oleh pengguna sistem operasi tamu."
+          },
+          {
+            "id": "E",
+            "text": "Kinerja sistem tidak akan terpengaruh sama sekali karena virtualisasi modern mengabaikan batasan kapasitas RAM fisik pada motherboard."
+          }
+        ],
+        "answer": "A",
+        "answer_keys": [],
+        "statements": [],
+        "premises": [],
+        "targets": [],
+        "rubric": "",
+        "ideal_answer": "",
+        "max_score": 100,
+        "keywords": [],
+        "weight": 1,
+        "explanation": "Pembahasan kunci jawaban terverifikasi.",
+        "generated_by": "import_word_docx",
+        "source_engine": "word_document_parser"
       }
     ]
   }

@@ -2813,6 +2813,42 @@
         </div>
       </div>
 
+<!-- Panduan 6 Format Soal Standar TKA -->
+        <div class="p-3 bg-slate-950/80 border border-slate-800 rounded-xl space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-layer-group text-indigo-400"></i> Mendukung 6 Format Soal Standar TKA:
+            </span>
+            <span class="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Auto-Detect</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-[10px]">
+            <div class="p-2 bg-slate-900/90 rounded-lg border border-slate-800 text-slate-300">
+              <strong class="text-blue-300 block font-bold">1. PG Tunggal</strong>
+              <span class="text-slate-500">Opsi A-E, 1 Kunci Benar</span>
+            </div>
+            <div class="p-2 bg-slate-900/90 rounded-lg border border-slate-800 text-slate-300">
+              <strong class="text-purple-300 block font-bold">2. PG Kompleks</strong>
+              <span class="text-slate-500">Multi-Kunci (A, C, E)</span>
+            </div>
+            <div class="p-2 bg-slate-900/90 rounded-lg border border-slate-800 text-slate-300">
+              <strong class="text-amber-300 block font-bold">3. Benar / Salah</strong>
+              <span class="text-slate-500">[B]/[S] Matriks Pernyataan</span>
+            </div>
+            <div class="p-2 bg-slate-900/90 rounded-lg border border-slate-800 text-slate-300">
+              <strong class="text-teal-300 block font-bold">4. Menjodohkan</strong>
+              <span class="text-slate-500">Premis ---> Target Pasangan</span>
+            </div>
+            <div class="p-2 bg-slate-900/90 rounded-lg border border-slate-800 text-slate-300">
+              <strong class="text-emerald-300 block font-bold">5. Isian Singkat</strong>
+              <span class="text-slate-500">Jawaban kata kunci / sinonim</span>
+            </div>
+            <div class="p-2 bg-slate-900/90 rounded-lg border border-slate-800 text-slate-300">
+              <strong class="text-rose-300 block font-bold">6. Uraian / Esai AI</strong>
+              <span class="text-slate-500">Rubrik & skor komprehensif</span>
+            </div>
+          </div>
+        </div>
+
       <div class="space-y-3">
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1">Pilih Bank Soal Tujuan</label>
@@ -5496,10 +5532,21 @@
       if (list) {
         list.innerHTML = (data.questions || []).map((q, idx) => {
           let ansDisplay = "";
-          if (q.type === "mcq") ansDisplay = `<span class="font-bold text-emerald-400">Kunci: ${q.answer || "A"}</span>`;
-          else if (q.type === "mcq_complex") ansDisplay = `<span class="font-bold text-emerald-400">Kunci: ${(Array.isArray(q.answer) ? q.answer.join(", ") : q.answer)}</span>`;
-          else if (q.type === "short_essay") ansDisplay = `<span class="font-bold text-emerald-400">Kunci Isian: ${(q.answer_keys || []).join(" / ")}</span>`;
-          else ansDisplay = `<span class="font-bold text-emerald-400">Kunci: ${q.answer || "-"}</span>`;
+            if (q.type === "mcq") ansDisplay = `<span class="font-bold text-emerald-400">Kunci: ${q.answer || "A"}</span>`;
+            else if (q.type === "mcq_complex") ansDisplay = `<span class="font-bold text-purple-400">Kunci: ${(Array.isArray(q.answer) ? q.answer.join(", ") : q.answer)}</span>`;
+            else if (q.type === "true_false") {
+              const keys = (q.statements || []).map(s => s.key).join("-");
+              ansDisplay = `<span class="font-bold text-amber-400">Kunci B/S: ${keys || JSON.stringify(q.answer || {})}</span>`;
+            } else if (q.type === "matching") {
+              const pairs = (q.premises || []).map((_, idx) => `${idx + 1}-${String.fromCharCode(65 + idx)}`).join(", ");
+              ansDisplay = `<span class="font-bold text-teal-400">Pasangan: ${pairs}</span>`;
+            } else if (q.type === "short_essay") {
+              ansDisplay = `<span class="font-bold text-emerald-400">Kunci Isian: ${(q.answer_keys || []).join(" / ")}</span>`;
+            } else if (q.type === "long_essay") {
+              ansDisplay = `<span class="font-bold text-rose-400">Rubrik Esai (Maks: ${q.max_score || 100})</span>`;
+            } else {
+              ansDisplay = `<span class="font-bold text-emerald-400">Kunci: ${q.answer || "-"}</span>`;
+            }
 
           return `
             <div class="p-3.5 bg-slate-950 rounded-xl border border-slate-800 space-y-2 text-xs">
@@ -5515,7 +5562,36 @@
                   `).join("")}
                 </div>
               ` : ""}
-              <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between flex-wrap gap-2 text-[11px]">
+                ${q.statements && q.statements.length > 0 ? `
+                  <div class="space-y-1 pl-3 border-l-2 border-amber-500/30">
+                    ${q.statements.map((st, sIdx) => `
+                      <div class="text-slate-300 flex items-center justify-between text-[11px]">
+                        <span>${sIdx + 1}. ${st.text}</span>
+                        <span class="font-bold px-1.5 py-0.5 rounded text-[10px] ${st.key === 'B' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}">[${st.key || 'B'}]</span>
+                      </div>
+                    `).join("")}
+                  </div>
+                ` : ""}
+                ${q.premises && q.premises.length > 0 ? `
+                  <div class="space-y-1 pl-3 border-l-2 border-teal-500/30">
+                    ${q.premises.map((p, pIdx) => {
+                      const tgt = (q.targets || [])[pIdx];
+                      return `
+                        <div class="text-slate-300 flex items-center justify-between text-[11px]">
+                          <span><strong>Premis ${pIdx + 1}:</strong> ${p.text}</span>
+                          <span class="text-teal-400 font-semibold">➔ Target ${tgt ? tgt.id : String.fromCharCode(65 + pIdx)}: ${tgt ? tgt.text : ''}</span>
+                        </div>
+                      `;
+                    }).join("")}
+                  </div>
+                ` : ""}
+                ${q.type === 'long_essay' && q.rubric ? `
+                  <div class="p-2 rounded bg-slate-900 border border-slate-800 text-[11px] text-slate-300">
+                    <strong class="text-indigo-300 block">Rubrik Penilaian AI:</strong>
+                    <span>${q.rubric}</span>
+                  </div>
+                ` : ""}
+                <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between flex-wrap gap-2 text-[11px]">
                 <div>${ansDisplay}</div>
                 ${q.explanation ? `<div class="text-slate-400 italic">Pembahasan: ${q.explanation}</div>` : ""}
               </div>

@@ -1936,29 +1936,57 @@ function parseQuestionsFromWordText(rawText) {
 
   function finalizeCurrentQ() {
     if (!currentQ) return;
-    if (currentQ.stem && (currentQ.options.length > 0 || currentQ.answer_keys.length > 0 || currentQ.answer || currentQ.type === 'long_essay')) {
+    const hasOptions = currentQ.options && currentQ.options.length > 0;
+    const hasKeys = currentQ.answer_keys && currentQ.answer_keys.length > 0;
+    const hasStatements = currentQ.statements && currentQ.statements.length > 0;
+    const hasPremises = currentQ.premises && currentQ.premises.length > 0;
+    const isLongEssay = currentQ.type === 'long_essay';
+
+    if (currentQ.stem && (hasOptions || hasKeys || currentQ.answer || hasStatements || hasPremises || isLongEssay)) {
       if (!currentQ.type) {
-        if (currentQ.options.length > 0) {
+        if (hasPremises) {
+          currentQ.type = 'matching';
+        } else if (hasStatements) {
+          currentQ.type = 'true_false';
+        } else if (hasOptions) {
           if (Array.isArray(currentQ.answer) && currentQ.answer.length > 1) {
             currentQ.type = 'mcq_complex';
           } else {
             currentQ.type = 'mcq';
           }
-        } else if (currentQ.answer_keys.length > 0) {
+        } else if (hasKeys) {
           currentQ.type = 'short_essay';
-        } else if (currentQ.statements && currentQ.statements.length > 0) {
-          currentQ.type = 'true_false';
         } else {
           currentQ.type = 'short_essay';
           if (currentQ.answer) currentQ.answer_keys = [currentQ.answer];
         }
       }
 
-      if (currentQ.type === 'mcq' && !currentQ.answer && currentQ.options.length > 0) {
+      if (currentQ.type === 'mcq' && !currentQ.answer && hasOptions) {
         currentQ.answer = currentQ.options[0].id;
       }
-      if (currentQ.type === 'short_essay' && currentQ.answer_keys.length === 0) {
+      if (currentQ.type === 'true_false') {
+        const ansObj = {};
+        currentQ.statements.forEach((st, idx) => {
+          ansObj[String(idx)] = st.key || 'B';
+        });
+        currentQ.answer = currentQ.answer || ansObj;
+      }
+      if (currentQ.type === 'matching') {
+        const ansObj = {};
+        currentQ.premises.forEach((p, idx) => {
+          const tgt = currentQ.targets[idx];
+          ansObj[String(idx)] = tgt ? tgt.id : String.fromCharCode(65 + idx);
+        });
+        currentQ.answer = currentQ.answer || ansObj;
+      }
+      if (currentQ.type === 'short_essay' && (!currentQ.answer_keys || currentQ.answer_keys.length === 0)) {
         currentQ.answer_keys = [currentQ.answer || 'kunci jawaban'];
+      }
+      if (currentQ.type === 'long_essay') {
+        if (!currentQ.ideal_answer && currentQ.answer) currentQ.ideal_answer = currentQ.answer;
+        if (!currentQ.rubric) currentQ.rubric = 'Kriteria rubrik penilaian analitis berbobot.';
+        if (!currentQ.max_score) currentQ.max_score = 100;
       }
       if (!currentQ.weight) {
         currentQ.weight = (currentQ.type === 'long_essay' ? 3.0 : (currentQ.type === 'matching' ? 2.0 : (currentQ.type === 'mcq_complex' || currentQ.type === 'true_false' ? 1.5 : 1.0)));
@@ -2036,12 +2064,41 @@ function parseQuestionsFromWordText(rawText) {
     if (kMatch) {
       let val = kMatch[1].trim();
 
-      // Check if explanation is in the same line: "KUNCI: B | Pembahasan: ..."
       if (/\|\s*(?:pembahasan|penjelasan|explanation|alasan)\s*:/i.test(val)) {
         const pParts = val.split(/\|\s*(?:pembahasan|penjelasan|explanation|alasan)\s*:/i);
         val = pParts[0].trim();
         if (pParts[1] && !currentQ.explanation) {
           currentQ.explanation = pParts[1].trim();
+        }
+      }
+
+      if (currentQ.type === 'true_false' || (/^[BSbs\s\-\,\;]+$/.test(val) && val.length >= 3)) {
+        const bsLetters = val.match(/[BSbs]/g);
+        if (bsLetters && bsLetters.length > 0) {
+          currentQ.type = 'true_false';
+          const ansMap = {};
+          bsLetters.forEach((letter, bIdx) => {
+            ansMap[String(bIdx)] = letter.toUpperCase();
+            if (currentQ.statements[bIdx]) {
+              currentQ.statements[bIdx].key = letter.toUpperCase();
+            }
+          });
+          currentQ.answer = ansMap;
+          continue;
+        }
+      }
+
+      if (currentQ.type === 'matching' || (val.includes('-') && /\d+\s*[-:=]\s*[A-Za-z]/.test(val))) {
+        currentQ.type = 'matching';
+        const pairMatches = [...val.matchAll(/(\d+)\s*[-:=]\s*([A-Za-z])/g)];
+        if (pairMatches.length > 0) {
+          const ansMap = {};
+          pairMatches.forEach(pm => {
+            const premisIdx = parseInt(pm[1], 10) - 1;
+            ansMap[String(premisIdx)] = pm[2].toUpperCase();
+          });
+          currentQ.answer = ansMap;
+          continue;
         }
       }
 
@@ -2060,7 +2117,11 @@ function parseQuestionsFromWordText(rawText) {
       } else {
         currentQ.answer = val;
         currentQ.answer_keys = [val];
-        if (!currentQ.type) currentQ.type = 'short_essay';
+        if (currentQ.type === 'long_essay') {
+          currentQ.ideal_answer = val;
+        } else if (!currentQ.type) {
+          currentQ.type = 'short_essay';
+        }
       }
       continue;
     }
@@ -2094,6 +2155,54 @@ function parseQuestionsFromWordText(rawText) {
       continue;
     }
 
+    // Matching format: "PREMIS 1: xxx ---> TARGET A: yyy" or "xxx ---> yyy"
+    if (line.includes('--->') || line.includes('-->') || /PREMIS\s*\d*[:\.\-]/i.test(line)) {
+      currentQ.type = 'matching';
+      const parts = line.split(/(?:--->|---|-->|➔|->)/);
+      if (parts.length >= 2) {
+        const left = parts[0].replace(/^(?:PREMIS\s*\d*[:\.\-]?|\d+[\.\)])\s*/i, '').trim();
+        let right = parts[1].replace(/^(?:\[\s*[A-Za-z0-9\.\s]*\s*\])?\s*(?:TARGET\s*[A-Za-z0-9]?[:\.\-]?|[A-Ea-e][\.\)])\s*/i, '').trim();
+        const idNum = currentQ.premises.length;
+        const targetId = String.fromCharCode(65 + idNum);
+        currentQ.premises.push({ id: idNum, text: left });
+        currentQ.targets.push({ id: targetId, text: right });
+        continue;
+      }
+    }
+
+    // True/False format: "[B] pernyataan" or "[S] pernyataan" or "[ ] [ B / S ] pernyataan"
+    const tfBracketMatch = line.match(/^\[([BSbs])\]\s*(?:(?:Pernyataan|\d+)[\.\:]?\s*)?(.*)$/i);
+    if (tfBracketMatch) {
+      currentQ.type = 'true_false';
+      currentQ.statements.push({
+        id: currentQ.statements.length,
+        key: tfBracketMatch[1].toUpperCase(),
+        text: tfBracketMatch[2].trim()
+      });
+      continue;
+    }
+
+    const tfEmptyMatch = line.match(/^\[\s*\]\s*\[\s*[BSbs]\s*(?:\/|\s)\s*[BSbs]\s*\]\s*(?:(?:Pernyataan|\d+)[\.\:]?\s*)?(.*)$/i);
+    if (tfEmptyMatch) {
+      currentQ.type = 'true_false';
+      currentQ.statements.push({
+        id: currentQ.statements.length,
+        key: 'B',
+        text: tfEmptyMatch[1].trim()
+      });
+      continue;
+    }
+
+    if (currentQ.type === 'true_false' && /^(?:\d+[\.\)]\s*|Pernyataan\s*\d*[:\.\-]?\s*)(.*)$/i.test(line)) {
+      const pMatch = line.match(/^(?:\d+[\.\)]\s*|Pernyataan\s*\d*[:\.\-]?\s*)(.*)$/i);
+      currentQ.statements.push({
+        id: currentQ.statements.length,
+        key: 'B',
+        text: pMatch[1].trim()
+      });
+      continue;
+    }
+
     const optMatch = line.match(optRegex);
     if (optMatch) {
       currentQ.options.push({
@@ -2103,7 +2212,7 @@ function parseQuestionsFromWordText(rawText) {
       continue;
     }
 
-    if (currentQ.options.length === 0 && !currentQ.answer && currentQ.answer_keys.length === 0) {
+    if (currentQ.options.length === 0 && !currentQ.answer && currentQ.answer_keys.length === 0 && currentQ.statements.length === 0 && currentQ.premises.length === 0) {
       currentQ.stem += (currentQ.stem ? '<br>' : '') + line;
     } else if (currentQ.explanation) {
       currentQ.explanation += ' ' + line;
@@ -2113,6 +2222,92 @@ function parseQuestionsFromWordText(rawText) {
   finalizeCurrentQ();
   return questions;
 }
+
+const SAMPLE_TEMPLATE_QUESTIONS = [
+  {
+    stem: "Layanan jaringan apa yang bertugas memberikan konfigurasi alamat IP, subnet mask, dan default gateway secara otomatis kepada komputer klien di laboratorium sekolah?",
+    type: "mcq",
+    cog: "C2",
+    weight: 1.0,
+    options: [
+      { id: "A", text: "DNS (Domain Name System)" },
+      { id: "B", text: "DHCP (Dynamic Host Configuration Protocol)" },
+      { id: "C", text: "FTP (File Transfer Protocol)" },
+      { id: "D", text: "SSH (Secure Shell)" },
+      { id: "E", text: "NTP (Network Time Protocol)" }
+    ],
+    answer: "B",
+    explanation: "DHCP (Dynamic Host Configuration Protocol) berfungsi mengalokasikan alamat IP, subnet mask, DNS, dan gateway kepada komputer klien secara dinamis."
+  },
+  {
+    stem: "Manakah dari protokol jaringan berikut yang menggunakan enkripsi kriptografi untuk mengamankan komunikasi data dari sniffing? (Pilih semua jawaban yang benar)",
+    type: "mcq_complex",
+    cog: "C3",
+    weight: 1.5,
+    options: [
+      { id: "A", text: "HTTPS (Port 443 - Hypertext Transfer Protocol Secure)" },
+      { id: "B", text: "HTTP (Port 80 - Standar Plaintext)" },
+      { id: "C", text: "SSH (Port 22 - Secure Shell)" },
+      { id: "D", text: "Telnet (Port 23 - Plaintext Remote Login)" },
+      { id: "E", text: "SFTP (Port 22 - SSH File Transfer Protocol)" }
+    ],
+    answer: ["A", "C", "E"],
+    explanation: "HTTPS, SSH, dan SFTP menggunakan protokol kriptografi (SSL/TLS dan SSH) untuk mengamankan pertukaran data dari penyadapan (sniffing)."
+  },
+  {
+    stem: "Tentukan status kebenaran dari setiap pernyataan teknis mengenai media transmisi dan perangkat keras jaringan komputer berikut!",
+    type: "true_false",
+    cog: "C3",
+    weight: 1.5,
+    statements: [
+      { id: 0, text: "Kabel UTP Kategori 6 (Cat6) mampu mendukung kecepatan transfer data hingga 10 Gbps pada jarak maksimal 55 meter.", key: "B" },
+      { id: 1, text: "Topologi Star menggunakan satu kabel coaxial utama sebagai backbone tunggal bagi seluruh komputer klien.", key: "S" },
+      { id: 2, text: "Switch jaringan bekerja pada Data Link Layer (Layer 2 OSI) dan menggunakan tabel MAC Address untuk meneruskan frame ke port tujuan.", key: "B" },
+      { id: 3, text: "Repeater memeriksa header alamat IP pada paket data sebelum meneruskannya ke segmen jaringan lain.", key: "S" }
+    ],
+    answer: { "0": "B", "1": "S", "2": "B", "3": "S" },
+    explanation: "Pernyataan 1 Benar (spesifikasi Cat6). Pernyataan 2 Salah (backbone tunggal adalah topologi Bus). Pernyataan 3 Benar (Switch bekerja di Layer 2 OSI). Pernyataan 4 Salah (Repeater bekerja di Layer 1 Physical dan hanya memperkuat sinyal fisik tanpa membaca IP)."
+  },
+  {
+    stem: "Jodohkan istilah protokol jaringan komputer di sebelah kiri dengan nomor port default yang sesuai di sebelah kanan:",
+    type: "matching",
+    cog: "C3",
+    weight: 2.0,
+    premises: [
+      { id: 0, text: "HTTP (Hypertext Transfer Protocol - Web Standar)" },
+      { id: 1, text: "HTTPS (HTTP Secure - Web Terenkripsi)" },
+      { id: 2, text: "SSH (Secure Shell - Remote Console Terenkripsi)" },
+      { id: 3, text: "DNS (Domain Name System - Resolusi Domain)" }
+    ],
+    targets: [
+      { id: "A", text: "Port 80" },
+      { id: "B", text: "Port 443" },
+      { id: "C", text: "Port 22" },
+      { id: "D", text: "Port 53" }
+    ],
+    answer: { "0": "A", "1": "B", "2": "C", "3": "D" },
+    explanation: "HTTP Port 80, HTTPS Port 443, SSH Port 22, dan DNS Port 53."
+  },
+  {
+    stem: "Sebutkan perintah terminal lengkap di Linux Ubuntu 24.04 LTS untuk memperbarui indeks daftar repositori paket sistem menggunakan manajer paket apt!",
+    type: "short_essay",
+    cog: "C2",
+    weight: 1.0,
+    answer_keys: ["sudo apt update", "apt update", "sudo apt-get update"],
+    explanation: "Perintah standar untuk sinkronisasi indeks repositori Debian/Ubuntu adalah 'sudo apt update'."
+  },
+  {
+    stem: "Sebuah laboratorium sekolah mengalami kendala jaringan di mana komputer klien tidak dapat mengakses internet meskipun kabel LAN terhubung dan lampu port switch menyala hijau normal. Jelaskan langkah-langkah pemecahan masalah (troubleshooting) sistematis yang harus Anda lakukan mulai dari physical layer hingga application layer!",
+    type: "long_essay",
+    cog: "C4",
+    weight: 3.0,
+    rubric: "35% Pemeriksaan konfigurasi IP & Gateway, 35% Pengujian Ping Gateway & IP Publik, 30% Solusi Resolusi DNS & Routing.",
+    ideal_answer: "1. Periksa konfigurasi IP melalui terminal (ip a / ipconfig) untuk memastikan klien mendapatkan alamat IP dan default gateway dari DHCP server. 2. Lakukan ping ke default gateway lokal untuk verifikasi koneksi switch & router. 3. Lakukan ping ke IP publik (misal 8.8.8.8) untuk memastikan routing dan koneksi internet router berjalan. 4. Uji resolusi domain menggunakan nslookup untuk memastikan DNS berfungsi.",
+    max_score: 100,
+    keywords: ["IP address", "default gateway", "ping", "DNS", "nslookup", "routing"],
+    explanation: "Troubleshooting dilakukan berurutan sesuai OSI layer: verifikasi konfigurasi IP (Layer 3), gateway & routing (Layer 3), dan resolusi DNS (Layer 7)."
+  }
+];
 
 function generateDocxDocument({ title, school, subject, teacher, targetClass, questions, includeKeys = true, includeExplanation = true, includeHeader = true }) {
   let bodyXml = '';
@@ -2131,10 +2326,22 @@ function generateDocxDocument({ title, school, subject, teacher, targetClass, qu
     const qNum = idx + 1;
     const cleanStem = (q.stem || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
     
-    bodyXml += `<w:p><w:pPr><w:spacing w:before="240" w:after="100"/></w:pPr>`;
+    bodyXml += `<w:p><w:pPr><w:spacing w:before="240" w:after="80"/></w:pPr>`;
     bodyXml += `<w:r><w:rPr><w:b/></w:rPr><w:t>${qNum}. </w:t></w:r>`;
     bodyXml += `<w:r><w:t>${xmlEscape(cleanStem)}</w:t></w:r>`;
     bodyXml += `</w:p>`;
+
+    let typeLabel = '';
+    if (q.type === 'mcq') typeLabel = 'Pilihan Ganda Tunggal';
+    else if (q.type === 'mcq_complex') typeLabel = 'Pilihan Ganda Kompleks';
+    else if (q.type === 'true_false') typeLabel = 'Pernyataan Benar / Salah';
+    else if (q.type === 'matching') typeLabel = 'Menjodohkan';
+    else if (q.type === 'short_essay') typeLabel = 'Isian Singkat';
+    else if (q.type === 'long_essay') typeLabel = 'Uraian / Esai AI';
+
+    if (typeLabel) {
+      bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="4338ca"/></w:rPr><w:t>TIPE: ${typeLabel}</w:t></w:r></w:p>`;
+    }
 
     if (q.type === 'mcq' || q.type === 'mcq_complex') {
       const opts = q.options || [];
@@ -2148,19 +2355,31 @@ function generateDocxDocument({ title, school, subject, teacher, targetClass, qu
     } else if (q.type === 'true_false') {
       (q.statements || []).forEach((st, sIdx) => {
         bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="40"/></w:pPr>`;
-        bodyXml += `<w:r><w:t>[   ] [ B / S ] ${xmlEscape(st.text)}</w:t></w:r>`;
+        if (includeKeys && st.key) {
+          bodyXml += `<w:r><w:rPr><w:b/><w:color w:val="047857"/></w:rPr><w:t>[${xmlEscape(st.key)}] </w:t></w:r>`;
+        } else {
+          bodyXml += `<w:r><w:t>[   ] [ B / S ] </w:t></w:r>`;
+        }
+        bodyXml += `<w:r><w:t>${sIdx + 1}. ${xmlEscape(st.text)}</w:t></w:r>`;
         bodyXml += `</w:p>`;
       });
     } else if (q.type === 'matching') {
       (q.premises || []).forEach((p, pIdx) => {
         const target = (q.targets || [])[pIdx];
         bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="40"/></w:pPr>`;
-        bodyXml += `<w:r><w:t>${pIdx + 1}. ${xmlEscape(p.text)}   ----&gt;   [ ... ] ${target ? xmlEscape(target.text) : ''}</w:t></w:r>`;
+        if (includeKeys && target) {
+          bodyXml += `<w:r><w:rPr><w:b/></w:rPr><w:t>PREMIS ${pIdx + 1}: ${xmlEscape(p.text)}   --->   TARGET ${target.id}: ${xmlEscape(target.text)}</w:t></w:r>`;
+        } else {
+          bodyXml += `<w:r><w:t>${pIdx + 1}. ${xmlEscape(p.text)}   --->   [ ... ] ${target ? `${target.id}. ${xmlEscape(target.text)}` : ''}</w:t></w:r>`;
+        }
         bodyXml += `</w:p>`;
       });
     } else if (q.type === 'short_essay') {
       bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:i/><w:color w:val="6b7280"/></w:rPr><w:t>Jawaban Singkat: _____________________________________________</w:t></w:r></w:p>`;
     } else if (q.type === 'long_essay') {
+      if (q.rubric) {
+        bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="40"/></w:pPr><w:r><w:rPr><w:i/><w:color w:val="4b5563"/></w:rPr><w:t>RUBRIK: ${xmlEscape(q.rubric)}</w:t></w:r></w:p>`;
+      }
       bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:i/><w:color w:val="6b7280"/></w:rPr><w:t>Lembar Uraian / Jawaban: [ ............................................................................................................ ]</w:t></w:r></w:p>`;
     }
 
@@ -2169,9 +2388,15 @@ function generateDocxDocument({ title, school, subject, teacher, targetClass, qu
       if (q.type === 'mcq') keyText = q.answer || '-';
       else if (q.type === 'mcq_complex') keyText = Array.isArray(q.answer) ? q.answer.join(', ') : q.answer;
       else if (q.type === 'true_false') keyText = (q.statements || []).map(s => s.key).join('-');
+      else if (q.type === 'matching') {
+        if (typeof q.answer === 'object' && q.answer !== null) {
+          keyText = Object.entries(q.answer).map(([k, v]) => `${Number(k) + 1}-${v}`).join(', ');
+        } else {
+          keyText = (q.premises || []).map((_, idx) => `${idx + 1}-${String.fromCharCode(65 + idx)}`).join(', ');
+        }
+      }
       else if (q.type === 'short_essay') keyText = (q.answer_keys || []).join(' / ');
-      else if (q.type === 'matching') keyText = JSON.stringify(q.answer || {});
-      else if (q.type === 'long_essay') keyText = `Skor Maks: ${q.max_score || 100} | Kata Kunci: ${(q.keywords || []).join(', ')}`;
+      else if (q.type === 'long_essay') keyText = q.ideal_answer || (q.keywords ? `Kata Kunci: ${(q.keywords || []).join(', ')}` : 'Jawaban Esai Komprehensif');
 
       bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:pBdr><w:left w:val="single" w:sz="14" w:space="8" w:color="10b981"/></w:pBdr><w:shd w:val="clear" w:color="auto" w:fill="ecfdf5"/><w:spacing w:before="60" w:after="100"/></w:pPr>`;
       bodyXml += `<w:r><w:rPr><w:b/><w:color w:val="065f46"/></w:rPr><w:t>KUNCI JAWABAN: ${xmlEscape(keyText)}</w:t></w:r>`;
@@ -2213,49 +2438,16 @@ function generateDocxDocument({ title, school, subject, teacher, targetClass, qu
 }
 
 function generateDocxTemplate() {
-  const sampleQuestions = [
-    {
-      stem: "Layanan jaringan apa yang bertugas memberikan konfigurasi alamat IP secara otomatis kepada komputer klien di laboratorium sekolah?",
-      type: "mcq",
-      options: [
-        { id: "A", text: "DNS (Domain Name System)" },
-        { id: "B", text: "DHCP (Dynamic Host Configuration Protocol)" },
-        { id: "C", text: "FTP (File Transfer Protocol)" },
-        { id: "D", text: "SSH (Secure Shell)" },
-        { id: "E", text: "NTP (Network Time Protocol)" }
-      ],
-      answer: "B",
-      explanation: "DHCP berfungsi mengalokasikan alamat IP dan konfigurasi jaringan lainnya kepada komputer klien secara dinamis."
-    },
-    {
-      stem: "Sebutkan perintah terminal lengkap di Ubuntu 24.04 untuk menginstal paket web server Apache menggunakan manajer paket apt!",
-      type: "short_essay",
-      answer_keys: ["sudo apt install apache2", "apt install apache2", "sudo apt-get install apache2"],
-      explanation: "Perintah standar instalasi Apache pada Ubuntu adalah 'sudo apt install apache2'."
-    },
-    {
-      stem: "Manakah dari protokol berikut yang menggunakan enkripsi data untuk pertukaran data yang aman? (Pilih semua yang benar)",
-      type: "mcq_complex",
-      options: [
-        { id: "A", text: "HTTPS (Port 443)" },
-        { id: "B", text: "HTTP (Port 80)" },
-        { id: "C", text: "SSH (Port 22)" },
-        { id: "D", text: "Telnet (Port 23)" },
-        { id: "E", text: "SFTP (Port 22)" }
-      ],
-      answer: ["A", "C", "E"],
-      explanation: "HTTPS, SSH, dan SFTP menggunakan protokol kriptografi (SSL/TLS dan SSH) untuk mengamankan pertukaran data."
-    }
-  ];
-
   return generateDocxDocument({
-    title: "TEMPLATE RESMI UPLOAD BUTIR SOAL CBT",
+    title: "TEMPLATE RESMI UNGGAH BUTIR SOAL CBT",
     school: "SMK NEGERI 5 BANDUNG",
     subject: "Administrasi Sistem Jaringan / Umum",
     teacher: "Tim Asesmen Guru",
     targetClass: "Semua Kelas",
-    questions: sampleQuestions,
-    includeKeys: true
+    questions: SAMPLE_TEMPLATE_QUESTIONS,
+    includeKeys: true,
+    includeExplanation: true,
+    includeHeader: true
   });
 }
 
@@ -2268,15 +2460,31 @@ function generateWordHtmlDocument({ title, school, subject, teacher, targetClass
     qHtml += `<div style="margin-bottom: 16px; page-break-inside: avoid;">`;
     qHtml += `<p style="margin: 0 0 6px 0; font-weight: bold;">${qNum}. ${q.stem || ''}</p>`;
 
+    let typeLabel = '';
+    if (q.type === 'mcq') typeLabel = 'Pilihan Ganda Tunggal';
+    else if (q.type === 'mcq_complex') typeLabel = 'Pilihan Ganda Kompleks';
+    else if (q.type === 'true_false') typeLabel = 'Pernyataan Benar / Salah';
+    else if (q.type === 'matching') typeLabel = 'Menjodohkan';
+    else if (q.type === 'short_essay') typeLabel = 'Isian Singkat';
+    else if (q.type === 'long_essay') typeLabel = 'Uraian / Esai AI';
+
+    if (typeLabel) {
+      qHtml += `<p style="margin: 0 0 6px 24px; font-size: 9.5pt; color: #4338ca; font-weight: bold;">TIPE: ${typeLabel}</p>`;
+    }
+
     if (q.type === 'mcq' || q.type === 'mcq_complex') {
       (q.options || []).forEach(opt => {
         qHtml += `<p style="margin: 0 0 4px 24px;"><strong>${opt.id}.</strong> ${opt.text || ''}</p>`;
       });
     } else if (q.type === 'true_false') {
       qHtml += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse: collapse; margin-left: 24px; margin-bottom: 6px; font-size: 10pt;">`;
-      qHtml += `<tr style="background:#f3f4f6;"><th>No</th><th>Pernyataan</th><th>Benar</th><th>Salah</th></tr>`;
+      qHtml += `<tr style="background:#f3f4f6;"><th>No</th><th>Pernyataan</th>${includeKeys ? '<th>Kunci</th>' : '<th>Benar</th><th>Salah</th>'}</tr>`;
       (q.statements || []).forEach((st, sIdx) => {
-        qHtml += `<tr><td align="center">${sIdx + 1}</td><td>${st.text}</td><td align="center">[ &nbsp; ]</td><td align="center">[ &nbsp; ]</td></tr>`;
+        if (includeKeys) {
+          qHtml += `<tr><td align="center">${sIdx + 1}</td><td>${st.text}</td><td align="center" style="font-weight:bold;color:${st.key === 'B' ? '#059669' : '#dc2626'};">${st.key || 'B'}</td></tr>`;
+        } else {
+          qHtml += `<tr><td align="center">${sIdx + 1}</td><td>${st.text}</td><td align="center">[ &nbsp; ]</td><td align="center">[ &nbsp; ]</td></tr>`;
+        }
       });
       qHtml += `</table>`;
     } else if (q.type === 'matching') {
@@ -2284,12 +2492,16 @@ function generateWordHtmlDocument({ title, school, subject, teacher, targetClass
       qHtml += `<tr style="background:#f3f4f6;"><th>Premis / Konsep</th><th>Jodohkan dengan</th><th>Pilihan Target</th></tr>`;
       (q.premises || []).forEach((p, pIdx) => {
         const target = (q.targets || [])[pIdx];
-        qHtml += `<tr><td>${p.text}</td><td align="center">➔ [ &nbsp;&nbsp;&nbsp; ]</td><td>${target ? `<strong>${target.id}.</strong> ${target.text}` : ''}</td></tr>`;
+        const arrow = (includeKeys && target) ? `➔ <strong>${target.id}</strong>` : '➔ [ &nbsp;&nbsp;&nbsp; ]';
+        qHtml += `<tr><td>${p.text}</td><td align="center">${arrow}</td><td>${target ? `<strong>${target.id}.</strong> ${target.text}` : ''}</td></tr>`;
       });
       qHtml += `</table>`;
     } else if (q.type === 'short_essay') {
       qHtml += `<p style="margin: 0 0 4px 24px; color: #4b5563;"><em>Jawaban Singkat: _____________________________________________</em></p>`;
     } else if (q.type === 'long_essay') {
+      if (q.rubric) {
+        qHtml += `<p style="margin: 0 0 4px 24px; font-size: 9pt; color: #4b5563;"><em>RUBRIK: ${q.rubric}</em></p>`;
+      }
       qHtml += `<div style="margin: 4px 0 6px 24px; border: 1px dashed #9ca3af; height: 100px; padding: 6px; font-size: 9pt; color: #6b7280;"><em>Lembar Uraian / Jawaban Siswa...</em></div>`;
     }
 
@@ -2298,9 +2510,15 @@ function generateWordHtmlDocument({ title, school, subject, teacher, targetClass
       if (q.type === 'mcq') keyVal = q.answer || '-';
       else if (q.type === 'mcq_complex') keyVal = Array.isArray(q.answer) ? q.answer.join(', ') : q.answer;
       else if (q.type === 'true_false') keyVal = (q.statements || []).map(s => s.key).join('-');
+      else if (q.type === 'matching') {
+        if (typeof q.answer === 'object' && q.answer !== null) {
+          keyVal = Object.entries(q.answer).map(([k, v]) => `${Number(k) + 1}-${v}`).join(', ');
+        } else {
+          keyVal = (q.premises || []).map((_, idx) => `${idx + 1}-${String.fromCharCode(65 + idx)}`).join(', ');
+        }
+      }
       else if (q.type === 'short_essay') keyVal = (q.answer_keys || []).join(' / ');
-      else if (q.type === 'matching') keyVal = JSON.stringify(q.answer || {});
-      else if (q.type === 'long_essay') keyVal = `Skor: ${q.max_score || 100} | Kata Kunci: ${(q.keywords || []).join(', ')}`;
+      else if (q.type === 'long_essay') keyVal = q.ideal_answer || (q.keywords ? `Kata Kunci: ${(q.keywords || []).join(', ')}` : 'Jawaban Esai Komprehensif');
 
       qHtml += `<div style="margin: 6px 0 0 24px; padding: 6px 10px; background: #ecfdf5; border-left: 4px solid #10b981; font-size: 9.5pt; color: #065f46;">`;
       qHtml += `<strong>KUNCI JAWABAN:</strong> ${keyVal}`;
@@ -2369,7 +2587,6 @@ function generateWordHtmlDocument({ title, school, subject, teacher, targetClass
   </head>
   <body>
     ${headerHtml}
-    ${qHtml}
     ${qHtml}
   </body>
   </html>`;
@@ -3993,12 +4210,12 @@ const server = http.createServer(async (req, res) => {
       const envPath = path.join(__dirname, '.env');
       let envContent = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf8') : '';
       if (envContent.includes('AI_API_KEY=')) {
-        envContent = envContent.replace(/AI_API_KEY=.*(\r?\n|$)/, `AI_API_KEY=${SERVER_CONFIG.gemini_api_key}\n`);
+        envContent = envContent.replace(/AI_API_KEY=.*(\n?\n|$)/, `AI_API_KEY=${SERVER_CONFIG.gemini_api_key}\n`);
       } else {
         envContent += `\nAI_API_KEY=${SERVER_CONFIG.gemini_api_key}\n`;
       }
       if (envContent.includes('AI_MODEL=')) {
-        envContent = envContent.replace(/AI_MODEL=.*(\r?\n|$)/, `AI_MODEL=${SERVER_CONFIG.default_model}\n`);
+        envContent = envContent.replace(/AI_MODEL=.*(\n?\n|$)/, `AI_MODEL=${SERVER_CONFIG.default_model}\n`);
       } else {
         envContent += `\nAI_MODEL=${SERVER_CONFIG.default_model}\n`;
       }

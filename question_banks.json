@@ -2057,487 +2057,167 @@
       {
         "id": 1,
         "type": "mcq",
-        "cog": "C4",
-        "stem": "Seorang administrator jaringan di SMK sedang melakukan audit keamanan pada server Ubuntu Server kelas XI TKJ. Saat memeriksa log otentikasi melalui perintah <code>sudo tail -f /var/log/auth.log</code>, ditemukan baris peringatan berikut:<br><br><code>sshd[1942]: Connection reset by authenticating user admin [preauth]</code><br><code>sshd[1948]: Failed password for root from 192.168.10.45 port 54321 ssh2</code><br><br>Berdasarkan cuplikan log tersebut, langkah mitigasi paling tepat yang harus diterapkan dalam konfigurasi <code>/etc/ssh/sshd_config</code> untuk mencegah eksploitasi lanjutan adalah...",
+        "cog": "C3",
+        "stem": "Seorang siswa SMK sedang melakukan instalasi sistem operasi Ubuntu Server 24.04 LTS pada komputer praktik. Pada tahap pemilihan partisi disk, sistem menawarkan opsi 'Guided - use entire disk and set up LVM' (Logical Volume Manager). Apa keuntungan utama bagi teknisi jaringan jika memilih opsi LVM tersebut dibandingkan partisi standar?",
         "weight": 1,
-        "explanation": "Log menunjukkan adanya percobaan brute-force login menggunakan akun 'root' dari IP lokal 192.168.10.45. Praktik keamanan terbaik (best practice) pada OpenSSH server adalah melarang login langsung sebagai pengguna root (PermitRootLogin no) untuk mencegah penyerang mendapatkan hak akses tertinggi secara langsung, serta menggunakan autentikasi berbasis SSH Key.",
+        "explanation": "Logical Volume Manager (LVM) memberikan fleksibilitas tinggi dalam manajemen penyimpanan di Linux. Keuntungan utamanya adalah kemampuan untuk memperbesar atau memperkecil ukuran logical volume secara dinamis saat sistem sedang berjalan (online), sangat berguna untuk direktori seperti /var atau /home yang sering mengalami fluktuasi kebutuhan kapasitas pada server.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "Mengubah port default SSH dari port 22 ke port yang tidak umum digunakan."
+            "text": "Mempercepat proses booting sistem operasi secara signifikan melalui kompresi data otomatis pada partisi root."
           },
           {
             "id": "B",
-            "text": "Menonaktifkan akses login langsung untuk pengguna root (PermitRootLogin no) dan membatasi autentikasi berbasis kunci publik."
+            "text": "Memungkinkan ukuran partisi (seperti /var atau /home) diubah ukurannya secara dinamis (resize) tanpa harus melakukan format ulang."
           },
           {
             "id": "C",
-            "text": "Menonaktifkan protokol SSHv2 dan memaksa penggunaan protokol SSHv1 untuk enkripsi yang lebih cepat."
+            "text": "Mengaktifkan enkripsi seluruh hard disk secara otomatis menggunakan standar AES-256 untuk keamanan tingkat tinggi."
           },
           {
             "id": "D",
-            "text": "Mengaktifkan X11Forwarding agar sesi grafis dapat dipantau langsung oleh administrator."
+            "text": "Membuat sistem secara otomatis membuat cadangan (backup) data harian ke server cloud eksternal."
           },
           {
             "id": "E",
-            "text": "Menaikkan nilai MaxSessions dan MaxStartups untuk menampung koneksi masuk secara bersamaan."
+            "text": "Menghilangkan kebutuhan akan partisi swap karena RAM akan dikelola langsung oleh kernel melalui LVM."
           }
         ],
         "answer": "B"
       },
       {
         "id": 2,
-        "type": "mcq_complex",
-        "cog": "C4",
-        "stem": "Seorang siswa kelas XI TKJ diminta mengonfigurasi akses SSH tanpa password (key-based authentication) dari klien Linux ke server jarak jauh. Siswa tersebut telah menjalankan perintah <code>ssh-keygen -t rsa -b 4096</code> pada mesin klien. Manakah dari pernyataan berikut yang merupakan langkah lanjutan yang benar dan aman? (Pilih dua jawaban yang benar)",
-        "weight": 1.5,
-        "explanation": "Kunci publik disalin ke authorized_keys dengan izin chmod 600.",
+        "type": "mcq",
+        "cog": "C3",
+        "stem": "Setelah proses instalasi Ubuntu 24.04 LTS selesai, seorang administrator jaringan ingin melakukan konfigurasi alamat IP statis pada antarmuka jaringan. Pada Ubuntu versi terbaru ini, utilitas jaringan default apa yang digunakan untuk mengatur konfigurasi tersebut melalui berkas teks YAML di direktori <code>/etc/netplan/</code>?",
+        "weight": 1,
+        "explanation": "Ubuntu mulai versi 18.04 LTS hingga versi terbaru 24.04 LTS menggunakan Netplan sebagai utilitas manajemen konfigurasi jaringan default. Netplan membaca berkas konfigurasi berformat YAML yang terletak di direktori /etc/netplan/ untuk kemudian diterapkan ke backend seperti systemd-networkd atau NetworkManager.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "Menyalin berkas id_rsa.pub ke ~/.ssh/authorized_keys di server target."
+            "text": "ifconfig"
           },
           {
             "id": "B",
-            "text": "Mengirim berkas private key id_rsa ke server target."
+            "text": "network-manager"
           },
           {
             "id": "C",
-            "text": "Mengatur izin berkas ~/.ssh/authorized_keys menjadi 600 di server target."
+            "text": "netplan"
           },
           {
             "id": "D",
-            "text": "Mengubah izin berkas id_rsa menjadi 777 agar dapat dibaca semua pengguna."
+            "text": "systemd-resolved"
           },
           {
             "id": "E",
-            "text": "Menonaktifkan layanan firewall di klien dan server."
+            "text": "dhcpcd"
           }
         ],
-        "answer": [
-          "A",
-          "C"
-        ]
+        "answer": "C"
       },
       {
         "id": 3,
-        "type": "true_false",
+        "type": "mcq",
         "cog": "C4",
-        "stem": "Perhatikan konfigurasi file <code>/etc/ssh/sshd_config</code> pada server remote berikut:\n<code>Port 2222</code>\n<code>PermitRootLogin prohibit-password</code>\n<code>PubkeyAuthentication yes</code>\n<code>PasswordAuthentication no</code>\nTentukan kebenaran dari setiap pernyataan analisis teknis berikut berdasarkan konfigurasi tersebut:",
-        "weight": 1.5,
-        "explanation": "Pernyataan 0 salah karena Port SSH telah diubah ke 2222, sehingga klien harus menyertakan `-p 2222`. Pernyataan 1 benar karena `PermitRootLogin prohibit-password` mengizinkan root login asalkan memakai kunci publik. Pernyataan 2 benar karena `PasswordAuthentication no` menutup total metode login dengan password.",
+        "stem": "Perhatikan cuplikan berkas konfigurasi Netplan berikut pada Ubuntu 24.04 LTS:<br><code>network:\nversion: 2\nethernets:\nenp3s0:\naddresses:\n- 192.168.1.10/24\ngateway4: 192.168.1.1\nnameservers:\naddresses: [8.8.8.8, 8.8.4.4]</code><br>Ketika perintah <code>sudo netplan apply</code> dieksekusi, sistem mengeluarkan pesan peringatan atau galat terkait <code>gateway4</code> yang sudah deprecated (tidak digunakan lagi). Bagaimana format penulisan rute default (gateway) yang benar pada versi Netplan terbaru di Ubuntu 24.04?",
+        "weight": 1,
+        "explanation": "Pada versi Netplan modern yang digunakan di Ubuntu 24.04, properti 'gateway4' dan 'gateway6' sudah ditinggalkan (deprecated). Standar penulisan rute default yang benar menggunakan blok 'routes' dengan mendefinisikan tujuan 'to: default' dan alamat 'via: [IP Gateway]'.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "statements": [
+        "options": [
           {
-            "id": 0,
-            "text": "Klien yang mencoba terhubung menggunakan perintah standar <code>ssh user@server_ip</code> tanpa menentukan port akan langsung berhasil terhubung ke server.",
-            "key": "S"
+            "id": "A",
+            "text": "Mengganti baris tersebut menjadi <code>default-gateway: [192.168.1.1]</code>"
           },
           {
-            "id": 1,
-            "text": "Pengguna root diizinkan masuk ke server, tetapi hanya jika menggunakan metode autentikasi berbasis kunci (SSH key), bukan kata sandi.",
-            "key": "B"
+            "id": "B",
+            "text": "Mengganti baris tersebut menjadi <code>routes: [{to: default, via: 192.168.1.1}]</code>"
           },
           {
-            "id": 2,
-            "text": "Server menolak semua upaya login yang mengandalkan autentikasi berbasis kata sandi (password) dari semua jenis akun pengguna.",
-            "key": "B"
+            "id": "C",
+            "text": "Memindahkan alamat gateway ke dalam blok <code>nameservers</code>"
+          },
+          {
+            "id": "D",
+            "text": "Menghapus baris gateway dan menggantinya dengan utilitas <code>route add default gw</code>"
+          },
+          {
+            "id": "E",
+            "text": "Menggunakan sintaks lama <code>gateway: 192.168.1.1</code> di bawah blok addresses"
           }
         ],
-        "answer": {
-          "0": "S",
-          "1": "B",
-          "2": "B"
-        }
+        "answer": "B"
       },
       {
         "id": 4,
-        "type": "matching",
-        "cog": "C4",
-        "stem": "Pasangkan parameter konfigurasi SSH Server di sebelah kiri dengan fungsi atau dampak operasionalnya di sebelah kanan secara tepat:",
-        "weight": 2,
-        "explanation": "ClientAliveInterval mengatur keep-alive untuk mendeteksi koneksi idle/dead. X11Forwarding berkaitan dengan GUI forwarding. MaxAuthTries membatasi jumlah salah ketik password/key sebelum koneksi diputus untuk mencegah brute-force.",
+        "type": "mcq",
+        "cog": "C3",
+        "stem": "Seorang pengelola lab komputer sekolah ingin mengaktifkan layanan jarak jauh agar dapat meremote Ubuntu Server 24.04 dari komputer klien. Paket perangkat lunak SSH server apa yang harus diinstal melalui manajer paket apt, dan apa perintah untuk memeriksa status layanan tersebut?",
+        "weight": 1,
+        "explanation": "Standar industri untuk akses remote CLI yang aman pada sistem Linux adalah OpenSSH. Paket servernya adalah 'openssh-server' dan layanannya dikelola menggunakan systemd dengan nama layanan 'ssh' (atau sshd), sehingga perintah pengecekan status yang tepat adalah 'sudo systemctl status ssh'.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "premises": [
-          {
-            "id": 0,
-            "text": "ClientAliveInterval"
-          },
-          {
-            "id": 1,
-            "text": "X11Forwarding"
-          },
-          {
-            "id": 2,
-            "text": "MaxAuthTries"
-          }
-        ],
-        "targets": [
+        "options": [
           {
             "id": "A",
-            "text": "Menentukan batas maksimum percobaan autentikasi yang diizinkan per koneksi koneksi SSH."
+            "text": "Paket: <code>telnetd</code>, Perintah status: <code>service telnet status</code>"
           },
           {
             "id": "B",
-            "text": "Mengatur jeda waktu dalam detik di mana server akan mengirim sinyal kosong ke klien untuk mendeteksi koneksi yang terputus."
+            "text": "Paket: <code>openssh-server</code>, Perintah status: <code>sudo systemctl status ssh</code>"
           },
           {
             "id": "C",
-            "text": "Mengizinkan penerusan aplikasi grafis berbasis sistem windowing X11 dari jarak jauh."
+            "text": "Paket: <code>vsftpd</code>, Perintah status: <code>sudo systemctl status vsftpd</code>"
+          },
+          {
+            "id": "D",
+            "text": "Paket: <code>remmina</code>, Perintah status: <code>sudo systemctl status remmina</code>"
+          },
+          {
+            "id": "E",
+            "text": "Paket: <code>xrdp</code>, Perintah status: <code>sudo systemctl status xrdp</code>"
           }
         ],
-        "answer": {
-          "0": "B",
-          "1": "C",
-          "2": "A"
-        }
+        "answer": "B"
       },
       {
         "id": 5,
-        "type": "short_essay",
-        "cog": "C3",
-        "stem": "Sebutkan nama utilitas atau perintah bawaan paket OpenSSH yang digunakan untuk melakukan penyalinan berkas secara aman (secure file transfer) melalui protokol SSH di lingkungan terminal Linux.",
-        "weight": 1,
-        "explanation": "Perintah `scp` (Secure Copy Protocol) atau `sftp` (Secure File Transfer Protocol) adalah utilitas standar yang memanfaatkan terowongan SSH untuk menyalin berkas secara terenkripsi antara host lokal dan remote.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "answer_keys": [
-          "scp",
-          "sftp"
-        ]
-      },
-      {
-        "id": 6,
-        "type": "long_essay",
-        "cog": "C5",
-        "stem": "Sebuah perusahaan rintisan mengalami insiden keamanan di mana server produksi berbasis Debian yang menjalankan OpenSSH Server berhasil disusupi oleh penyerang melalui teknik brute-force pada port default (22) dengan akun layanan yang lemah. Sebagai seorang administrator jaringan profesional, Anda ditugaskan untuk melakukan hardoning (pengerasan) total pada layanan SSH tersebut.\nUraikan langkah-langkah komprehensif yang harus Anda lakukan, mencakup:\n1. Identifikasi celah keamanan utama pada skenario di atas.\n2. Analisis minimal 4 parameter penting dalam berkas <code>/etc/ssh/sshd_config</code> yang wajib diubah beserta nilai konfigurasinya.\n3. Implementasi lapisan keamanan tambahan di luar konfigurasi SSH bawaan (misalnya penggunaan firewall atau port knocking/fail2ban).",
-        "weight": 3,
-        "explanation": "Pengerasan SSH server memerlukan pendekatan berlapis, mulai dari perubahan port, pengetatan otentikasi daemon SSH, hingga proteksi eksternal menggunakan fail2ban untuk mitigasi serangan brute-force.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "rubric": "Kriteria penilaian: 35% ketepatan identifikasi celah, 35% ketepatan analisis dan parameter konfigurasi sshd_config, 30% implementasi pengamanan tambahan yang relevan.",
-        "ideal_answer": "1. Identifikasi celah: Penggunaan port default 22 memudahkan pemindaian botnet, izin login root aktif, dan autentikasi berbasis password lemah.\n2. Parameter sshd_config: Port diubah (misal: Port 2233), PermitRootLogin no, PasswordAuthentication no, MaxAuthTries 3.\n3. Lapisan tambahan: Instalasi fail2ban untuk memblokir IP penyerang secara otomatis setelah beberapa kali gagal login, atau pembatasan akses menggunakan UFW/iptables.",
-        "max_score": 100,
-        "keywords": [
-          "Port",
-          "PermitRootLogin",
-          "PasswordAuthentication",
-          "fail2ban",
-          "hardoning"
-        ]
-      },
-      {
-        "id": 7,
         "type": "mcq",
         "cog": "C4",
-        "stem": "Saat seorang siswa mencoba melakukan koneksi SSH ke server praktikum, muncul pesan error di terminal klien sebagai berikut:<br><br><code>@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</code><br><code>@ WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED! @</code><br><code>@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</code><br><code>IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!</code><br><br>Apa akar masalah (root cause) utama yang memicu kemunculan peringatan keamanan tersebut?",
+        "stem": "Seorang siswa SMK mendapati bahwa setelah selesai menginstal paket web server Apache di Ubuntu 24.04, situs web tidak dapat diakses dari komputer lain di jaringan lokal. Ketika diperiksa menggunakan perintah <code>sudo ufw status</code>, status firewall aktif (active) namun belum ada aturan untuk lalu lintas web. Tindakan konfigurasi UFW (Uncomplicated Firewall) yang paling tepat agar layanan HTTP dan HTTPS dapat diakses adalah:",
         "weight": 1,
-        "explanation": "Peringatan 'REMOTE HOST IDENTIFICATION HAS CHANGED' muncul ketika RSA/ECDSA/ED25519 host key dari server berbeda dengan yang tercatat di `~/.ssh/known_hosts` klien. Ini biasa terjadi jika server di-reinstall atau identitas IP-nya dipakai oleh perangkat lain.",
+        "explanation": "UFW menyediakan profil aplikasi yang mempermudah pembukaan port jaringan. Profil 'Apache Full' secara otomatis membuka port 80 (HTTP) dan port 443 (HTTPS). Menonaktifkan firewall secara total bukanlah praktik terbaik keamanan jaringan di lingkungan produksi maupun sekolah.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "Layanan SSH di server belum diaktifkan atau mengalami crash pada port daemon."
+            "text": "Menjalankan perintah <code>sudo ufw disable</code> secara permanen untuk mematikan seluruh pengamanan."
           },
           {
             "id": "B",
-            "text": "Sidik jari (fingerprint) / kunci host di server telah berubah (misalnya karena instalasi ulang OS server), sehingga tidak cocok dengan catatan yang tersimpan di berkas <code>known_hosts</code> klien."
+            "text": "Menjalankan perintah <code>sudo ufw allow 'Apache Full'</code> untuk membuka port 80 dan 443 sekaligus."
           },
           {
             "id": "C",
-            "text": "Klien salah memasukkan password sebanyak tiga kali berturut-turut sehingga terkena mekanisme auto-block."
+            "text": "Menjalankan perintah <code>sudo ufw allow 22/tcp</code> agar port web terbuka."
           },
           {
             "id": "D",
-            "text": "Versi protokol SSH yang digunakan oleh klien tidak kompatibel dengan versi yang didukung oleh daemon server."
+            "text": "Menjalankan perintah <code>sudo ufw route default ACCEPT</code> pada konfigurasi sistem."
           },
           {
             "id": "E",
-            "text": "Kunci privat milik pengguna di mesin klien telah kadaluarsa atau rusak."
+            "text": "Menghapus total paket ufw menggunakan perintah <code>sudo apt purge ufw</code>."
           }
         ],
         "answer": "B"
-      },
-      {
-        "id": 8,
-        "type": "mcq_complex",
-        "cog": "C4",
-        "stem": "Dalam manajemen terowongan jaringan (SSH Tunneling / Port Forwarding), seorang administrator sistem sering kali perlu meneruskan port lokal ke server jarak jauh. Manakah di antara perintah berikut yang benar dalam mengimplementasikan local port forwarding? (Pilih dua jawaban yang benar)",
-        "weight": 1.5,
-        "explanation": "Opsi A menggunakan flag `-L` yang merupakan sintaks baku untuk local port forwarding (port lokal diteruskan ke tujuan remote). Penjelasan pada opsi C sangat akurat mendeskripsikan cara kerjanya. Opsi D terbalik, dan opsi E benar mengenai dynamic forwarding.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "options": [
-          {
-            "id": "A",
-            "text": "<code>ssh -L 8080:localhost:80 user@remote_server</code>"
-          },
-          {
-            "id": "B",
-            "text": "<code>ssh -R 8080:localhost:80 user@remote_server</code>"
-          },
-          {
-            "id": "C",
-            "text": "Perintah tersebut meneruskan lalu lintas dari port 8080 di mesin lokal ke port 80 pada server remote (atau jaringan lokal di sisi remote)."
-          },
-          {
-            "id": "D",
-            "text": "Parameter <code>-L</code> digunakan secara eksklusif untuk remote port forwarding, sedangkan <code>-R</code> untuk local port forwarding."
-          },
-          {
-            "id": "E",
-            "text": "<code>ssh -D 1080 user@remote_server</code> digunakan untuk melakukan dynamic port forwarding (SOCKS proxy)."
-          }
-        ],
-        "answer": [
-          "A",
-          "C"
-        ]
-      },
-      {
-        "id": 9,
-        "type": "true_false",
-        "cog": "C4",
-        "stem": "Evaluasi pernyataan berikut terkait mekanisme kerja dan protokol keamanan SSH (Secure Shell):\n1. SSH beroperasi pada Layer Aplikasi dalam model OSI dan menggunakan protokol TCP pada port default 22.\n2. Seluruh data autentikasi dan muatan sesi (payload) ditransmisikan dalam bentuk teks biasa (plaintext) sebelum pertukaran kunci selesai dilakukan.\n3. SSH menyediakan enkripsi simetris untuk mengamankan data yang dikirimkan setelah proses negosiasi kunci asimetris selesai.",
-        "weight": 1.5,
-        "explanation": "Pernyataan 0 benar (TCP port 22). Pernyataan 1 salah karena bahkan pada fase awal, SSH melakukan pertukaran kunci (Diffie-Hellman) untuk membangun terowongan terenkripsi sebelum kredensial/autentikasi dikirim. Pernyataan 2 benar (menggunakan asimetris untuk autentikasi/pertukaran kunci, lalu simetris untuk kecepatan enkripsi data sesi).",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "statements": [
-          {
-            "id": 0,
-            "text": "SSH beroperasi pada Layer Aplikasi dalam model OSI dan menggunakan protokol TCP pada port default 22.",
-            "key": "B"
-          },
-          {
-            "id": 1,
-            "text": "Seluruh data autentikasi dan muatan sesi (payload) ditransmisikan dalam bentuk teks biasa (plaintext) sebelum pertukaran kunci selesai dilakukan.",
-            "key": "S"
-          },
-          {
-            "id": 2,
-            "text": "SSH menyediakan enkripsi simetris untuk mengamankan data yang dikirimkan setelah proses negosiasi kunci asimetris selesai.",
-            "key": "B"
-          }
-        ],
-        "answer": {
-          "0": "B",
-          "1": "S",
-          "2": "B"
-        }
-      },
-      {
-        "id": 10,
-        "type": "matching",
-        "cog": "C4",
-        "stem": "Jodohkan perintah troubleshooting atau manajemen layanan SSH di Linux dengan fungsi operasionalnya yang sesuai:",
-        "weight": 2,
-        "explanation": "systemctl restart ssh menerapkan konfigurasi baru, sshd -t sangat berguna untuk memastikan tidak ada error sintaks di sshd_config yang dapat membuat server terkunci (lockout), dan journalctl -u ssh memantau log operasional SSH.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "premises": [
-          {
-            "id": 0,
-            "text": "sudo systemctl restart ssh"
-          },
-          {
-            "id": 1,
-            "text": "sshd -t"
-          },
-          {
-            "id": 2,
-            "text": "journalctl -u ssh"
-          }
-        ],
-        "targets": [
-          {
-            "id": "A",
-            "text": "Melakukan uji sintaks (syntax check) pada file konfigurasi sshd_config sebelum daemon direstart."
-          },
-          {
-            "id": "B",
-            "text": "Menerapkan perubahan parameter konfigurasi baru pada layanan SSH server."
-          },
-          {
-            "id": "C",
-            "text": "Menampilkan log sistem khusus yang berkaitan dengan aktivitas daemon SSH menggunakan systemd journal."
-          }
-        ],
-        "answer": {
-          "0": "B",
-          "1": "A",
-          "2": "C"
-        }
-      },
-      {
-        "id": 11,
-        "type": "mcq",
-        "cog": "C4",
-        "stem": "Seorang siswa SMK kelas XI sedang menguji koneksi SSH dari komputer klien ke server praktikum Debian. Saat perintah <code>ssh -v student@192.168.10.50</code> dieksekusi, terminal menampilkan proses negosiasi hingga tahap <code>debug1: SSH2_MSG_SERVICE_REQUEST received: ssh-userauth</code>. Namun, proses terhenti dan klien mendapati penolakan izin masuk meskipun kombinasi username dan password sudah diketik dengan benar.<br><br>Berdasarkan cuplikan log debug tersebut dan analisis arsitektur protokol SSH, tahapan manakah yang mengalami kegagalan dan parameter apa yang paling mungkin salah dikonfigurasi di sisi server (<code>/etc/ssh/sshd_config</code>)?",
-        "weight": 1,
-        "explanation": "Pesan debug 'SSH2_MSG_SERVICE_REQUEST received: ssh-userauth' menandakan bahwa fase pertukaran kunci (Key Exchange) dan verifikasi identitas server (Host Key Verification) telah BERHASIL diselesaikan. Proses selanjutnya adalah memasuki fase otentikasi pengguna (user authentication). Jika pada tahap ini akses ditolak meskipun kredensial benar, penyebab utamanya adalah mekanisme otentikasi kata sandi dinonaktifkan secara eksplisit pada file konfigurasi server melalui parameter 'PasswordAuthentication no'.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "options": [
-          {
-            "id": "A",
-            "text": "Kegagalan pada pertukaran kunci Diffie-Hellman karena parameter KexAlgorithms tidak kompatibel."
-          },
-          {
-            "id": "B",
-            "text": "Kegagalan pada verifikasi sandi karena parameter PasswordAuthentication bernilai no."
-          },
-          {
-            "id": "C",
-            "text": "Kegagalan pada validasi alamat IP karena larutan AllowUsers tidak menyertakan subnet klien."
-          },
-          {
-            "id": "D",
-            "text": "Kegagalan pada dekripsi HostKey karena sidik jari server (fingerprint) berubah di sisi klien."
-          },
-          {
-            "id": "E",
-            "text": "Kegagalan pada negosiasi versi protokol karena server memaksa penggunaan SSH versi 1."
-          }
-        ],
-        "answer": "B"
-      },
-      {
-        "id": 12,
-        "type": "mcq_complex",
-        "cog": "C4",
-        "stem": "Dalam sebuah skenario praktik jaringan komputer di SMK, seorang guru meminta para siswa kelas XI untuk mengamankan akses layanan SSH pada server Ubuntu dari ancaman <i>brute-force attack</i>. Siswa diberikan beberapa opsi tindakan pengerasan (hardening).<br><br>Pilihlah <strong>dua</strong> tindakan konfigurasi yang paling efektif dan benar untuk diterapkan pada file <code>/etc/ssh/sshd_config</code> guna meminimalisir risiko serangan tersebut!",
-        "weight": 1.5,
-        "explanation": "Pilihan A (mengubah port default) mengurangi serangan otomatis (botnet scanner) yang menargetkan port 22 secara membabi buta. Pilihan C (menggunakan SSH key-based auth dan mematikan password auth) adalah praktik pengerasan standar industri yang menutup celah brute-force sandi secara total karena kunci kriptografi asimetris jauh lebih aman dibanding string password. Pilihan B, D, dan E justru menurunkan tingkat keamanan server.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "options": [
-          {
-            "id": "A",
-            "text": "Mengubah port default SSH dari port 22 ke port lain yang tidak umum (misal: port 2222)."
-          },
-          {
-            "id": "B",
-            "text": "Mengaktifkan parameter PermitRootLogin yes agar administrator mudah memantau aktivitas root."
-          },
-          {
-            "id": "C",
-            "text": "Menerapkan otentikasi berbasis kunci publik (PubkeyAuthentication yes) dan menonaktifkan otentikasi sandi (PasswordAuthentication no)."
-          },
-          {
-            "id": "D",
-            "text": "Mengizinkan semua pengguna sistem melakukan koneksi jarak jauh tanpa terkecuali menggunakan perintah AllowUsers *."
-          },
-          {
-            "id": "E",
-            "text": "Mengaktifkan kembali protokol usang X11Forwarding untuk mempermudah eksekusi aplikasi grafis."
-          }
-        ],
-        "answer": [
-          "A",
-          "C"
-        ]
-      },
-      {
-        "id": 13,
-        "type": "true_false",
-        "cog": "C4",
-        "stem": "Seorang teknisi jaringan sedang membandingkan karakteristik operasional antara protokol <strong>Telnet</strong> dan <strong>SSH (Secure Shell)</strong> untuk keperluan manajemen jarak jauh perangkat jaringan di sekolah. Evaluasi kebenaran dari pernyataan teknis berikut:",
-        "weight": 1.5,
-        "explanation": "Pernyataan 0 benar karena Telnet tidak menyediakan mekanisme enkripsi sama sekali. Pernyataan 1 salah karena SSH bekerja pada Layer Aplikasi (Application Layer) dalam model OSI dan menggunakan protokol TCP pada port 22 di Transport Layer, bukan Data Link Layer. Pernyataan 2 benar karena arsitektur SSH menggabungkan kriptografi simetris dan asimetris demi efisiensi dan keamanan tingkat tinggi.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "statements": [
-          {
-            "id": 0,
-            "text": "Protokol Telnet mengirimkan seluruh data, termasuk username dan password, dalam bentuk teks biasa (plaintext) yang sangat rentan terhadap teknik penyadapan paket (packet sniffing) seperti Wireshark.",
-            "key": "B"
-          },
-          {
-            "id": 1,
-            "text": "SSH beroperasi secara eksklusif pada Layer 2 (Data Link Layer) dalam model OSI untuk memastikan enkripsi langsung pada perangkat keras jaringan.",
-            "key": "S"
-          },
-          {
-            "id": 2,
-            "text": "SSH menerapkan mekanisme enkripsi simetris (seperti AES) untuk pengiriman data sesi dan enkripsi asimetris (seperti RSA/Ed25519) untuk proses otentikasi awal serta pertukaran kunci.",
-            "key": "B"
-          }
-        ],
-        "answer": {
-          "0": "B",
-          "1": "S",
-          "2": "B"
-        }
-      },
-      {
-        "id": 14,
-        "type": "matching",
-        "cog": "C4",
-        "stem": "Cocokkan parameter atau direktif konfigurasi SSH Server di sebelah kiri dengan fungsi atau dampak operasionalnya pada sistem di sebelah kanan:",
-        "weight": 2,
-        "explanation": "Parameter 'PermitRootLogin prohibit-password' mengizinkan root login khusus via public key auth. 'X11Forwarding no' menonaktifkan penerusan tampilan grafis X11 untuk menghemat sumber daya dan memperketat keamanan. 'MaxAuthTries 3' membatasi percobaan otentikasi guna meredam serangan percobaan sandi berulang.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "premises": [
-          {
-            "id": 0,
-            "text": "PermitRootLogin prohibit-password"
-          },
-          {
-            "id": 1,
-            "text": "X11Forwarding no"
-          },
-          {
-            "id": 2,
-            "text": "MaxAuthTries 3"
-          }
-        ],
-        "targets": [
-          {
-            "id": "A",
-            "text": "Membatasi jumlah maksimum percobaan login yang salah per koneksi sebelum sesi diputus secara paksa oleh server."
-          },
-          {
-            "id": "B",
-            "text": "Melarang pengguna melakukan eksekusi aplikasi berbasis antarmuka grafis (GUI) jarak jauh melalui saluran terowongan SSH."
-          },
-          {
-            "id": "C",
-            "text": "Mengizinkan akun superuser (root) masuk ke sistem hanya jika menggunakan metode kunci publik, melarang login root via sandi."
-          },
-          {
-            "id": "D",
-            "text": "Memaksa enkripsi data sesi menggunakan algoritma DES 56-bit demi kompatibilitas perangkat lawas."
-          }
-        ],
-        "answer": {
-          "0": "C",
-          "1": "B",
-          "2": "A"
-        }
-      },
-      {
-        "id": 15,
-        "type": "short_essay",
-        "cog": "C3",
-        "stem": "Sebutkan nama utilitas baris perintah (command line utility) standar berbasis paket OpenSSH yang digunakan untuk menyalin berkas secara aman dari komputer lokal ke server remote melalui protokol SSH pada sistem operasi Linux.",
-        "weight": 1,
-        "explanation": "Utilitas standar yang digunakan untuk menyalin berkas melalui protokol SSH adalah 'scp' (Secure Copy Protocol) atau 'sftp' (Secure File Transfer Protocol). Perintah scp memanfaatkan enkripsi SSH secara langsung untuk mentransfer file antar host di jaringan secara aman.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "answer_keys": [
-          "scp",
-          "secure copy",
-          "sftp"
-        ]
       }
     ]
   }

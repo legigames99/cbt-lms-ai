@@ -1082,12 +1082,31 @@
           const opts = q.options || [];
           bodyHtml = `
             <div class="text-xs text-slate-300 space-y-1.5 pl-2">
-              ${opts.map(o => {
-                const isKey = (o.id === q.answer);
+              ${opts.map((o, optIdx) => {
+                let optId = (o && o.id) ? o.id : String.fromCharCode(65 + optIdx);
+                let optText = '';
+                if (typeof o === 'string') {
+                  optText = o;
+                } else if (o && typeof o === 'object') {
+                  if (o.text !== undefined && o.text !== null) {
+                    optText = String(o.text);
+                  } else if (o['0'] !== undefined || o[0] !== undefined) {
+                    let str = '';
+                    let ci = 0;
+                    while (o[ci] !== undefined || o[String(ci)] !== undefined) {
+                      str += (o[ci] !== undefined ? o[ci] : o[String(ci)]);
+                      ci++;
+                    }
+                    optText = str;
+                  } else {
+                    optText = o.value || o.content || o.label || '';
+                  }
+                }
+                const isKey = (String(optId).toUpperCase() === String(q.answer).toUpperCase());
                 return `
                   <div class="flex items-start gap-2.5 p-2 rounded-lg ${isKey ? 'bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 font-semibold' : 'bg-slate-950/60 border border-slate-800 text-slate-300'}">
-                    <span class="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold ${isKey ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-300'}">${o.id}</span>
-                    <div class="flex-1 text-xs pt-0.5">${o.text}</div>
+                    <span class="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold ${isKey ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-300'}">${optId}</span>
+                    <div class="flex-1 text-xs pt-0.5">${formatQuestionText(optText)}</div>
                     ${isKey ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold"><i class="fa-solid fa-check mr-1"></i>Kunci Benar</span>' : ''}
                   </div>
                 `;
@@ -1096,15 +1115,34 @@
           `;
         } else if (q.type === 'mcq_complex') {
           const opts = q.options || [];
-          const correctKeys = Array.isArray(q.answer) ? q.answer : [q.answer];
+          const correctKeys = (Array.isArray(q.answer) ? q.answer : [q.answer]).map(k => String(k).toUpperCase());
           bodyHtml = `
             <div class="text-xs text-slate-300 space-y-1.5 pl-2">
-              ${opts.map(o => {
-                const isKey = correctKeys.includes(o.id);
+              ${opts.map((o, optIdx) => {
+                let optId = (o && o.id) ? o.id : String.fromCharCode(65 + optIdx);
+                let optText = '';
+                if (typeof o === 'string') {
+                  optText = o;
+                } else if (o && typeof o === 'object') {
+                  if (o.text !== undefined && o.text !== null) {
+                    optText = String(o.text);
+                  } else if (o['0'] !== undefined || o[0] !== undefined) {
+                    let str = '';
+                    let ci = 0;
+                    while (o[ci] !== undefined || o[String(ci)] !== undefined) {
+                      str += (o[ci] !== undefined ? o[ci] : o[String(ci)]);
+                      ci++;
+                    }
+                    optText = str;
+                  } else {
+                    optText = o.value || o.content || o.label || '';
+                  }
+                }
+                const isKey = correctKeys.includes(String(optId).toUpperCase());
                 return `
                   <div class="flex items-start gap-2.5 p-2 rounded-lg ${isKey ? 'bg-purple-950/40 border border-purple-500/40 text-purple-200 font-semibold' : 'bg-slate-950/60 border border-slate-800 text-slate-300'}">
-                    <span class="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold ${isKey ? 'bg-purple-600 text-white' : 'bg-slate-800 text-slate-300'}">${isKey ? '✓' : o.id}</span>
-                    <div class="flex-1 text-xs pt-0.5"><strong>[${o.id}]</strong> ${o.text}</div>
+                    <span class="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold ${isKey ? 'bg-purple-600 text-white' : 'bg-slate-800 text-slate-300'}">${isKey ? '✓' : optId}</span>
+                    <div class="flex-1 text-xs pt-0.5">${formatQuestionText(optText)}</div>
                     ${isKey ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 font-bold">Kunci Pilihan</span>' : ''}
                   </div>
                 `;

@@ -297,6 +297,186 @@ if (fs.existsSync(SCHOOL_PROFILE_PATH)) {
   } catch (err) {}
 }
 
+// ==============================================================
+// SANITASI & NORMALISASI STRUKTUR ASESMEN (STANDAR TKA & AI GENERATOR)
+// ==============================================================
+
+function sanitizeQuestionText(text) {
+  if (!text || typeof text !== 'string') return text;
+  return text
+    .replace(/pada\s+tingkat\s+kognitif\s*C?[1-6]?,?\s*/gi, '')
+    .replace(/berdasarkan\s+prinsip\s+dasar\s+ilmu\s+pada\s+tingkat\s+kognitif\s*C?[1-6]?,?\s*/gi, 'Berdasarkan analisis prinsip ilmu tersebut, ')
+    .replace(/berdasarkan\s+tingkat\s+kognitif\s*C?[1-6]?,?\s*/gi, '')
+    .replace(/\(level\s+kognitif:?\s*C[1-6]\)/gi, '')
+    .replace(/\[\s*tingkat\s+kognitif:?\s*C[1-6]\s*\]/gi, '')
+    .replace(/\bLevel\s+kognitif\s+C[1-6]\b:?\s*/gi, '')
+    .replace(/\bLevel\s+C[1-6]\b:?\s*/gi, '')
+    .replace(/\btingkat\s+kognitif\s+C[1-6]\b/gi, 'analisis mendalam')
+    .replace(/\bC[1-6]\s*-\s*(Mengingat|Memahami|Menerapkan|Menganalisis|Mengevaluasi|Mencipta)/gi, '$1')
+    .replace(/(\s)\s+/g, '$1')
+    .trim();
+}
+
+// Normalisasi & Perbaikan Struktur Opsi Asesmen (Mencegah bug character-spread undefinedundefined)
+function normalizeQuestionOptions(rawOptions) {
+  if (!rawOptions) return null;
+  const defaultLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+  let list = [];
+
+  if (Array.isArray(rawOptions)) {
+    list = rawOptions;
+  } else if (typeof rawOptions === 'object') {
+    list = Object.keys(rawOptions).map(k => {
+      return { id: k.toUpperCase(), text: rawOptions[k] };
+    });
+  }
+
+  if (list.length === 0) return null;
+
+  return list.map((opt, idx) => {
+    const fallbackId = defaultLetters[idx] || String.fromCharCode(65 + idx);
+
+    // Kasus 1: opt adalah string murni (misal ["Mempercepat...", "Meningkatkan..."])
+    if (typeof opt === 'string') {
+      let text = opt.trim();
+      let id = fallbackId;
+      const match = text.match(/^([A-Ha-h])[\.\)\:\s\-]+([\s\S]*)$/);
+      if (match) {
+        id = match[1].toUpperCase();
+        text = match[2].trim();
+      }
+      return { id, text: sanitizeQuestionText(text) };
+    }
+
+    // Kasus 2: opt adalah objek karakter yang rusak akibat spreading string ({ '0': 'M', '1': 'e', ... })
+    if (opt && typeof opt === 'object') {
+      if (opt.text === undefined && (opt['0'] !== undefined || opt[0] !== undefined)) {
+        let str = '';
+        let i = 0;
+        while (opt[i] !== undefined || opt[String(i)] !== undefined) {
+          str += (opt[i] !== undefined ? opt[i] : opt[String(i)]);
+          i++;
+        }
+        let text = str.trim();
+        let id = opt.id || fallbackId;
+        const match = text.match(/^([A-Ha-h])[\.\)\:\s\-]+([\s\S]*)$/);
+        if (match) {
+          id = match[1].toUpperCase();
+          text = match[2].trim();
+        }
+        return { id: String(id).toUpperCase(), text: sanitizeQuestionText(text) };
+      }
+
+      // Kasus 3: opt adalah objek normal { id, text }, { label, value }, dll.
+      let id = opt.id || opt.key || opt.label || opt.option || fallbackId;
+      let rawText = opt.text !== undefined ? opt.text : (opt.value || opt.content || opt.desc || opt.description || '');
+      if (typeof rawText !== 'string') rawText = String(rawText || '');
+      let text = rawText.trim();
+
+      const match = text.match(/^([A-Ha-h])[\.\)\:\s\-]+([\s\S]*)$/);
+      if (match && match[1].toUpperCase() === String(id).toUpperCase()) {
+        text = match[2].trim();
+      }
+
+      return {
+        id: String(id).toUpperCase(),
+        text: sanitizeQuestionText(text)
+      };
+    }
+
+    return { id: fallbackId, text: sanitizeQuestionText(String(opt || '')) };
+  });
+}
+
+function normalizeStatements(rawStatements) {
+  if (!rawStatements || !Array.isArray(rawStatements)) return null;
+  return rawStatements.map((st, idx) => {
+    if (typeof st === 'string') {
+      return { id: idx, text: sanitizeQuestionText(st.trim()), key: 'B' };
+    }
+    if (st && typeof st === 'object') {
+      let text = st.text !== undefined ? st.text : (st.statement || st.value || '');
+      if (text === undefined && (st['0'] !== undefined || st[0] !== undefined)) {
+        let str = '';
+        let i = 0;
+        while (st[i] !== undefined || st[String(i)] !== undefined) {
+          str += (st[i] !== undefined ? st[i] : st[String(i)]);
+          i++;
+        }
+        text = str;
+      }
+      let key = (st.key || 'B').toString().toUpperCase().trim();
+      if (key.startsWith('B') || key === 'TRUE' || key === '1') key = 'B';
+      else key = 'S';
+      return {
+        id: st.id !== undefined ? st.id : idx,
+        text: sanitizeQuestionText(String(text || '').trim()),
+        key
+      };
+    }
+    return { id: idx, text: sanitizeQuestionText(String(st || '')), key: 'B' };
+  });
+}
+
+function normalizePremises(rawPremises) {
+  if (!rawPremises || !Array.isArray(rawPremises)) return null;
+  return rawPremises.map((p, idx) => {
+    if (typeof p === 'string') {
+      return { id: idx, text: sanitizeQuestionText(p.trim()) };
+    }
+    if (p && typeof p === 'object') {
+      let text = p.text !== undefined ? p.text : (p.premise || p.value || '');
+      return {
+        id: p.id !== undefined ? p.id : idx,
+        text: sanitizeQuestionText(String(text || '').trim())
+      };
+    }
+    return { id: idx, text: sanitizeQuestionText(String(p || '')) };
+  });
+}
+
+function normalizeTargets(rawTargets) {
+  if (!rawTargets || !Array.isArray(rawTargets)) return null;
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+  return rawTargets.map((t, idx) => {
+    const fallbackId = letters[idx] || String.fromCharCode(65 + idx);
+    if (typeof t === 'string') {
+      return { id: fallbackId, text: sanitizeQuestionText(t.trim()) };
+    }
+    if (t && typeof t === 'object') {
+      let id = t.id || fallbackId;
+      let text = t.text !== undefined ? t.text : (t.target || t.value || '');
+      return {
+        id: String(id).toUpperCase(),
+        text: sanitizeQuestionText(String(text || '').trim())
+      };
+    }
+    return { id: fallbackId, text: sanitizeQuestionText(String(t || '')) };
+  });
+}
+
+function repairCorruptedQuestionBanks(banks) {
+  let repairedCount = 0;
+  if (!Array.isArray(banks)) return repairedCount;
+  banks.forEach(b => {
+    (b.questions || []).forEach(q => {
+      if (q.type === 'mcq' || q.type === 'mcq_complex') {
+        if (q.options && Array.isArray(q.options)) {
+          let needsRepair = false;
+          q.options.forEach(o => {
+            if (o['0'] !== undefined || o.text === undefined || !o.id) needsRepair = true;
+          });
+          if (needsRepair) {
+            q.options = normalizeQuestionOptions(q.options);
+            repairedCount++;
+          }
+        }
+      }
+    });
+  });
+  return repairedCount;
+}
+
 // Master Questions & Bank Soal (Mendukung Standar TKA SMA/SMK, ANBK, AKM)
 const QUESTION_BANKS_FILE = path.join(__dirname, 'question_banks.json');
 let QUESTION_BANKS = [];
@@ -305,6 +485,11 @@ if (fs.existsSync(QUESTION_BANKS_FILE)) {
   try {
     const raw = fs.readFileSync(QUESTION_BANKS_FILE, 'utf8');
     QUESTION_BANKS = JSON.parse(raw);
+    const repaired = repairCorruptedQuestionBanks(QUESTION_BANKS);
+    if (repaired > 0) {
+      console.log(`[Bank Soal] Berhasil memulihkan ${repaired} butir soal yang opsi jawabannya terkorupsi!`);
+      saveQuestionBanksToFile();
+    }
     console.log(`[Bank Soal] Berhasil memuat ${QUESTION_BANKS.length} bank soal dari question_banks.json`);
   } catch (err) {
     console.error('[Bank Soal] Gagal membaca question_banks.json, menggunakan fallback:', err.message);
@@ -483,22 +668,6 @@ function gradeEssayWithAI({ question_stem, rubric, ideal_answer, student_answer,
 // AI QUESTION GENERATOR ENGINE (GEMINI FLASH SERIES & BYOK TKA)
 // Bebas C2/C3/C4, Berdasarkan Materi/CP/TP, & Anti-Duplikasi
 // ==============================================================
-
-function sanitizeQuestionText(text) {
-  if (!text || typeof text !== 'string') return text;
-  return text
-    .replace(/pada\s+tingkat\s+kognitif\s*C?[1-6]?,?\s*/gi, '')
-    .replace(/berdasarkan\s+prinsip\s+dasar\s+ilmu\s+pada\s+tingkat\s+kognitif\s*C?[1-6]?,?\s*/gi, 'Berdasarkan analisis prinsip ilmu tersebut, ')
-    .replace(/berdasarkan\s+tingkat\s+kognitif\s*C?[1-6]?,?\s*/gi, '')
-    .replace(/\(level\s+kognitif:?\s*C[1-6]\)/gi, '')
-    .replace(/\[\s*tingkat\s+kognitif:?\s*C[1-6]\s*\]/gi, '')
-    .replace(/\bLevel\s+kognitif\s+C[1-6]\b:?\s*/gi, '')
-    .replace(/\bLevel\s+C[1-6]\b:?\s*/gi, '')
-    .replace(/\btingkat\s+kognitif\s+C[1-6]\b/gi, 'analisis mendalam')
-    .replace(/\bC[1-6]\s*-\s*(Mengingat|Memahami|Menerapkan|Menganalisis|Mengevaluasi|Mencipta)/gi, '$1')
-    .replace(/(\s)\s+/g, '$1')
-    .trim();
-}
 
 function safeParseQuestionsJSON(rawText) {
   if (!rawText || typeof rawText !== 'string') return null;
@@ -911,21 +1080,21 @@ async function generateQuestionsWithGeminiAI({
     sourceUsed = effectiveKey ? ("pedagogical_engine (fallback " + model + ")") : ("pedagogical_engine (" + model + ")");
   }
 
-  // Sanitasi semua butir soal dari label kognitif harfiah (C2, C3, C4, dll)
+  // Sanitasi & normalisasi semua butir soal dari label kognitif dan struktur opsi/stimulus
   questions = questions.map(q => {
     q.stem = sanitizeQuestionText(q.stem);
     q.explanation = sanitizeQuestionText(q.explanation);
-    if (q.options && Array.isArray(q.options)) {
-      q.options = q.options.map(opt => ({ ...opt, text: sanitizeQuestionText(opt.text) }));
+    if (q.options) {
+      q.options = normalizeQuestionOptions(q.options);
     }
-    if (q.statements && Array.isArray(q.statements)) {
-      q.statements = q.statements.map(st => ({ ...st, text: sanitizeQuestionText(st.text) }));
+    if (q.statements) {
+      q.statements = normalizeStatements(q.statements);
     }
-    if (q.premises && Array.isArray(q.premises)) {
-      q.premises = q.premises.map(p => ({ ...p, text: sanitizeQuestionText(p.text) }));
+    if (q.premises) {
+      q.premises = normalizePremises(q.premises);
     }
-    if (q.targets && Array.isArray(q.targets)) {
-      q.targets = q.targets.map(t => ({ ...t, text: sanitizeQuestionText(t.text) }));
+    if (q.targets) {
+      q.targets = normalizeTargets(q.targets);
     }
     return q;
   });
@@ -3356,7 +3525,7 @@ const server = http.createServer(async (req, res) => {
       };
 
       if (baseQ.type === 'mcq') {
-        baseQ.options = q.options || [
+        baseQ.options = normalizeQuestionOptions(q.options) || [
           { id: 'A', text: 'Opsi jawaban A' },
           { id: 'B', text: 'Opsi jawaban B' },
           { id: 'C', text: 'Opsi jawaban C' },
@@ -3365,7 +3534,7 @@ const server = http.createServer(async (req, res) => {
         ];
         baseQ.answer = q.answer || 'A';
       } else if (baseQ.type === 'mcq_complex') {
-        baseQ.options = q.options || [
+        baseQ.options = normalizeQuestionOptions(q.options) || [
           { id: 'A', text: 'Opsi pernyataan A' },
           { id: 'B', text: 'Opsi pernyataan B' },
           { id: 'C', text: 'Opsi pernyataan C' },

@@ -1033,13 +1033,33 @@
         removeStemImage();
       }
 
+      // Helper ekstraksi teks opsi aman
+      const extractOptText = (o) => {
+        if (!o) return '';
+        if (typeof o === 'string') return o;
+        if (typeof o === 'object') {
+          if (o.text !== undefined && o.text !== null) return String(o.text);
+          if (o['0'] !== undefined || o[0] !== undefined) {
+            let str = '';
+            let ci = 0;
+            while (o[ci] !== undefined || o[String(ci)] !== undefined) {
+              str += (o[ci] !== undefined ? o[ci] : o[String(ci)]);
+              ci++;
+            }
+            return str;
+          }
+          return o.value || o.content || o.label || '';
+        }
+        return String(o);
+      };
+
       // Populate opsi dan kunci sesuai tipe soal
       if (qType === 'mcq') {
         const opts = q.options || [];
         ['A', 'B', 'C', 'D', 'E'].forEach((letter, idx) => {
           const o = opts.find(x => x.id === letter) || opts[idx];
           const el = document.getElementById(`mcqOpt${letter}`);
-          if (el) el.value = htmlToCleanEditorText(o ? (o.text || '') : '');
+          if (el) el.value = htmlToCleanEditorText(extractOptText(o));
         });
         const correctKey = q.answer || 'A';
         const rBtn = document.querySelector(`input[name="mcqCorrectKey"][value="${correctKey}"]`);
@@ -1052,7 +1072,7 @@
           const o = opts.find(x => x.id === letter) || opts[idx];
           const tEl = document.getElementById(`complexOptText_${letter}`);
           const cEl = document.getElementById(`complexOptCheck_${letter}`);
-          if (tEl) tEl.value = htmlToCleanEditorText(o ? (o.text || '') : '');
+          if (tEl) tEl.value = htmlToCleanEditorText(extractOptText(o));
           if (cEl) cEl.checked = ansList.includes(letter) || (o && ansList.includes(o.id));
         });
       } else if (qType === 'true_false') {

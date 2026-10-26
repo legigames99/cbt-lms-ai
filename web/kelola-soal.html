@@ -200,9 +200,13 @@
             </p>
           </div>
 
-          <div class="flex items-center gap-4 text-xs text-slate-400 pt-1">
-            <div><i class="fa-solid fa-user-tie text-indigo-400 mr-1.5"></i>Pengampu: <strong id="bankTeacherDisplay" class="text-slate-200">-</strong></div>
-            <div><i class="fa-solid fa-id-card-clip text-indigo-400 mr-1.5"></i>ID Bank: <strong id="bankIdDisplay" class="text-slate-200">#1</strong></div>
+          <div class="flex flex-wrap items-center gap-3 text-xs text-slate-400 pt-1">
+            <div class="flex items-center gap-1.5"><i class="fa-solid fa-user-tie text-indigo-400"></i>Pengampu: <strong id="bankTeacherDisplay" class="text-slate-200">-</strong></div>
+            <div class="flex items-center gap-1.5"><i class="fa-solid fa-id-card-clip text-indigo-400"></i>ID Bank: <strong id="bankIdDisplay" class="text-slate-200">#1</strong></div>
+            <button type="button" onclick="openModalEditBankInfo()" class="px-2.5 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 text-[11px] font-semibold transition flex items-center gap-1.5 shadow-sm" title="Ubah Nama Guru Pengampu & Identitas Bank">
+              <i class="fa-solid fa-pen-to-square text-amber-400 text-[11px]"></i>
+              <span>Ubah Pengampu & Identitas Bank</span>
+            </button>
           </div>
         </div>
 
@@ -919,6 +923,80 @@
   <!-- ============================================================== -->
   <!-- MODAL 4: GENERATOR SOAL VIA AI (GEMINI FLASH & BYOK) -->
   <!-- ============================================================== -->
+  
+  <!-- ============================================================== -->
+  <!-- MODAL EDIT BANK INFO & GURU PENGAMPU -->
+  <!-- ============================================================== -->
+  <div id="modalEditBankInfo" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div>
+          <h4 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-pen-to-square text-indigo-400"></i> Edit Informasi Bank Soal & Pengampu
+          </h4>
+          <p class="text-[11px] text-slate-400 mt-0.5">Sesuaikan nama guru pengampu, mata pelajaran, dan identitas bank soal.</p>
+        </div>
+        <button onclick="closeModal('modalEditBankInfo')" class="text-slate-400 hover:text-white transition">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="formEditBankInfo" onsubmit="event.preventDefault(); submitEditBankInfo();" class="space-y-3.5">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+            <i class="fa-solid fa-user-tie text-indigo-400 mr-1"></i> Nama Guru Pengampu & Gelar <span class="text-rose-400">*</span>
+          </label>
+          <input type="text" id="editBankTeacher" required placeholder="Contoh: Drs. Budi Pratama, M.Pd."
+            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition shadow-inner">
+          <span class="text-[10px] text-slate-500 mt-1 block">Nama guru ini akan muncul di kartu bank, header aplikasi, dan kop berkas Word/PDF ujian.</span>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+            <i class="fa-solid fa-book-bookmark text-blue-400 mr-1"></i> Judul Bank Soal <span class="text-rose-400">*</span>
+          </label>
+          <input type="text" id="editBankTitle" required placeholder="Contoh: Penilaian Akhir Semester - Administrasi Sistem Jaringan"
+            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition shadow-inner">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+              <i class="fa-solid fa-graduation-cap text-purple-400 mr-1"></i> Mata Pelajaran <span class="text-rose-400">*</span>
+            </label>
+            <input type="text" id="editBankSubject" required placeholder="Contoh: ASJ / Informatika"
+              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition shadow-inner">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+              <i class="fa-solid fa-users text-emerald-400 mr-1"></i> Target Kelas
+            </label>
+            <input type="text" id="editBankTargetClass" placeholder="Contoh: Kelas XI TKJ"
+              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition shadow-inner">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+            <i class="fa-solid fa-align-left text-slate-400 mr-1"></i> Deskripsi / Catatan Tambahan
+          </label>
+          <textarea id="editBankDesc" rows="2" placeholder="Deskripsi singkat bank soal..."
+            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition shadow-inner"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeModal('modalEditBankInfo')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-semibold transition">
+            Batal
+          </button>
+          <button type="submit" id="btnSaveBankInfo" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition flex items-center gap-2 shadow-lg shadow-indigo-600/30">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Simpan Perubahan</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="modalAIGenerator" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto custom-scrollbar">
       <div class="flex items-center justify-between pb-3 border-b border-slate-800">
@@ -2340,6 +2418,65 @@ window.setAIBasisMode = function(basis) {
       const st = document.getElementById("kelolaWordStatusText");
       if (st) st.innerHTML = "";
       openModal("modalUploadSoal");
+    };
+
+    
+    window.openModalEditBankInfo = function() {
+      if (!currentBankData) return;
+      document.getElementById('editBankTeacher').value = currentBankData.teacher || '';
+      document.getElementById('editBankTitle').value = currentBankData.title || '';
+      document.getElementById('editBankSubject').value = currentBankData.subject || '';
+      document.getElementById('editBankTargetClass').value = currentBankData.target_class || '';
+      document.getElementById('editBankDesc').value = currentBankData.description || '';
+      openModal('modalEditBankInfo');
+    };
+
+    window.submitEditBankInfo = async function() {
+      if (!activeBankId) return;
+      const teacher = document.getElementById('editBankTeacher').value.trim();
+      const title = document.getElementById('editBankTitle').value.trim();
+      const subject = document.getElementById('editBankSubject').value.trim();
+      const target_class = document.getElementById('editBankTargetClass').value.trim();
+      const description = document.getElementById('editBankDesc').value.trim();
+
+      if (!teacher || !title || !subject) {
+        alert('Mohon isi Nama Guru Pengampu, Judul Bank Soal, dan Mata Pelajaran.');
+        return;
+      }
+
+      const btn = document.getElementById('btnSaveBankInfo');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Menyimpan...';
+      }
+
+      try {
+        const res = await fetch('/api/v1/cbt/question-banks/' + activeBankId + '/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            teacher,
+            title,
+            subject,
+            target_class,
+            description
+          })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Gagal menyimpan perubahan');
+
+        closeModal('modalEditBankInfo');
+        alert(json.message || 'Informasi bank soal dan pengampu berhasil diperbarui!');
+        await loadActiveBank(activeBankId);
+        await loadAllBanks();
+      } catch (err) {
+        alert('Gagal menyimpan: ' + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> <span>Simpan Perubahan</span>';
+        }
+      }
     };
 
     window.openExportWordModal = function() {

@@ -4860,6 +4860,32 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
+  // POST /api/v1/cbt/question-banks/:id/update (Edit Informasi Bank Soal & Guru Pengampu)
+  if (pathname.startsWith('/api/v1/cbt/question-banks/') && (pathname.endsWith('/update') || pathname.endsWith('/edit')) && req.method === 'POST') {
+    const parts = pathname.split('/');
+    const bankId = parseInt(parts[5], 10);
+    const bank = QUESTION_BANKS.find(b => Number(b.id) === Number(bankId));
+    if (!bank) {
+      return sendJSON(404, { status: 'error', message: 'Bank soal tidak ditemukan' });
+    }
+
+    const body = await parseBody(req);
+    if (body.title !== undefined) bank.title = String(body.title).trim();
+    if (body.teacher !== undefined) bank.teacher = String(body.teacher).trim();
+    if (body.subject !== undefined) bank.subject = String(body.subject).trim();
+    if (body.target_class !== undefined) bank.target_class = String(body.target_class).trim();
+    if (body.description !== undefined) bank.description = String(body.description).trim();
+
+    saveQuestionBanksToFile();
+    compileAndEncryptPackage();
+
+    return sendJSON(200, {
+      status: 'success',
+      message: `Informasi bank soal #${bank.id} (${bank.title}) dan guru pengampu berhasil diperbarui!`,
+      data: bank
+    });
+  }
+
   // POST /api/v1/cbt/question-banks/:id/add-question (Tambah Butir Soal Baru)
   if (pathname.startsWith('/api/v1/cbt/question-banks/') && pathname.endsWith('/add-question') && req.method === 'POST') {
     const parts = pathname.split('/');

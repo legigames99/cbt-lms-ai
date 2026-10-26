@@ -3979,6 +3979,11 @@
           <label class="block font-semibold text-slate-300 mb-1">Judul Bank Soal</label>
           <input type="text" id="bankTitle" placeholder="Contoh: Bank Soal Penilaian Akhir Semester (PAS)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
         </div>
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Nama Guru Pengampu & Gelar</label>
+          <input type="text" id="bankTeacher" placeholder="Contoh: Drs. Budi Pratama, M.Pd." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white placeholder-slate-500">
+          <p class="text-[10px] text-slate-500 mt-1">Akan tertera pada kop ujian, kartu bank soal, dan berkas ekspor Word/PDF.</p>
+        </div>
       </div>
       <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
         <button onclick="closeModal('modalCreateBank')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Batal</button>
@@ -5142,6 +5147,11 @@
         return;
       }
 
+      const teacherInput = document.getElementById('bankTeacher');
+      const teacher = (teacherInput ? teacherInput.value : '').trim() || 'Guru Pengampu';
+      const targetClassSelect = document.getElementById('bankTargetClass');
+      const targetClass = (targetClassSelect ? targetClassSelect.value : '').trim() || 'Semua Kelas';
+
       try {
         const res = await fetch('/api/v1/cbt/question-banks/create', {
           method: 'POST',
@@ -5149,8 +5159,8 @@
           body: JSON.stringify({
             title: title,
             subject: subj,
-            teacher: 'Drs. Budi Pratama, M.Pd.',
-            target_class: 'Semua Kelas',
+            teacher: teacher,
+            target_class: targetClass,
             questions: []
           })
         });

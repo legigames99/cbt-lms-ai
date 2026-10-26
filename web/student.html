@@ -6,7 +6,24 @@
   <title>Ruang Ujian Siswa - CBT Local-First</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- KaTeX for High-Performance Math Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Arabic Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
+    .font-arabic {
+      font-family: 'Amiri', 'Noto Naskh Arabic', serif !important;
+      font-size: 1.35rem;
+      line-height: 2.3;
+    }
+    .katex-display { margin: 0.6em 0; overflow-x: auto; overflow-y: hidden; }
     .option-card:hover { border-color: #6366f1; }
     .option-card.selected { border-color: #6366f1; background-color: rgba(99, 102, 241, 0.15); }
   </style>
@@ -687,6 +704,37 @@
           </div>
         `;
         listContainer.appendChild(essayWrap);
+      }
+
+      // Auto-detect Arabic text direction & font
+      if (/[\u0600-\u06FF]/.test(q.stem || '')) {
+        document.getElementById('qStemHTML').setAttribute('dir', 'rtl');
+        document.getElementById('qStemHTML').classList.add('font-arabic');
+      } else {
+        document.getElementById('qStemHTML').setAttribute('dir', 'ltr');
+        document.getElementById('qStemHTML').classList.remove('font-arabic');
+      }
+
+      // Auto-render KaTeX math formulas in question stem & options
+      if (window.renderMathInElement) {
+        renderMathInElement(document.getElementById('qStemHTML'), {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '\\[', right: '\\]', display: true}
+          ],
+          throwOnError: false
+        });
+        renderMathInElement(document.getElementById('qOptionsList'), {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '\\[', right: '\\]', display: true}
+          ],
+          throwOnError: false
+        });
       }
 
       document.getElementById('btnPrevQ').disabled = (currentIndex === 0);

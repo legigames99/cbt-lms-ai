@@ -1612,6 +1612,10 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     return fs.createReadStream(path.join(WEB_DIR, 'kelola-soal.html')).pipe(res);
   }
+  if (pathname === '/editor-soal' || pathname === '/soal/editor') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    return fs.createReadStream(path.join(WEB_DIR, 'editor-soal.html')).pipe(res);
+  }
   if (pathname === '/exam') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     return fs.createReadStream(path.join(WEB_DIR, 'student.html')).pipe(res);
@@ -1827,6 +1831,46 @@ const server = http.createServer(async (req, res) => {
       });
     } catch (err) {
       return sendJSON(500, { status: 'error', message: 'Gagal memproses cap sekolah: ' + err.message });
+    }
+  }
+
+  // POST /api/v1/cbt/upload-image (Unggah Gambar Soal / Stimulus / Opsi)
+  if (pathname === '/api/v1/cbt/upload-image' && req.method === 'POST') {
+    const body = await parseBody(req);
+    if (!body.image_data) {
+      return sendJSON(400, { status: 'error', message: 'Data gambar tidak ditemukan.' });
+    }
+
+    try {
+      const match = body.image_data.match(/^data:image\/([a-zA-Z0-9\+\-]+);base64,(.+)$/);
+      let ext = 'png';
+      let buffer;
+      if (match) {
+        ext = match[1].replace('svg+xml', 'svg').replace('jpeg', 'jpg');
+        buffer = Buffer.from(match[2], 'base64');
+      } else {
+        buffer = Buffer.from(body.image_data, 'base64');
+      }
+
+      if (!fs.existsSync(STATIC_UPLOADS_DIR)) {
+        fs.mkdirSync(STATIC_UPLOADS_DIR, { recursive: true });
+      }
+
+      const safeExt = ['png', 'jpg', 'jpeg', 'svg', 'webp', 'gif'].includes(ext) ? ext : 'png';
+      const prefix = (body.prefix || 'soal').replace(/[^a-zA-Z0-9_-]/g, '');
+      const filename = `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${safeExt}`;
+      const filePath = path.join(STATIC_UPLOADS_DIR, filename);
+      fs.writeFileSync(filePath, buffer);
+
+      const fileUrl = `/static/uploads/${filename}`;
+      return sendJSON(200, {
+        status: 'success',
+        message: 'Gambar berhasil diunggah!',
+        file_url: fileUrl,
+        filename: filename
+      });
+    } catch (err) {
+      return sendJSON(500, { status: 'error', message: 'Gagal memproses unggahan gambar: ' + err.message });
     }
   }
 

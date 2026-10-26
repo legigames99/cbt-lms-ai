@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor Butir Soal - CBT & LMS AI Suite</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- KaTeX for High-Performance Math Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Google Fonts: Inter (UI) & Amiri / Noto Naskh (Arabic) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Naskh+Arabic:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-arabic {
+      font-family: 'Amiri', 'Noto Naskh Arabic', serif !important;
+      font-size: 1.25rem;
+      line-height: 2.2;
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0b1120; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    select { color-scheme: dark !important; }
+    select option {
+      background-color: #0b1120 !important;
+      color: #ffffff !important;
+      font-weight: 600;
+      padding: 8px 12px;
+    }
+
+    .katex-display { margin: 0.75em 0; overflow-x: auto; overflow-y: hidden; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- ==================== TOP NAVIGATION BAR ==================== -->
+  <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 sm:px-6 py-3">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      <!-- Breadcrumb & Back button -->
+      <div class="flex items-center gap-3">
+        <a id="btnBackToBank" href="/kelola-soal" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 flex items-center justify-center transition shadow-sm" title="Kembali ke Bank Soal">
+          <i class="fa-solid fa-arrow-left text-sm"></i>
+        </a>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-400">Bank Soal:</span>
+            <span id="headerBankTitle" class="text-xs font-bold text-indigo-300">Memuat Bank Soal...</span>
+            <span id="badgeEditorMode" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Tambah Baru</span>
+          </div>
+          <h1 id="pageTitle" class="text-sm sm:text-base font-extrabold text-white flex items-center gap-2">
+            <i class="fa-solid fa-file-pen text-indigo-400"></i> Editor Butir Soal Standar Asesmen
+          </h1>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2 shrink-0">
+        <button type="button" onclick="toggleMobilePreview()" class="lg:hidden px-3 py-2 rounded-xl bg-slate-800 text-slate-300 border border-slate-700 text-xs font-semibold flex items-center gap-1.5">
+          <i class="fa-solid fa-eye text-cyan-400"></i> <span id="mobilePreviewToggleText">Lihat Pratinjau</span>
+        </button>
+        <button type="button" onclick="handleCancel()" class="px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold transition">
+          Batal
+        </button>
+        <button type="button" onclick="saveQuestion(false)" id="btnSaveKeep" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-indigo-950 text-indigo-300 border border-indigo-500/40 text-xs font-bold transition flex items-center gap-1.5">
+          <i class="fa-solid fa-floppy-disk"></i> Simpan & Lanjut
+        </button>
+        <button type="button" onclick="saveQuestion(true)" id="btnSaveClose" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-check"></i> Simpan & Selesai
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT: 2-COLUMN STUDIO ==================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+    <!-- LEFT COLUMN: QUESTION BUILDER FORM (7 COLS) -->
+    <div id="builderSection" class="lg:col-span-7 space-y-5">
+
+      <!-- 1. METADATA KARTU PENGATURAN SOAL -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800/80">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+            <h2 class="text-xs font-bold text-white uppercase tracking-wider">Pengaturan & Parameter Asesmen</h2>
+          </div>
+          <span class="text-[11px] text-slate-400">Standar TKA Kemdikbudristek</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <!-- Target Bank Soal -->
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Target Bank Soal</label>
+            <select id="inputBankId" onchange="handleBankChange(this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-medium focus:border-indigo-500">
+              <option value="">Memuat daftar...</option>
+            </select>
+          </div>
+
+          <!-- Tipe Soal (6 Tipe TKA) -->
+          <div>
+            <label class="block font-semibold text-indigo-300 mb-1">Tipe Asesmen</label>
+            <select id="inputQuestionType" onchange="handleTypeChange(this.value)" class="w-full bg-slate-950 border border-indigo-500/50 rounded-xl p-2.5 text-indigo-300 font-bold focus:border-indigo-500">
+              <option value="mcq">Pilihan Ganda Tunggal (PG Biasa)</option>
+              <option value="mcq_complex">Pilihan Ganda Kompleks (Multi Jawaban)</option>
+              <option value="true_false">Pernyataan Benar / Salah (Matriks B/S)</option>
+              <option value="matching">Menjodohkan (Matching Pairs)</option>
+              <option value="short_essay">Isian Singkat (Short Answer)</option>
+              <option value="long_essay">Uraian / Esai Panjang AI</option>
+            </select>
+          </div>
+
+          <!-- Level Kognitif & Bobot -->
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block font-semibold text-slate-300 mb-1">Level Bloom</label>
+              <select id="inputCogLevel" onchange="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-medium">
+                <option value="C1">C1 - Ingat</option>
+                <option value="C2" selected>C2 - Paham</option>
+                <option value="C3">C3 - Terap</option>
+                <option value="C4">C4 - Analisis</option>
+                <option value="C5">C5 - Evaluasi</option>
+                <option value="C6">C6 - Cipta</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-300 mb-1">Bobot Nilai</label>
+              <input type="number" id="inputWeight" min="0.5" max="20" step="0.5" value="1.0" onchange="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-mono text-center">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. STUDIO STIMULUS SOAL & TOOLBAR MATEMATIKA / ARAB / GAMBAR -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
+          <div>
+            <h3 class="text-xs font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-align-left text-cyan-400"></i> Pertanyaan & Stimulus Soal (Stem)
+            </h3>
+            <p class="text-[11px] text-slate-400">Tulis teks pertanyaan, narasi kasus, tabel data, atau potongan kode.</p>
+          </div>
+
+          <!-- Direction Toggle LTR vs RTL -->
+          <div class="flex items-center gap-1.5 self-start sm:self-auto">
+            <span class="text-[10px] text-slate-400 font-semibold uppercase">Arah Teks:</span>
+            <div class="flex bg-slate-950 p-0.5 rounded-lg border border-slate-800 text-xs">
+              <button type="button" onclick="setTextDirection('ltr')" id="btnDirLTR" class="px-2.5 py-1 rounded-md font-bold text-white bg-indigo-600 transition" title="Kiri ke Kanan (Bahasa Indonesia / Latin)">
+                LTR
+              </button>
+              <button type="button" onclick="setTextDirection('rtl')" id="btnDirRTL" class="px-2.5 py-1 rounded-md font-bold text-slate-400 hover:text-white transition" title="Kanan ke Kiri (Bahasa Arab)">
+                RTL (عربي)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SPECIAL CHARACTERS & MEDIA TOOLBAR -->
+        <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-2.5 space-y-2">
+          
+          <!-- Category Tabs -->
+          <div class="flex flex-wrap items-center gap-1.5 border-b border-slate-800 pb-2 text-xs">
+            <button type="button" onclick="switchToolbarTab('math')" id="tabBtn_math" class="px-3 py-1.5 rounded-lg bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold transition flex items-center gap-1.5">
+              <i class="fa-solid fa-square-root-variable text-indigo-400"></i> Matematika & Rumus
+            </button>
+            <button type="button" onclick="switchToolbarTab('arabic')" id="tabBtn_arabic" class="px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white border border-slate-800 font-bold transition flex items-center gap-1.5">
+              <i class="fa-solid fa-moon text-emerald-400"></i> Bahasa Arab & Harakat
+            </button>
+            <button type="button" onclick="switchToolbarTab('image')" id="tabBtn_image" class="px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white border border-slate-800 font-bold transition flex items-center gap-1.5">
+              <i class="fa-solid fa-image text-cyan-400"></i> Unggah Gambar
+            </button>
+            <button type="button" onclick="switchToolbarTab('formatting')" id="tabBtn_formatting" class="px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white border border-slate-800 font-bold transition flex items-center gap-1.5">
+              <i class="fa-solid fa-code text-amber-400"></i> Format Teks
+            </button>
+          </div>
+
+          <!-- TAB CONTENT 1: MATEMATIKA -->
+          <div id="tabContent_math" class="space-y-2 pt-1 text-xs">
+            <div class="text-[11px] text-slate-400 flex items-center justify-between">
+              <span>Klik simbol matematika di bawah untuk menyisipkan formula LaTeX otomatis ke dalam soal:</span>
+              <span class="text-indigo-400 font-mono text-[10px]">Inline: $...$ | Display: $$...$$</span>
+            </div>
+            <div class="flex flex-wrap gap-1.5 font-mono text-xs">
+              <button type="button" onclick="insertSnippet('$\\frac{a}{b}$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800 hover:border-indigo-500/40" title="Pecahan a/b">Pecahan $\frac{a}{b}$</button>
+              <button type="button" onclick="insertSnippet('$\\sqrt{x}$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800 hover:border-indigo-500/40" title="Akar Kuadrat">$\sqrt{x}$</button>
+              <button type="button" onclick="insertSnippet('$\\sqrt[n]{x}$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800 hover:border-indigo-500/40" title="Akar Pangkat n">$\sqrt[n]{x}$</button>
+              <button type="button" onclick="insertSnippet('$x^{2}$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800 hover:border-indigo-500/40" title="Pangkat / Kuadrat">Pangkat $x^2$</button>
+              <button type="button" onclick="insertSnippet('$x_{1}$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800 hover:border-indigo-500/40" title="Indeks / Subskrip">Indeks $x_1$</button>
+              <button type="button" onclick="insertSnippet('$\\pm$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Plus Minus">&plusmn;</button>
+              <button type="button" onclick="insertSnippet('$\\times$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Perkalian">&times;</button>
+              <button type="button" onclick="insertSnippet('$\\div$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Pembagian">&divide;</button>
+              <button type="button" onclick="insertSnippet('$\\neq$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Tidak Sama Dengan">&ne;</button>
+              <button type="button" onclick="insertSnippet('$\\le$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Kurang dari sama dengan">&le;</button>
+              <button type="button" onclick="insertSnippet('$\\ge$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Lebih dari sama dengan">&ge;</button>
+              <button type="button" onclick="insertSnippet('$\\approx$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Mendekati / Kira-kira">&asymp;</button>
+              <button type="button" onclick="insertSnippet('$\\pi$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Pi">&pi;</button>
+              <button type="button" onclick="insertSnippet('$\\alpha$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Alpha">&alpha;</button>
+              <button type="button" onclick="insertSnippet('$\\beta$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Beta">&beta;</button>
+              <button type="button" onclick="insertSnippet('$\\theta$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Theta">&theta;</button>
+              <button type="button" onclick="insertSnippet('$\\Delta$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Delta">&Delta;</button>
+              <button type="button" onclick="insertSnippet('$\\infty$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Tak Hingga">&infin;</button>
+              <button type="button" onclick="insertSnippet('$30^{\\circ}$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Derajat Sudut">Derajat &deg;</button>
+              <button type="button" onclick="insertSnippet('$\\sum_{i=1}^{n}$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Sigma / Penjumlahan">&sum;</button>
+              <button type="button" onclick="insertSnippet('$\\int_{a}^{b} f(x) dx$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Integral Tentu">&int;</button>
+              <button type="button" onclick="insertSnippet('$$\\begin{matrix} a & b \\\\ c & d \\end{matrix}$$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Matriks 2x2">Matriks</button>
+            </div>
+          </div>
+
+          <!-- TAB CONTENT 2: BAHASA ARAB -->
+          <div id="tabContent_arabic" class="hidden space-y-2 pt-1 text-xs">
+            <div class="text-[11px] text-emerald-400 font-medium flex items-center justify-between">
+              <span>Klik karakter harakat, tanda baca, atau lafadz untuk menyisipkan langsung:</span>
+              <button type="button" onclick="setTextDirection('rtl')" class="text-xs text-emerald-300 underline">Set Arah Teks ke Kanan (RTL)</button>
+            </div>
+
+            <!-- Baris 1: Harakat / Tasykil -->
+            <div class="flex flex-wrap items-center gap-1 text-sm font-arabic">
+              <span class="text-[11px] font-sans text-slate-400 mr-1 self-center">Harakat:</span>
+              <button type="button" onclick="insertChar('\u064E')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Fathah">ـَ</button>
+              <button type="button" onclick="insertChar('\u0650')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Kasrah">ـِ</button>
+              <button type="button" onclick="insertChar('\u064F')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Dammah">ـُ</button>
+              <button type="button" onclick="insertChar('\u0652')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Sukun">ـْ</button>
+              <button type="button" onclick="insertChar('\u0651')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Tasydid / Shaddah">ـّ</button>
+              <button type="button" onclick="insertChar('\u064B')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Fathatain / Tanwin Fathah">ـً</button>
+              <button type="button" onclick="insertChar('\u064D')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Kasratain / Tanwin Kasrah">ـٍ</button>
+              <button type="button" onclick="insertChar('\u064C')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Dammatain / Tanwin Dammah">ـٌ</button>
+              <button type="button" onclick="insertChar('\u0653')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Maddah">ـٓ</button>
+            </div>
+
+            <!-- Baris 2: Huruf Khusus & Hamzah -->
+            <div class="flex flex-wrap items-center gap-1 text-sm font-arabic">
+              <span class="text-[11px] font-sans text-slate-400 mr-1 self-center">Huruf:</span>
+              <button type="button" onclick="insertChar('ء')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Hamzah">ء</button>
+              <button type="button" onclick="insertChar('أ')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Alif Hamzah Atas">أ</button>
+              <button type="button" onclick="insertChar('إ')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Alif Hamzah Bawah">إ</button>
+              <button type="button" onclick="insertChar('ؤ')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Waw Hamzah">ؤ</button>
+              <button type="button" onclick="insertChar('ئ')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Ya Hamzah">ئ</button>
+              <button type="button" onclick="insertChar('ى')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Alif Maqsurah">ى</button>
+              <button type="button" onclick="insertChar('ة')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Ta Marbutah">ة</button>
+              <button type="button" onclick="insertChar('ٱ')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Alif Waslah">ٱ</button>
+              <button type="button" onclick="insertChar('\u0670')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Alif Khanjariyah">ـٰ</button>
+            </div>
+
+            <!-- Baris 3: Tanda Baca & Pungtuasi Arab -->
+            <div class="flex flex-wrap items-center gap-1 text-sm font-arabic">
+              <span class="text-[11px] font-sans text-slate-400 mr-1 self-center">Pungtuasi:</span>
+              <button type="button" onclick="insertChar('؟')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Tanda Tanya Arab">؟</button>
+              <button type="button" onclick="insertChar('،')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Koma Arab">،</button>
+              <button type="button" onclick="insertChar('؛')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Titik Koma Arab">؛</button>
+              <button type="button" onclick="insertChar('﴿ ')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-emerald-300 border border-slate-800 flex items-center justify-center" title="Kurung Buka Ayat">﴿</button>
+              <button type="button" onclick="insertChar(' ﴾')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-emerald-300 border border-slate-800 flex items-center justify-center" title="Kurung Tutup Ayat">﴾</button>
+              <button type="button" onclick="insertChar(' ﷽ ')" class="px-2.5 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-emerald-300 border border-slate-800 flex items-center justify-center text-xs" title="Bismillah">﷽</button>
+              <button type="button" onclick="insertChar(' ﷺ ')" class="px-2 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-emerald-300 border border-slate-800 flex items-center justify-center text-xs" title="Sallallahu Alaihi Wasallam">ﷺ</button>
+            </div>
+
+            <!-- Baris 4: Angka Arab Timur -->
+            <div class="flex flex-wrap items-center gap-1 text-sm font-arabic">
+              <span class="text-[11px] font-sans text-slate-400 mr-1 self-center">Angka:</span>
+              <button type="button" onclick="insertChar('٠')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٠</button>
+              <button type="button" onclick="insertChar('١')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">١</button>
+              <button type="button" onclick="insertChar('٢')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٢</button>
+              <button type="button" onclick="insertChar('٣')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٣</button>
+              <button type="button" onclick="insertChar('٤')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٤</button>
+              <button type="button" onclick="insertChar('٥')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٥</button>
+              <button type="button" onclick="insertChar('٦')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٦</button>
+              <button type="button" onclick="insertChar('٧')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٧</button>
+              <button type="button" onclick="insertChar('٨')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٨</button>
+              <button type="button" onclick="insertChar('٩')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٩</button>
+            </div>
+          </div>
+
+          <!-- TAB CONTENT 3: UNGGAH GAMBAR -->
+          <div id="tabContent_image" class="hidden space-y-3 pt-1 text-xs">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 p-3 bg-slate-900 rounded-xl border border-dashed border-slate-700 hover:border-cyan-500/50 transition">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center text-lg shrink-0">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-white">Unggah Gambar Stimulus / Ilustrasi Soal</h4>
+                  <p class="text-[11px] text-slate-400">Pilih berkas dari komputer atau tekan <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-[10px]">Ctrl+V</kbd> untuk paste gambar langsung.</p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <input type="file" id="fileStemImage" accept="image/*" class="hidden" onchange="handleImageFileSelect(event, 'stem')">
+                <button type="button" onclick="document.getElementById('fileStemImage').click()" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold transition flex items-center gap-1.5 shadow-md shadow-cyan-600/20">
+                  <i class="fa-solid fa-folder-open"></i> Pilih Berkas
+                </button>
+              </div>
+            </div>
+
+            <!-- Image Preview & Insertion Bar -->
+            <div id="stemImagePreviewBox" class="hidden p-3 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3 overflow-hidden">
+                <img id="stemImagePreviewImg" src="" alt="Preview" class="w-16 h-16 object-cover rounded-lg border border-slate-700 shrink-0">
+                <div class="truncate">
+                  <span id="stemImageFileName" class="block font-bold text-white text-xs truncate">nama_gambar.png</span>
+                  <span id="stemImageUrl" class="block text-[11px] text-slate-400 font-mono truncate">/static/uploads/...</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <button type="button" onclick="insertImageToStem()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1">
+                  <i class="fa-solid fa-plus"></i> Sisipkan ke Teks
+                </button>
+                <button type="button" onclick="removeStemImage()" class="p-1.5 px-2.5 rounded-lg bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB CONTENT 4: FORMATTING TEKS -->
+          <div id="tabContent_formatting" class="hidden flex flex-wrap gap-1.5 pt-1 text-xs">
+            <button type="button" onclick="wrapText('<strong>', '</strong>')" class="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 font-bold" title="Tebal (Bold)"><i class="fa-solid fa-bold"></i> Tebal</button>
+            <button type="button" onclick="wrapText('<em>', '</em>')" class="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 italic" title="Miring (Italic)"><i class="fa-solid fa-italic"></i> Miring</button>
+            <button type="button" onclick="wrapText('<u>', '</u>')" class="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 underline" title="Garis Bawah (Underline)"><i class="fa-solid fa-underline"></i> Garis Bawah</button>
+            <button type="button" onclick="wrapText('<code>', '</code>')" class="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-800 font-mono" title="Kode Singkat (Inline Code)"><i class="fa-solid fa-code"></i> Kode</button>
+            <button type="button" onclick="insertSnippet('<pre><code class=\'language-bash\'>\n# Ketik kode atau konfigurasi di sini\n</code></pre>')" class="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 font-mono" title="Blok Kode Utuh">Blok Kode &lt;pre&gt;</button>
+            <button type="button" onclick="insertSnippet('<table class=\'w-full border border-slate-700 my-2 text-xs\'>\n  <tr class=\'bg-slate-800\'>\n    <th class=\'border border-slate-700 p-2\'>Kolom A</th>\n    <th class=\'border border-slate-700 p-2\'>Kolom B</th>\n  </tr>\n  <tr>\n    <td class=\'border border-slate-700 p-2\'>Data 1</td>\n    <td class=\'border border-slate-700 p-2\'>Data 2</td>\n  </tr>\n</table>')" class="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800" title="Tabel Data"><i class="fa-solid fa-table"></i> Tabel</button>
+            <button type="button" onclick="wrapText('<blockquote>', '</blockquote>')" class="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800" title="Kutipan Kasus"><i class="fa-solid fa-quote-left"></i> Kutipan</button>
+          </div>
+        </div>
+
+        <!-- TEXTAREA PERTANYAAN (STEM) -->
+        <div class="relative">
+          <textarea id="inputStem" rows="6" oninput="updateLivePreview()" onpaste="handleStemPaste(event)" placeholder="Ketik pertanyaan atau stimulus asesmen di sini..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-white leading-relaxed focus:outline-none focus:border-indigo-500 custom-scrollbar text-sm transition"></textarea>
+          
+          <div class="flex items-center justify-between text-[11px] text-slate-500 mt-1 px-1">
+            <span>Mendukung teks HTML, KaTeX Math ($...$), dan teks Arab. Paste gambar langsung (Ctrl+V) didukung.</span>
+            <span id="stemCharCount">0 karakter</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. SECTION DINAMIS: OPSI JAWABAN / PREMIS / MATRIKS BERDASARKAN TIPE SOAL -->
+      <div id="dynamicAnswerSection" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
+        
+        <!-- ==================== A. TIPE: MCQ (PILIHAN GANDA TUNGGAL) ==================== -->
+        <div id="formSection_mcq" class="space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+            <div>
+              <h3 class="text-xs font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-circle-dot text-indigo-400"></i> Pilihan Jawaban (Opsi A s/d E)
+              </h3>
+              <p class="text-[11px] text-slate-400">Pilih radio button untuk menentukan kunci jawaban yang benar.</p>
+            </div>
+            <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 rounded-lg">1 Kunci Benar</span>
+          </div>
+
+          <div class="space-y-2.5 text-xs">
+            <!-- Opsi A -->
+            <div class="flex items-start gap-2.5 p-2 bg-slate-950/80 rounded-xl border border-slate-800/80">
+              <label class="flex items-center gap-1.5 pt-2 cursor-pointer">
+                <input type="radio" name="mcqCorrectKey" value="A" checked onchange="updateLivePreview()" class="w-4 h-4 text-indigo-600 bg-slate-900 border-slate-700 focus:ring-indigo-500">
+                <span class="w-6 h-6 rounded-lg bg-indigo-600/20 text-indigo-300 font-bold flex items-center justify-center">A</span>
+              </label>
+              <div class="flex-1 space-y-1">
+                <textarea id="mcqOptA" rows="1" oninput="updateLivePreview()" placeholder="Teks opsi jawaban A..." class="w-full bg-slate-900 border border-slate-700/80 rounded-lg p-2 text-white text-xs focus:border-indigo-500"></textarea>
+                <div class="flex items-center gap-2 text-[11px]">
+                  <input type="file" id="fileOptA" accept="image/*" class="hidden" onchange="uploadOptionImage(event, 'mcqOptA')">
+                  <button type="button" onclick="document.getElementById('fileOptA').click()" class="text-slate-400 hover:text-cyan-400 transition flex items-center gap-1"><i class="fa-regular fa-image"></i> Sisipkan Gambar Opsi</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Opsi B -->
+            <div class="flex items-start gap-2.5 p-2 bg-slate-950/80 rounded-xl border border-slate-800/80">
+              <label class="flex items-center gap-1.5 pt-2 cursor-pointer">
+                <input type="radio" name="mcqCorrectKey" value="B" onchange="updateLivePreview()" class="w-4 h-4 text-indigo-600 bg-slate-900 border-slate-700 focus:ring-indigo-500">
+                <span class="w-6 h-6 rounded-lg bg-indigo-600/20 text-indigo-300 font-bold flex items-center justify-center">B</span>
+              </label>
+              <div class="flex-1 space-y-1">
+                <textarea id="mcqOptB" rows="1" oninput="updateLivePreview()" placeholder="Teks opsi jawaban B..." class="w-full bg-slate-900 border border-slate-700/80 rounded-lg p-2 text-white text-xs focus:border-indigo-500"></textarea>
+                <div class="flex items-center gap-2 text-[11px]">
+                  <input type="file" id="fileOptB" accept="image/*" class="hidden" onchange="uploadOptionImage(event, 'mcqOptB')">
+                  <button type="button" onclick="document.getElementById('fileOptB').click()" class="text-slate-400 hover:text-cyan-400 transition flex items-center gap-1"><i class="fa-regular fa-image"></i> Sisipkan Gambar Opsi</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Opsi C -->
+            <div class="flex items-start gap-2.5 p-2 bg-slate-950/80 rounded-xl border border-slate-800/80">
+              <label class="flex items-center gap-1.5 pt-2 cursor-pointer">
+                <input type="radio" name="mcqCorrectKey" value="C" onchange="updateLivePreview()" class="w-4 h-4 text-indigo-600 bg-slate-900 border-slate-700 focus:ring-indigo-500">
+                <span class="w-6 h-6 rounded-lg bg-indigo-600/20 text-indigo-300 font-bold flex items-center justify-center">C</span>
+              </label>
+              <div class="flex-1 space-y-1">
+                <textarea id="mcqOptC" rows="1" oninput="updateLivePreview()" placeholder="Teks opsi jawaban C..." class="w-full bg-slate-900 border border-slate-700/80 rounded-lg p-2 text-white text-xs focus:border-indigo-500"></textarea>
+                <div class="flex items-center gap-2 text-[11px]">
+                  <input type="file" id="fileOptC" accept="image/*" class="hidden" onchange="uploadOptionImage(event, 'mcqOptC')">
+                  <button type="button" onclick="document.getElementById('fileOptC').click()" class="text-slate-400 hover:text-cyan-400 transition flex items-center gap-1"><i class="fa-regular fa-image"></i> Sisipkan Gambar Opsi</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Opsi D -->
+            <div class="flex items-start gap-2.5 p-2 bg-slate-950/80 rounded-xl border border-slate-800/80">
+              <label class="flex items-center gap-1.5 pt-2 cursor-pointer">
+                <input type="radio" name="mcqCorrectKey" value="D" onchange="updateLivePreview()" class="w-4 h-4 text-indigo-600 bg-slate-900 border-slate-700 focus:ring-indigo-500">
+                <span class="w-6 h-6 rounded-lg bg-indigo-600/20 text-indigo-300 font-bold flex items-center justify-center">D</span>
+              </label>
+              <div class="flex-1 space-y-1">
+                <textarea id="mcqOptD" rows="1" oninput="updateLivePreview()" placeholder="Teks opsi jawaban D..." class="w-full bg-slate-900 border border-slate-700/80 rounded-lg p-2 text-white text-xs focus:border-indigo-500"></textarea>
+                <div class="flex items-center gap-2 text-[11px]">
+                  <input type="file" id="fileOptD" accept="image/*" class="hidden" onchange="uploadOptionImage(event, 'mcqOptD')">
+                  <button type="button" onclick="document.getElementById('fileOptD').click()" class="text-slate-400 hover:text-cyan-400 transition flex items-center gap-1"><i class="fa-regular fa-image"></i> Sisipkan Gambar Opsi</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Opsi E -->
+            <div class="flex items-start gap-2.5 p-2 bg-slate-950/80 rounded-xl border border-slate-800/80">
+              <label class="flex items-center gap-1.5 pt-2 cursor-pointer">
+                <input type="radio" name="mcqCorrectKey" value="E" onchange="updateLivePreview()" class="w-4 h-4 text-indigo-600 bg-slate-900 border-slate-700 focus:ring-indigo-500">
+                <span class="w-6 h-6 rounded-lg bg-indigo-600/20 text-indigo-300 font-bold flex items-center justify-center">E</span>
+              </label>
+              <div class="flex-1 space-y-1">
+                <textarea id="mcqOptE" rows="1" oninput="updateLivePreview()" placeholder="Teks opsi jawaban E..." class="w-full bg-slate-900 border border-slate-700/80 rounded-lg p-2 text-white text-xs focus:border-indigo-500"></textarea>
+                <div class="flex items-center gap-2 text-[11px]">
+                  <input type="file" id="fileOptE" accept="image/*" class="hidden" onchange="uploadOptionImage(event, 'mcqOptE')">
+                  <button type="button" onclick="document.getElementById('fileOptE').click()" class="text-slate-400 hover:text-cyan-400 transition flex items-center gap-1"><i class="fa-regular fa-image"></i> Sisipkan Gambar Opsi</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== B. TIPE: MCQ COMPLEX (MULTI JAWABAN) ==================== -->
+        <div id="formSection_mcq_complex" class="hidden space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+            <div>
+              <h3 class="text-xs font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-square-check text-purple-400"></i> Pilihan Ganda Kompleks
+              </h3>
+              <p class="text-[11px] text-slate-400">Centang semua opsi yang merupakan jawaban benar (multi-kunci).</p>
+            </div>
+            <span class="text-xs font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2.5 py-1 rounded-lg">Multi Jawaban Benar</span>
+          </div>
+
+          <div class="space-y-2.5 text-xs">
+            <!-- A sampai E dengan checkbox -->
+            <template id="complexOptionTpl">
+              <!-- Dynamically rendered -->
+            </template>
+            <div id="complexOptionsContainer" class="space-y-2"></div>
+          </div>
+        </div>
+
+        <!-- ==================== C. TIPE: TRUE / FALSE (MATRIKS BENAR SALAH) ==================== -->
+        <div id="formSection_true_false" class="hidden space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+            <div>
+              <h3 class="text-xs font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-list-check text-amber-400"></i> Pernyataan Matriks Benar / Salah
+              </h3>
+              <p class="text-[11px] text-slate-400">Tambahkan butir-butir pernyataan analitis serta tentukan kunci Benar (B) atau Salah (S).</p>
+            </div>
+            <button type="button" onclick="addTrueFalseRow('', 'B')" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-plus"></i> Tambah Baris
+            </button>
+          </div>
+
+          <div id="trueFalseContainer" class="space-y-2 text-xs">
+            <!-- Dynamic True False Rows -->
+          </div>
+        </div>
+
+        <!-- ==================== D. TIPE: MATCHING (MENJODOHKAN) ==================== -->
+        <div id="formSection_matching" class="hidden space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+            <div>
+              <h3 class="text-xs font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-shuffle text-cyan-400"></i> Pasangan Menjodohkan (Matching Pairs)
+              </h3>
+              <p class="text-[11px] text-slate-400">Pasangkan premis/parameter di sebelah kiri dengan pilihan/fungsi di sebelah kanan.</p>
+            </div>
+            <button type="button" onclick="addMatchingRow('', '')" class="px-2.5 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-plus"></i> Tambah Pasangan
+            </button>
+          </div>
+
+          <div id="matchingContainer" class="space-y-2 text-xs">
+            <!-- Dynamic Matching Rows -->
+          </div>
+        </div>
+
+        <!-- ==================== E. TIPE: SHORT ESSAY (ISIAN SINGKAT) ==================== -->
+        <div id="formSection_short_essay" class="hidden space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+            <div>
+              <h3 class="text-xs font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-pen-nib text-emerald-400"></i> Kunci Jawaban Isian Singkat
+              </h3>
+              <p class="text-[11px] text-slate-400">Tuliskan kata kunci jawaban benar. Pisahkan dengan tanda koma jika ada beberapa variasi/sinonim.</p>
+            </div>
+            <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">Koreksi Otomatis</span>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <textarea id="inputShortEssayKeys" rows="2" oninput="updateLivePreview()" placeholder="Contoh: dua, 2, hukum kedua, hukum II newton" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:border-emerald-500"></textarea>
+            <p class="text-[11px] text-slate-400">Pemeriksaan jawaban siswa bersifat fleksibel (case-insensitive / mengabaikan huruf besar/kecil dan spasi berlebih).</p>
+          </div>
+        </div>
+
+        <!-- ==================== F. TIPE: LONG ESSAY (URAIAN / ESAI AI) ==================== -->
+        <div id="formSection_long_essay" class="hidden space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+            <div>
+              <h3 class="text-xs font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> Konfigurasi Rubrik & Jawaban Ideal AI
+              </h3>
+              <p class="text-[11px] text-slate-400">AI menggunakan rubrik dan jawaban ideal ini untuk memeriksa jawaban uraian siswa secara objektif.</p>
+            </div>
+            <span class="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg">AI Evaluator</span>
+          </div>
+
+          <div class="space-y-3 text-xs">
+            <div>
+              <label class="block font-semibold text-slate-300 mb-1">Rubrik Kriteria Penilaian</label>
+              <textarea id="inputEssayRubric" rows="2" oninput="updateLivePreview()" placeholder="Aspek penilaian: 1. Ketepatan analisis konfigurasi (35%), 2. Identifikasi kendala teknis (35%), 3. Solusi metodologis (30%)..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:border-amber-500"></textarea>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-300 mb-1">Uraian Jawaban Model / Ideal</label>
+              <textarea id="inputEssayIdeal" rows="3" oninput="updateLivePreview()" placeholder="Tuliskan uraian model jawaban yang dianggap lengkap dan bernilai maksimal..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:border-amber-500"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">Skor Maksimal Soal Ini</label>
+                <input type="number" id="inputEssayMaxScore" value="100" min="10" max="100" oninput="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-white font-mono">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">Kata Kunci Kriteria (Pisahkan Koma)</label>
+                <input type="text" id="inputEssayKeywords" oninput="updateLivePreview()" placeholder="konfigurasi, iptables, dhcp, reload" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-white">
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 4. PEMBAHASAN / SOLUSI ANALITIS -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl space-y-3">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+          <div>
+            <h3 class="text-xs font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-lightbulb text-amber-400"></i> Pembahasan / Penjelasan Kunci Jawaban
+            </h3>
+            <p class="text-[11px] text-slate-400">Pembahasan analitis ditampilkan kepada siswa setelah ujian selesai atau saat pembahasan hasil.</p>
+          </div>
+        </div>
+
+        <textarea id="inputExplanation" rows="3" oninput="updateLivePreview()" placeholder="Tuliskan pembahasan ilmiah detail mengapa kunci jawaban tersebut benar dan alternatif lain salah..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white text-xs leading-relaxed focus:border-indigo-500"></textarea>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: LIVE REAL-TIME STUDENT PREVIEW (5 COLS) -->
+    <div id="previewSection" class="lg:col-span-5 sticky top-20 space-y-4">
+      
+      <div class="bg-slate-900 border border-indigo-500/40 rounded-2xl p-4 sm:p-5 shadow-2xl space-y-4">
+        
+        <!-- Live Preview Header -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+            <h3 class="text-xs font-extrabold text-white tracking-wide uppercase flex items-center gap-1.5">
+              <i class="fa-solid fa-desktop text-cyan-400"></i> Pratinjau Tampilan Siswa
+            </h3>
+          </div>
+          <span class="text-[10px] bg-slate-800 text-slate-300 font-mono px-2 py-0.5 rounded-md border border-slate-700">Real-Time</span>
+        </div>
+
+        <!-- Student Question Card Simulation -->
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-4">
+          
+          <!-- Badges & Question Number -->
+          <div class="flex items-center justify-between text-xs pb-2 border-b border-slate-800/80">
+            <div class="flex items-center gap-2">
+              <span class="font-extrabold text-indigo-400 font-mono text-sm">Soal #<span id="previewQNumber">1</span></span>
+              <span id="previewTypeBadge" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">PG Tunggal</span>
+            </div>
+            <div class="flex items-center gap-2 text-[11px] text-slate-400">
+              <span id="previewCogBadge" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-bold">C2</span>
+              <span>Bobot: <strong id="previewWeight" class="text-white">1.0</strong></span>
+            </div>
+          </div>
+
+          <!-- Question Stem (Stimulus) Live Render -->
+          <div id="previewStemHTML" class="text-slate-100 text-sm leading-relaxed space-y-2 min-h-[50px]">
+            <p class="text-slate-500 italic">Ketik pertanyaan atau stimulus di sebelah kiri untuk melihat pratinjau langsung...</p>
+          </div>
+
+          <!-- Dynamic Options / Input Live Render -->
+          <div id="previewAnswersContainer" class="space-y-2 text-xs pt-2">
+            <!-- Rendered by updateLivePreview() -->
+          </div>
+
+          <!-- Explanation Collapsible Preview -->
+          <div id="previewExplanationBox" class="mt-4 pt-3 border-t border-slate-800/80 hidden">
+            <div class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs space-y-1">
+              <span class="font-bold text-amber-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-lightbulb"></i> Pembahasan Kunci Jawaban:
+              </span>
+              <div id="previewExplanationHTML" class="text-slate-200 leading-relaxed pt-1"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="text-[11px] text-slate-400 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 flex items-start gap-2">
+          <i class="fa-solid fa-circle-info text-cyan-400 mt-0.5 shrink-0"></i>
+          <span>Rumus matematika KaTeX (<code class="text-indigo-300 font-mono">$formula$</code>) dan aksara Arab akan langsung dirender secara otomatis persis seperti yang akan dilihat siswa di ruang ujian.</span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ==================== JAVASCRIPT LOGIC & CONTROLLER ==================== -->
+  <script>
+    // State Variables
+    let allQuestionBanks = [];
+    let activeBankId = 1;
+    let editingQuestionId = null;
+    let activeToolbarTab = 'math';
+    let currentTextDir = 'ltr';
+
+    // 1. Inisialisasi Halaman
+    document.addEventListener('DOMContentLoaded', async () => {
+      parseUrlParameters();
+      await fetchAllBanks();
+      initializeComplexOptions();
+      initializeDefaultDynamicRows();
+      setupPasteListener();
+      updateLivePreview();
+    });
+
+    // 2. Parse URL Params (?bank_id=1&question_id=3)
+    function parseUrlParameters() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const bId = urlParams.get('bank_id');
+      const qId = urlParams.get('question_id');
+
+      if (bId) activeBankId = parseInt(bId, 10);
+      if (qId) editingQuestionId = parseInt(qId, 10);
+
+      const btnBack = document.getElementById('btnBackToBank');
+      if (btnBack) btnBack.href = `/kelola-soal?bank_id=${activeBankId}`;
+    }
+
+    // 3. Ambil Semua Data Bank Soal dari Server
+    async function fetchAllBanks() {
+      try {
+        const res = await fetch('/api/v1/cbt/question-banks');
+        const json = await res.json();
+        allQuestionBanks = json.data || [];
+
+        const select = document.getElementById('inputBankId');
+        select.innerHTML = allQuestionBanks.map(b => 
+          `<option value="${b.id}" ${b.id === activeBankId ? 'selected' : ''}>#${b.id} - ${b.title} (${b.subject || 'Umum'})</option>`
+        ).join('');
+
+        const currentBank = allQuestionBanks.find(b => b.id === activeBankId) || allQuestionBanks[0];
+        if (currentBank) {
+          activeBankId = currentBank.id;
+          document.getElementById('headerBankTitle').innerText = `#${currentBank.id} - ${currentBank.title}`;
+          
+          if (editingQuestionId) {
+            loadQuestionToEdit(currentBank, editingQuestionId);
+          }
+        }
+      } catch (err) {
+        console.error('Gagal memuat bank soal:', err);
+      }
+    }
+
+    // 4. Muat Data Soal Jika Mode Edit
+    function loadQuestionToEdit(bank, qId) {
+      if (!bank || !bank.questions) return;
+      const q = bank.questions.find(item => item.id === qId);
+      if (!q) return;
+
+      document.getElementById('badgeEditorMode').innerText = `Edit Soal #${q.id}`;
+      document.getElementById('badgeEditorMode').className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30';
+      document.getElementById('pageTitle').innerHTML = `<i class="fa-solid fa-file-pen text-amber-400"></i> Edit Butir Soal #${q.id}`;
+      document.getElementById('previewQNumber').innerText = q.id;
+
+      document.getElementById('inputQuestionType').value = q.type || 'mcq';
+      handleTypeChange(q.type || 'mcq');
+
+      document.getElementById('inputCogLevel').value = q.cog || 'C2';
+      document.getElementById('inputWeight').value = q.weight || 1.0;
+      document.getElementById('inputStem').value = q.stem || '';
+      document.getElementById('inputExplanation').value = q.explanation || '';
+
+      // Deteksi bahasa Arab dari teks stem
+      if (/[\u0600-\u06FF]/.test(q.stem || '')) {
+        setTextDirection('rtl');
+      }
+
+      // Populate opsi sesuai tipe
+      if (q.type === 'mcq') {
+        const opts = q.options || [];
+        opts.forEach(o => {
+          const el = document.getElementById(`mcqOpt${o.id}`);
+          if (el) el.value = o.text || '';
+        });
+        const rBtn = document.querySelector(`input[name="mcqCorrectKey"][value="${q.answer || 'A'}"]`);
+        if (rBtn) rBtn.checked = true;
+      } else if (q.type === 'mcq_complex') {
+        const opts = q.options || [];
+        const ansList = Array.isArray(q.answer) ? q.answer : [q.answer];
+        opts.forEach((o, idx) => {
+          const letter = String.fromCharCode(65 + idx);
+          const tEl = document.getElementById(`complexOptText_${letter}`);
+          const cEl = document.getElementById(`complexOptCheck_${letter}`);
+          if (tEl) tEl.value = o.text || '';
+          if (cEl) cEl.checked = ansList.includes(letter) || ansList.includes(o.id);
+        });
+      } else if (q.type === 'true_false') {
+        const container = document.getElementById('trueFalseContainer');
+        container.innerHTML = '';
+        (q.statements || []).forEach(st => {
+          addTrueFalseRow(st.text, st.key || (q.answer && q.answer[st.id]) || 'B');
+        });
+      } else if (q.type === 'matching') {
+        const container = document.getElementById('matchingContainer');
+        container.innerHTML = '';
+        const premises = q.premises || [];
+        const targets = q.targets || [];
+        premises.forEach((p, idx) => {
+          const targetKey = (q.answer && q.answer[p.id]) || String.fromCharCode(65 + idx);
+          const tObj = targets.find(t => t.id === targetKey);
+          addMatchingRow(p.text, tObj ? tObj.text : '');
+        });
+      } else if (q.type === 'short_essay') {
+        document.getElementById('inputShortEssayKeys').value = (q.answer_keys || []).join(', ');
+      } else if (q.type === 'long_essay') {
+        document.getElementById('inputEssayRubric').value = q.rubric || '';
+        document.getElementById('inputEssayIdeal').value = q.ideal_answer || '';
+        document.getElementById('inputEssayMaxScore').value = q.max_score || 100;
+        document.getElementById('inputEssayKeywords').value = (q.keywords || []).join(', ');
+      }
+
+      updateLivePreview();
+    }
+
+    // 5. Inisialisasi Kompleks Opsi A-E
+    function initializeComplexOptions() {
+      const container = document.getElementById('complexOptionsContainer');
+      const letters = ['A', 'B', 'C', 'D', 'E'];
+      container.innerHTML = letters.map(letter => `
+        <div class="flex items-start gap-2.5 p-2 bg-slate-950/80 rounded-xl border border-slate-800/80">
+          <label class="flex items-center gap-1.5 pt-2 cursor-pointer">
+            <input type="checkbox" id="complexOptCheck_${letter}" onchange="updateLivePreview()" class="w-4 h-4 text-purple-600 bg-slate-900 border-slate-700 rounded focus:ring-purple-500">
+            <span class="w-6 h-6 rounded-lg bg-purple-600/20 text-purple-300 font-bold flex items-center justify-center">${letter}</span>
+          </label>
+          <div class="flex-1 space-y-1">
+            <textarea id="complexOptText_${letter}" rows="1" oninput="updateLivePreview()" placeholder="Pernyataan / opsi ${letter}..." class="w-full bg-slate-900 border border-slate-700/80 rounded-lg p-2 text-white text-xs focus:border-purple-500"></textarea>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 6. Inisialisasi Baris Default untuk B/S dan Matching
+    function initializeDefaultDynamicRows() {
+      const tfContainer = document.getElementById('trueFalseContainer');
+      if (tfContainer && tfContainer.children.length === 0) {
+        addTrueFalseRow('Pernyataan evaluasi teknis pertama', 'B');
+        addTrueFalseRow('Pernyataan evaluasi teknis kedua', 'S');
+        addTrueFalseRow('Pernyataan evaluasi teknis ketiga', 'B');
+      }
+
+      const matchContainer = document.getElementById('matchingContainer');
+      if (matchContainer && matchContainer.children.length === 0) {
+        addMatchingRow('Konsep atau istilah 1', 'Fungsi atau definisi pasangan A');
+        addMatchingRow('Konsep atau istilah 2', 'Fungsi atau definisi pasangan B');
+        addMatchingRow('Konsep atau istilah 3', 'Fungsi atau definisi pasangan C');
+      }
+    }
+
+    function addTrueFalseRow(text = '', key = 'B') {
+      const container = document.getElementById('trueFalseContainer');
+      const idx = container.children.length;
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-2 p-2 bg-slate-950/80 border border-slate-800 rounded-xl';
+      row.innerHTML = `
+        <span class="w-5 font-bold text-slate-400 font-mono text-center">${idx + 1}.</span>
+        <input type="text" class="tf-text flex-1 bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-white text-xs focus:border-amber-500" placeholder="Pernyataan yang dievaluasi..." value="${text}" oninput="updateLivePreview()">
+        <div class="flex items-center gap-1 shrink-0">
+          <label class="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-xs cursor-pointer flex items-center gap-1">
+            <input type="radio" name="tf_key_${idx}" value="B" ${key === 'B' ? 'checked' : ''} onchange="updateLivePreview()" class="text-emerald-500">
+            <span class="text-emerald-400 font-bold">B</span>
+          </label>
+          <label class="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-xs cursor-pointer flex items-center gap-1">
+            <input type="radio" name="tf_key_${idx}" value="S" ${key === 'S' ? 'checked' : ''} onchange="updateLivePreview()" class="text-rose-500">
+            <span class="text-rose-400 font-bold">S</span>
+          </label>
+        </div>
+        <button type="button" onclick="this.closest('.flex').remove(); updateLivePreview();" class="text-rose-400 hover:text-rose-300 px-2 py-1" title="Hapus Baris"><i class="fa-solid fa-xmark"></i></button>
+      `;
+      container.appendChild(row);
+      updateLivePreview();
+    }
+
+    function addMatchingRow(left = '', right = '') {
+      const container = document.getElementById('matchingContainer');
+      const idx = container.children.length;
+      const targetLetter = String.fromCharCode(65 + idx);
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-2 p-2 bg-slate-950/80 border border-slate-800 rounded-xl';
+      row.innerHTML = `
+        <span class="w-5 font-bold text-slate-400 font-mono text-center">${idx + 1}.</span>
+        <input type="text" class="match-left flex-1 bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-white text-xs focus:border-cyan-500" placeholder="Premis di sebelah kiri..." value="${left}" oninput="updateLivePreview()">
+        <span class="text-cyan-400 font-bold">&rarr;</span>
+        <span class="text-cyan-300 font-bold font-mono text-xs">${targetLetter}.</span>
+        <input type="text" class="match-right flex-1 bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-white text-xs focus:border-cyan-500" placeholder="Pilihan di sebelah kanan (${targetLetter})..." value="${right}" oninput="updateLivePreview()">
+        <button type="button" onclick="this.closest('.flex').remove(); updateLivePreview();" class="text-rose-400 hover:text-rose-300 px-2 py-1" title="Hapus Baris"><i class="fa-solid fa-xmark"></i></button>
+      `;
+      container.appendChild(row);
+      updateLivePreview();
+    }
+
+    // 7. Penggantian Tipe Soal
+    function handleTypeChange(qType) {
+      const sections = ['mcq', 'mcq_complex', 'true_false', 'matching', 'short_essay', 'long_essay'];
+      sections.forEach(s => {
+        const el = document.getElementById(`formSection_${s}`);
+        if (el) el.classList.toggle('hidden', s !== qType);
+      });
+
+      // Update bobot standar rekomendasi jika belum diubah guru
+      const weightEl = document.getElementById('inputWeight');
+      if (weightEl) {
+        if (qType === 'long_essay') weightEl.value = '3.0';
+        else if (qType === 'matching') weightEl.value = '2.0';
+        else if (qType === 'mcq_complex' || qType === 'true_false') weightEl.value = '1.5';
+        else weightEl.value = '1.0';
+      }
+
+      updateLivePreview();
+    }
+
+    function handleBankChange(newBankId) {
+      activeBankId = parseInt(newBankId, 10);
+      const b = allQuestionBanks.find(x => x.id === activeBankId);
+      if (b) {
+        document.getElementById('headerBankTitle').innerText = `#${b.id} - ${b.title}`;
+        document.getElementById('btnBackToBank').href = `/kelola-soal?bank_id=${b.id}`;
+      }
+    }
+
+    // 8. Toolbar Tab Switcher
+    function switchToolbarTab(tab) {
+      activeToolbarTab = tab;
+      const tabs = ['math', 'arabic', 'image', 'formatting'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tabBtn_${t}`);
+        const content = document.getElementById(`tabContent_${t}`);
+        if (btn) {
+          if (t === tab) {
+            btn.className = 'px-3 py-1.5 rounded-lg bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold transition flex items-center gap-1.5';
+          } else {
+            btn.className = 'px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white border border-slate-800 font-bold transition flex items-center gap-1.5';
+          }
+        }
+        if (content) content.classList.toggle('hidden', t !== tab);
+      });
+    }
+
+    // 9. Text Direction Toggle (LTR vs RTL)
+    function setTextDirection(dir) {
+      currentTextDir = dir;
+      const inputStem = document.getElementById('inputStem');
+      const btnLTR = document.getElementById('btnDirLTR');
+      const btnRTL = document.getElementById('btnDirRTL');
+
+      if (dir === 'rtl') {
+        inputStem.setAttribute('dir', 'rtl');
+        inputStem.classList.add('font-arabic');
+        btnRTL.className = 'px-2.5 py-1 rounded-md font-bold text-white bg-emerald-600 transition';
+        btnLTR.className = 'px-2.5 py-1 rounded-md font-bold text-slate-400 hover:text-white transition';
+      } else {
+        inputStem.setAttribute('dir', 'ltr');
+        inputStem.classList.remove('font-arabic');
+        btnLTR.className = 'px-2.5 py-1 rounded-md font-bold text-white bg-indigo-600 transition';
+        btnRTL.className = 'px-2.5 py-1 rounded-md font-bold text-slate-400 hover:text-white transition';
+      }
+
+      updateLivePreview();
+    }
+
+    // 10. Karakter & Snippet Inserter ke Kursor Aktif
+    function insertSnippet(snippet) {
+      const textarea = document.getElementById('inputStem');
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value;
+
+      textarea.value = text.substring(0, start) + snippet + text.substring(end);
+      textarea.focus();
+      textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
+
+      updateLivePreview();
+    }
+
+    function insertChar(ch) {
+      insertSnippet(ch);
+    }
+
+    function wrapText(openTag, closeTag) {
+      const textarea = document.getElementById('inputStem');
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value;
+      const selected = text.substring(start, end) || 'teks';
+
+      const replacement = openTag + selected + closeTag;
+      textarea.value = text.substring(0, start) + replacement + text.substring(end);
+      textarea.focus();
+      textarea.selectionStart = start + openTag.length;
+      textarea.selectionEnd = start + openTag.length + selected.length;
+
+      updateLivePreview();
+    }
+
+    // 11. Penanganan Upload Gambar
+    let currentUploadedImageUrl = '';
+
+    async function handleImageFileSelect(e, target = 'stem') {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64Data = event.target.result;
+        await uploadImagePayload(base64Data, file.name, target);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function uploadImagePayload(base64Data, filename = 'image.png', target = 'stem') {
+      try {
+        const res = await fetch('/api/v1/cbt/upload-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image_data: base64Data, filename: filename, prefix: 'soal' })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Gagal mengunggah gambar');
+
+        currentUploadedImageUrl = json.file_url;
+
+        if (target === 'stem') {
+          document.getElementById('stemImagePreviewBox').classList.remove('hidden');
+          document.getElementById('stemImagePreviewImg').src = json.file_url;
+          document.getElementById('stemImageFileName').innerText = filename;
+          document.getElementById('stemImageUrl').innerText = json.file_url;
+
+          // Sisipkan otomatis ke textarea stem
+          insertImageToStem();
+        }
+
+        return json.file_url;
+      } catch (err) {
+        alert('Gagal mengunggah gambar: ' + err.message);
+      }
+    }
+
+    function insertImageToStem() {
+      if (!currentUploadedImageUrl) return;
+      const imgTag = `\n<div class="my-3 text-center"><img src="${currentUploadedImageUrl}" alt="Stimulus Gambar" class="rounded-xl max-h-72 inline-block border border-slate-700 shadow-md"></div>\n`;
+      insertSnippet(imgTag);
+    }
+
+    function removeStemImage() {
+      currentUploadedImageUrl = '';
+      document.getElementById('stemImagePreviewBox').classList.add('hidden');
+      document.getElementById('stemImagePreviewImg').src = '';
+    }
+
+    // Paste listener (Ctrl+V) untuk paste gambar dari clipboard
+    function setupPasteListener() {
+      const textarea = document.getElementById('inputStem');
+      textarea.addEventListener('paste', async (e) => {
+        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+        for (const item of items) {
+          if (item.kind === 'file' && item.type.startsWith('image/')) {
+            e.preventDefault();
+            const blob = item.getAsFile();
+            const reader = new FileReader();
+            reader.onload = async (evt) => {
+              await uploadImagePayload(evt.target.result, 'clipboard_image.png', 'stem');
+            };
+            reader.readAsDataURL(blob);
+            break;
+          }
+        }
+      });
+    }
+
+    async function uploadOptionImage(e, targetTextareaId) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64Data = event.target.result;
+        try {
+          const res = await fetch('/api/v1/cbt/upload-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image_data: base64Data, filename: file.name, prefix: 'opt' })
+          });
+          const json = await res.json();
+          if (!res.ok) throw new Error(json.message);
+
+          const targetArea = document.getElementById(targetTextareaId);
+          if (targetArea) {
+            targetArea.value += ` <img src="${json.file_url}" alt="Opsi" class="inline-block max-h-24 rounded border border-slate-700 align-middle my-1">`;
+            updateLivePreview();
+          }
+        } catch (err) {
+          alert('Gagal mengunggah gambar opsi: ' + err.message);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // 12. Real-Time Student Preview Renderer
+    function updateLivePreview() {
+      const qType = document.getElementById('inputQuestionType').value;
+      const cog = document.getElementById('inputCogLevel').value;
+      const weight = document.getElementById('inputWeight').value || '1.0';
+      const stemRaw = document.getElementById('inputStem').value;
+      const explRaw = document.getElementById('inputExplanation').value;
+
+      document.getElementById('stemCharCount').innerText = `${stemRaw.length} karakter`;
+
+      // Badge Labels
+      const typeLabels = {
+        'mcq': 'Pilihan Ganda Tunggal',
+        'mcq_complex': 'PG Kompleks',
+        'true_false': 'Benar / Salah (Matrix)',
+        'matching': 'Menjodohkan',
+        'short_essay': 'Isian Singkat',
+        'long_essay': 'Uraian AI'
+      };
+
+      document.getElementById('previewTypeBadge').innerText = typeLabels[qType] || qType;
+      document.getElementById('previewCogBadge').innerText = cog;
+      document.getElementById('previewWeight').innerText = weight;
+
+      // Stem Live Render
+      const stemPreviewEl = document.getElementById('previewStemHTML');
+      if (stemRaw.trim()) {
+        stemPreviewEl.innerHTML = stemRaw;
+        if (currentTextDir === 'rtl') {
+          stemPreviewEl.setAttribute('dir', 'rtl');
+          stemPreviewEl.classList.add('font-arabic');
+        } else {
+          stemPreviewEl.setAttribute('dir', 'ltr');
+          stemPreviewEl.classList.remove('font-arabic');
+        }
+      } else {
+        stemPreviewEl.innerHTML = `<p class="text-slate-500 italic">Ketik pertanyaan atau stimulus di sebelah kiri untuk melihat pratinjau langsung...</p>`;
+      }
+
+      // Answers Live Render
+      const ansContainer = document.getElementById('previewAnswersContainer');
+      ansContainer.innerHTML = '';
+
+      if (qType === 'mcq') {
+        const letters = ['A', 'B', 'C', 'D', 'E'];
+        const correctKey = (document.querySelector('input[name="mcqCorrectKey"]:checked')?.value) || 'A';
+        letters.forEach(letter => {
+          const val = document.getElementById(`mcqOpt${letter}`)?.value.trim() || `Pilihan jawaban ${letter}`;
+          const isCorrect = (letter === correctKey);
+          const row = document.createElement('div');
+          row.className = `p-3 rounded-xl border flex items-center gap-3 transition ${isCorrect ? 'border-emerald-500/60 bg-emerald-950/20' : 'border-slate-800 bg-slate-900/60'}`;
+          row.innerHTML = `
+            <div class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs ${isCorrect ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30' : 'bg-slate-800 text-slate-400 border border-slate-700'}">${letter}</div>
+            <div class="flex-1 text-slate-200 text-xs">${val}</div>
+            ${isCorrect ? '<span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/30"><i class="fa-solid fa-check mr-1"></i>Kunci Benar</span>' : ''}
+          `;
+          ansContainer.appendChild(row);
+        });
+      } else if (qType === 'mcq_complex') {
+        const letters = ['A', 'B', 'C', 'D', 'E'];
+        letters.forEach(letter => {
+          const val = document.getElementById(`complexOptText_${letter}`)?.value.trim() || `Pernyataan alternatif ${letter}`;
+          const isChecked = document.getElementById(`complexOptCheck_${letter}`)?.checked;
+          const row = document.createElement('div');
+          row.className = `p-3 rounded-xl border flex items-center gap-3 transition ${isChecked ? 'border-purple-500/60 bg-purple-950/20' : 'border-slate-800 bg-slate-900/60'}`;
+          row.innerHTML = `
+            <div class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs ${isChecked ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30' : 'bg-slate-800 text-slate-400 border border-slate-700'}">${letter}</div>
+            <div class="flex-1 text-slate-200 text-xs">${val}</div>
+            ${isChecked ? '<span class="text-[10px] font-bold text-purple-400 bg-purple-500/20 px-2 py-0.5 rounded border border-purple-500/30"><i class="fa-solid fa-check mr-1"></i>Kunci</span>' : ''}
+          `;
+          ansContainer.appendChild(row);
+        });
+      } else if (qType === 'true_false') {
+        const rows = document.querySelectorAll('#trueFalseContainer > div');
+        let html = '<div class="space-y-1.5">';
+        rows.forEach((r, idx) => {
+          const text = r.querySelector('.tf-text')?.value.trim() || `Pernyataan ${idx + 1}`;
+          const key = r.querySelector('input[type="radio"]:checked')?.value || 'B';
+          html += `
+            <div class="flex items-center justify-between gap-3 p-2.5 bg-slate-900/80 rounded-xl border border-slate-800">
+              <span class="text-xs text-slate-200"><strong class="text-slate-400 mr-2">${idx + 1}.</strong>${text}</span>
+              <span class="px-2.5 py-0.5 rounded text-[11px] font-bold ${key === 'B' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}">${key === 'B' ? 'BENAR (B)' : 'SALAH (S)'}</span>
+            </div>
+          `;
+        });
+        html += '</div>';
+        ansContainer.innerHTML = html;
+      } else if (qType === 'matching') {
+        const rows = document.querySelectorAll('#matchingContainer > div');
+        let html = '<div class="space-y-1.5">';
+        rows.forEach((r, idx) => {
+          const left = r.querySelector('.match-left')?.value.trim() || `Premis ${idx + 1}`;
+          const right = r.querySelector('.match-right')?.value.trim() || `Pilihan ${String.fromCharCode(65 + idx)}`;
+          html += `
+            <div class="flex items-center justify-between gap-2 p-2.5 bg-slate-900/80 rounded-xl border border-slate-800 text-xs">
+              <span class="font-medium text-slate-200">${left}</span>
+              <div class="flex items-center gap-1.5 text-cyan-400 font-bold">
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                <span class="bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/30">${String.fromCharCode(65 + idx)}. ${right}</span>
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+        ansContainer.innerHTML = html;
+      } else if (qType === 'short_essay') {
+        const keys = document.getElementById('inputShortEssayKeys')?.value || 'kata kunci jawaban';
+        ansContainer.innerHTML = `
+          <div class="space-y-2">
+            <input type="text" disabled placeholder="Siswa mengetikkan jawaban singkat di sini..." class="w-full bg-slate-900/80 border border-slate-800 rounded-xl p-3 text-slate-400 text-xs">
+            <div class="text-[11px] text-emerald-400"><i class="fa-solid fa-key mr-1"></i>Kunci Jawaban Diterima: <strong>${keys}</strong></div>
+          </div>
+        `;
+      } else if (qType === 'long_essay') {
+        const maxScore = document.getElementById('inputEssayMaxScore')?.value || 100;
+        ansContainer.innerHTML = `
+          <div class="space-y-2">
+            <textarea disabled rows="3" placeholder="Siswa menguraikan jawaban esai komprehensif di sini..." class="w-full bg-slate-900/80 border border-slate-800 rounded-xl p-3 text-slate-400 text-xs"></textarea>
+            <div class="text-[11px] text-amber-400"><i class="fa-solid fa-star mr-1"></i>Penilaian otomatis dipandu rubrik AI (Skor Maksimal: ${maxScore}).</div>
+          </div>
+        `;
+      }
+
+      // Explanation Live Render
+      const explBox = document.getElementById('previewExplanationBox');
+      const explEl = document.getElementById('previewExplanationHTML');
+      if (explRaw.trim()) {
+        explBox.classList.remove('hidden');
+        explEl.innerHTML = explRaw;
+      } else {
+        explBox.classList.add('hidden');
+      }
+
+      // Auto-render KaTeX in Preview container
+      if (window.renderMathInElement) {
+        renderMathInElement(document.getElementById('previewSection'), {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '\\[', right: '\\]', display: true}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    // 13. Simpan Butir Soal (Save Handler)
+    async function saveQuestion(redirectAfterSave = true) {
+      const qType = document.getElementById('inputQuestionType').value;
+      const stem = document.getElementById('inputStem').value.trim();
+      const cog = document.getElementById('inputCogLevel').value;
+      const weight = parseFloat(document.getElementById('inputWeight').value) || 1.0;
+      const explanation = document.getElementById('inputExplanation').value.trim();
+
+      if (!stem) {
+        alert('Teks / Pertanyaan stimulus soal tidak boleh kosong!');
+        document.getElementById('inputStem').focus();
+        return;
+      }
+
+      const payload = {
+        type: qType,
+        cog: cog,
+        stem: stem,
+        weight: weight,
+        explanation: explanation
+      };
+
+      if (qType === 'mcq') {
+        payload.options = [
+          { id: 'A', text: document.getElementById('mcqOptA').value.trim() },
+          { id: 'B', text: document.getElementById('mcqOptB').value.trim() },
+          { id: 'C', text: document.getElementById('mcqOptC').value.trim() },
+          { id: 'D', text: document.getElementById('mcqOptD').value.trim() },
+          { id: 'E', text: document.getElementById('mcqOptE').value.trim() }
+        ];
+        payload.answer = (document.querySelector('input[name="mcqCorrectKey"]:checked')?.value) || 'A';
+      } else if (qType === 'mcq_complex') {
+        const letters = ['A', 'B', 'C', 'D', 'E'];
+        const opts = [];
+        const ans = [];
+        letters.forEach(letter => {
+          opts.push({ id: letter, text: document.getElementById(`complexOptText_${letter}`).value.trim() });
+          if (document.getElementById(`complexOptCheck_${letter}`).checked) {
+            ans.push(letter);
+          }
+        });
+        payload.options = opts;
+        payload.answer = ans.length > 0 ? ans : ['A'];
+      } else if (qType === 'true_false') {
+        const rows = document.querySelectorAll('#trueFalseContainer > div');
+        const statements = [];
+        const ansMap = {};
+        rows.forEach((r, idx) => {
+          const t = r.querySelector('.tf-text')?.value.trim() || `Pernyataan ${idx + 1}`;
+          const k = r.querySelector('input[type="radio"]:checked')?.value || 'B';
+          statements.push({ id: idx, text: t, key: k });
+          ansMap[idx] = k;
+        });
+        payload.statements = statements;
+        payload.answer = ansMap;
+      } else if (qType === 'matching') {
+        const rows = document.querySelectorAll('#matchingContainer > div');
+        const premises = [];
+        const targets = [];
+        const ansMap = {};
+        rows.forEach((r, idx) => {
+          const letter = String.fromCharCode(65 + idx);
+          const left = r.querySelector('.match-left')?.value.trim() || `Premis ${idx + 1}`;
+          const right = r.querySelector('.match-right')?.value.trim() || `Pilihan ${letter}`;
+          premises.push({ id: idx, text: left });
+          targets.push({ id: letter, text: right });
+          ansMap[idx] = letter;
+        });
+        payload.premises = premises;
+        payload.targets = targets;
+        payload.answer = ansMap;
+      } else if (qType === 'short_essay') {
+        const raw = document.getElementById('inputShortEssayKeys').value.trim();
+        payload.answer_keys = raw.split(',').map(s => s.trim()).filter(Boolean);
+      } else if (qType === 'long_essay') {
+        payload.rubric = document.getElementById('inputEssayRubric').value.trim();
+        payload.ideal_answer = document.getElementById('inputEssayIdeal').value.trim();
+        payload.max_score = parseInt(document.getElementById('inputEssayMaxScore').value, 10) || 100;
+        const kwRaw = document.getElementById('inputEssayKeywords').value.trim();
+        payload.keywords = kwRaw.split(',').map(s => s.trim()).filter(Boolean);
+      }
+
+      const saveUrl = editingQuestionId
+        ? `/api/v1/cbt/question-banks/${activeBankId}/update-question/${editingQuestionId}`
+        : `/api/v1/cbt/question-banks/${activeBankId}/add-question`;
+
+      const btnSave = redirectAfterSave ? document.getElementById('btnSaveClose') : document.getElementById('btnSaveKeep');
+      const origText = btnSave.innerHTML;
+      btnSave.disabled = true;
+      btnSave.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Menyimpan...`;
+
+      try {
+        const res = await fetch(saveUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Gagal menyimpan soal');
+
+        alert(json.message || 'Butir soal berhasil disimpan!');
+
+        if (redirectAfterSave) {
+          window.location.href = `/kelola-soal?bank_id=${activeBankId}`;
+        } else {
+          // Reset form untuk input butir berikutnya
+          if (!editingQuestionId) {
+            document.getElementById('inputStem').value = '';
+            document.getElementById('inputExplanation').value = '';
+            removeStemImage();
+            updateLivePreview();
+          }
+        }
+      } catch (err) {
+        alert('Gagal menyimpan butir soal: ' + err.message);
+      } finally {
+        btnSave.disabled = false;
+        btnSave.innerHTML = origText;
+      }
+    }
+
+    function handleCancel() {
+      if (confirm('Batalkan perubahan dan kembali ke halaman Bank Soal?')) {
+        window.location.href = `/kelola-soal?bank_id=${activeBankId}`;
+      }
+    }
+
+    // Toggle Preview di layar kecil (Mobile / Tablet)
+    let isMobilePreviewActive = false;
+    function toggleMobilePreview() {
+      isMobilePreviewActive = !isMobilePreviewActive;
+      const builder = document.getElementById('builderSection');
+      const preview = document.getElementById('previewSection');
+      const btnText = document.getElementById('mobilePreviewToggleText');
+
+      if (isMobilePreviewActive) {
+        builder.classList.add('hidden');
+        preview.classList.remove('hidden');
+        btnText.innerText = 'Kembali ke Editor';
+      } else {
+        builder.classList.remove('hidden');
+        preview.classList.add('hidden');
+        btnText.innerText = 'Lihat Pratinjau';
+      }
+    }
+  </script>
+</body>
+</html>

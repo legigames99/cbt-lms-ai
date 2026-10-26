@@ -2654,7 +2654,10 @@
           </h4>
           <p class="text-[11px] text-slate-400 mt-0.5">Mendukung PG Biasa, PG Kompleks, Benar/Salah, Menjodohkan, Isian Singkat, dan Esai Panjang AI.</p>
         </div>
-        <button onclick="closeModal('modalAddQuestionManual')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="window.location.href = '/editor-soal?bank_id=' + (currentActiveBankId || 1)" class="text-xs px-3 py-1.5 rounded-lg bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 hover:bg-indigo-600/50 font-bold transition flex items-center gap-1.5"><i class="fa-solid fa-up-right-from-square"></i> Buka di Halaman Penuh</button>
+          <button onclick="closeModal('modalAddQuestionManual')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
       </div>
 
       <form onsubmit="handleSaveManualQuestion(event)" class="space-y-4 text-xs">

@@ -7,7 +7,24 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="/static/js/xlsx.full.min.js"></script>
+
+  <!-- KaTeX for High-Performance Math Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Arabic Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
+    .font-arabic {
+      font-family: 'Amiri', 'Noto Naskh Arabic', serif !important;
+      font-size: 1.25rem;
+      line-height: 2.2;
+    }
+    .katex-display { margin: 0.5em 0; overflow-x: auto; overflow-y: hidden; }
     .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: #0b1120; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
@@ -121,7 +138,7 @@
 
         <!-- ACTION BUTTONS -->
         <div class="flex flex-wrap lg:flex-col gap-2.5 shrink-0 no-print">
-          <button onclick="openModal('modalAddQuestionManual')" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
+          <button onclick="goToQuestionEditor()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
             <i class="fa-solid fa-plus text-sm"></i>
             <span>Tambah Butir Soal Baru</span>
           </button>
@@ -285,7 +302,12 @@
           </h4>
           <p class="text-[11px] text-slate-400 mt-0.5">Mendukung PG Biasa, PG Kompleks, Benar/Salah, Menjodohkan, Isian Singkat, dan Esai Panjang AI.</p>
         </div>
-        <button onclick="closeModal('modalAddQuestionManual')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="goToQuestionEditor()" class="text-xs px-3 py-1.5 rounded-lg bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 hover:bg-indigo-600/50 font-bold transition flex items-center gap-1.5">
+            <i class="fa-solid fa-up-right-from-square"></i> Buka Editor Halaman Penuh
+          </button>
+          <button onclick="closeModal('modalAddQuestionManual')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
       </div>
 
       <form onsubmit="handleSaveQuestion(event)" class="space-y-4 text-xs">
@@ -1134,7 +1156,7 @@
                     <i class="fa-solid fa-wand-magic-sparkles text-amber-400 text-xs"></i> Uji Koreksi AI
                   </button>
                 ` : ''}
-                <button onclick="openEditQuestionModal(${q.id})" class="p-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition text-xs font-semibold" title="Edit Soal">
+                <button onclick="goToQuestionEditor(${q.id})" class="p-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition text-xs font-semibold" title="Edit Soal di Halaman Penuh">
                   <i class="fa-regular fa-pen-to-square"></i>
                 </button>
                 <button onclick="handleDeleteQuestion(${q.id})" class="p-1.5 px-2.5 rounded-lg bg-rose-600/10 hover:bg-rose-600/20 text-rose-400 hover:text-rose-300 border border-rose-500/20 transition text-xs font-semibold" title="Hapus Soal">
@@ -1161,6 +1183,19 @@
           </div>
         `;
       }).join('');
+
+      // Auto-render KaTeX math formulas in questionsContainer
+      if (window.renderMathInElement) {
+        renderMathInElement(container, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '\\[', right: '\\]', display: true}
+          ],
+          throwOnError: false
+        });
+      }
     }
 
     // 6. Filtering & Searching
@@ -1359,6 +1394,15 @@
         await loadActiveBank(activeBankId);
       } catch (err) {
         alert('Gagal menyimpan butir soal: ' + err.message);
+      }
+    }
+
+    // Navigasi ke Editor Halaman Penuh
+    function goToQuestionEditor(qId = null) {
+      if (qId) {
+        window.location.href = `/editor-soal?bank_id=${activeBankId}&question_id=${qId}`;
+      } else {
+        window.location.href = `/editor-soal?bank_id=${activeBankId}`;
       }
     }
 

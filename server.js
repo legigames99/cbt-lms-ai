@@ -1383,6 +1383,72 @@ function loadSchedulesFromFile() {
 
 loadSchedulesFromFile();
 
+// ==============================================================
+// BERITA ACARA & ABSENSI UJIAN TERINTEGRASI (STANDAR SEKOLAH INDONESIA)
+// ==============================================================
+const EXAM_ATTENDANCE_FILE = path.join(__dirname, 'exam_attendance.json');
+let EXAM_ATTENDANCE = {};
+
+function loadExamAttendanceFromFile() {
+  try {
+    if (fs.existsSync(EXAM_ATTENDANCE_FILE)) {
+      const raw = fs.readFileSync(EXAM_ATTENDANCE_FILE, 'utf8');
+      EXAM_ATTENDANCE = JSON.parse(raw);
+      if (typeof EXAM_ATTENDANCE !== 'object' || EXAM_ATTENDANCE === null) {
+        EXAM_ATTENDANCE = {};
+      }
+    }
+  } catch (err) {
+    console.error('[Attendance] Gagal membaca exam_attendance.json:', err.message);
+    EXAM_ATTENDANCE = {};
+  }
+}
+
+function saveExamAttendanceToFile() {
+  try {
+    fs.writeFileSync(EXAM_ATTENDANCE_FILE, JSON.stringify(EXAM_ATTENDANCE, null, 2), 'utf8');
+  } catch (err) {
+    console.error('[Attendance] Gagal menyimpan exam_attendance.json:', err.message);
+  }
+}
+
+loadExamAttendanceFromFile();
+
+function getIndonesianDateString(date = new Date()) {
+  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  const dayName = days[date.getDay()];
+  const day = date.getDate();
+  const monthName = months[date.getMonth()];
+  const year = date.getFullYear();
+  return `${dayName}, ${day} ${monthName} ${year}`;
+}
+
+function getStudentsForSchedule(sch, targetClass = 'all') {
+  const allStudents = USERS.filter(u => u.role === 'student');
+  const norm = normalizeClassTarget(sch.class_target);
+
+  let filtered = allStudents;
+  if (Array.isArray(norm)) {
+    filtered = filtered.filter(st => norm.includes(st.class_name));
+  }
+
+  const availableClasses = Array.from(new Set(filtered.map(st => st.class_name).filter(Boolean))).sort();
+
+  if (targetClass && targetClass !== 'all' && targetClass !== 'Semua Kelas') {
+    filtered = filtered.filter(st => st.class_name === targetClass);
+  }
+
+  filtered.sort((a, b) => {
+    if (a.class_name && b.class_name && a.class_name !== b.class_name) return a.class_name.localeCompare(b.class_name);
+    if (a.exam_no && b.exam_no) return a.exam_no.localeCompare(b.exam_no);
+    return a.full_name.localeCompare(b.full_name);
+  });
+
+  return { students: filtered, classes: availableClasses };
+}
+
+
 // Interval pemeriksaan token dinamis otomatis di latar belakang setiap 10 detik
 setInterval(() => {
   SCHEDULES.forEach(s => {
@@ -3430,6 +3496,137 @@ const server = http.createServer(async (req, res) => {
       data: mappedList,
       total: mappedList.length,
       counts: counts,
+    });
+  }
+
+  
+  // GET /api/v1/cbt/schedules/:id/attendance (Ambil Data Berita Acara & Absensi Ujian Terintegrasi)
+  if (pathname.startsWith('/api/v1/cbt/schedules/') && pathname.endsWith('/attendance') && req.method === 'GET') {
+    const parts = pathname.split('/');
+    const schId = parseInt(parts[5], 10);
+    const sch = SCHEDULES.find(s => s.id === schId);
+    if (!sch) {
+      return sendJSON(404, { status: 'error', message: 'Jadwal ujian tidak ditemukan' });
+    }
+
+    const classQuery = (parsedUrl.searchParams.get('class') || 'all').trim();
+    const { classes: availableClasses } = getStudentsForSchedule(sch, 'all');
+    const { students: targetStudents } = getStudentsForSchedule(sch, classQuery);
+
+    const schAttendance = EXAM_ATTENDANCE[schId] || { students: {}, classes_meta: {}, default_meta: {} };
+    const savedMeta = (schAttendance.classes_meta && schAttendance.classes_meta[classQuery]) || schAttendance.default_meta || {};
+    const studentStatuses = schAttendance.students || {};
+
+    const populatedStudents = targetStudents.map(st => {
+      const rec = studentStatuses[st.id] || { status: 'hadir', reason: '', note: '' };
+      return {
+        id: st.id,
+        username: st.username,
+        full_name: st.full_name,
+        class_name: st.class_name,
+        exam_no: st.exam_no || `26-${st.class_name ? st.class_name.replace(/[^A-Za-z0-9]/g, '') : '01'}-${st.id}`,
+        nisn: st.nisn || `0078${st.id}`,
+        nis: st.nis || `2324${st.id}`,
+        gender: st.gender || 'Laki-laki',
+        room: st.room || 'Ruang Lab Komputer 01',
+        session: st.session || 'Sesi 1 (07:30 - 09:30)',
+        status: rec.status || 'hadir',
+        reason: rec.reason || '',
+        note: rec.note || ''
+      };
+    });
+
+    const total = populatedStudents.length;
+    const present = populatedStudents.filter(s => s.status === 'hadir').length;
+    const absent = populatedStudents.filter(s => s.status === 'tidak_hadir').length;
+    const absent_students = populatedStudents.filter(s => s.status === 'tidak_hadir');
+
+    return sendJSON(200, {
+      status: 'success',
+      data: {
+        schedule: sch,
+        classes: availableClasses,
+        selected_class: classQuery,
+        school_profile: schoolProfile,
+        attendance: {
+          exam_date: savedMeta.exam_date || getIndonesianDateString(),
+          start_time: savedMeta.start_time || sch.start_time || '07:30 WIB',
+          end_time: savedMeta.end_time || '09:00 WIB',
+          room: savedMeta.room || (populatedStudents[0]?.room || 'Ruang Lab Komputer 01'),
+          session: savedMeta.session || (populatedStudents[0]?.session || 'Sesi 1'),
+          proctor_1_name: savedMeta.proctor_1_name || 'Dra. Hj. Siti Aminah, M.Pd.',
+          proctor_1_nip: savedMeta.proctor_1_nip || '19680512 199403 2 004',
+          proctor_2_name: savedMeta.proctor_2_name || 'Rahmat Hidayat, S.Pd.',
+          proctor_2_nip: savedMeta.proctor_2_nip || '19820719 200801 1 009',
+          headmaster_name: savedMeta.headmaster_name || schoolProfile.headmaster_name || 'Drs. H. Ahmad Fauzi, M.Pd.',
+          headmaster_nip: savedMeta.headmaster_nip || schoolProfile.headmaster_nip || '19710815 199802 1 003',
+          notes: savedMeta.notes || 'Pelaksanaan ujian berlangsung tertib, aman, dan lancar.'
+        },
+        students: populatedStudents,
+        summary: {
+          total,
+          present,
+          absent,
+          absent_students
+        }
+      }
+    });
+  }
+
+  // POST /api/v1/cbt/schedules/:id/attendance (Simpan Status Kehadiran Siswa & Berita Acara)
+  if (pathname.startsWith('/api/v1/cbt/schedules/') && pathname.endsWith('/attendance') && req.method === 'POST') {
+    const parts = pathname.split('/');
+    const schId = parseInt(parts[5], 10);
+    const sch = SCHEDULES.find(s => s.id === schId);
+    if (!sch) {
+      return sendJSON(404, { status: 'error', message: 'Jadwal ujian tidak ditemukan' });
+    }
+
+    const body = await parseBody(req);
+    const classTarget = (body.class_name || 'all').trim();
+
+    if (!EXAM_ATTENDANCE[schId]) {
+      EXAM_ATTENDANCE[schId] = { students: {}, classes_meta: {}, default_meta: {} };
+    }
+
+    if (body.students && typeof body.students === 'object') {
+      for (const [stId, val] of Object.entries(body.students)) {
+        EXAM_ATTENDANCE[schId].students[stId] = {
+          status: val.status === 'tidak_hadir' ? 'tidak_hadir' : 'hadir',
+          reason: String(val.reason || '').trim(),
+          note: String(val.note || '').trim()
+        };
+      }
+    }
+
+    const metaObj = {
+      exam_date: body.exam_date || getIndonesianDateString(),
+      start_time: body.start_time || '07:30 WIB',
+      end_time: body.end_time || '09:00 WIB',
+      room: body.room || 'Ruang Lab Komputer 01',
+      session: body.session || 'Sesi 1',
+      proctor_1_name: body.proctor_1_name || '',
+      proctor_1_nip: body.proctor_1_nip || '',
+      proctor_2_name: body.proctor_2_name || '',
+      proctor_2_nip: body.proctor_2_nip || '',
+      notes: body.notes || 'Pelaksanaan ujian berlangsung tertib, aman, dan lancar.',
+      updated_at: Date.now()
+    };
+
+    if (!EXAM_ATTENDANCE[schId].classes_meta) EXAM_ATTENDANCE[schId].classes_meta = {};
+    EXAM_ATTENDANCE[schId].classes_meta[classTarget] = metaObj;
+    EXAM_ATTENDANCE[schId].default_meta = { ...metaObj };
+
+    saveExamAttendanceToFile();
+
+    return sendJSON(200, {
+      status: 'success',
+      message: `Data Berita Acara & Absensi jadwal "${sch.title}" (${classTarget === 'all' ? 'Semua Kelas' : classTarget}) berhasil disimpan!`,
+      data: {
+        schedule_id: schId,
+        class_name: classTarget,
+        updated_at: metaObj.updated_at
+      }
     });
   }
 

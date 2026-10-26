@@ -1,0 +1,39 @@
+{
+  "1": {
+    "students": {
+      "1002": {
+        "status": "tidak_hadir",
+        "reason": "Sakit",
+        "note": "Surat dokter"
+      }
+    },
+    "classes_meta": {
+      "all": {
+        "exam_date": "Senin, 26 Oktober 2026",
+        "start_time": "07:30 WIB",
+        "end_time": "09:00 WIB",
+        "room": "Ruang Lab Komputer 01",
+        "session": "Sesi 1",
+        "proctor_1_name": "",
+        "proctor_1_nip": "",
+        "proctor_2_name": "",
+        "proctor_2_nip": "",
+        "notes": "Pelaksanaan ujian berlangsung tertib, aman, dan lancar.",
+        "updated_at": 1793000514475
+      }
+    },
+    "default_meta": {
+      "exam_date": "Senin, 26 Oktober 2026",
+      "start_time": "07:30 WIB",
+      "end_time": "09:00 WIB",
+      "room": "Ruang Lab Komputer 01",
+      "session": "Sesi 1",
+      "proctor_1_name": "",
+      "proctor_1_nip": "",
+      "proctor_2_name": "",
+      "proctor_2_nip": "",
+      "notes": "Pelaksanaan ujian berlangsung tertib, aman, dan lancar.",
+      "updated_at": 1793000514475
+    }
+  }
+}

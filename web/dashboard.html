@@ -91,6 +91,52 @@
         z-index: auto !important;
       }
 
+      /* Berita Acara & Absensi Ujian Standar Indonesia */
+      #modalPrintOfficialExamDoc {
+        display: block !important;
+        position: static !important;
+        inset: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        z-index: auto !important;
+      }
+      #modalPrintOfficialExamDoc > div {
+        display: block !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+        background: #ffffff !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .official-a4-page {
+        page-break-after: always !important;
+        break-after: page !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 8mm 12mm !important;
+        box-sizing: border-box !important;
+        font-family: 'Times New Roman', Times, serif !important;
+      }
+      .official-a4-page:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+      }
+
       #modalPrintCards > div {
         display: block !important;
         max-width: 100% !important;
@@ -269,6 +315,12 @@
           <i class="fa-solid fa-desktop w-4 text-center"></i>
           <span>Monitoring Proktor</span>
           <span class="ml-auto w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        </a>
+
+        <a href="#berita-acara" onclick="switchTab('berita-acara')" id="nav-berita-acara" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+          <i class="fa-solid fa-file-signature w-4 text-center text-amber-400"></i>
+          <span>Berita Acara & Absensi</span>
+          <span class="ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold font-mono">Resmi</span>
         </a>
 
         <a href="#nilai" onclick="switchTab('nilai')" id="nav-nilai" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
@@ -677,6 +729,10 @@
               <i class="fa-solid fa-clock-rotate-left text-sm"></i>
               <span>+Waktu</span>
             </button>
+            <button onclick="openBeritaAcaraTab(document.getElementById('proctorScheduleFilter')?.value, document.getElementById('filterClassSelect')?.value)" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-amber-500/10" title="Buka Berita Acara & Absensi untuk Jadwal & Kelas Ini">
+              <i class="fa-solid fa-file-signature text-amber-400"></i>
+              <span>Berita Acara & Absensi</span>
+            </button>
           </div>
         </div>
 
@@ -779,6 +835,263 @@
       <!-- ============================================================== -->
       <!-- TAB 5: HASIL & ANALISIS NILAI (PER JADWAL UJIAN) -->
       <!-- ============================================================== -->
+      
+      <!-- ============================================================== -->
+      <!-- TAB: BERITA ACARA & ABSENSI UJIAN RESMI STANDAR INDONESIA -->
+      <!-- ============================================================== -->
+      <section id="tab-berita-acara" class="hidden space-y-6">
+        <!-- Header Toolbar -->
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-file-signature text-amber-400"></i>
+              <span>Berita Acara & Daftar Hadir Peserta Ujian</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono">Format Resmi Sekolah</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Kelola absensi siswa (hadir / sakit / izin / alpa) per jadwal & per kelas, terintegrasi otomatis ke lembar Berita Acara resmi siap cetak.</p>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button type="button" onclick="saveBeritaAcaraAttendance()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition flex items-center gap-1.5">
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span>Simpan Kehadiran</span>
+            </button>
+            <button type="button" onclick="printBeritaAcaraDoc()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Cetak Lembar Berita Acara A4">
+              <i class="fa-solid fa-print"></i> Cetak Berita Acara
+            </button>
+            <button type="button" onclick="printAbsensiDoc()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Cetak Lembar Daftar Hadir Siswa A4">
+              <i class="fa-solid fa-user-check"></i> Cetak Daftar Hadir
+            </button>
+            <button type="button" onclick="printFullExamPackageDoc()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="Cetak Berita Acara & Absensi Sekaligus (1 Paket)">
+              <i class="fa-solid fa-file-contract text-indigo-400"></i> Cetak Paket Lengkap
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Bar: Jadwal Ujian & Kelas / Rombel -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+            <!-- Selector Jadwal -->
+            <div class="lg:col-span-2">
+              <label class="block font-bold text-slate-300 mb-1">
+                <i class="fa-regular fa-calendar-check text-indigo-400 mr-1"></i> Pilih Jadwal Ujian
+              </label>
+              <select id="baScheduleSelect" onchange="handleBAScheduleChange(this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white font-medium focus:outline-none focus:border-indigo-500 transition">
+                <!-- Populated dynamically via JS -->
+              </select>
+            </div>
+
+            <!-- Selector Kelas / Rombel -->
+            <div class="lg:col-span-2">
+              <label class="block font-bold text-slate-300 mb-1">
+                <i class="fa-solid fa-chalkboard-user text-blue-400 mr-1"></i> Bagi / Filter Per Kelas (Rombel)
+              </label>
+              <select id="baClassSelect" onchange="handleBAClassChange(this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white font-medium focus:outline-none focus:border-indigo-500 transition">
+                <option value="all">Semua Kelas Terdaftar</option>
+                <!-- Populated dynamically via JS -->
+              </select>
+            </div>
+          </div>
+
+          <!-- View Mode Tabs -->
+          <div class="flex items-center gap-2 pt-2 border-t border-slate-800/80 overflow-x-auto text-xs">
+            <button type="button" id="btnBAView_editor" onclick="switchBAView('editor')" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold transition flex items-center gap-2 shadow-md shadow-indigo-600/20">
+              <i class="fa-solid fa-list-check"></i>
+              <span>1. Checklist Kehadiran Siswa & Pengawas</span>
+            </button>
+            <button type="button" id="btnBAView_preview_ba" onclick="switchBAView('preview-ba')" class="px-4 py-2 rounded-xl bg-slate-950 text-slate-400 hover:text-white border border-slate-800 font-semibold transition flex items-center gap-2">
+              <i class="fa-solid fa-file-signature text-amber-400"></i>
+              <span>2. Lembar Berita Acara Resmi (A4)</span>
+            </button>
+            <button type="button" id="btnBAView_preview_absensi" onclick="switchBAView('preview-absensi')" class="px-4 py-2 rounded-xl bg-slate-950 text-slate-400 hover:text-white border border-slate-800 font-semibold transition flex items-center gap-2">
+              <i class="fa-solid fa-user-check text-emerald-400"></i>
+              <span>3. Lembar Daftar Hadir Siswa (A4)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ==================== VIEW 1: EDITOR KEHADIRAN & IDENTITAS ==================== -->
+        <div id="baViewContainer_editor" class="space-y-5">
+          <!-- 4 Stat Counters -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
+              <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Total Terdaftar</span>
+              <div class="flex items-baseline justify-between mt-1">
+                <span id="baStatTotal" class="text-2xl font-black text-white font-mono">0</span>
+                <i class="fa-solid fa-users text-slate-600 text-sm"></i>
+              </div>
+              <span class="text-[10px] text-slate-500 mt-1 block">Peserta pada rombel terpilih</span>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
+              <span class="text-[10px] text-emerald-400 uppercase font-bold tracking-wider">Hadir Mengikuti</span>
+              <div class="flex items-baseline justify-between mt-1">
+                <span id="baStatPresent" class="text-2xl font-black text-emerald-400 font-mono">0</span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">✓ Hadir</span>
+              </div>
+              <span class="text-[10px] text-slate-500 mt-1 block">Siswa aktif di ruang ujian</span>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
+              <span class="text-[10px] text-rose-400 uppercase font-bold tracking-wider">Tidak Hadir</span>
+              <div class="flex items-baseline justify-between mt-1">
+                <span id="baStatAbsent" class="text-2xl font-black text-rose-400 font-mono">0</span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold">✗ Absen</span>
+              </div>
+              <span class="text-[10px] text-slate-500 mt-1 block">Sakit / Izin / Alpa</span>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
+              <span class="text-[10px] text-amber-400 uppercase font-bold tracking-wider">Persentase Kehadiran</span>
+              <div class="flex items-baseline justify-between mt-1">
+                <span id="baStatPercent" class="text-2xl font-black text-amber-400 font-mono">100%</span>
+                <i class="fa-solid fa-chart-pie text-slate-600 text-sm"></i>
+              </div>
+              <span class="text-[10px] text-slate-500 mt-1 block">Tingkat kehadiran siswa</span>
+            </div>
+          </div>
+
+          <!-- Form Identitas Pelaksanaan & Pengawas -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+              <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-pen-nib text-indigo-400"></i> Rincian Pelaksanaan, Ruang & Pengawas Ujian
+              </h4>
+              <span class="text-[11px] text-slate-400">Data ini akan tercetak otomatis pada Berita Acara & Daftar Hadir</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">Hari & Tanggal Pelaksanaan</label>
+                <input type="text" id="baExamDate" placeholder="Contoh: Senin, 26 Oktober 2026" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">Jam Pelaksanaan (Mulai - Selesai)</label>
+                <div class="grid grid-cols-2 gap-2">
+                  <input type="text" id="baStartTime" placeholder="07:30 WIB" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-white text-center focus:outline-none focus:border-indigo-500">
+                  <input type="text" id="baEndTime" placeholder="09:00 WIB" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-white text-center focus:outline-none focus:border-indigo-500">
+                </div>
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">Ruang Ujian / Laboratorium</label>
+                <input type="text" id="baRoom" placeholder="Contoh: Ruang Lab Komputer 01" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">Nama Pengawas Ruang 1</label>
+                <input type="text" id="baProctor1Name" placeholder="Nama Lengkap & Gelar Pengawas 1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">NIP Pengawas Ruang 1</label>
+                <input type="text" id="baProctor1Nip" placeholder="19680512 199403 2 004 / -" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500 transition">
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">Sesi Ujian</label>
+                <input type="text" id="baSession" placeholder="Contoh: Sesi 1 (Pagi)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">Nama Pengawas Ruang 2 (Opsional)</label>
+                <input type="text" id="baProctor2Name" placeholder="Nama Lengkap & Gelar Pengawas 2" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">NIP Pengawas Ruang 2</label>
+                <input type="text" id="baProctor2Nip" placeholder="NIP Pengawas 2 / -" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500 transition">
+              </div>
+
+              <div class="sm:col-span-2 lg:col-span-1">
+                <label class="block font-semibold text-slate-300 mb-1">Catatan Khusus Kejadian Ujian</label>
+                <input type="text" id="baNotes" placeholder="Contoh: Ujian berjalan tertib, lancar, dan aman." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Students Checklist Table -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+              <div>
+                <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                  <i class="fa-solid fa-clipboard-check text-emerald-400"></i> Daftar Peserta & Ceklis Kehadiran Siswa
+                </h4>
+                <p class="text-[11px] text-slate-400 mt-0.5">Ceklis siswa yang hadir atau tandai siswa yang tidak hadir berikut alasannya (Sakit / Izin / Alpa).</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="setAllStudentsAttendance('hadir')" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition flex items-center gap-1.5">
+                  <i class="fa-solid fa-check-double"></i> Tandai Semua Hadir
+                </button>
+                <button type="button" onclick="saveBeritaAcaraAttendance()" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-md shadow-indigo-600/20">
+                  <i class="fa-solid fa-floppy-disk"></i> Simpan
+                </button>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left">
+                <thead class="text-slate-400 bg-slate-950 uppercase text-[10px] tracking-wider">
+                  <tr>
+                    <th class="px-3 py-2.5 rounded-l-lg w-10 text-center">No</th>
+                    <th class="px-3 py-2.5 w-32">No. Peserta</th>
+                    <th class="px-3 py-2.5 w-28">NISN</th>
+                    <th class="px-3 py-2.5">Nama Siswa</th>
+                    <th class="px-3 py-2.5 w-16 text-center">L/P</th>
+                    <th class="px-3 py-2.5 w-24">Kelas</th>
+                    <th class="px-3 py-2.5 w-44 text-center">Status Kehadiran</th>
+                    <th class="px-3 py-2.5 rounded-r-lg">Alasan / Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody id="baStudentsTableBody" class="divide-y divide-slate-800 text-slate-300">
+                  <!-- Populated dynamically via renderBAEditor() -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== VIEW 2: PRATINJAU BERITA ACARA RESMI (A4) ==================== -->
+        <div id="baViewContainer_preview_ba" class="hidden space-y-4">
+          <div class="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl p-3 px-4 text-xs">
+            <span class="text-slate-300 flex items-center gap-2">
+              <i class="fa-solid fa-circle-info text-amber-400"></i>
+              Pratinjau naskah Berita Acara resmi format A4. Klik tombol <strong>Cetak Berita Acara</strong> untuk mencetak langsung.
+            </span>
+            <button type="button" onclick="printBeritaAcaraDoc()" class="px-4 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition flex items-center gap-1.5 shadow-md shadow-amber-500/20">
+              <i class="fa-solid fa-print"></i> Cetak Berita Acara
+            </button>
+          </div>
+
+          <!-- Kertas Putih A4 Berita Acara -->
+          <div class="max-w-4xl mx-auto bg-white text-black p-8 sm:p-12 rounded-2xl shadow-2xl border border-slate-300" style="font-family: 'Times New Roman', Times, serif;">
+            <div id="baOfficialPreviewContent">
+              <!-- Dynamically populated via renderBAPreviewOfficialDoc() -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== VIEW 3: PRATINJAU DAFTAR HADIR (A4) ==================== -->
+        <div id="baViewContainer_preview_absensi" class="hidden space-y-4">
+          <div class="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl p-3 px-4 text-xs">
+            <span class="text-slate-300 flex items-center gap-2">
+              <i class="fa-solid fa-circle-info text-emerald-400"></i>
+              Pratinjau lembar Daftar Hadir Peserta Ujian dengan kolom tanda tangan zig-zag resmi.
+            </span>
+            <button type="button" onclick="printAbsensiDoc()" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition flex items-center gap-1.5 shadow-md shadow-emerald-600/20">
+              <i class="fa-solid fa-print"></i> Cetak Daftar Hadir
+            </button>
+          </div>
+
+          <!-- Kertas Putih A4 Daftar Hadir -->
+          <div class="max-w-4xl mx-auto bg-white text-black p-8 sm:p-12 rounded-2xl shadow-2xl border border-slate-300" style="font-family: 'Times New Roman', Times, serif;">
+            <div id="baAbsensiPreviewContent">
+              <!-- Dynamically populated via renderBAAbsensiOfficialDoc() -->
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="tab-nilai" class="hidden space-y-6">
         <!-- Header Toolbar -->
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -4155,6 +4468,37 @@
   </div>
 
   <!-- ==================== MODAL 7: CETAK KARTU PESERTA UJIAN (A4 FORMAT) ==================== -->
+  
+  <!-- ==================== MODAL CETAK DOKUMEN UJIAN RESMI (BERITA ACARA & ABSENSI) ==================== -->
+  <div id="modalPrintOfficialExamDoc" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 overflow-y-auto p-4 flex justify-center items-start">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-5xl w-full p-6 shadow-2xl my-6 space-y-5">
+      <!-- Toolbar Non-Print -->
+      <div class="no-print flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-800 gap-4">
+        <div>
+          <h4 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-file-signature text-amber-400"></i> Cetak Dokumen Ujian Sekolah (Format Resmi A4)
+          </h4>
+          <p class="text-xs text-slate-400 mt-0.5">Hasil cetak siap untuk printer fisik atau Simpan sebagai PDF (A4 Portrait, Kop Surat & TTD Resmi).</p>
+        </div>
+
+        <div class="flex items-center gap-3 flex-wrap">
+          <button type="button" onclick="window.print()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg shadow-amber-500/30">
+            <i class="fa-solid fa-print text-sm"></i>
+            <span>Cetak Dokumen Sekarang (Ctrl+P)</span>
+          </button>
+          <button type="button" onclick="closeModal('modalPrintOfficialExamDoc')" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold transition">
+            <i class="fa-solid fa-xmark"></i> Tutup
+          </button>
+        </div>
+      </div>
+
+      <!-- Area Dokumen Cetak Putih Bersih -->
+      <div id="officialDocPrintArea" class="bg-white text-black p-4 sm:p-8 rounded-xl shadow-inner overflow-x-auto">
+        <!-- Dynamically injected via print functions -->
+      </div>
+    </div>
+  </div>
+
   <div id="modalPrintCards" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 overflow-y-auto p-4 flex justify-center items-start">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-5xl w-full p-6 shadow-2xl my-6 space-y-5">
       <!-- Toolbar Non-Print -->
@@ -4531,6 +4875,9 @@
       if (tabName === 'jadwal') {
         fetchScheduleList();
       }
+      if (tabName === 'berita-acara') {
+        initBeritaAcaraTab();
+      }
       if (tabName === 'pengaturan') {
         fetchSchoolProfile();
       }
@@ -4562,6 +4909,7 @@
         'overview': 'Dashboard Utama',
         'bank-soal': 'Bank Soal & Butir Soal',
         'jadwal': 'Jadwal Ujian (CBT)',
+        'berita-acara': 'Berita Acara & Absensi Ujian Resmi Standar Sekolah',
         'monitoring': 'Pengawasan Ujian (Live Proktor)',
         'nilai': 'Hasil & Analisis Nilai',
         'materi': 'Materi Ajar & Penugasan LMS',
@@ -6020,6 +6368,9 @@
                   <div class="flex items-center justify-end gap-2 flex-wrap">
                     <button onclick="switchToProctorSchedule(${sch.id})" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-emerald-500/10" title="Pantau peserta ujian jadwal ini di Live Proktor">
                       <i class="fa-solid fa-desktop text-emerald-400"></i> Pantau di Live Proktor &rarr;
+                    </button>
+                    <button onclick="openBeritaAcaraTab(${sch.id})" class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="Buka Berita Acara & Absensi Peserta">
+                      <i class="fa-solid fa-file-signature text-amber-400"></i> Berita Acara & Absensi
                     </button>
                     <button onclick="handleToggleScheduleActive(${sch.id}, event)" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700 text-[11px] font-medium transition" title="Pindahkan ke Halaman Arsip Tidak Aktif">
                       <i class="fa-solid fa-box-archive mr-1"></i> Nonaktifkan
@@ -11539,7 +11890,729 @@
       setTimeout(purgeDashboardAutofill, 100);
       setTimeout(purgeDashboardAutofill, 500);
     });
-    window.addEventListener('focus', purgeDashboardAutofill);
+
+    // ==============================================================
+    // MODUL BERITA ACARA & ABSENSI UJIAN TERINTEGRASI (STANDAR INDONESIA)
+    // ==============================================================
+    window.currentBAData = null;
+    window.currentBAScheduleId = null;
+    window.currentBAClassFilter = 'all';
+    window.currentBAViewMode = 'editor';
+
+    window.openBeritaAcaraTab = function(scheduleId = null, className = null) {
+      if (scheduleId) window.currentBAScheduleId = parseInt(scheduleId, 10);
+      if (className) window.currentBAClassFilter = className;
+      switchTab('berita-acara');
+    };
+
+    window.initBeritaAcaraTab = async function(targetScheduleId = null, targetClass = null) {
+      try {
+        // 1. Pastikan data jadwal termuat
+        let schList = (typeof cachedSchedules !== 'undefined' && cachedSchedules.length > 0) ? cachedSchedules : [];
+        if (schList.length === 0) {
+          const res = await fetch('/api/v1/cbt/schedules');
+          if (res.ok) {
+            const json = await res.json();
+            schList = json.data || [];
+            if (typeof cachedSchedules !== 'undefined') cachedSchedules = schList;
+          }
+        }
+
+        const schSelect = document.getElementById('baScheduleSelect');
+        if (schSelect && schList.length > 0) {
+          schSelect.innerHTML = schList.map(s => {
+            const isAct = s.is_active !== false;
+            return `<option value="${s.id}">#${s.id} - ${s.title} (${s.bank_name || 'Ujian'}) - ${isAct ? 'Aktif' : 'Arsip'}</option>`;
+          }).join('');
+        }
+
+        const selectedSchId = targetScheduleId || window.currentBAScheduleId || (schList[0] ? schList[0].id : 1);
+        window.currentBAScheduleId = parseInt(selectedSchId, 10);
+        if (schSelect) schSelect.value = String(window.currentBAScheduleId);
+
+        const selectedClass = targetClass || window.currentBAClassFilter || 'all';
+        await window.fetchBeritaAcaraData(window.currentBAScheduleId, selectedClass);
+      } catch (err) {
+        console.error('Gagal menginisialisasi Berita Acara:', err);
+      }
+    };
+
+    window.handleBAScheduleChange = async function(schId) {
+      window.currentBAScheduleId = parseInt(schId, 10);
+      await window.fetchBeritaAcaraData(window.currentBAScheduleId, 'all');
+    };
+
+    window.handleBAClassChange = async function(className) {
+      window.currentBAClassFilter = className;
+      await window.fetchBeritaAcaraData(window.currentBAScheduleId, className);
+    };
+
+    window.fetchBeritaAcaraData = async function(schId, classFilter = 'all') {
+      const tbody = document.getElementById('baStudentsTableBody');
+      if (tbody) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="text-center py-8 text-slate-400">
+              <i class="fa-solid fa-circle-notch fa-spin text-indigo-400 text-xl mr-2"></i> Memuat data peserta & berita acara jadwal #${schId}...
+            </td>
+          </tr>
+        `;
+      }
+
+      try {
+        const res = await fetch(`/api/v1/cbt/schedules/${schId}/attendance?class=${encodeURIComponent(classFilter)}`);
+        if (!res.ok) throw new Error('Gagal memuat data absensi jadwal');
+        const json = await res.json();
+        window.currentBAData = json.data;
+        window.currentBAScheduleId = schId;
+        window.currentBAClassFilter = classFilter;
+
+        // Populate dropdown kelas
+        const classSelect = document.getElementById('baClassSelect');
+        if (classSelect) {
+          const availClasses = window.currentBAData.classes || [];
+          let opts = `<option value="all">Semua Kelas Terdaftar (${availClasses.length} Rombel)</option>`;
+          availClasses.forEach(c => {
+            opts += `<option value="${c}" ${c === classFilter ? 'selected' : ''}>Kelas ${c}</option>`;
+          });
+          classSelect.innerHTML = opts;
+          classSelect.value = classFilter;
+        }
+
+        // Populate form inputs
+        const att = window.currentBAData.attendance || {};
+        const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+        setVal('baExamDate', att.exam_date);
+        setVal('baStartTime', att.start_time);
+        setVal('baEndTime', att.end_time);
+        setVal('baRoom', att.room);
+        setVal('baSession', att.session);
+        setVal('baProctor1Name', att.proctor_1_name);
+        setVal('baProctor1Nip', att.proctor_1_nip);
+        setVal('baProctor2Name', att.proctor_2_name);
+        setVal('baProctor2Nip', att.proctor_2_nip);
+        setVal('baNotes', att.notes);
+
+        window.renderBeritaAcaraUI();
+      } catch (err) {
+        console.error('Kendala fetch berita acara:', err);
+        if (tbody) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="8" class="text-center py-8 text-rose-400">
+                <i class="fa-solid fa-triangle-exclamation mr-1.5"></i> ${err.message}
+              </td>
+            </tr>
+          `;
+        }
+      }
+    };
+
+    window.switchBAView = function(view) {
+      window.currentBAViewMode = view;
+      ['editor', 'preview_ba', 'preview_absensi'].forEach(v => {
+        const btn = document.getElementById('btnBAView_' + v);
+        const container = document.getElementById('baViewContainer_' + v);
+        const isActive = (v === view.replace('-', '_'));
+
+        if (btn) {
+          if (isActive) {
+            btn.className = 'px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold transition flex items-center gap-2 shadow-md shadow-indigo-600/20';
+          } else {
+            btn.className = 'px-4 py-2 rounded-xl bg-slate-950 text-slate-400 hover:text-white border border-slate-800 font-semibold transition flex items-center gap-2';
+          }
+        }
+        if (container) {
+          if (isActive) container.classList.remove('hidden');
+          else container.classList.add('hidden');
+        }
+      });
+
+      if (view === 'preview-ba' || view === 'preview_ba') {
+        window.renderBAPreviewOfficialDoc();
+      } else if (view === 'preview-absensi' || view === 'preview_absensi') {
+        window.renderBAAbsensiOfficialDoc();
+      }
+    };
+
+    window.renderBeritaAcaraUI = function() {
+      if (!window.currentBAData) return;
+      const students = window.currentBAData.students || [];
+
+      // Hitung live counter
+      const total = students.length;
+      const present = students.filter(s => s.status === 'hadir').length;
+      const absent = students.filter(s => s.status === 'tidak_hadir').length;
+      const percent = total > 0 ? Math.round((present / total) * 100) : 0;
+
+      const setTxt = (id, txt) => { const el = document.getElementById(id); if (el) el.innerText = txt; };
+      setTxt('baStatTotal', total);
+      setTxt('baStatPresent', present);
+      setTxt('baStatAbsent', absent);
+      setTxt('baStatPercent', percent + '%');
+
+      // Render View 1: Editor Checklist Table
+      window.renderBAEditor(students);
+
+      // Render View 2 & 3
+      window.renderBAPreviewOfficialDoc();
+      window.renderBAAbsensiOfficialDoc();
+    };
+
+    window.renderBAEditor = function(students) {
+      const tbody = document.getElementById('baStudentsTableBody');
+      if (!tbody) return;
+
+      if (!students || students.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="text-center py-8 text-slate-500 font-medium">
+              Tidak ada siswa terdaftar pada kelas / rombel ini untuk jadwal yang dipilih.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = students.map((st, idx) => {
+        const isPresent = (st.status === 'hadir');
+        const rowBg = isPresent ? 'hover:bg-slate-800/40' : 'bg-rose-950/20 hover:bg-rose-950/30';
+
+        return `
+          <tr class="${rowBg} transition" id="baRow_${st.id}">
+            <td class="px-3 py-2.5 text-center font-mono text-slate-400 font-semibold">${idx + 1}</td>
+            <td class="px-3 py-2.5 font-mono font-bold text-white whitespace-nowrap">${st.exam_no || '-'}</td>
+            <td class="px-3 py-2.5 font-mono text-slate-400 whitespace-nowrap">${st.nisn || '-'}</td>
+            <td class="px-3 py-2.5">
+              <strong class="text-white block font-semibold">${st.full_name}</strong>
+              <span class="text-[10px] text-slate-500">Username: ${st.username}</span>
+            </td>
+            <td class="px-3 py-2.5 text-center">
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${st.gender === 'Perempuan' ? 'bg-pink-500/20 text-pink-300' : 'bg-blue-500/20 text-blue-300'}">${st.gender === 'Perempuan' ? 'P' : 'L'}</span>
+            </td>
+            <td class="px-3 py-2.5 font-medium whitespace-nowrap text-slate-300">${st.class_name || '-'}</td>
+            <td class="px-3 py-2.5 text-center">
+              <div class="inline-flex rounded-xl p-0.5 bg-slate-950 border border-slate-800 shadow-inner">
+                <button type="button" onclick="toggleStudentAttendance(${st.id}, true)" class="px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 ${isPresent ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30' : 'text-slate-400 hover:text-white'}">
+                  <i class="fa-solid fa-check text-[10px]"></i> Hadir
+                </button>
+                <button type="button" onclick="toggleStudentAttendance(${st.id}, false)" class="px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 ${!isPresent ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30' : 'text-slate-400 hover:text-white'}">
+                  <i class="fa-solid fa-xmark text-[10px]"></i> Tidak Hadir
+                </button>
+              </div>
+            </td>
+            <td class="px-3 py-2.5">
+              ${!isPresent ? `
+                <div class="flex items-center gap-2 flex-wrap">
+                  <select onchange="setStudentAbsentReason(${st.id}, this.value)" class="bg-rose-950/40 border border-rose-500/40 text-rose-200 text-xs rounded-lg px-2 py-1 font-semibold focus:outline-none focus:border-rose-400">
+                    <option value="Sakit" ${st.reason === 'Sakit' || !st.reason ? 'selected' : ''}>Sakit (S)</option>
+                    <option value="Izin" ${st.reason === 'Izin' ? 'selected' : ''}>Izin (I)</option>
+                    <option value="Alpa" ${st.reason === 'Alpa' ? 'selected' : ''}>Alpa / Tanpa Keterangan (A)</option>
+                    <option value="Dispensasi" ${st.reason === 'Dispensasi' ? 'selected' : ''}>Dispensasi (D)</option>
+                  </select>
+                  <input type="text" value="${st.note || ''}" placeholder="Catatan khusus..." onchange="setStudentAbsentNote(${st.id}, this.value)" class="bg-slate-950 border border-slate-800 text-[11px] text-white rounded-lg px-2 py-1 placeholder-slate-500 focus:outline-none focus:border-indigo-500 flex-1 min-w-[120px]">
+                </div>
+              ` : `
+                <span class="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
+                  <i class="fa-solid fa-circle-check text-[10px]"></i> Hadir di ruang ujian
+                </span>
+              `}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    };
+
+    window.toggleStudentAttendance = function(studentId, isPresent) {
+      if (!window.currentBAData || !window.currentBAData.students) return;
+      const st = window.currentBAData.students.find(s => s.id === studentId);
+      if (!st) return;
+
+      st.status = isPresent ? 'hadir' : 'tidak_hadir';
+      if (!isPresent && !st.reason) st.reason = 'Sakit';
+      if (isPresent) { st.reason = ''; st.note = ''; }
+
+      window.renderBeritaAcaraUI();
+    };
+
+    window.setStudentAbsentReason = function(studentId, reason) {
+      if (!window.currentBAData || !window.currentBAData.students) return;
+      const st = window.currentBAData.students.find(s => s.id === studentId);
+      if (!st) return;
+      st.reason = reason;
+      window.renderBAPreviewOfficialDoc();
+      window.renderBAAbsensiOfficialDoc();
+    };
+
+    window.setStudentAbsentNote = function(studentId, note) {
+      if (!window.currentBAData || !window.currentBAData.students) return;
+      const st = window.currentBAData.students.find(s => s.id === studentId);
+      if (!st) return;
+      st.note = note;
+    };
+
+    window.setAllStudentsAttendance = function(status) {
+      if (!window.currentBAData || !window.currentBAData.students) return;
+      window.currentBAData.students.forEach(st => {
+        st.status = status;
+        if (status === 'hadir') { st.reason = ''; st.note = ''; }
+      });
+      window.renderBeritaAcaraUI();
+    };
+
+    window.saveBeritaAcaraAttendance = async function() {
+      if (!window.currentBAData || !window.currentBAScheduleId) return;
+
+      const getVal = id => (document.getElementById(id)?.value || '').trim();
+      const exam_date = getVal('baExamDate');
+      const start_time = getVal('baStartTime');
+      const end_time = getVal('baEndTime');
+      const room = getVal('baRoom');
+      const session = getVal('baSession');
+      const proctor_1_name = getVal('baProctor1Name');
+      const proctor_1_nip = getVal('baProctor1Nip');
+      const proctor_2_name = getVal('baProctor2Name');
+      const proctor_2_nip = getVal('baProctor2Nip');
+      const notes = getVal('baNotes');
+
+      const studentDict = {};
+      (window.currentBAData.students || []).forEach(st => {
+        studentDict[st.id] = {
+          status: st.status || 'hadir',
+          reason: st.reason || '',
+          note: st.note || ''
+        };
+      });
+
+      try {
+        const res = await fetch(`/api/v1/cbt/schedules/${window.currentBAScheduleId}/attendance`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            class_name: window.currentBAClassFilter || 'all',
+            exam_date,
+            start_time,
+            end_time,
+            room,
+            session,
+            proctor_1_name,
+            proctor_1_nip,
+            proctor_2_name,
+            proctor_2_nip,
+            notes,
+            students: studentDict
+          })
+        });
+
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Gagal menyimpan kehadiran');
+        alert(json.message || 'Berita Acara & status absensi peserta berhasil disimpan!');
+      } catch (err) {
+        alert('Kendala menyimpan: ' + err.message);
+      }
+    };
+
+    // Helper Kop Surat Resmi Standar Sekolah Indonesia
+    function generateOfficialSchoolKop(sp) {
+      const p = sp || {};
+      const logoUrl = p.logo_url || '/static/uploads/logo_sekolah_1792567623623.png';
+      const dinas = p.dinas || 'PEMERINTAH DAERAH PROVINSI JAWA BARAT\nDINAS PENDIDIKAN';
+      const dinasLines = dinas.split('\n').map(l => `<div class="font-bold text-[11px] tracking-wider uppercase text-black">${l}</div>`).join('');
+      const name = p.name || 'SMK NEGERI 5 BANDUNG';
+      const addr = p.address || 'Jl. Bojongkoneng No. 37A';
+      const city = p.city || 'KOTA BANDUNG';
+      const prov = p.province || 'JAWA BARAT';
+      const phone = p.phone || '(022) 7100428';
+      const email = p.email || 'info@smkn5bandung.sch.id';
+      const npsn = p.npsn || '20219143';
+
+      return `
+        <div class="border-b-[3px] border-black pb-2 mb-4" style="border-bottom-style: double; border-bottom-width: 4px;">
+          <table style="width: 100%; border-collapse: collapse; border: none;">
+            <tr>
+              <td style="width: 80px; vertical-align: middle; text-align: center; border: none; padding: 0 10px 0 0;">
+                <img src="${logoUrl}" style="width: 72px; height: 72px; object-fit: contain;" alt="Logo Sekolah" onerror="this.style.display='none'">
+              </td>
+              <td style="vertical-align: middle; text-align: center; border: none; padding: 0;">
+                ${dinasLines}
+                <div style="font-size: 16px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; color: #000; margin: 2px 0;">${name}</div>
+                <div style="font-size: 11px; color: #111; line-height: 1.3;">${addr} ${city ? ' - ' + city : ''} ${prov ? ', ' + prov : ''}</div>
+                <div style="font-size: 10px; color: #222;">NPSN: ${npsn} | Telp: ${phone} | Email: ${email}</div>
+              </td>
+              <td style="width: 80px; border: none;"></td>
+            </tr>
+          </table>
+        </div>
+      `;
+    }
+
+    // Helper Generator Dokumen Berita Acara Resmi (A4)
+    window.renderBAPreviewOfficialDoc = function() {
+      const container = document.getElementById('baOfficialPreviewContent');
+      if (!container || !window.currentBAData) return;
+
+      const d = window.currentBAData;
+      const sch = d.schedule || {};
+      const sp = d.school_profile || {};
+      const att = d.attendance || {};
+      const students = d.students || [];
+
+      const getVal = (id, fallback) => (document.getElementById(id)?.value || fallback || '').trim();
+      const examDate = getVal('baExamDate', att.exam_date);
+      const startTime = getVal('baStartTime', att.start_time);
+      const endTime = getVal('baEndTime', att.end_time);
+      const room = getVal('baRoom', att.room);
+      const session = getVal('baSession', att.session);
+      const p1Name = getVal('baProctor1Name', att.proctor_1_name);
+      const p1Nip = getVal('baProctor1Nip', att.proctor_1_nip);
+      const p2Name = getVal('baProctor2Name', att.proctor_2_name);
+      const p2Nip = getVal('baProctor2Nip', att.proctor_2_nip);
+      const notes = getVal('baNotes', att.notes);
+      const headmaster = att.headmaster_name || sp.headmaster_name || 'Drs. H. Ahmad Fauzi, M.Pd.';
+      const headmasterNip = att.headmaster_nip || sp.headmaster_nip || '19710815 199802 1 003';
+
+      const total = students.length;
+      const present = students.filter(s => s.status === 'hadir').length;
+      const absentStudents = students.filter(s => s.status === 'tidak_hadir');
+      const absent = absentStudents.length;
+
+      const classLabel = (window.currentBAClassFilter && window.currentBAClassFilter !== 'all')
+        ? 'Kelas ' + window.currentBAClassFilter
+        : (sch.class_target || 'Semua Kelas');
+
+      container.innerHTML = `
+        <div class="official-a4-page" style="font-family: 'Times New Roman', Times, serif; color: #000; line-height: 1.45;">
+          ${generateOfficialSchoolKop(sp)}
+
+          <div style="text-align: center; margin: 12px 0 16px 0;">
+            <div style="font-size: 14px; font-weight: bold; text-decoration: underline; letter-spacing: 0.5px; text-transform: uppercase;">
+              BERITA ACARA PELAKSANAAN ASESMEN / UJIAN SEKOLAH
+            </div>
+            <div style="font-size: 11px; font-weight: bold; margin-top: 3px;">
+              TAHUN PELAJARAN ${sp.academic_year || '2026/2027'} - SEMESTER ${(sp.semester || 'GANJIL').toUpperCase()}
+            </div>
+          </div>
+
+          <p style="font-size: 12px; text-align: justify; margin-bottom: 10px;">
+            Pada hari ini <strong>${examDate || '........................'}</strong>, bertempat di <strong>${sp.name || 'Sekolah'}</strong>, telah diselenggarakan Ujian Berbasis Komputer (Computer Based Test - CBT) untuk mengukur capaian kompetensi peserta didik dengan rincian pelaksanaan sebagai berikut:
+          </p>
+
+          <table style="width: 100%; font-size: 11.5px; border-collapse: collapse; margin-bottom: 12px;">
+            <tr>
+              <td style="width: 170px; padding: 3px 0; font-weight: 600;">Mata Pelajaran / Asesmen</td>
+              <td style="width: 15px; padding: 3px 0;">:</td>
+              <td style="padding: 3px 0; font-weight: bold;">${sch.title || 'Ujian Sekolah'} (${sch.bank_name || '-'})</td>
+            </tr>
+            <tr>
+              <td style="padding: 3px 0; font-weight: 600;">Tingkat / Rombel (Kelas)</td>
+              <td style="padding: 3px 0;">:</td>
+              <td style="padding: 3px 0;">${classLabel}</td>
+            </tr>
+            <tr>
+              <td style="padding: 3px 0; font-weight: 600;">Ruang / Laboratorium</td>
+              <td style="padding: 3px 0;">:</td>
+              <td style="padding: 3px 0;">${room || 'Ruang Lab CBT'}</td>
+            </tr>
+            <tr>
+              <td style="padding: 3px 0; font-weight: 600;">Sesi Ujian & Waktu</td>
+              <td style="padding: 3px 0;">:</td>
+              <td style="padding: 3px 0;">${session || 'Sesi 1'} (${startTime || '07:30'} s.d. ${endTime || '09:00'}) - Durasi: ${sch.duration_minutes || 90} Menit</td>
+            </tr>
+          </table>
+
+          <!-- REKAPITULASI PESERTA -->
+          <div style="border: 1px solid #000; padding: 8px 12px; margin-bottom: 12px; background: #fafafa;">
+            <div style="font-size: 11.5px; font-weight: bold; margin-bottom: 6px;">Rekapitulasi Kehadiran Peserta Ujian:</div>
+            <table style="width: 100%; font-size: 11px; text-align: center; border-collapse: collapse;">
+              <tr>
+                <td style="border: 1px solid #000; padding: 6px; width: 33.3%;">
+                  <span style="font-size: 10px; color: #444; display: block;">Jumlah Peserta Terdaftar</span>
+                  <strong style="font-size: 14px;">${total} Orang</strong>
+                </td>
+                <td style="border: 1px solid #000; padding: 6px; width: 33.3%; background: #f0fdf4;">
+                  <span style="font-size: 10px; color: #166534; display: block;">Jumlah Peserta Hadir</span>
+                  <strong style="font-size: 14px; color: #166534;">${present} Orang</strong>
+                </td>
+                <td style="border: 1px solid #000; padding: 6px; width: 33.3%; background: #fef2f2;">
+                  <span style="font-size: 10px; color: #991b1b; display: block;">Jumlah Tidak Hadir</span>
+                  <strong style="font-size: 14px; color: #991b1b;">${absent} Orang</strong>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- DAFTAR PESERTA TIDAK HADIR -->
+          <div style="margin-bottom: 12px;">
+            <div style="font-size: 11.5px; font-weight: bold; margin-bottom: 4px;">Daftar Peserta Yang Tidak Hadir:</div>
+            ${absent === 0 ? `
+              <div style="border: 1px solid #000; padding: 8px; text-align: center; font-style: italic; font-size: 11px; background: #ffffff;">
+                <strong>NIHIL</strong> — Seluruh peserta terdaftar (${total} siswa) hadir lengkap mengikuti ujian.
+              </div>
+            ` : `
+              <table style="width: 100%; font-size: 10.5px; border-collapse: collapse; border: 1px solid #000;">
+                <thead style="background: #e2e8f0; font-weight: bold;">
+                  <tr>
+                    <th style="border: 1px solid #000; padding: 4px; text-align: center; width: 30px;">No</th>
+                    <th style="border: 1px solid #000; padding: 4px; text-align: center; width: 110px;">No. Peserta</th>
+                    <th style="border: 1px solid #000; padding: 4px; text-align: center; width: 90px;">NISN</th>
+                    <th style="border: 1px solid #000; padding: 4px; text-align: left;">Nama Lengkap Siswa</th>
+                    <th style="border: 1px solid #000; padding: 4px; text-align: center; width: 80px;">Kelas</th>
+                    <th style="border: 1px solid #000; padding: 4px; text-align: center; width: 100px;">Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${absentStudents.map((st, i) => `
+                    <tr>
+                      <td style="border: 1px solid #000; padding: 3px 5px; text-align: center;">${i + 1}</td>
+                      <td style="border: 1px solid #000; padding: 3px 5px; text-align: center; font-family: monospace;">${st.exam_no || '-'}</td>
+                      <td style="border: 1px solid #000; padding: 3px 5px; text-align: center; font-family: monospace;">${st.nisn || '-'}</td>
+                      <td style="border: 1px solid #000; padding: 3px 5px; font-weight: 600;">${st.full_name}</td>
+                      <td style="border: 1px solid #000; padding: 3px 5px; text-align: center;">${st.class_name || '-'}</td>
+                      <td style="border: 1px solid #000; padding: 3px 5px; text-align: center; font-weight: bold; text-transform: uppercase; color: #991b1b;">
+                        ${st.reason || 'Alpa'} ${st.note ? '(' + st.note + ')' : ''}
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `}
+          </div>
+
+          <!-- CATATAN KHUSUS PELAKSANAAN -->
+          <div style="margin-bottom: 16px;">
+            <div style="font-size: 11.5px; font-weight: bold; margin-bottom: 3px;">Catatan Khusus Selama Ujian Berlangsung:</div>
+            <div style="border: 1px solid #000; padding: 6px 10px; font-size: 11px; min-height: 35px; background: #ffffff; font-style: italic;">
+              ${notes || 'Pelaksanaan asesmen berlangsung tertib, lancar, dan aman sesuai petunjuk operasional standar.'}
+            </div>
+          </div>
+
+          <!-- TANDA TANGAN PENGAWAS & KEPALA SEKOLAH -->
+          <div style="margin-top: 18px; font-size: 11px;">
+            <table style="width: 100%; border-collapse: collapse; border: none; text-align: center;">
+              <tr>
+                <td style="width: 50%; vertical-align: top; border: none; padding-right: 20px;">
+                  <div>Pengawas Ruang 1,</div>
+                  <div style="height: 52px;"></div>
+                  <div style="font-weight: bold; text-decoration: underline;">${p1Name || 'Dra. Hj. Siti Aminah, M.Pd.'}</div>
+                  <div style="font-size: 10px;">NIP. ${p1Nip || '19680512 199403 2 004'}</div>
+                </td>
+                <td style="width: 50%; vertical-align: top; border: none; padding-left: 20px;">
+                  <div>Pengawas Ruang 2,</div>
+                  <div style="height: 52px;"></div>
+                  <div style="font-weight: bold; text-decoration: underline;">${p2Name || '( .................................................... )'}</div>
+                  <div style="font-size: 10px;">NIP. ${p2Nip || '....................................................'}</div>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" style="border: none; padding-top: 14px;">
+                  <div>${sp.city || 'Kota Bandung'}, ${examDate || '........................'}</div>
+                  <div style="font-weight: 600; margin-top: 2px;">Mengetahui,<br>Kepala Sekolah,</div>
+                  <div style="height: 48px; position: relative;">
+                    ${sp.stamp_url ? `<img src="${sp.stamp_url}" style="position: absolute; left: 45%; top: -8px; width: 65px; opacity: 0.85;" alt="Cap">` : ''}
+                    ${sp.signature_url ? `<img src="${sp.signature_url}" style="position: absolute; left: 48%; top: -5px; width: 90px;" alt="TTD">` : ''}
+                  </div>
+                  <div style="font-weight: bold; text-decoration: underline;">${headmaster}</div>
+                  <div style="font-size: 10px;">NIP. ${headmasterNip}</div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      `;
+    };
+
+    // Helper Generator Dokumen Daftar Hadir (Absensi Siswa A4)
+    window.renderBAAbsensiOfficialDoc = function() {
+      const container = document.getElementById('baAbsensiPreviewContent');
+      if (!container || !window.currentBAData) return;
+
+      const d = window.currentBAData;
+      const sch = d.schedule || {};
+      const sp = d.school_profile || {};
+      const att = d.attendance || {};
+      const students = d.students || [];
+
+      const getVal = (id, fallback) => (document.getElementById(id)?.value || fallback || '').trim();
+      const examDate = getVal('baExamDate', att.exam_date);
+      const startTime = getVal('baStartTime', att.start_time);
+      const endTime = getVal('baEndTime', att.end_time);
+      const room = getVal('baRoom', att.room);
+      const session = getVal('baSession', att.session);
+      const p1Name = getVal('baProctor1Name', att.proctor_1_name);
+      const p1Nip = getVal('baProctor1Nip', att.proctor_1_nip);
+      const p2Name = getVal('baProctor2Name', att.proctor_2_name);
+      const p2Nip = getVal('baProctor2Nip', att.proctor_2_nip);
+
+      const total = students.length;
+      const present = students.filter(s => s.status === 'hadir').length;
+      const absent = students.filter(s => s.status === 'tidak_hadir').length;
+
+      const classLabel = (window.currentBAClassFilter && window.currentBAClassFilter !== 'all')
+        ? 'Kelas ' + window.currentBAClassFilter
+        : (sch.class_target || 'Semua Kelas');
+
+      container.innerHTML = `
+        <div class="official-a4-page" style="font-family: 'Times New Roman', Times, serif; color: #000; line-height: 1.4;">
+          ${generateOfficialSchoolKop(sp)}
+
+          <div style="text-align: center; margin: 10px 0 14px 0;">
+            <div style="font-size: 14px; font-weight: bold; text-decoration: underline; letter-spacing: 0.5px; text-transform: uppercase;">
+              DAFTAR HADIR PESERTA ASESMEN / UJIAN SEKOLAH (CBT)
+            </div>
+            <div style="font-size: 11px; font-weight: bold; margin-top: 2px;">
+              TAHUN PELAJARAN ${sp.academic_year || '2026/2027'} - SEMESTER ${(sp.semester || 'GANJIL').toUpperCase()}
+            </div>
+          </div>
+
+          <table style="width: 100%; font-size: 11px; border-collapse: collapse; margin-bottom: 10px;">
+            <tr>
+              <td style="width: 130px; font-weight: 600;">Mata Pelajaran</td>
+              <td style="width: 10px;">:</td>
+              <td style="font-weight: bold; width: 40%;">${sch.title || 'Ujian'}</td>
+              <td style="width: 120px; font-weight: 600;">Ruang Ujian</td>
+              <td style="width: 10px;">:</td>
+              <td>${room || 'Ruang Lab CBT'}</td>
+            </tr>
+            <tr>
+              <td style="font-weight: 600;">Kelas / Rombel</td>
+              <td>:</td>
+              <td>${classLabel}</td>
+              <td style="font-weight: 600;">Hari, Tanggal</td>
+              <td>:</td>
+              <td>${examDate || '-'}</td>
+            </tr>
+            <tr>
+              <td style="font-weight: 600;">Sesi / Waktu</td>
+              <td>:</td>
+              <td>${session || 'Sesi 1'} (${startTime} s.d. ${endTime})</td>
+              <td style="font-weight: 600;">Durasi Waktu</td>
+              <td>:</td>
+              <td>${sch.duration_minutes || 90} Menit</td>
+            </tr>
+          </table>
+
+          <!-- TABEL DAFTAR HADIR ZIG-ZAG RESMI -->
+          <table style="width: 100%; font-size: 10.5px; border-collapse: collapse; border: 1px solid #000;">
+            <thead style="background: #e2e8f0; font-weight: bold; text-align: center;">
+              <tr>
+                <th style="border: 1px solid #000; padding: 4px; width: 28px;">No</th>
+                <th style="border: 1px solid #000; padding: 4px; width: 105px;">No. Peserta</th>
+                <th style="border: 1px solid #000; padding: 4px; width: 85px;">NISN</th>
+                <th style="border: 1px solid #000; padding: 4px; text-align: left;">Nama Lengkap Siswa</th>
+                <th style="border: 1px solid #000; padding: 4px; width: 30px;">L/P</th>
+                <th style="border: 1px solid #000; padding: 4px; width: 75px;">Kelas</th>
+                <th style="border: 1px solid #000; padding: 4px; width: 150px;" colspan="2">Tanda Tangan Peserta</th>
+                <th style="border: 1px solid #000; padding: 4px; width: 75px;">Ket.</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${students.map((st, i) => {
+                const num = i + 1;
+                const isEven = (num % 2 === 0);
+                const isPresent = (st.status === 'hadir');
+
+                return `
+                  <tr style="height: 28px;">
+                    <td style="border: 1px solid #000; text-align: center;">${num}</td>
+                    <td style="border: 1px solid #000; text-align: center; font-family: monospace;">${st.exam_no || '-'}</td>
+                    <td style="border: 1px solid #000; text-align: center; font-family: monospace;">${st.nisn || '-'}</td>
+                    <td style="border: 1px solid #000; padding: 2px 6px; font-weight: 600;">${st.full_name}</td>
+                    <td style="border: 1px solid #000; text-align: center;">${st.gender === 'Perempuan' ? 'P' : 'L'}</td>
+                    <td style="border: 1px solid #000; text-align: center;">${st.class_name || '-'}</td>
+                    ${isPresent ? (
+                      !isEven ? `
+                        <td style="border: 1px solid #000; width: 75px; vertical-align: top; padding: 2px 4px; font-size: 10px; font-weight: bold;">${num}. .............</td>
+                        <td style="border: 1px solid #000; width: 75px; background: #fafafa;"></td>
+                      ` : `
+                        <td style="border: 1px solid #000; width: 75px; background: #fafafa;"></td>
+                        <td style="border: 1px solid #000; width: 75px; vertical-align: top; padding: 2px 4px; font-size: 10px; font-weight: bold; text-align: right;">............. ${num}.</td>
+                      `
+                    ) : `
+                      <td colspan="2" style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 9.5px; background: #fee2e2; color: #991b1b; letter-spacing: 0.3px;">
+                        TIDAK HADIR (${(st.reason || 'ALPA').toUpperCase()})
+                      </td>
+                    `}
+                    <td style="border: 1px solid #000; text-align: center; font-size: 9.5px; ${!isPresent ? 'color: #991b1b; font-weight: bold;' : ''}">
+                      ${!isPresent ? (st.reason || 'Alpa') : ''}
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+
+          <!-- REKAPITULASI BAWAH & TANDA TANGAN -->
+          <div style="margin-top: 10px; font-size: 11px;">
+            <table style="width: 100%; border-collapse: collapse; border: none;">
+              <tr>
+                <td style="vertical-align: top; width: 50%; border: none;">
+                  <div style="border: 1px solid #000; padding: 6px 10px; display: inline-block; background: #fafafa;">
+                    <span style="font-weight: bold; display: block; margin-bottom: 2px;">Rekapitulasi Kehadiran:</span>
+                    <div>Terdaftar : <strong>${total} Orang</strong></div>
+                    <div>Hadir &nbsp; &nbsp; &nbsp;: <strong>${present} Orang</strong></div>
+                    <div>Tidak Hadir : <strong style="color: ${absent > 0 ? '#991b1b' : '#000'};">${absent} Orang</strong></div>
+                  </div>
+                </td>
+                <td style="vertical-align: top; width: 50%; text-align: center; border: none;">
+                  <div>Pengawas Ruang Ujian,</div>
+                  <div style="margin-top: 4px; display: flex; justify-content: space-around;">
+                    <div style="display: inline-block; width: 140px; text-align: center;">
+                      <div style="font-size: 10px;">Pengawas 1</div>
+                      <div style="height: 42px;"></div>
+                      <div style="font-weight: bold; text-decoration: underline; font-size: 10.5px;">${p1Name || 'Dra. Hj. Siti Aminah, M.Pd.'}</div>
+                      <div style="font-size: 9px;">NIP. ${p1Nip || '19680512 199403 2 004'}</div>
+                    </div>
+                    <div style="display: inline-block; width: 140px; text-align: center;">
+                      <div style="font-size: 10px;">Pengawas 2</div>
+                      <div style="height: 42px;"></div>
+                      <div style="font-weight: bold; text-decoration: underline; font-size: 10.5px;">${p2Name || '( ...................................... )'}</div>
+                      <div style="font-size: 9px;">NIP. ${p2Nip || '......................................'}</div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      `;
+    };
+
+    // Fungsi Cetak Berita Acara
+    window.printBeritaAcaraDoc = function() {
+      window.renderBAPreviewOfficialDoc();
+      const printArea = document.getElementById('officialDocPrintArea');
+      const src = document.getElementById('baOfficialPreviewContent');
+      if (printArea && src) {
+        printArea.innerHTML = src.innerHTML;
+        openModal('modalPrintOfficialExamDoc');
+      }
+    };
+
+    // Fungsi Cetak Daftar Hadir
+    window.printAbsensiDoc = function() {
+      window.renderBAAbsensiOfficialDoc();
+      const printArea = document.getElementById('officialDocPrintArea');
+      const src = document.getElementById('baAbsensiPreviewContent');
+      if (printArea && src) {
+        printArea.innerHTML = src.innerHTML;
+        openModal('modalPrintOfficialExamDoc');
+      }
+    };
+
+    // Fungsi Cetak Paket Lengkap (Berita Acara + Absensi)
+    window.printFullExamPackageDoc = function() {
+      window.renderBAPreviewOfficialDoc();
+      window.renderBAAbsensiOfficialDoc();
+      const printArea = document.getElementById('officialDocPrintArea');
+      const baSrc = document.getElementById('baOfficialPreviewContent');
+      const absSrc = document.getElementById('baAbsensiPreviewContent');
+      if (printArea && baSrc && absSrc) {
+        printArea.innerHTML = baSrc.innerHTML + absSrc.innerHTML;
+        openModal('modalPrintOfficialExamDoc');
+      }
+    };
+
+        window.addEventListener('focus', purgeDashboardAutofill);
   </script>
 </body>
 </html>

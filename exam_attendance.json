@@ -1,10 +1,50 @@
 {
   "1": {
     "students": {
+      "1001": {
+        "status": "hadir",
+        "reason": "",
+        "note": ""
+      },
       "1002": {
-        "status": "tidak_hadir",
-        "reason": "Sakit",
-        "note": "Surat dokter"
+        "status": "hadir",
+        "reason": "",
+        "note": ""
+      },
+      "1003": {
+        "status": "hadir",
+        "reason": "",
+        "note": ""
+      },
+      "1004": {
+        "status": "hadir",
+        "reason": "",
+        "note": ""
+      },
+      "1005": {
+        "status": "hadir",
+        "reason": "",
+        "note": ""
+      },
+      "1006": {
+        "status": "hadir",
+        "reason": "",
+        "note": ""
+      },
+      "1007": {
+        "status": "hadir",
+        "reason": "",
+        "note": ""
+      },
+      "1008": {
+        "status": "hadir",
+        "reason": "",
+        "note": ""
+      },
+      "1009": {
+        "status": "hadir",
+        "reason": "",
+        "note": ""
       }
     },
     "classes_meta": {
@@ -20,6 +60,19 @@
         "proctor_2_nip": "",
         "notes": "Pelaksanaan ujian berlangsung tertib, aman, dan lancar.",
         "updated_at": 1793000514475
+      },
+      "XII IPA 1": {
+        "exam_date": "Senin, 26 Oktober 2026",
+        "start_time": "07:30 WIB",
+        "end_time": "09:00 WIB",
+        "room": "Ruang Lab Komputer 01",
+        "session": "Sesi 1",
+        "proctor_1_name": "Dra. Hj. Siti Aminah, M.Pd.",
+        "proctor_1_nip": "19680512 199403 2 004",
+        "proctor_2_name": "Rahmat Hidayat, S.Pd.",
+        "proctor_2_nip": "19820719 200801 1 009",
+        "notes": "Pelaksanaan ujian berlangsung tertib, aman, dan lancar.",
+        "updated_at": 1793000981043
       }
     },
     "default_meta": {
@@ -28,12 +81,12 @@
       "end_time": "09:00 WIB",
       "room": "Ruang Lab Komputer 01",
       "session": "Sesi 1",
-      "proctor_1_name": "",
-      "proctor_1_nip": "",
-      "proctor_2_name": "",
-      "proctor_2_nip": "",
+      "proctor_1_name": "Dra. Hj. Siti Aminah, M.Pd.",
+      "proctor_1_nip": "19680512 199403 2 004",
+      "proctor_2_name": "Rahmat Hidayat, S.Pd.",
+      "proctor_2_nip": "19820719 200801 1 009",
       "notes": "Pelaksanaan ujian berlangsung tertib, aman, dan lancar.",
-      "updated_at": 1793000514475
+      "updated_at": 1793000981043
     }
   }
 }

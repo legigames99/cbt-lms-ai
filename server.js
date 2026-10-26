@@ -3737,6 +3737,25 @@ const server = http.createServer(async (req, res) => {
     }
     return sendJSON(404, { status: 'error', message: 'Bank soal atau butir soal tidak ditemukan' });
   }
+
+  // POST /api/v1/cbt/question-banks/:id/restore-question (Undo / Pulihkan Butir Soal yang Dihapus)
+  if (pathname.startsWith('/api/v1/cbt/question-banks/') && pathname.endsWith('/restore-question') && req.method === 'POST') {
+    const parts = pathname.split('/');
+    const bankId = parseInt(parts[5], 10);
+    const body = await parseBody(req);
+    const bank = QUESTION_BANKS.find(b => Number(b.id) === Number(bankId));
+    if (bank && body.question) {
+      if (!bank.questions) bank.questions = [];
+      const insertIndex = (body.index !== undefined && body.index >= 0 && body.index <= bank.questions.length)
+        ? body.index
+        : bank.questions.length;
+      bank.questions.splice(insertIndex, 0, body.question);
+      saveQuestionBanksToFile();
+      compileAndEncryptPackage();
+      return sendJSON(200, { status: 'success', message: `Butir soal #${body.question.id} berhasil dipulihkan!` });
+    }
+    return sendJSON(400, { status: 'error', message: 'Gagal memulihkan butir soal' });
+  }
 // POST /api/v1/cbt/question-banks/:id/bulk-delete-questions (Hapus Sebagian Butir Soal Terpilih)
   if (pathname.startsWith('/api/v1/cbt/question-banks/') && pathname.endsWith('/bulk-delete-questions') && req.method === 'POST') {
     const parts = pathname.split('/');

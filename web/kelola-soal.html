@@ -1548,21 +1548,108 @@
 
     // 10. Manajemen Penghapusan Soal (Hapus Satu-satu, Hapus Sebagian Terpilih, & Hapus Semua)
 
-    // A. Hapus Satu Butir Soal (Per Item)
+    let lastDeletedQuestionData = null;
+    let undoToastTimeout = null;
+
+    // A. Hapus Satu Butir Soal (Per Item) dengan Fitur Undo
     async function handleDeleteQuestion(qId) {
-      if (!confirm(`Apakah Anda yakin ingin menghapus butir soal #${qId}? Tindakan ini tidak dapat dibatalkan.`)) return;
+      if (!confirm(`Apakah Anda yakin ingin menghapus butir soal #${qId}? (Penghapusan ini dapat dibatalkan dengan Undo / Ctrl+Z).`)) return;
+
+      // Simpan objek soal dan posisinya sebelum dihapus
+      const currentQIndex = (currentBankData.questions || []).findIndex(q => Number(q.id) === Number(qId));
+      const deletedQObj = (currentBankData.questions || [])[currentQIndex];
+
       try {
         const res = await fetch(`/api/v1/cbt/question-banks/${activeBankId}/delete-question/${qId}`, {
           method: 'POST'
         });
         const json = await res.json();
         if (!res.ok) throw new Error(json.message);
+
+        // Catat state untuk Undo
+        if (deletedQObj) {
+          lastDeletedQuestionData = {
+            bankId: activeBankId,
+            question: deletedQObj,
+            index: currentQIndex
+          };
+          showUndoDeleteToast(qId);
+        }
+
         await loadActiveBank(activeBankId);
         updateBulkDeleteUI();
       } catch (err) {
         alert('Gagal menghapus butir soal: ' + err.message);
       }
     }
+
+    // Pulihkan / Undo Penghapusan Soal
+    async function undoDeleteQuestion() {
+      if (!lastDeletedQuestionData) return;
+      const { bankId, question, index } = lastDeletedQuestionData;
+
+      try {
+        const res = await fetch(`/api/v1/cbt/question-banks/${bankId}/restore-question`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question, index })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message);
+
+        hideUndoDeleteToast();
+        lastDeletedQuestionData = null;
+        await loadActiveBank(bankId);
+      } catch (err) {
+        alert('Gagal memulihkan butir soal: ' + err.message);
+      }
+    }
+
+    function showUndoDeleteToast(qId) {
+      let toast = document.getElementById('undoDeleteToast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'undoDeleteToast';
+        toast.className = 'fixed bottom-6 right-6 z-50 bg-slate-900/95 border border-indigo-500/50 shadow-2xl rounded-2xl p-3.5 flex items-center gap-3.5 text-xs backdrop-blur-md transition-all duration-300';
+        document.body.appendChild(toast);
+      }
+
+      toast.innerHTML = `
+        <div class="flex items-center gap-2 text-slate-200">
+          <i class="fa-solid fa-trash-can text-rose-400"></i>
+          <span>Butir soal <strong>#${qId}</strong> telah dihapus.</span>
+        </div>
+        <button onclick="undoDeleteQuestion()" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold flex items-center gap-1.5 shadow-md shadow-indigo-600/30 transition">
+          <i class="fa-solid fa-rotate-left"></i> Batalkan / Undo (Ctrl+Z)
+        </button>
+        <button onclick="hideUndoDeleteToast()" class="text-slate-400 hover:text-white p-1 ml-1" title="Tutup">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      `;
+
+      toast.classList.remove('hidden');
+
+      if (undoToastTimeout) clearTimeout(undoToastTimeout);
+      undoToastTimeout = setTimeout(() => {
+        hideUndoDeleteToast();
+      }, 12000);
+    }
+
+    function hideUndoDeleteToast() {
+      const toast = document.getElementById('undoDeleteToast');
+      if (toast) toast.classList.add('hidden');
+    }
+
+    // Global Key Listener untuk Ctrl+Z pada kelola-soal
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+        if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
+        if (lastDeletedQuestionData) {
+          e.preventDefault();
+          undoDeleteQuestion();
+        }
+      }
+    });
 
     // B. Checkbox "Pilih Semua Soal"
     window.toggleSelectAllQuestions = function(isChecked) {

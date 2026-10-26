@@ -260,10 +260,18 @@
               </button>
             </div>
 
-            <!-- Quick Beautifier & Cleaner -->
-            <button type="button" onclick="cleanRawBrTags()" class="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-[11px] font-semibold transition flex items-center gap-1.5 shadow-sm" title="Hapus tag <code>, <br>, <p> mentah dan jadikan format rapi bebas kode">
-              <i class="fa-solid fa-broom text-amber-400"></i> Bersihkan Tag HTML
-            </button>
+            <!-- Quick Actions: Undo, Redo, Cleaner -->
+            <div class="flex items-center gap-1.5">
+              <button type="button" id="btnUndo" onclick="performUndo()" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-[11px] font-semibold transition flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm" title="Batalkan Perubahan Terakhir (Ctrl+Z)" disabled>
+                <i class="fa-solid fa-rotate-left text-indigo-400"></i> Undo (Ctrl+Z)
+              </button>
+              <button type="button" id="btnRedo" onclick="performRedo()" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-[11px] font-semibold transition flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm" title="Ulangi Perubahan (Ctrl+Y)" disabled>
+                <i class="fa-solid fa-rotate-right text-indigo-400"></i> Redo (Ctrl+Y)
+              </button>
+              <button type="button" onclick="cleanRawBrTags()" class="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-[11px] font-semibold transition flex items-center gap-1.5 shadow-sm" title="Hapus tag <code>, <br>, <p> mentah dan jadikan format rapi bebas kode">
+                <i class="fa-solid fa-broom text-amber-400"></i> Bersihkan Tag HTML
+              </button>
+            </div>
           </div>
 
           <!-- TAB CONTENT 1: FORMAT TEKS NORMAL -->
@@ -457,7 +465,7 @@
 
         <!-- TEXTAREA PERTANYAAN (STEM) -->
         <div class="relative">
-          <textarea id="inputStem" rows="6" oninput="updateLivePreview()" onpaste="handleStemPaste(event)" placeholder="Ketik pertanyaan atau stimulus asesmen di sini..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-white leading-relaxed focus:outline-none focus:border-indigo-500 custom-scrollbar text-sm transition"></textarea>
+          <textarea id="inputStem" rows="6" oninput="handleStemInput()" onpaste="handleStemPaste(event)" placeholder="Ketik pertanyaan atau stimulus asesmen di sini..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-white leading-relaxed focus:outline-none focus:border-indigo-500 custom-scrollbar text-sm transition"></textarea>
           
           <div class="flex items-center justify-between text-[11px] text-slate-500 mt-1 px-1">
             <span>Gunakan format rapi: `perintah`, ```blok kode```, **tebal**, *miring*, KaTeX Math ($...$), atau Arab tanpa tag HTML mentah. Paste gambar (Ctrl+V) didukung.</span>
@@ -768,6 +776,7 @@
       initializeDefaultDynamicRows();
       setupPasteListener();
       switchToolbarTab('normal');
+      initEditorHistory();
       await fetchAllBanks();
     });
 
@@ -874,6 +883,7 @@
       document.getElementById('inputWeight').value = q.weight !== undefined ? q.weight : 1.0;
       document.getElementById('inputStem').value = htmlToCleanEditorText(q.stem || '');
       document.getElementById('inputExplanation').value = htmlToCleanEditorText(q.explanation || '');
+      initEditorHistory();
 
       // Deteksi format konten & aktifkan tab toolbar yang paling relevan otomatis
       const stemText = q.stem || '';
@@ -1203,8 +1213,159 @@
       }).join('');
     }
 
-    // 8c. Pembersih & Perapih Format Teks Manual (Bebas dari semua tag HTML mentah)
+    // ==========================================
+    // 8c. UNDO & REDO HISTORY SYSTEM FOR EDITOR
+    // ==========================================
+    let editorHistory = [];
+    let editorHistoryIndex = -1;
+    const MAX_HISTORY = 80;
+    let isPerformingUndoRedo = false;
+    let inputDebounceTimer = null;
+
+    function initEditorHistory() {
+      const textarea = document.getElementById('inputStem');
+      const val = textarea ? textarea.value : '';
+      editorHistory = [{
+        value: val,
+        start: textarea ? textarea.selectionStart : 0,
+        end: textarea ? textarea.selectionEnd : 0
+      }];
+      editorHistoryIndex = 0;
+      updateUndoRedoButtons();
+    }
+
+    function recordEditorState(immediate = false) {
+      if (isPerformingUndoRedo) return;
+      const textarea = document.getElementById('inputStem');
+      if (!textarea) return;
+
+      const save = () => {
+        const val = textarea.value;
+        const selStart = textarea.selectionStart;
+        const selEnd = textarea.selectionEnd;
+
+        // Jangan simpan jika state sama dengan state saat ini
+        if (editorHistoryIndex >= 0 && editorHistoryIndex < editorHistory.length) {
+          if (editorHistory[editorHistoryIndex].value === val) {
+            return;
+          }
+        }
+
+        // Pangkas riwayat redo jika ada perubahan baru setelah undo
+        if (editorHistoryIndex < editorHistory.length - 1) {
+          editorHistory = editorHistory.slice(0, editorHistoryIndex + 1);
+        }
+
+        editorHistory.push({ value: val, start: selStart, end: selEnd });
+        if (editorHistory.length > MAX_HISTORY) {
+          editorHistory.shift();
+        } else {
+          editorHistoryIndex++;
+        }
+        updateUndoRedoButtons();
+      };
+
+      if (immediate) {
+        if (inputDebounceTimer) clearTimeout(inputDebounceTimer);
+        save();
+      } else {
+        if (inputDebounceTimer) clearTimeout(inputDebounceTimer);
+        inputDebounceTimer = setTimeout(save, 300);
+      }
+    }
+
+    function handleStemInput() {
+      recordEditorState(false);
+      updateLivePreview();
+    }
+
+    function performUndo() {
+      if (editorHistoryIndex <= 0) return;
+      const textarea = document.getElementById('inputStem');
+      if (!textarea) return;
+
+      // Pastikan state terkini di textarea tersimpan jika ada ketikan yang belum ter-debounce
+      if (editorHistory[editorHistoryIndex] && editorHistory[editorHistoryIndex].value !== textarea.value) {
+        editorHistory.push({
+          value: textarea.value,
+          start: textarea.selectionStart,
+          end: textarea.selectionEnd
+        });
+        editorHistoryIndex = editorHistory.length - 1;
+      }
+
+      editorHistoryIndex--;
+      const targetState = editorHistory[editorHistoryIndex];
+      if (targetState) {
+        isPerformingUndoRedo = true;
+        textarea.value = targetState.value;
+        textarea.selectionStart = targetState.start;
+        textarea.selectionEnd = targetState.end;
+        textarea.focus();
+        updateLivePreview();
+        isPerformingUndoRedo = false;
+      }
+      updateUndoRedoButtons();
+    }
+
+    function performRedo() {
+      if (editorHistoryIndex >= editorHistory.length - 1) return;
+      const textarea = document.getElementById('inputStem');
+      if (!textarea) return;
+
+      editorHistoryIndex++;
+      const targetState = editorHistory[editorHistoryIndex];
+      if (targetState) {
+        isPerformingUndoRedo = true;
+        textarea.value = targetState.value;
+        textarea.selectionStart = targetState.start;
+        textarea.selectionEnd = targetState.end;
+        textarea.focus();
+        updateLivePreview();
+        isPerformingUndoRedo = false;
+      }
+      updateUndoRedoButtons();
+    }
+
+    function updateUndoRedoButtons() {
+      const btnUndo = document.getElementById('btnUndo');
+      const btnRedo = document.getElementById('btnRedo');
+      if (btnUndo) {
+        btnUndo.disabled = (editorHistoryIndex <= 0);
+      }
+      if (btnRedo) {
+        btnRedo.disabled = (editorHistoryIndex >= editorHistory.length - 1);
+      }
+    }
+
+    // Global Key Listener untuk Ctrl+Z dan Ctrl+Y / Ctrl+Shift+Z
+    document.addEventListener('keydown', (e) => {
+      const isCtrlOrCmd = e.ctrlKey || e.metaKey;
+      if (!isCtrlOrCmd) return;
+
+      const key = e.key.toLowerCase();
+      const textarea = document.getElementById('inputStem');
+      const isStemFocused = (document.activeElement === textarea);
+
+      // Ctrl+Z (Undo)
+      if (key === 'z' && !e.shiftKey) {
+        if (isStemFocused || (!document.activeElement || document.activeElement.tagName !== 'INPUT')) {
+          e.preventDefault();
+          performUndo();
+        }
+      }
+      // Ctrl+Y atau Ctrl+Shift+Z (Redo)
+      else if (key === 'y' || (key === 'z' && e.shiftKey)) {
+        if (isStemFocused || (!document.activeElement || document.activeElement.tagName !== 'INPUT')) {
+          e.preventDefault();
+          performRedo();
+        }
+      }
+    });
+
+    // 8d. Pembersih & Perapih Format Teks Manual (Bebas dari semua tag HTML mentah)
     function cleanRawBrTags() {
+      recordEditorState(true);
       const textarea = document.getElementById('inputStem');
       if (!textarea) return;
       textarea.value = htmlToCleanEditorText(textarea.value);
@@ -1212,10 +1373,11 @@
       if (expl && expl.value) {
         expl.value = htmlToCleanEditorText(expl.value);
       }
+      recordEditorState(true);
       updateLivePreview();
     }
 
-    // 8d. Helper Snippet untuk SMK / TKJ / Jaringan
+    // 8e. Helper Snippet untuk SMK / TKJ / Jaringan
     function insertLinuxTerminalSnippet() {
       const snippet = `\n<div class="terminal-box my-3">\n  <div class="terminal-header">\n    <span class="terminal-dot bg-rose-500"></span>\n    <span class="terminal-dot bg-amber-500"></span>\n    <span class="terminal-dot bg-emerald-500"></span>\n    <span class="text-[10px] text-slate-400 font-mono ml-2">Terminal Linux / SSH</span>\n  </div>\n  <div class="terminal-body">user@server:~$ sudo tail -f /var/log/auth.log\nsshd[1942]: Connection reset by authenticating user admin [preauth]\nsshd[1948]: Failed password for root from 192.168.10.45 port 54321 ssh2</div>\n</div>\n`;
       insertSnippet(snippet);
@@ -1227,6 +1389,7 @@
     }
 
     function formatSelectionAsTerminalBox() {
+      recordEditorState(true);
       const textarea = document.getElementById('inputStem');
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
@@ -1241,6 +1404,7 @@
       const replacement = `\n<div class="terminal-box my-3">\n  <div class="terminal-header">\n    <span class="terminal-dot bg-rose-500"></span>\n    <span class="terminal-dot bg-amber-500"></span>\n    <span class="terminal-dot bg-emerald-500"></span>\n    <span class="text-[10px] text-slate-400 font-mono ml-2">Terminal — bash</span>\n  </div>\n  <div class="terminal-body">${cleanSelected}</div>\n</div>\n`;
 
       textarea.value = text.substring(0, start) + replacement + text.substring(end);
+      recordEditorState(true);
       textarea.focus();
       updateLivePreview();
     }
@@ -1269,6 +1433,7 @@
 
     // 10. Karakter & Snippet Inserter ke Kursor Aktif
     function insertSnippet(snippet) {
+      recordEditorState(true);
       const textarea = document.getElementById('inputStem');
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
@@ -1278,6 +1443,7 @@
       textarea.focus();
       textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
 
+      recordEditorState(true);
       updateLivePreview();
     }
 
@@ -1286,6 +1452,7 @@
     }
 
     function wrapText(openTag, closeTag) {
+      recordEditorState(true);
       const textarea = document.getElementById('inputStem');
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
@@ -1298,6 +1465,7 @@
       textarea.selectionStart = start + openTag.length;
       textarea.selectionEnd = start + openTag.length + selected.length;
 
+      recordEditorState(true);
       updateLivePreview();
     }
 

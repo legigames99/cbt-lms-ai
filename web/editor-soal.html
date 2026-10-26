@@ -212,231 +212,351 @@
       <!-- 2. STUDIO STIMULUS SOAL & TOOLBAR MATEMATIKA / ARAB / GAMBAR -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
         
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
+        <!-- HEADER STIMULUS DENGAN QUICK UTILITIES TERINTEGRASI -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
           <div>
-            <h3 class="text-xs font-bold text-white flex items-center gap-2">
+            <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
               <i class="fa-solid fa-align-left text-cyan-400"></i> Pertanyaan & Stimulus Soal (Stem)
             </h3>
             <p class="text-[11px] text-slate-400">Tulis teks pertanyaan, narasi kasus, tabel data, atau potongan kode.</p>
           </div>
 
-          <!-- Direction Toggle LTR vs RTL -->
-          <div class="flex items-center gap-1.5 self-start sm:self-auto">
-            <span class="text-[10px] text-slate-400 font-semibold uppercase">Arah Teks:</span>
-            <div class="flex bg-slate-950 p-0.5 rounded-lg border border-slate-800 text-xs">
-              <button type="button" onclick="setTextDirection('ltr')" id="btnDirLTR" class="px-2.5 py-1 rounded-md font-bold text-white bg-indigo-600 transition" title="Kiri ke Kanan (Bahasa Indonesia / Latin)">
-                LTR
+          <!-- Quick Utility Bar: Undo, Redo, Cleaner, Text Direction -->
+          <div class="flex items-center gap-1.5 self-start lg:self-auto bg-slate-950 p-1 rounded-xl border border-slate-800 shadow-sm text-xs">
+            <!-- Undo & Redo Group -->
+            <div class="flex items-center gap-0.5">
+              <button type="button" id="btnUndo" onclick="performUndo()" class="h-7 px-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center gap-1 transition disabled:opacity-30 disabled:cursor-not-allowed" title="Batalkan Perubahan Terakhir (Ctrl+Z)" disabled>
+                <i class="fa-solid fa-rotate-left text-xs text-indigo-400"></i>
+                <span class="text-[11px] font-medium hidden sm:inline">Undo</span>
               </button>
-              <button type="button" onclick="setTextDirection('rtl')" id="btnDirRTL" class="px-2.5 py-1 rounded-md font-bold text-slate-400 hover:text-white transition" title="Kanan ke Kiri (Bahasa Arab)">
-                RTL (عربي)
+              <button type="button" id="btnRedo" onclick="performRedo()" class="h-7 px-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center gap-1 transition disabled:opacity-30 disabled:cursor-not-allowed" title="Ulangi Perubahan (Ctrl+Y)" disabled>
+                <i class="fa-solid fa-rotate-right text-xs text-indigo-400"></i>
+                <span class="text-[11px] font-medium hidden sm:inline">Redo</span>
               </button>
+            </div>
+
+            <span class="w-px h-4 bg-slate-800"></span>
+
+            <!-- Cleaner Button -->
+            <button type="button" onclick="cleanRawBrTags()" class="h-7 px-2.5 rounded-lg hover:bg-amber-500/10 text-amber-300 hover:text-amber-200 border border-transparent hover:border-amber-500/30 text-[11px] font-semibold transition flex items-center gap-1.5" title="Hapus sisa tag HTML mentah seperti <code> dan <br> menjadi format bersih">
+              <i class="fa-solid fa-broom text-amber-400 text-xs"></i>
+              <span>Bersihkan Tag</span>
+            </button>
+
+            <span class="w-px h-4 bg-slate-800"></span>
+
+            <!-- Direction Toggle LTR vs RTL -->
+            <div class="flex items-center gap-1 text-[11px]">
+              <span class="text-[10px] text-slate-500 uppercase font-bold px-1 hidden md:inline">Arah:</span>
+              <div class="flex bg-slate-900 p-0.5 rounded-lg border border-slate-800 text-[11px]">
+                <button type="button" onclick="setTextDirection('ltr')" id="btnDirLTR" class="px-2 py-0.5 rounded-md font-bold text-white bg-indigo-600 transition" title="Kiri ke Kanan (Latin)">
+                  LTR
+                </button>
+                <button type="button" onclick="setTextDirection('rtl')" id="btnDirRTL" class="px-2 py-0.5 rounded-md font-bold text-slate-400 hover:text-white transition" title="Kanan ke Kiri (Arab)">
+                  RTL
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- SPECIAL CHARACTERS, CODE & MEDIA TOOLBAR -->
-        <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-2.5 space-y-2.5 shadow-md">
+        <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-2 space-y-2 shadow-inner">
           
-          <!-- Category Tabs & Quick Clean Action -->
-          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2 text-xs">
-            <div class="flex flex-wrap items-center gap-1.5">
-              <button type="button" onclick="switchToolbarTab('normal')" id="tabBtn_normal" class="px-3 py-1.5 rounded-lg bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold transition flex items-center gap-1.5 shadow-sm">
-                <i class="fa-solid fa-font text-indigo-400"></i> Format Teks Normal
-              </button>
-              <button type="button" onclick="switchToolbarTab('code')" id="tabBtn_code" class="px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white border border-slate-800 font-bold transition flex items-center gap-1.5">
-                <i class="fa-solid fa-terminal text-emerald-400"></i> Kode & Konfigurasi IT
-              </button>
-              <button type="button" onclick="switchToolbarTab('math')" id="tabBtn_math" class="px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white border border-slate-800 font-bold transition flex items-center gap-1.5">
-                <i class="fa-solid fa-square-root-variable text-purple-400"></i> Matematika & Rumus
-              </button>
-              <button type="button" onclick="switchToolbarTab('arabic')" id="tabBtn_arabic" class="px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white border border-slate-800 font-bold transition flex items-center gap-1.5">
-                <i class="fa-solid fa-moon text-amber-400"></i> Bahasa Arab & Harakat
-              </button>
-              <button type="button" onclick="switchToolbarTab('table')" id="tabBtn_table" class="px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white border border-slate-800 font-bold transition flex items-center gap-1.5">
-                <i class="fa-solid fa-table-cells text-blue-400"></i> Tabel Data
-              </button>
-              <button type="button" onclick="switchToolbarTab('image')" id="tabBtn_image" class="px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white border border-slate-800 font-bold transition flex items-center gap-1.5">
-                <i class="fa-solid fa-image text-cyan-400"></i> Unggah Gambar
-              </button>
-            </div>
-
-            <!-- Quick Actions: Undo, Redo, Cleaner -->
-            <div class="flex items-center gap-1.5">
-              <button type="button" id="btnUndo" onclick="performUndo()" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-[11px] font-semibold transition flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm" title="Batalkan Perubahan Terakhir (Ctrl+Z)" disabled>
-                <i class="fa-solid fa-rotate-left text-indigo-400"></i> Undo (Ctrl+Z)
-              </button>
-              <button type="button" id="btnRedo" onclick="performRedo()" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-[11px] font-semibold transition flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm" title="Ulangi Perubahan (Ctrl+Y)" disabled>
-                <i class="fa-solid fa-rotate-right text-indigo-400"></i> Redo (Ctrl+Y)
-              </button>
-              <button type="button" onclick="cleanRawBrTags()" class="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-[11px] font-semibold transition flex items-center gap-1.5 shadow-sm" title="Hapus tag <code>, <br>, <p> mentah dan jadikan format rapi bebas kode">
-                <i class="fa-solid fa-broom text-amber-400"></i> Bersihkan Tag HTML
-              </button>
-            </div>
+          <!-- Category Tabs: Segmented Control Bar -->
+          <div class="flex items-center gap-1 overflow-x-auto custom-scrollbar p-1 bg-slate-900/90 rounded-lg border border-slate-800/80 text-xs">
+            <button type="button" onclick="switchToolbarTab('normal')" id="tabBtn_normal" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white font-semibold shadow-sm transition flex items-center gap-1.5 text-xs whitespace-nowrap">
+              <i class="fa-solid fa-font text-indigo-300"></i> Teks Normal
+            </button>
+            <button type="button" onclick="switchToolbarTab('code')" id="tabBtn_code" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium transition flex items-center gap-1.5 text-xs whitespace-nowrap">
+              <i class="fa-solid fa-terminal text-emerald-400"></i> IT & Kode
+            </button>
+            <button type="button" onclick="switchToolbarTab('math')" id="tabBtn_math" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium transition flex items-center gap-1.5 text-xs whitespace-nowrap">
+              <i class="fa-solid fa-square-root-variable text-purple-400"></i> Matematika
+            </button>
+            <button type="button" onclick="switchToolbarTab('arabic')" id="tabBtn_arabic" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium transition flex items-center gap-1.5 text-xs whitespace-nowrap">
+              <i class="fa-solid fa-moon text-amber-400"></i> Bahasa Arab
+            </button>
+            <button type="button" onclick="switchToolbarTab('table')" id="tabBtn_table" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium transition flex items-center gap-1.5 text-xs whitespace-nowrap">
+              <i class="fa-solid fa-table-cells text-blue-400"></i> Tabel Data
+            </button>
+            <button type="button" onclick="switchToolbarTab('image')" id="tabBtn_image" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium transition flex items-center gap-1.5 text-xs whitespace-nowrap">
+              <i class="fa-solid fa-image text-cyan-400"></i> Unggah Gambar
+            </button>
           </div>
 
           <!-- TAB CONTENT 1: FORMAT TEKS NORMAL -->
           <div id="tabContent_normal" class="space-y-2 pt-1 text-xs">
-            <div class="text-[11px] text-slate-400 flex items-center justify-between">
-              <span>Format teks standar untuk soal umum, narasi kasus, paragraf, dan daftar poin:</span>
-              <span class="text-indigo-400 font-mono text-[10px]">Teks Standar & Narasi Soal</span>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span class="text-indigo-400 font-medium flex items-center gap-1.5">
+                <i class="fa-solid fa-pen-nib text-xs"></i> Format Teks Standar & Struktur Paragraf Soal
+              </span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Rich Format</span>
             </div>
-            <div class="flex flex-wrap items-center gap-1.5">
-              <button type="button" onclick="wrapText('**', '**')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 font-bold flex items-center gap-1" title="Tebal (**teks**)"><i class="fa-solid fa-bold text-indigo-400"></i> Tebal</button>
-              <button type="button" onclick="wrapText('*', '*')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 italic flex items-center gap-1" title="Miring (*teks*)"><i class="fa-solid fa-italic text-indigo-400"></i> Miring</button>
-              <button type="button" onclick="wrapText('<u>', '</u>')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 underline flex items-center gap-1" title="Garis Bawah (<u>teks</u>)"><i class="fa-solid fa-underline text-indigo-400"></i> Garis Bawah</button>
-              <button type="button" onclick="wrapText('~~', '~~')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 line-through flex items-center gap-1" title="Coret (~~teks~~)"><i class="fa-solid fa-strikethrough text-slate-400"></i> Coret</button>
-              <button type="button" onclick="wrapText('<mark>', '</mark>')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-800 flex items-center gap-1" title="Sorot Kuning (Highlight)"><i class="fa-solid fa-highlighter text-amber-400"></i> Sorot Teks</button>
-              <span class="w-px h-5 bg-slate-800 mx-1"></span>
-              <button type="button" onclick="insertSnippet('\n\n')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1" title="Paragraf Baru (Enter 2x)"><i class="fa-solid fa-paragraph text-cyan-400"></i> Paragraf Baru</button>
-              <button type="button" onclick="insertSnippet('\n')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1" title="Pindah Baris (Enter)"><i class="fa-solid fa-arrow-turn-down text-cyan-400"></i> Pindah Baris</button>
-              <button type="button" onclick="insertSnippet('\n<ol class=\'list-decimal pl-5 space-y-1 my-2\'>\n  <li>Poin pertama</li>\n  <li>Poin kedua</li>\n  <li>Poin ketiga</li>\n</ol>\n')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1" title="Daftar Nomor (1, 2, 3)"><i class="fa-solid fa-list-ol text-emerald-400"></i> Daftar Nomor</button>
-              <button type="button" onclick="insertSnippet('\n<ul class=\'list-disc pl-5 space-y-1 my-2\'>\n  <li>Poin butir A</li>\n  <li>Poin butir B</li>\n</ul>\n')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1" title="Daftar Bullet (•)"><i class="fa-solid fa-list-ul text-emerald-400"></i> Daftar Bullet</button>
-              <button type="button" onclick="wrapText('<blockquote>', '</blockquote>')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1" title="Kutipan Kasus"><i class="fa-solid fa-quote-left text-purple-400"></i> Kutipan</button>
-              <button type="button" onclick="insertSnippet('\n<hr class=\'border-slate-700 my-3\'>\n')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1" title="Garis Pemisah"><i class="fa-solid fa-minus text-slate-400"></i> Garis Pemisah</button>
+
+            <div class="flex flex-wrap items-center gap-1.5 bg-slate-900/60 p-1.5 rounded-xl border border-slate-800/60">
+              <!-- Font Style Group -->
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="wrapText('**', '**')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 font-bold flex items-center gap-1 transition" title="Tebal (**teks**)"><i class="fa-solid fa-bold text-indigo-400"></i> Tebal</button>
+                <button type="button" onclick="wrapText('*', '*')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 italic flex items-center gap-1 transition" title="Miring (*teks*)"><i class="fa-solid fa-italic text-indigo-400"></i> Miring</button>
+                <button type="button" onclick="wrapText('<u>', '</u>')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 underline flex items-center gap-1 transition" title="Garis Bawah (<u>teks</u>)"><i class="fa-solid fa-underline text-indigo-400"></i> Garis Bawah</button>
+                <button type="button" onclick="wrapText('~~', '~~')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 line-through flex items-center gap-1 transition" title="Coret (~~teks~~)"><i class="fa-solid fa-strikethrough text-slate-400"></i> Coret</button>
+                <button type="button" onclick="wrapText('<mark>', '</mark>')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-800 flex items-center gap-1 transition" title="Sorot Kuning (Highlight)"><i class="fa-solid fa-highlighter text-amber-400"></i> Sorot</button>
+              </div>
+
+              <div class="h-4 w-px bg-slate-800 mx-1 hidden sm:block"></div>
+
+              <!-- Paragraph & Spacing -->
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="insertSnippet('\n\n')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1 transition" title="Paragraf Baru (Enter 2x)"><i class="fa-solid fa-paragraph text-cyan-400"></i> Paragraf</button>
+                <button type="button" onclick="insertSnippet('\n')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1 transition" title="Pindah Baris (Enter)"><i class="fa-solid fa-arrow-turn-down text-cyan-400"></i> Baris</button>
+              </div>
+
+              <div class="h-4 w-px bg-slate-800 mx-1 hidden sm:block"></div>
+
+              <!-- Lists & Elements -->
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="insertSnippet('\n<ol class=\'list-decimal pl-5 space-y-1 my-2\'>\n  <li>Poin pertama</li>\n  <li>Poin kedua</li>\n  <li>Poin ketiga</li>\n</ol>\n')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1 transition" title="Daftar Nomor (1, 2, 3)"><i class="fa-solid fa-list-ol text-emerald-400"></i> Nomor</button>
+                <button type="button" onclick="insertSnippet('\n<ul class=\'list-disc pl-5 space-y-1 my-2\'>\n  <li>Poin butir A</li>\n  <li>Poin butir B</li>\n</ul>\n')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1 transition" title="Daftar Bullet (•)"><i class="fa-solid fa-list-ul text-emerald-400"></i> Bullet</button>
+                <button type="button" onclick="wrapText('<blockquote>', '</blockquote>')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1 transition" title="Kutipan Kasus"><i class="fa-solid fa-quote-left text-purple-400"></i> Kutipan</button>
+                <button type="button" onclick="insertSnippet('\n<hr class=\'border-slate-700 my-3\'>\n')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1 transition" title="Garis Pemisah"><i class="fa-solid fa-minus text-slate-400"></i> Garis</button>
+              </div>
             </div>
           </div>
 
           <!-- TAB CONTENT 2: KODE & KONFIGURASI IT (SMK / TKJ / INFORMATIKA) -->
           <div id="tabContent_code" class="hidden space-y-2 pt-1 text-xs">
-            <div class="text-[11px] text-emerald-400 font-medium flex items-center justify-between">
-              <span>Khusus soal kejuruan Informatika, TKJ, RPL, Administrasi Server, Jaringan, dan Skrip:</span>
-              <span class="text-emerald-400 font-mono text-[10px]">SMK TI / TKJ / Server</span>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span class="text-emerald-400 font-medium flex items-center gap-1.5">
+                <i class="fa-solid fa-code-branch text-xs"></i> Format Soal Kejuruan Informatika / TKJ / Jaringan / Server
+              </span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Clean Code Mode</span>
             </div>
-            <div class="flex flex-wrap items-center gap-1.5">
-              <button type="button" onclick="wrapText('`', '`')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-800 font-mono flex items-center gap-1" title="Format Perintah / Kode Singkat (`perintah`)"><i class="fa-solid fa-code text-amber-400"></i> Format `Kode`</button>
-              <button type="button" onclick="insertSnippet('`sudo tail -f /var/log/auth.log`')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-slate-800 font-mono flex items-center gap-1" title="Contoh Perintah CLI Linux"><i class="fa-brands fa-linux text-cyan-400"></i> Perintah CLI</button>
-              <button type="button" onclick="insertSnippet('`/etc/ssh/sshd_config`')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-slate-800 font-mono flex items-center gap-1" title="Contoh File Konfigurasi Server"><i class="fa-regular fa-file-code text-cyan-400"></i> File Konfigurasi</button>
-              <button type="button" onclick="insertLinuxTerminalSnippet()" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-emerald-950/60 text-emerald-300 border border-slate-800 hover:border-emerald-500/40 font-mono flex items-center gap-1" title="Kotak Terminal Linux Estetis dengan Window Header"><i class="fa-solid fa-terminal text-emerald-400"></i> Kotak Terminal Linux</button>
-              <button type="button" onclick="insertServerLogSnippet()" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-amber-950/60 text-amber-300 border border-slate-800 hover:border-amber-500/40 font-mono flex items-center gap-1" title="Cuplikan Blok Log Server"><i class="fa-solid fa-receipt text-amber-400"></i> Blok Log Server</button>
-              <button type="button" onclick="insertSnippet('\n```bash\n# Skrip Bash / Konfigurasi\nsudo systemctl restart sshd\n```\n')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 font-mono flex items-center gap-1" title="Blok Kode Skrip (```kode```)"><i class="fa-solid fa-file-code text-indigo-400"></i> Blok ```Kode```</button>
-              <button type="button" onclick="formatSelectionAsTerminalBox()" class="px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 font-bold flex items-center gap-1" title="Sorot teks di bawah lalu klik tombol ini untuk menjadikannya kotak terminal"><i class="fa-solid fa-wand-magic-sparkles text-emerald-400"></i> Jadikan Kotak Terminal</button>
+
+            <!-- Sleek Tool Groups -->
+            <div class="flex flex-wrap items-center gap-1.5 bg-slate-900/60 p-1.5 rounded-xl border border-slate-800/60">
+              <!-- Inline Code Group -->
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="wrapText('`', '`')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-300 hover:text-amber-200 border border-slate-800 hover:border-slate-700 font-mono text-xs flex items-center gap-1.5 transition shadow-xs" title="Format Perintah / Kode Singkat (`perintah`)">
+                  <i class="fa-solid fa-code text-amber-400"></i> Format `Kode`
+                </button>
+                <button type="button" onclick="insertSnippet('`sudo tail -f /var/log/auth.log`')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-cyan-300 hover:text-cyan-200 border border-slate-800 hover:border-slate-700 font-mono text-xs flex items-center gap-1.5 transition shadow-xs" title="Sisipkan contoh Perintah CLI Linux">
+                  <i class="fa-brands fa-linux text-cyan-400"></i> Perintah CLI
+                </button>
+                <button type="button" onclick="insertSnippet('`/etc/ssh/sshd_config`')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-cyan-300 hover:text-cyan-200 border border-slate-800 hover:border-slate-700 font-mono text-xs flex items-center gap-1.5 transition shadow-xs" title="Sisipkan contoh Path File Konfigurasi Server">
+                  <i class="fa-regular fa-file-code text-cyan-400"></i> File Konfigurasi
+                </button>
+              </div>
+
+              <div class="h-4 w-px bg-slate-800 mx-1 hidden sm:block"></div>
+
+              <!-- Block Code Group -->
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="insertSnippet('\n```bash\n# Skrip Bash / Konfigurasi\nsudo systemctl restart sshd\n```\n')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 font-mono text-xs flex items-center gap-1.5 transition shadow-xs" title="Sisipkan Blok Kode Skrip (```kode```)">
+                  <i class="fa-solid fa-file-code text-indigo-400"></i> Blok ```Kode```
+                </button>
+                <button type="button" onclick="insertServerLogSnippet()" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-300 hover:text-amber-200 border border-slate-800 hover:border-slate-700 font-mono text-xs flex items-center gap-1.5 transition shadow-xs" title="Sisipkan Cuplikan Blok Log Server">
+                  <i class="fa-solid fa-receipt text-amber-400"></i> Log Server
+                </button>
+                <button type="button" onclick="insertLinuxTerminalSnippet()" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-emerald-300 hover:text-emerald-200 border border-slate-800 hover:border-slate-700 font-mono text-xs flex items-center gap-1.5 transition shadow-xs" title="Kotak Terminal Linux Estetis dengan Window Header">
+                  <i class="fa-solid fa-terminal text-emerald-400"></i> Terminal Linux
+                </button>
+              </div>
+
+              <div class="h-4 w-px bg-slate-800 mx-1 hidden sm:block"></div>
+
+              <!-- Action Preset -->
+              <button type="button" onclick="formatSelectionAsTerminalBox()" class="h-8 px-3 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold flex items-center gap-1.5 transition shadow-xs" title="Sorot teks di textarea lalu klik untuk menjadikannya kotak terminal estetis">
+                <i class="fa-solid fa-wand-magic-sparkles text-emerald-400"></i> Jadikan Kotak Terminal
+              </button>
             </div>
           </div>
 
           <!-- TAB CONTENT 3: MATEMATIKA & RUMUS -->
           <div id="tabContent_math" class="hidden space-y-2 pt-1 text-xs">
-            <div class="text-[11px] text-slate-400 flex items-center justify-between">
-              <span>Klik simbol matematika di bawah untuk menyisipkan formula LaTeX otomatis ke dalam soal:</span>
-              <span class="text-purple-400 font-mono text-[10px]">KaTeX: $inline$ | $$display$$</span>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span class="text-purple-400 font-medium flex items-center gap-1.5">
+                <i class="fa-solid fa-square-root-variable text-xs"></i> Simbol & Rumus Matematika (KaTeX)
+              </span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">$inline$ &bull; $$display$$</span>
             </div>
-            <div class="flex flex-wrap gap-1.5 font-mono text-xs">
-              <button type="button" onclick="insertSnippet('$\\frac{a}{b}$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800 hover:border-indigo-500/40" title="Pecahan a/b">Pecahan $\frac{a}{b}$</button>
-              <button type="button" onclick="insertSnippet('$\\sqrt{x}$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800 hover:border-indigo-500/40" title="Akar Kuadrat">$\sqrt{x}$</button>
-              <button type="button" onclick="insertSnippet('$\\sqrt[n]{x}$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800 hover:border-indigo-500/40" title="Akar Pangkat n">$\sqrt[n]{x}$</button>
-              <button type="button" onclick="insertSnippet('$x^{2}$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800 hover:border-indigo-500/40" title="Pangkat / Kuadrat">Pangkat $x^2$</button>
-              <button type="button" onclick="insertSnippet('$x_{1}$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800 hover:border-indigo-500/40" title="Indeks / Subskrip">Indeks $x_1$</button>
-              <button type="button" onclick="insertSnippet('$\\pm$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Plus Minus">&plusmn;</button>
-              <button type="button" onclick="insertSnippet('$\\times$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Perkalian">&times;</button>
-              <button type="button" onclick="insertSnippet('$\\div$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Pembagian">&divide;</button>
-              <button type="button" onclick="insertSnippet('$\\neq$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Tidak Sama Dengan">&ne;</button>
-              <button type="button" onclick="insertSnippet('$\\le$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Kurang dari sama dengan">&le;</button>
-              <button type="button" onclick="insertSnippet('$\\ge$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Lebih dari sama dengan">&ge;</button>
-              <button type="button" onclick="insertSnippet('$\\approx$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Mendekati / Kira-kira">&asymp;</button>
-              <button type="button" onclick="insertSnippet('$\\pi$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Pi">&pi;</button>
-              <button type="button" onclick="insertSnippet('$\\alpha$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Alpha">&alpha;</button>
-              <button type="button" onclick="insertSnippet('$\\beta$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Beta">&beta;</button>
-              <button type="button" onclick="insertSnippet('$\\theta$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Theta">&theta;</button>
-              <button type="button" onclick="insertSnippet('$\\Delta$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Delta">&Delta;</button>
-              <button type="button" onclick="insertSnippet('$\\infty$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Tak Hingga">&infin;</button>
-              <button type="button" onclick="insertSnippet('$30^{\\circ}$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Derajat Sudut">Derajat &deg;</button>
-              <button type="button" onclick="insertSnippet('$\\sum_{i=1}^{n}$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Sigma / Penjumlahan">&sum;</button>
-              <button type="button" onclick="insertSnippet('$\\int_{a}^{b} f(x) dx$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Integral Tentu">&int;</button>
-              <button type="button" onclick="insertSnippet('$$\\begin{matrix} a & b \\\\ c & d \\end{matrix}$$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Matriks 2x2">Matriks 2x2</button>
-              <button type="button" onclick="insertSnippet('$$\\begin{pmatrix} a & b & c \\\\ d & e & f \\\\ g & h & i \\end{pmatrix}$$')" class="px-2 py-1 rounded bg-slate-900 hover:bg-indigo-900/40 text-slate-200 border border-slate-800" title="Matriks 3x3">Matriks 3x3</button>
+
+            <div class="flex flex-wrap items-center gap-1.5 bg-slate-900/60 p-1.5 rounded-xl border border-slate-800/60">
+              <!-- Pecahan & Akar -->
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="insertSnippet('$\\frac{a}{b}$')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 font-mono text-xs flex items-center gap-1 transition shadow-xs" title="Pecahan a/b">Pecahan $\frac{a}{b}$</button>
+                <button type="button" onclick="insertSnippet('$\\sqrt{x}$')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 font-mono text-xs flex items-center gap-1 transition shadow-xs" title="Akar Kuadrat">$\sqrt{x}$</button>
+                <button type="button" onclick="insertSnippet('$\\sqrt[n]{x}$')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 font-mono text-xs flex items-center gap-1 transition shadow-xs" title="Akar Pangkat n">$\sqrt[n]{x}$</button>
+              </div>
+
+              <div class="h-4 w-px bg-slate-800 mx-1 hidden sm:block"></div>
+
+              <!-- Pangkat & Subskrip -->
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="insertSnippet('$x^{2}$')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 font-mono text-xs flex items-center gap-1 transition shadow-xs" title="Pangkat / Kuadrat">$x^2$</button>
+                <button type="button" onclick="insertSnippet('$x_{1}$')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 font-mono text-xs flex items-center gap-1 transition shadow-xs" title="Indeks / Subskrip">$x_1$</button>
+              </div>
+
+              <div class="h-4 w-px bg-slate-800 mx-1 hidden sm:block"></div>
+
+              <!-- Operator & Relasi -->
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="insertSnippet('$\\pm$')" class="h-8 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs transition" title="Plus Minus">&plusmn;</button>
+                <button type="button" onclick="insertSnippet('$\\times$')" class="h-8 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs transition" title="Perkalian">&times;</button>
+                <button type="button" onclick="insertSnippet('$\\div$')" class="h-8 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs transition" title="Pembagian">&divide;</button>
+                <button type="button" onclick="insertSnippet('$\\neq$')" class="h-8 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs transition" title="Tidak Sama Dengan">&ne;</button>
+                <button type="button" onclick="insertSnippet('$\\le$')" class="h-8 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs transition" title="Kurang Dari Sama Dengan">&le;</button>
+                <button type="button" onclick="insertSnippet('$\\ge$')" class="h-8 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs transition" title="Lebih Dari Sama Dengan">&ge;</button>
+                <button type="button" onclick="insertSnippet('$\\approx$')" class="h-8 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs transition" title="Mendekati / Kira-kira">&asymp;</button>
+              </div>
+
+              <div class="h-4 w-px bg-slate-800 mx-1 hidden sm:block"></div>
+
+              <!-- Simbol & Derajat -->
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="insertSnippet('$\\pi$')" class="h-8 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs transition" title="Pi">&pi;</button>
+                <button type="button" onclick="insertSnippet('$\\alpha$')" class="h-8 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs transition" title="Alpha">&alpha;</button>
+                <button type="button" onclick="insertSnippet('$\\beta$')" class="h-8 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs transition" title="Beta">&beta;</button>
+                <button type="button" onclick="insertSnippet('$\\theta$')" class="h-8 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs transition" title="Theta">&theta;</button>
+                <button type="button" onclick="insertSnippet('$\\Delta$')" class="h-8 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs transition" title="Delta">&Delta;</button>
+                <button type="button" onclick="insertSnippet('$\\infty$')" class="h-8 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs transition" title="Tak Hingga">&infin;</button>
+                <button type="button" onclick="insertSnippet('$30^{\\circ}$')" class="h-8 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs transition" title="Derajat Sudut">&deg;</button>
+              </div>
+
+              <div class="h-4 w-px bg-slate-800 mx-1 hidden sm:block"></div>
+
+              <!-- Kalkulus & Matriks -->
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="insertSnippet('$\\sum_{i=1}^{n}$')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs transition" title="Sigma / Penjumlahan">&sum; Sigma</button>
+                <button type="button" onclick="insertSnippet('$\\int_{a}^{b} f(x) dx$')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs transition" title="Integral Tentu">&int; Integral</button>
+                <button type="button" onclick="insertSnippet('$$\\begin{matrix} a & b \\\\ c & d \\end{matrix}$$')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-purple-300 hover:text-purple-200 border border-slate-800 hover:border-slate-700 text-xs transition" title="Matriks 2x2">Matriks 2x2</button>
+                <button type="button" onclick="insertSnippet('$$\\begin{pmatrix} a & b & c \\\\ d & e & f \\\\ g & h & i \\end{pmatrix}$$')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-purple-300 hover:text-purple-200 border border-slate-800 hover:border-slate-700 text-xs transition" title="Matriks 3x3">Matriks 3x3</button>
+              </div>
             </div>
           </div>
 
           <!-- TAB CONTENT 4: BAHASA ARAB & HARAKAT -->
           <div id="tabContent_arabic" class="hidden space-y-2 pt-1 text-xs">
-            <div class="text-[11px] text-amber-400 font-medium flex items-center justify-between">
-              <span>Klik karakter harakat, tanda baca, atau lafadz untuk menyisipkan langsung:</span>
-              <button type="button" onclick="setTextDirection('rtl')" class="text-xs text-amber-300 underline font-bold">Set Arah Teks ke Kanan (RTL)</button>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span class="text-amber-400 font-medium flex items-center gap-1.5">
+                <i class="fa-solid fa-moon text-xs"></i> Karakter, Harakat & Pungtuasi Arab
+              </span>
+              <button type="button" onclick="setTextDirection('rtl')" class="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 hover:bg-amber-500/20 transition flex items-center gap-1" title="Ubah arah penulisan teks menjadi Kanan ke Kiri (RTL)">
+                <i class="fa-solid fa-align-right text-xs"></i> Terapkan Mode RTL
+              </button>
             </div>
 
-            <!-- Baris 1: Harakat / Tasykil -->
-            <div class="flex flex-wrap items-center gap-1 text-sm font-arabic">
-              <span class="text-[11px] font-sans text-slate-400 mr-1 self-center">Harakat:</span>
-              <button type="button" onclick="insertChar('\u064E')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Fathah">ـَ</button>
-              <button type="button" onclick="insertChar('\u0650')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Kasrah">ـِ</button>
-              <button type="button" onclick="insertChar('\u064F')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Dammah">ـُ</button>
-              <button type="button" onclick="insertChar('\u0652')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Sukun">ـْ</button>
-              <button type="button" onclick="insertChar('\u0651')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Tasydid / Shaddah">ـّ</button>
-              <button type="button" onclick="insertChar('\u064B')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Fathatain / Tanwin Fathah">ـً</button>
-              <button type="button" onclick="insertChar('\u064D')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Kasratain / Tanwin Kasrah">ـٍ</button>
-              <button type="button" onclick="insertChar('\u064C')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Dammatain / Tanwin Dammah">ـٌ</button>
-              <button type="button" onclick="insertChar('\u0653')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Maddah">ـٓ</button>
-            </div>
+            <div class="bg-slate-900/60 p-2 rounded-xl border border-slate-800/60 space-y-2.5">
+              <!-- Baris 1: Harakat / Tasykil -->
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700/60 min-w-[65px] text-center">Harakat</span>
+                <div class="flex flex-wrap items-center gap-1 text-sm font-arabic">
+                  <button type="button" onclick="insertChar('\u064E')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Fathah">ـَ</button>
+                  <button type="button" onclick="insertChar('\u0650')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Kasrah">ـِ</button>
+                  <button type="button" onclick="insertChar('\u064F')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Dammah">ـُ</button>
+                  <button type="button" onclick="insertChar('\u0652')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Sukun">ـْ</button>
+                  <button type="button" onclick="insertChar('\u0651')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Tasydid / Shaddah">ـّ</button>
+                  <button type="button" onclick="insertChar('\u064B')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Tanwin Fathah">ـً</button>
+                  <button type="button" onclick="insertChar('\u064D')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Tanwin Kasrah">ـٍ</button>
+                  <button type="button" onclick="insertChar('\u064C')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Tanwin Dammah">ـٌ</button>
+                  <button type="button" onclick="insertChar('\u0653')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Maddah">ـٓ</button>
+                </div>
+              </div>
 
-            <!-- Baris 2: Huruf Khusus & Hamzah -->
-            <div class="flex flex-wrap items-center gap-1 text-sm font-arabic">
-              <span class="text-[11px] font-sans text-slate-400 mr-1 self-center">Huruf:</span>
-              <button type="button" onclick="insertChar('ء')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Hamzah">ء</button>
-              <button type="button" onclick="insertChar('أ')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Alif Hamzah Atas">أ</button>
-              <button type="button" onclick="insertChar('إ')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Alif Hamzah Bawah">إ</button>
-              <button type="button" onclick="insertChar('ؤ')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Waw Hamzah">ؤ</button>
-              <button type="button" onclick="insertChar('ئ')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Ya Hamzah">ئ</button>
-              <button type="button" onclick="insertChar('ى')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Alif Maqsurah">ى</button>
-              <button type="button" onclick="insertChar('ة')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Ta Marbutah">ة</button>
-              <button type="button" onclick="insertChar('ٱ')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Alif Waslah">ٱ</button>
-              <button type="button" onclick="insertChar('\u0670')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Alif Khanjariyah">ـٰ</button>
-            </div>
+              <!-- Baris 2: Huruf Khusus & Hamzah -->
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700/60 min-w-[65px] text-center">Huruf</span>
+                <div class="flex flex-wrap items-center gap-1 text-sm font-arabic">
+                  <button type="button" onclick="insertChar('ء')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Hamzah">ء</button>
+                  <button type="button" onclick="insertChar('أ')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Alif Hamzah Atas">أ</button>
+                  <button type="button" onclick="insertChar('إ')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Alif Hamzah Bawah">إ</button>
+                  <button type="button" onclick="insertChar('ؤ')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Waw Hamzah">ؤ</button>
+                  <button type="button" onclick="insertChar('ئ')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Ya Hamzah">ئ</button>
+                  <button type="button" onclick="insertChar('ى')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Alif Maqsurah">ى</button>
+                  <button type="button" onclick="insertChar('ة')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Ta Marbutah">ة</button>
+                  <button type="button" onclick="insertChar('ٱ')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Alif Waslah">ٱ</button>
+                  <button type="button" onclick="insertChar('\u0670')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Alif Khanjariyah">ـٰ</button>
+                </div>
+              </div>
 
-            <!-- Baris 3: Tanda Baca & Pungtuasi Arab -->
-            <div class="flex flex-wrap items-center gap-1 text-sm font-arabic">
-              <span class="text-[11px] font-sans text-slate-400 mr-1 self-center">Pungtuasi:</span>
-              <button type="button" onclick="insertChar('؟')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Tanda Tanya Arab">؟</button>
-              <button type="button" onclick="insertChar('،')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Koma Arab">،</button>
-              <button type="button" onclick="insertChar('؛')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-white border border-slate-800 flex items-center justify-center" title="Titik Koma Arab">؛</button>
-              <button type="button" onclick="insertChar('﴿ ')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-amber-300 border border-slate-800 flex items-center justify-center" title="Kurung Buka Ayat">﴿</button>
-              <button type="button" onclick="insertChar(' ﴾')" class="w-8 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-amber-300 border border-slate-800 flex items-center justify-center" title="Kurung Tutup Ayat">﴾</button>
-              <button type="button" onclick="insertChar(' ﷽ ')" class="px-2.5 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-amber-300 border border-slate-800 flex items-center justify-center text-xs" title="Bismillah">﷽</button>
-              <button type="button" onclick="insertChar(' ﷺ ')" class="px-2 h-8 rounded bg-slate-900 hover:bg-emerald-950 text-amber-300 border border-slate-800 flex items-center justify-center text-xs" title="Sallallahu Alaihi Wasallam">ﷺ</button>
-            </div>
+              <!-- Baris 3: Tanda Baca & Lafadz -->
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700/60 min-w-[65px] text-center">Pungtuasi</span>
+                <div class="flex flex-wrap items-center gap-1 text-sm font-arabic">
+                  <button type="button" onclick="insertChar('؟')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Tanda Tanya Arab">؟</button>
+                  <button type="button" onclick="insertChar('،')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Koma Arab">،</button>
+                  <button type="button" onclick="insertChar('؛')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Titik Koma Arab">؛</button>
+                  <button type="button" onclick="insertChar('﴿ ')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-amber-300 border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Kurung Buka Ayat">﴿</button>
+                  <button type="button" onclick="insertChar(' ﴾')" class="w-8 h-8 rounded-lg bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-amber-300 border border-slate-800 hover:border-amber-500/40 flex items-center justify-center transition shadow-xs" title="Kurung Tutup Ayat">﴾</button>
+                  <button type="button" onclick="insertChar(' ﷽ ')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-amber-950/60 text-amber-300 border border-slate-800 hover:border-amber-500/40 flex items-center justify-center text-xs font-semibold transition shadow-xs" title="Lafadz Bismillah">﷽ Bismillah</button>
+                  <button type="button" onclick="insertChar(' ﷺ ')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-amber-950/60 text-amber-300 border border-slate-800 hover:border-amber-500/40 flex items-center justify-center text-xs font-semibold transition shadow-xs" title="Lafadz Shalawat">ﷺ Nabi</button>
+                </div>
+              </div>
 
-            <!-- Baris 4: Angka Arab Timur -->
-            <div class="flex flex-wrap items-center gap-1 text-sm font-arabic">
-              <span class="text-[11px] font-sans text-slate-400 mr-1 self-center">Angka:</span>
-              <button type="button" onclick="insertChar('٠')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٠</button>
-              <button type="button" onclick="insertChar('١')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">١</button>
-              <button type="button" onclick="insertChar('٢')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٢</button>
-              <button type="button" onclick="insertChar('٣')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٣</button>
-              <button type="button" onclick="insertChar('٤')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٤</button>
-              <button type="button" onclick="insertChar('٥')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٥</button>
-              <button type="button" onclick="insertChar('٦')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٦</button>
-              <button type="button" onclick="insertChar('٧')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٧</button>
-              <button type="button" onclick="insertChar('٨')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٨</button>
-              <button type="button" onclick="insertChar('٩')" class="w-7 h-7 rounded bg-slate-900 text-white border border-slate-800 flex items-center justify-center text-xs">٩</button>
+              <!-- Baris 4: Angka Arab Timur -->
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700/60 min-w-[65px] text-center">Angka</span>
+                <div class="flex flex-wrap items-center gap-1 text-sm font-arabic">
+                  <button type="button" onclick="insertChar('٠')" class="w-7 h-7 rounded-md bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center text-xs transition">٠</button>
+                  <button type="button" onclick="insertChar('١')" class="w-7 h-7 rounded-md bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center text-xs transition">١</button>
+                  <button type="button" onclick="insertChar('٢')" class="w-7 h-7 rounded-md bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center text-xs transition">٢</button>
+                  <button type="button" onclick="insertChar('٣')" class="w-7 h-7 rounded-md bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center text-xs transition">٣</button>
+                  <button type="button" onclick="insertChar('٤')" class="w-7 h-7 rounded-md bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center text-xs transition">٤</button>
+                  <button type="button" onclick="insertChar('٥')" class="w-7 h-7 rounded-md bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center text-xs transition">٥</button>
+                  <button type="button" onclick="insertChar('٦')" class="w-7 h-7 rounded-md bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center text-xs transition">٦</button>
+                  <button type="button" onclick="insertChar('٧')" class="w-7 h-7 rounded-md bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center text-xs transition">٧</button>
+                  <button type="button" onclick="insertChar('٨')" class="w-7 h-7 rounded-md bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center text-xs transition">٨</button>
+                  <button type="button" onclick="insertChar('٩')" class="w-7 h-7 rounded-md bg-slate-900 hover:bg-amber-950/60 hover:text-amber-200 text-white border border-slate-800 hover:border-amber-500/40 flex items-center justify-center text-xs transition">٩</button>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- TAB CONTENT 5: TABEL DATA & STIMULUS -->
           <div id="tabContent_table" class="hidden space-y-2 pt-1 text-xs">
-            <div class="text-[11px] text-blue-400 font-medium flex items-center justify-between">
-              <span>Sisipkan tabel stimulus narasi atau perbandingan data:</span>
-              <span class="text-blue-400 font-mono text-[10px]">Tabel Stimulus AKM / Sains</span>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span class="text-blue-400 font-medium flex items-center gap-1.5">
+                <i class="fa-solid fa-table-cells text-xs"></i> Template Tabel Data Asesmen & AKM
+              </span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">Stimulus Tabel</span>
             </div>
-            <div class="flex flex-wrap items-center gap-1.5">
-              <button type="button" onclick="insertSnippet('\n<table class=\'w-full border border-slate-700 my-2 text-xs rounded-lg overflow-hidden\'>\n  <tr class=\'bg-slate-800 text-slate-200\'>\n    <th class=\'border border-slate-700 p-2 text-left\'>Kolom A</th>\n    <th class=\'border border-slate-700 p-2 text-left\'>Kolom B</th>\n  </tr>\n  <tr>\n    <td class=\'border border-slate-700 p-2\'>Data 1</td>\n    <td class=\'border border-slate-700 p-2\'>Keterangan 1</td>\n  </tr>\n  <tr>\n    <td class=\'border border-slate-700 p-2\'>Data 2</td>\n    <td class=\'border border-slate-700 p-2\'>Keterangan 2</td>\n  </tr>\n</table>\n')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1"><i class="fa-solid fa-table text-blue-400"></i> Tabel 2 Kolom</button>
-              <button type="button" onclick="insertSnippet('\n<table class=\'w-full border border-slate-700 my-2 text-xs rounded-lg overflow-hidden\'>\n  <tr class=\'bg-slate-800 text-slate-200\'>\n    <th class=\'border border-slate-700 p-2 text-center\'>No</th>\n    <th class=\'border border-slate-700 p-2 text-left\'>Kondisi / Parameter</th>\n    <th class=\'border border-slate-700 p-2 text-left\'>Hasil / Dampak</th>\n  </tr>\n  <tr>\n    <td class=\'border border-slate-700 p-2 text-center\'>1</td>\n    <td class=\'border border-slate-700 p-2\'>Kondisi A</td>\n    <td class=\'border border-slate-700 p-2\'>Dampak A</td>\n  </tr>\n  <tr>\n    <td class=\'border border-slate-700 p-2 text-center\'>2</td>\n    <td class=\'border border-slate-700 p-2\'>Kondisi B</td>\n    <td class=\'border border-slate-700 p-2\'>Dampak B</td>\n  </tr>\n</table>\n')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 flex items-center gap-1"><i class="fa-solid fa-table-cells text-blue-400"></i> Tabel 3 Kolom</button>
+
+            <div class="flex flex-wrap items-center gap-1.5 bg-slate-900/60 p-1.5 rounded-xl border border-slate-800/60">
+              <button type="button" onclick="insertSnippet('\n<table class=\'w-full border border-slate-700 my-2 text-xs rounded-lg overflow-hidden\'>\n  <tr class=\'bg-slate-800 text-slate-200\'>\n    <th class=\'border border-slate-700 p-2 text-left\'>Kolom A</th>\n    <th class=\'border border-slate-700 p-2 text-left\'>Kolom B</th>\n  </tr>\n  <tr>\n    <td class=\'border border-slate-700 p-2\'>Data 1</td>\n    <td class=\'border border-slate-700 p-2\'>Keterangan 1</td>\n  </tr>\n  <tr>\n    <td class=\'border border-slate-700 p-2\'>Data 2</td>\n    <td class=\'border border-slate-700 p-2\'>Keterangan 2</td>\n  </tr>\n</table>\n')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs flex items-center gap-1.5 transition shadow-xs" title="Tabel Standar 2 Kolom">
+                <i class="fa-solid fa-table text-blue-400"></i> Tabel 2 Kolom
+              </button>
+              <button type="button" onclick="insertSnippet('\n<table class=\'w-full border border-slate-700 my-2 text-xs rounded-lg overflow-hidden\'>\n  <tr class=\'bg-slate-800 text-slate-200\'>\n    <th class=\'border border-slate-700 p-2 text-center\'>No</th>\n    <th class=\'border border-slate-700 p-2 text-left\'>Kondisi / Parameter</th>\n    <th class=\'border border-slate-700 p-2 text-left\'>Hasil / Dampak</th>\n  </tr>\n  <tr>\n    <td class=\'border border-slate-700 p-2 text-center\'>1</td>\n    <td class=\'border border-slate-700 p-2\'>Kondisi A</td>\n    <td class=\'border border-slate-700 p-2\'>Dampak A</td>\n  </tr>\n  <tr>\n    <td class=\'border border-slate-700 p-2 text-center\'>2</td>\n    <td class=\'border border-slate-700 p-2\'>Kondisi B</td>\n    <td class=\'border border-slate-700 p-2\'>Dampak B</td>\n  </tr>\n</table>\n')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs flex items-center gap-1.5 transition shadow-xs" title="Tabel Kasus 3 Kolom">
+                <i class="fa-solid fa-table-cells text-blue-400"></i> Tabel 3 Kolom
+              </button>
+              <button type="button" onclick="insertSnippet('\n<table class=\'w-full border border-slate-700 my-2 text-xs rounded-lg overflow-hidden\'>\n  <tr class=\'bg-slate-800 text-slate-200\'>\n    <th class=\'border border-slate-700 p-2 text-left\'>Komponen / Fitur</th>\n    <th class=\'border border-slate-700 p-2 text-left\'>Skenario / Opsi A</th>\n    <th class=\'border border-slate-700 p-2 text-left\'>Skenario / Opsi B</th>\n  </tr>\n  <tr>\n    <td class=\'border border-slate-700 p-2\'>Protokol / Metode</td>\n    <td class=\'border border-slate-700 p-2\'>Nilai / Status A</td>\n    <td class=\'border border-slate-700 p-2\'>Nilai / Status B</td>\n  </tr>\n</table>\n')" class="h-8 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 text-xs flex items-center gap-1.5 transition shadow-xs" title="Tabel Perbandingan / Komparasi">
+                <i class="fa-solid fa-code-compare text-blue-400"></i> Tabel Perbandingan
+              </button>
             </div>
           </div>
 
           <!-- TAB CONTENT 6: UNGGAH GAMBAR -->
-          <div id="tabContent_image" class="hidden space-y-3 pt-1 text-xs">
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 p-3 bg-slate-900 rounded-xl border border-dashed border-slate-700 hover:border-cyan-500/50 transition">
+          <div id="tabContent_image" class="hidden space-y-2 pt-1 text-xs">
+            <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span class="text-cyan-400 font-medium flex items-center gap-1.5">
+                <i class="fa-solid fa-image text-xs"></i> Unggah Gambar Stimulus Soal
+              </span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">Ctrl+V / File</span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 bg-slate-900/60 rounded-xl border border-dashed border-slate-700 hover:border-cyan-500/50 transition">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center text-lg shrink-0">
                   <i class="fa-solid fa-cloud-arrow-up"></i>
                 </div>
                 <div>
-                  <h4 class="font-bold text-white">Unggah Gambar Stimulus / Ilustrasi Soal</h4>
+                  <h4 class="font-bold text-white text-xs">Unggah Gambar Stimulus / Ilustrasi Soal</h4>
                   <p class="text-[11px] text-slate-400">Pilih berkas dari komputer atau tekan <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-[10px]">Ctrl+V</kbd> untuk paste gambar langsung.</p>
                 </div>
               </div>
 
               <div class="flex items-center gap-2">
                 <input type="file" id="fileStemImage" accept="image/*" class="hidden" onchange="handleImageFileSelect(event, 'stem')">
-                <button type="button" onclick="document.getElementById('fileStemImage').click()" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold transition flex items-center gap-1.5 shadow-md shadow-cyan-600/20">
+                <button type="button" onclick="document.getElementById('fileStemImage').click()" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold transition flex items-center gap-1.5 shadow-md shadow-cyan-600/20 text-xs">
                   <i class="fa-solid fa-folder-open"></i> Pilih Berkas
                 </button>
               </div>
@@ -1129,9 +1249,9 @@
         const content = document.getElementById(`tabContent_${t}`);
         if (btn) {
           if (t === tab) {
-            btn.className = 'px-3 py-1.5 rounded-lg bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold transition flex items-center gap-1.5 shadow-sm';
+            btn.className = 'px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white font-semibold shadow-sm transition flex items-center gap-1.5 text-xs whitespace-nowrap';
           } else {
-            btn.className = 'px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white border border-slate-800 font-bold transition flex items-center gap-1.5';
+            btn.className = 'px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium transition flex items-center gap-1.5 text-xs whitespace-nowrap';
           }
         }
         if (content) content.classList.toggle('hidden', t !== tab);

@@ -2662,6 +2662,14 @@
         <button onclick="closeModal('modalExportWord')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
 
+      <!-- PILIH BANK SOAL -->
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1.5">Pilih Bank Soal Yang Akan Di-Export:</label>
+        <select id="exportWordBankSelect" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+          <!-- Populated dynamically via JS -->
+        </select>
+      </div>
+
       <!-- PILIHAN PROFIL NASKAH CEPAT -->
       <div class="space-y-2">
         <label class="block text-xs font-bold text-slate-300">Pilih Profil Dokumen:</label>
@@ -4647,13 +4655,22 @@
     };
 
     function populateBankSelectDropdown(banks) {
+      if (!banks || banks.length === 0) return;
       const select = document.getElementById('manualBankId');
-      if (select && banks && banks.length > 0) {
-        select.innerHTML = banks.map(b => `<option value="${b.id}" ${b.id === currentActiveBankId ? 'selected' : ''}>${b.id}. ${b.title} (${b.subject})</option>`).join('');
+      if (select) {
+        select.innerHTML = banks.map(b => `<option value="${b.id}" ${b.id === currentActiveBankId ? 'selected' : ''}>#${b.id} - ${b.title} (${b.subject})</option>`).join('');
       }
       const aiSelect = document.getElementById('aiTargetBank');
-      if (aiSelect && banks && banks.length > 0) {
-        aiSelect.innerHTML = banks.map(b => `<option value="${b.id}" ${b.id === currentActiveBankId ? 'selected' : ''}>${b.id}. ${b.title} (${b.subject})</option>`).join('');
+      if (aiSelect) {
+        aiSelect.innerHTML = banks.map(b => `<option value="${b.id}" ${b.id === currentActiveBankId ? 'selected' : ''}>#${b.id} - ${b.title} (${b.subject})</option>`).join('');
+      }
+      const importSelect = document.getElementById('importTargetBankSelect');
+      if (importSelect) {
+        importSelect.innerHTML = banks.map(b => `<option value="${b.id}" ${b.id === currentActiveBankId ? 'selected' : ''}>#${b.id} - ${b.title} (${b.subject || 'Umum'})</option>`).join('');
+      }
+      const exportSelect = document.getElementById('exportWordBankSelect');
+      if (exportSelect) {
+        exportSelect.innerHTML = banks.map(b => `<option value="${b.id}" ${b.id === currentActiveBankId ? 'selected' : ''}>#${b.id} - ${b.title} (${b.subject || 'Umum'})</option>`).join('');
       }
     }
 
@@ -4698,13 +4715,16 @@
             </div>
             <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
               <a href="/kelola-soal?bank_id=${b.id}" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold flex items-center gap-1.5 transition shadow-md shadow-indigo-600/30">
-                <i class="fa-solid fa-list-check text-xs"></i> Kelola Butir Soal (${b.question_count || 0}) &rarr;
+                <i class="fa-solid fa-list-check text-xs"></i> Kelola (${b.question_count || 0}) &rarr;
               </a>
-              <div class="flex items-center gap-2">
-                <a href="/kelola-soal?bank_id=${b.id}" class="text-slate-400 hover:text-white px-2.5 py-1.5 rounded-lg bg-slate-800 transition flex items-center gap-1">
-                  <i class="fa-solid fa-plus text-indigo-400"></i> Soal
-                </a>
-                <button onclick="handleDeleteCard(this, 'Bank Soal')" class="text-rose-400 hover:text-rose-300 px-2.5 py-1.5 rounded-lg bg-rose-600/10 border border-rose-500/20 transition flex items-center gap-1">
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="openUploadModalForBank(${b.id})" class="text-blue-300 hover:text-white px-2.5 py-1.5 rounded-lg bg-blue-600/20 border border-blue-500/30 transition flex items-center gap-1" title="Import Word ke Bank Soal ini">
+                  <i class="fa-solid fa-file-arrow-up text-blue-400"></i> Import
+                </button>
+                <button type="button" onclick="openExportWordModal(${b.id})" class="text-indigo-300 hover:text-white px-2.5 py-1.5 rounded-lg bg-indigo-600/20 border border-indigo-500/30 transition flex items-center gap-1" title="Export Word Bank Soal ini">
+                  <i class="fa-solid fa-file-word text-indigo-400"></i> Export
+                </button>
+                <button onclick="handleDeleteCard(this, 'Bank Soal')" class="text-rose-400 hover:text-rose-300 px-2 py-1.5 rounded-lg bg-rose-600/10 border border-rose-500/20 transition flex items-center gap-1" title="Hapus Bank Soal">
                   <i class="fa-regular fa-trash-can"></i>
                 </button>
               </div>
@@ -5372,10 +5392,22 @@
     let currentParsedQuestions = [];
     let currentImportBankId = 1;
 
-    window.openUploadModalForBank = function(targetBankId) {
+    window.openUploadModalForBank = async function(targetBankId) {
+      if (!cachedQuestionBanks || cachedQuestionBanks.length === 0) {
+        if (typeof fetchQuestionBanks === "function") {
+          await fetchQuestionBanks();
+        }
+      }
+
       const bankSel = document.getElementById("importTargetBankSelect");
-      if (bankSel && typeof currentQuestionBanks !== "undefined" && currentQuestionBanks.length > 0) {
-        bankSel.innerHTML = currentQuestionBanks.map(b => `<option value="${b.id}" ${(targetBankId && b.id === targetBankId) || b.id === currentActiveBankId ? "selected" : ""}>${b.title} (${b.subject || "Umum"})</option>`).join("");
+      if (bankSel) {
+        const banks = (cachedQuestionBanks && cachedQuestionBanks.length > 0) ? cachedQuestionBanks : [];
+        if (banks.length > 0) {
+          const selectedId = targetBankId || currentActiveBankId || banks[0].id;
+          bankSel.innerHTML = banks.map(b => `<option value="${b.id}" ${Number(b.id) === Number(selectedId) ? "selected" : ""}>#${b.id} - ${b.title} (${b.subject || "Umum"})</option>`).join("");
+        } else {
+          bankSel.innerHTML = '<option value="">-- Belum ada bank soal tersedia --</option>';
+        }
       }
       currentWordBase64 = "";
       currentWordFileName = "";
@@ -5390,7 +5422,24 @@
       openModal("modalUploadSoal");
     };
 
-    window.openExportWordModal = function() {
+    window.openExportWordModal = async function(targetBankId) {
+      if (!cachedQuestionBanks || cachedQuestionBanks.length === 0) {
+        if (typeof fetchQuestionBanks === "function") {
+          await fetchQuestionBanks();
+        }
+      }
+
+      const expSel = document.getElementById("exportWordBankSelect");
+      if (expSel) {
+        const banks = (cachedQuestionBanks && cachedQuestionBanks.length > 0) ? cachedQuestionBanks : [];
+        if (banks.length > 0) {
+          const selectedId = targetBankId || currentActiveBankId || banks[0].id;
+          expSel.innerHTML = banks.map(b => `<option value="${b.id}" ${Number(b.id) === Number(selectedId) ? "selected" : ""}>#${b.id} - ${b.title} (${b.subject || "Umum"})</option>`).join("");
+        } else {
+          expSel.innerHTML = '<option value="">-- Belum ada bank soal tersedia --</option>';
+        }
+      }
+
       setExportWordPreset('teacher');
       openModal('modalExportWord');
     };
@@ -5438,7 +5487,8 @@
     };
 
     window.submitExportWord = function() {
-      const bankId = currentActiveBankId || 1;
+      const expSel = document.getElementById("exportWordBankSelect");
+      const bankId = (expSel && expSel.value) ? parseInt(expSel.value, 10) : (currentActiveBankId || 1);
       const chkKeys = document.getElementById("exportWordIncludeKeys")?.checked ?? true;
       const chkExpl = document.getElementById("exportWordIncludeExpl")?.checked ?? true;
       const chkHeader = document.getElementById("exportWordIncludeHeader")?.checked ?? true;

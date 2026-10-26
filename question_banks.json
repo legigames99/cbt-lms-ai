@@ -2058,151 +2058,19 @@
         "id": 1,
         "type": "mcq",
         "cog": "C2",
-        "stem": "Dalam praktikum administrasi infrastruktur jaringan di kelas XI TKJ, siswa diminta untuk menginstal paket layanan DHCP Server pada sistem operasi Ubuntu Server 24.04. Perintah dasar manakah yang paling tepat digunakan untuk menginstal paket aplikasi DHCP server tersebut melalui terminal?",
+        "stem": "Sebelum melakukan instalasi paket perangkat lunak web server Apache, PHP, dan MariaDB pada sistem operasi Ubuntu 24.04, langkah awal yang paling tepat dilakukan melalui terminal adalah memperbarui daftar paket (package list) sistem. Perintah apa yang digunakan untuk melakukan pembaruan tersebut?",
         "weight": 1,
-        "explanation": "Paket standar yang umum digunakan untuk menyediakan layanan DHCP (Dynamic Host Configuration Protocol) pada sistem operasi berbasis Debian/Ubuntu adalah isc-dhcp-server. Pilihan A adalah web server Apache, C adalah DNS server BIND9, D adalah FTP server, dan E adalah proxy server Squid.",
-        "generated_by": "gemini-3.5-flash",
+        "explanation": "Perintah 'sudo apt update' digunakan untuk menyinkronkan ulang indeks paket dari repositori agar sistem Ubuntu mendapatkan daftar versi perangkat lunak terbaru sebelum proses instalasi dilakukan.",
+        "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "sudo apt install apache2"
+            "text": "sudo apt install apache2 php mariadb-server"
           },
           {
             "id": "B",
-            "text": "sudo apt install isc-dhcp-server"
-          },
-          {
-            "id": "C",
-            "text": "sudo apt install bind9"
-          },
-          {
-            "id": "D",
-            "text": "sudo apt install vsftpd"
-          },
-          {
-            "id": "E",
-            "text": "sudo apt install squid"
-          }
-        ],
-        "answer": "B"
-      },
-      {
-        "id": 2,
-        "type": "mcq",
-        "cog": "C3",
-        "stem": "Setelah paket layanan DHCP berhasil terpasang di Ubuntu Server 24.04, administrator jaringan harus menentukan antarmuka jaringan (network interface) fisik mana yang akan melayani permintaan IP dari klien. Berkas konfigurasi manakah yang harus disunting untuk mendefinisikan antarmuka tersebut?",
-        "weight": 1,
-        "explanation": "Pada paket isc-dhcp-server di Ubuntu, antarmuka jaringan yang digunakan untuk mendengarkan (listen) permintaan DHCP diatur di dalam berkas /etc/default/isc-dhcp-server pada parameter INTERFACESv4 atau INTERFACESv6. Berkas /etc/dhcp/dhcpd.conf digunakan untuk mengatur range IP dan subnet, sedangkan netplan mengatur alamat IP statis pada server.",
-        "generated_by": "gemini-3.5-flash",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "options": [
-          {
-            "id": "A",
-            "text": "/etc/network/interfaces"
-          },
-          {
-            "id": "B",
-            "text": "/etc/dhcp/dhcpd.conf"
-          },
-          {
-            "id": "C",
-            "text": "/etc/default/isc-dhcp-server"
-          },
-          {
-            "id": "D",
-            "text": "/etc/netplan/01-netcfg.yaml"
-          },
-          {
-            "id": "E",
-            "text": "/etc/resolv.conf"
-          }
-        ],
-        "answer": "C"
-      },
-      {
-        "id": 3,
-        "type": "mcq",
-        "cog": "C3",
-        "stem": "Seorang siswa kelas XI TKJ sedang menyunting berkas konfigurasi utama DHCP di <code>/etc/dhcp/dhcpd.conf</code> pada Ubuntu 24.04. Ia ingin membagikan segmen jaringan dengan alamat network 192.168.10.0 dan subnet mask 255.255.255.0. Penulisan blok deklarasi subnet yang paling tepat adalah...",
-        "weight": 1,
-        "explanation": "Dalam sintaks berkas konfigurasi ISC DHCP server (dhcpd.conf), pendefinisian suatu segmen jaringan wajib menggunakan keyword 'subnet' diikuti alamat jaringan dan 'netmask' beserta nilai subnet mask-nya, dilanjutkan dengan kurung kurawal pembuka.",
-        "generated_by": "gemini-3.5-flash",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "options": [
-          {
-            "id": "A",
-            "text": "network 192.168.10.0 netmask 255.255.255.0 { ... }"
-          },
-          {
-            "id": "B",
-            "text": "subnet 192.168.10.0 netmask 255.255.255.0 { ... }"
-          },
-          {
-            "id": "C",
-            "text": "ip dhcp pool 192.168.10.0 { ... }"
-          },
-          {
-            "id": "D",
-            "text": "range 192.168.10.0 192.168.10.255; { ... }"
-          },
-          {
-            "id": "E",
-            "text": "dhcp-range=192.168.10.0,255.255.255.0 { ... }"
-          }
-        ],
-        "answer": "B"
-      },
-      {
-        "id": 4,
-        "type": "mcq",
-        "cog": "C4",
-        "stem": "Perhatikan cuplikan konfigurasi dalam berkas <code>/etc/dhcp/dhcpd.conf</code> berikut:<br><pre>subnet 192.168.20.0 netmask 255.255.255.0 {\nrange 192.168.20.50 192.168.20.100;\noption routers 192.168.20.1;\noption domain-name-servers 8.8.8.8;\n}</pre><br>Berdasarkan konfigurasi di atas, tindakan apa yang akan dialami oleh komputer klien yang terhubung ke jaringan tersebut?",
-        "weight": 1.5,
-        "explanation": "Parameter 'range 192.168.20.50 192.168.20.100;' berfungsi untuk menentukan rentang (pool) alamat IP yang dapat dipinjamkan secara dinamis kepada komputer klien yang meminta alokasi IP DHCP pada subnet tersebut.",
-        "generated_by": "gemini-3.5-flash",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "options": [
-          {
-            "id": "A",
-            "text": "Klien akan mendapatkan alamat IP statis di luar rentang 192.168.20.50."
-          },
-          {
-            "id": "B",
-            "text": "Klien akan mendapatkan alamat IP secara dinamis berkisar antara 192.168.20.50 hingga 192.168.20.100."
-          },
-          {
-            "id": "C",
-            "text": "Klien tidak akan mendapatkan IP karena tidak ada parameter default-lease-time."
-          },
-          {
-            "id": "D",
-            "text": "Klien akan bertindak sebagai router sekunder pada jaringan 192.168.20.1."
-          },
-          {
-            "id": "E",
-            "text": "Klien hanya dapat mengakses internet menggunakan DNS lokal server."
-          }
-        ],
-        "answer": "B"
-      },
-      {
-        "id": 5,
-        "type": "mcq",
-        "cog": "C3",
-        "stem": "Setelah melakukan perubahan konfigurasi pada layanan DHCP server di Ubuntu 24.04, seorang administrator jaringan harus menerapkan perubahan tersebut agar sistem membaca konfigurasi baru. Perintah manakah yang tepat untuk me-restart layanan DHCP?",
-        "weight": 1,
-        "explanation": "Untuk menerapkan perubahan konfigurasi pada layanan DHCP server, nama layanan systemd yang harus di-restart adalah isc-dhcp-server dengan perintah 'sudo systemctl restart isc-dhcp-server'.",
-        "generated_by": "gemini-3.5-flash",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "options": [
-          {
-            "id": "A",
-            "text": "sudo systemctl restart networking"
-          },
-          {
-            "id": "B",
-            "text": "sudo systemctl restart isc-dhcp-server"
+            "text": "sudo apt update"
           },
           {
             "id": "C",
@@ -2210,14 +2078,140 @@
           },
           {
             "id": "D",
-            "text": "sudo apt update && sudo apt upgrade"
+            "text": "sudo ufw allow 'Apache Full'"
           },
           {
             "id": "E",
-            "text": "sudo netplan apply"
+            "text": "sudo mysql_secure_installation"
           }
         ],
         "answer": "B"
+      },
+      {
+        "id": 2,
+        "type": "mcq_complex",
+        "cog": "C3",
+        "stem": "Setelah paket Apache, PHP, dan MariaDB berhasil terinstal di Ubuntu 24.04, siswa kelas XI SMK melakukan pengujian layanan server. Manakah dari pernyataan di bawah ini yang merupakan langkah-langkah konfigurasi dan pengujian yang benar? (Pilih dua jawaban yang benar)",
+        "weight": 1.5,
+        "explanation": "Pengujian standar web server lokal dilakukan dengan mengakses http://localhost pada browser untuk melihat halaman sambutan Apache, dan pembuatan file info.php di /var/www/html/ adalah cara lazim untuk memeriksa apakah modul PHP sudah terintegrasi dengan baik.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Membuat file info.php berisi kode phpinfo(); di direktori /var/www/html/ untuk menguji dukungan PHP pada Apache."
+          },
+          {
+            "id": "B",
+            "text": "Menjalankan perintah 'sudo apt-get remove ubuntu-desktop' untuk mengaktifkan web server."
+          },
+          {
+            "id": "C",
+            "text": "Mengakses alamat http://localhost atau alamat IP server melalui browser web untuk memastikan halaman default Apache tampil."
+          },
+          {
+            "id": "D",
+            "text": "Mengubah konfigurasi jaringan router fisik secara langsung tanpa melalui terminal Ubuntu."
+          },
+          {
+            "id": "E",
+            "text": "Menghapus seluruh direktori sistem operasi agar database MariaDB berjalan secara optimal."
+          }
+        ],
+        "answer": [
+          "A",
+          "C"
+        ]
+      },
+      {
+        "id": 3,
+        "type": "true_false",
+        "cog": "C3",
+        "stem": "Evaluasi pernyataan berikut terkait fungsi dan pengelolaan layanan (service) LAMP Stack (Linux, Apache, MariaDB, PHP) di Ubuntu 24.04:",
+        "weight": 1.5,
+        "explanation": "Pernyataan 0 benar karena systemctl status adalah utilitas standar systemd. Pernyataan 1 benar karena PHP membutuhkan ekstensi seperti php-mysql agar bisa berkomunikasi dengan MariaDB. Pernyataan 2 salah karena konfigurasi virtual host Apache berada di /etc/apache2/sites-available/, bukan di direktori mysql.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "statements": [
+          {
+            "id": 0,
+            "text": "Perintah 'sudo systemctl status apache2' digunakan untuk memeriksa apakah layanan web server Apache sedang berjalan atau tidak.",
+            "key": "B"
+          },
+          {
+            "id": 1,
+            "text": "MariaDB memerlukan ekstensi khusus tambahan pada PHP agar dapat menghubungkan aplikasi web berbasis PHP dengan database relasional.",
+            "key": "B"
+          },
+          {
+            "id": 2,
+            "text": "File konfigurasi utama untuk virtual host Apache di Ubuntu 24.04 secara default ditempatkan di dalam direktori /etc/mysql/.",
+            "key": "S"
+          }
+        ],
+        "answer": {
+          "0": "B",
+          "1": "B",
+          "2": "S"
+        }
+      },
+      {
+        "id": 4,
+        "type": "matching",
+        "cog": "C3",
+        "stem": "Pasangkan komponen atau perintah pengelolaan LAMP Stack di kolom kiri dengan fungsi atau lokasinya yang sesuai di kolom kanan:",
+        "weight": 2,
+        "explanation": "Apache2 berfungsi menyajikan halaman web (A), MariaDB adalah database server (B), dan direktori /var/www/html/ adalah tempat penyimpanan utama dokumen web (C).",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "premises": [
+          {
+            "id": 0,
+            "text": "Apache2 Web Server"
+          },
+          {
+            "id": 1,
+            "text": "MariaDB Server"
+          },
+          {
+            "id": 2,
+            "text": "Direktori root web default"
+          }
+        ],
+        "targets": [
+          {
+            "id": "A",
+            "text": "Melayani dan menampilkan halaman web HTML serta skrip PHP ke browser klien"
+          },
+          {
+            "id": "B",
+            "text": "Sistem manajemen database relasional untuk menyimpan data aplikasi"
+          },
+          {
+            "id": "C",
+            "text": "Tempat menyimpan berkas website utama seperti index.html (/var/www/html/)"
+          }
+        ],
+        "answer": {
+          "0": "A",
+          "1": "B",
+          "2": "C"
+        }
+      },
+      {
+        "id": 5,
+        "type": "short_essay",
+        "cog": "C2",
+        "stem": "Sebutkan perintah terminal lengkap di Ubuntu 24.04 untuk menginstal paket web server Apache menggunakan manajer paket apt!",
+        "weight": 1,
+        "explanation": "Perintah dasar untuk menginstal Apache di Ubuntu adalah 'sudo apt install apache2' (atau menggunakan apt-get dengan hak akses sudo).",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "answer_keys": [
+          "sudo apt install apache2",
+          "apt install apache2",
+          "sudo apt-get install apache2"
+        ]
       }
     ]
   }

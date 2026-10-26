@@ -1516,8 +1516,8 @@ function evaluateStudentAnswers(questions, userAnswers) {
           break;
         }
         case 'short_essay': {
-          const sText = String(studentVal).trim().toLowerCase();
-          const validKeys = (q.answer_keys || []).map(k => String(k).trim().toLowerCase());
+          const sText = String(studentVal || '').replace(/\s+/g, ' ').replace(/[.;,]+$/, '').trim().toLowerCase();
+          const validKeys = (q.answer_keys || []).map(k => String(k).replace(/\s+/g, ' ').replace(/[.;,]+$/, '').trim().toLowerCase());
           isCorrect = validKeys.includes(sText);
           ratio = isCorrect ? 1.0 : 0.0;
           break;

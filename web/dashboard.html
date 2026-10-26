@@ -4553,9 +4553,15 @@
         } else if (q.type === 'short_essay') {
           const keys = q.answer_keys || [];
           bodyHtml = `
-            <div class="text-[11px] pl-4 border-l-2 border-emerald-500/40 space-y-1">
-              <span class="text-slate-400">Kunci Jawaban Isian: </span>
-              <span class="px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold font-mono">${keys.join(' / ')}</span>
+            <div class="text-[11px] pl-4 border-l-2 border-emerald-500/40 space-y-1.5">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-slate-400 font-semibold">Kunci Jawaban Isian (Salah Satu = Penuh):</span>
+                <span class="text-[10px] text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-full font-medium">1 Poin Penuh</span>
+              </div>
+              <div class="flex flex-wrap gap-1 mt-1">
+                ${keys.map(k => `<span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono font-bold text-[10px]">${k}</span>`).join('')}
+              </div>
+              <p class="text-[10px] text-slate-400 italic">💡 Siswa cukup menjawab salah satu variasi di atas untuk mendapatkan nilai 100%.</p>
             </div>
           `;
         } else if (q.type === 'long_essay') {

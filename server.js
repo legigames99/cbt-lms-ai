@@ -3312,7 +3312,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // GET /api/v1/cbt/ai/config (Status API Server, Daftar Model Gemini Flash, dan Format Soal)
-  if (pathname === '/api/v1/cbt/ai/config' && req.method === 'GET') {
+  if ((pathname === '/api/v1/cbt/ai/config' || pathname === '/api/v1/ai/config') && req.method === 'GET') {
     const srvKey = SERVER_CONFIG.gemini_api_key || process.env.GEMINI_API_KEY || process.env.AI_API_KEY || '';
     const masked = srvKey ? `${srvKey.substring(0, 7)}...${srvKey.substring(srvKey.length - 4)}` : null;
 
@@ -3321,6 +3321,7 @@ const server = http.createServer(async (req, res) => {
       data: {
         has_server_key: Boolean(srvKey),
         server_key_masked: masked,
+        server_key_raw: srvKey,
         default_model: SERVER_CONFIG.default_model || 'gemini-3.5-flash',
         supported_models: [
           { id: 'gemini-3.5-flash-lite', name: 'Gemini 3.5 Flash Lite (Super Cepat & Efisien)' },

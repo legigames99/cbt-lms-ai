@@ -1761,81 +1761,117 @@
           </div>
         </div>
 
-        <!-- Grid 2 Kolom untuk Pengaturan Utama -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- KARTU UTAMA (FOKUS UTAMA): KUNCI API SERVER GOOGLE GEMINI -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-7 shadow-xl space-y-5">
+          <!-- Header Card 1 -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-800">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-xl font-bold shadow-inner shrink-0">
+                <i class="fa-solid fa-key"></i>
+              </div>
+              <div>
+                <h4 class="text-base font-bold text-white flex items-center gap-2">
+                  Kunci API Server Google Gemini
+                </h4>
+                <p class="text-xs text-slate-400 mt-0.5">Kunci utama server sekolah (<code class="text-indigo-300 font-mono">.env</code>) untuk akses terpusat generate butir soal & koreksi esai AI.</p>
+              </div>
+            </div>
+            <span id="serverKeyStatusBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700 self-start sm:self-auto shrink-0 flex items-center gap-1.5">
+              <i class="fa-solid fa-spinner fa-spin text-indigo-400"></i> Memeriksa...
+            </span>
+          </div>
 
-          <!-- KARTU 1: KREDENSIAL API SERVER -->
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+          <!-- Kunci API Server Input & Visibility Controls -->
+          <div class="space-y-4">
             <div>
-              <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-lg font-bold">
-                    <i class="fa-solid fa-key"></i>
-                  </div>
-                  <div>
-                    <h4 class="text-sm font-bold text-white">1. Kunci API Server (Admin Global Key)</h4>
-                    <p class="text-[11px] text-slate-400">Tersimpan di file server (<code class="text-indigo-300">.env</code>) untuk akses terpusat seluruh sekolah</p>
-                  </div>
-                </div>
-                <span id="serverKeyStatusBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
-                  Memuat...
-                </span>
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <label for="serverApiKeyInput" class="text-xs font-bold text-slate-200 flex items-center gap-2">
+                  <i class="fa-solid fa-lock text-indigo-400"></i> Google Gemini API Key:
+                </label>
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="text-xs text-indigo-400 hover:text-indigo-300 hover:underline flex items-center gap-1.5 font-medium transition">
+                  <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Dapatkan API Key Gratis di Google AI Studio ↗
+                </a>
               </div>
 
-              <!-- Status Box Kunci Server Saat Ini -->
-              <div id="serverKeyInfoBox" class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 mb-4">
-                <div class="text-[11px] text-slate-400 mb-1 flex items-center justify-between">
-                  <span>Status Kunci API Server Terkini:</span>
-                  <span id="serverKeyEnvIndicator" class="font-mono text-[10px] text-slate-500">.env persistence</span>
+              <!-- Input Group dengan Tombol Lihat/Sembunyikan & Salin -->
+              <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <div class="relative flex-1">
+                  <input type="text" id="serverApiKeyInput" placeholder="Tempel Google Gemini API Key di sini (contoh: AIzaSy...)" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-xs sm:text-sm text-emerald-300 font-mono focus:outline-none focus:border-indigo-500 transition shadow-inner">
                 </div>
-                <div class="flex items-center gap-2">
-                  <i class="fa-solid fa-shield-halved text-indigo-400"></i>
-                  <span id="serverKeyMaskedText" class="font-mono text-xs font-bold text-white tracking-wider">
-                    Belum Terkonfigurasi
-                  </span>
+                <div class="flex items-center gap-2 shrink-0">
+                  <button type="button" onclick="togglePasswordVisibility('serverApiKeyInput', this)" class="px-3.5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold transition flex items-center gap-1.5" title="Sembunyikan / Tampilkan Karakter API Key">
+                    <i class="fa-regular fa-eye-slash"></i>
+                    <span id="textServerKeyVisibility">Sembunyikan</span>
+                  </button>
+                  <button type="button" onclick="copyServerKeyToClipboard()" class="px-3.5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold transition flex items-center gap-1.5" title="Salin Kunci API ke Clipboard">
+                    <i class="fa-regular fa-copy"></i>
+                    <span>Salin</span>
+                  </button>
                 </div>
               </div>
 
-              <!-- Input Form API Key Server -->
-              <div class="space-y-3">
-                <div>
-                  <label class="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
-                    <span>Perbarui Kunci API Server:</span>
-                    <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="text-[11px] text-indigo-400 hover:text-indigo-300 hover:underline flex items-center gap-1">
-                      <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Dapatkan API Key Google AI Studio Gratis
-                    </a>
-                  </label>
-                  <div class="relative">
-                    <input type="password" id="serverApiKeyInput" placeholder="Tempel Google Gemini API Key di sini (AIzaSy...)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 pr-10 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono transition">
-                    <button type="button" onclick="togglePasswordVisibility('serverApiKeyInput', this)" class="absolute right-3 top-2.5 text-slate-400 hover:text-white transition">
-                      <i class="fa-regular fa-eye"></i>
-                    </button>
-                  </div>
-                  <p class="text-[10px] text-slate-500 mt-1.5 leading-relaxed">
-                    Kunci ini akan digunakan saat guru atau proktor memilih opsi <b>Gunakan API Server Sekolah</b>. Kunci tersimpan di backend dan tidak akan diekspos ke browser siswa.
-                  </p>
+              <!-- Status Info Ringkas Kunci Terkini -->
+              <div id="serverKeyInfoBox" class="mt-3 p-3 rounded-xl bg-slate-950/60 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                <div class="flex items-center gap-2 text-slate-400 overflow-hidden">
+                  <i class="fa-solid fa-shield-halved text-indigo-400 shrink-0"></i>
+                  <span class="shrink-0">Status Kunci Saat Ini:</span>
+                  <span id="serverKeyMaskedText" class="font-mono text-xs font-bold text-emerald-400 truncate">Memuat...</span>
                 </div>
-
-                <!-- Hasil Uji Koneksi Server Key -->
-                <div id="serverKeyTestResult" class="hidden text-xs rounded-xl p-3 border transition"></div>
+                <span id="serverKeyEnvIndicator" class="font-mono text-[10px] text-slate-500 bg-slate-900 px-2 py-0.5 rounded border border-slate-800 self-start sm:self-auto shrink-0">.env persistence</span>
               </div>
             </div>
 
-            <!-- Tombol Aksi Kunci Server -->
-            <div class="pt-5 mt-5 border-t border-slate-800 flex flex-wrap items-center gap-2.5">
-              <button onclick="handleSaveServerKey()" id="btnSaveServerKey" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-indigo-600/20">
-                <i class="fa-solid fa-floppy-disk"></i> Simpan ke Server (.env)
+            <!-- Petunjuk Penggunaan Praktis -->
+            <div class="p-3.5 rounded-xl bg-indigo-950/20 border border-indigo-500/20 text-xs text-indigo-200/90 leading-relaxed flex items-start gap-2.5">
+              <i class="fa-solid fa-circle-info text-indigo-400 text-sm mt-0.5 shrink-0"></i>
+              <div>
+                <strong>Kemudahan Akses Sekolah:</strong> Cukup simpan Google Gemini API Key di sini satu kali. Semua guru, pembuat soal, dan proktor dapat langsung membuat soal HOTS dan mengoreksi esai secara otomatis tanpa perlu repot menginput API key di setiap komputer.
+              </div>
+            </div>
+
+            <!-- Hasil Uji Koneksi Server Key -->
+            <div id="serverKeyTestResult" class="hidden text-xs rounded-xl p-3.5 border transition"></div>
+
+            <!-- Tombol Aksi Utama -->
+            <div class="pt-4 flex flex-wrap items-center gap-3 border-t border-slate-800/80">
+              <button onclick="handleSaveServerKey()" id="btnSaveServerKey" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-bold transition flex items-center gap-2 shadow-lg shadow-indigo-600/30">
+                <i class="fa-solid fa-floppy-disk"></i> Simpan Kunci API (.env)
               </button>
-              <button onclick="handleTestServerKey()" id="btnTestServerKey" class="px-4 py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition flex items-center gap-2">
+              <button onclick="handleTestServerKey()" id="btnTestServerKey" class="px-5 py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs sm:text-sm font-bold transition flex items-center gap-2 shadow-sm">
                 <i class="fa-solid fa-vial-circle-check"></i> Uji Koneksi API
               </button>
-              <button onclick="handleClearServerKey()" id="btnClearServerKey" class="px-3.5 py-2.5 rounded-xl bg-rose-600/10 hover:bg-rose-600/20 text-rose-400 border border-rose-500/20 text-xs font-semibold transition flex items-center gap-1.5 ml-auto">
+              <button onclick="handleClearServerKey()" id="btnClearServerKey" class="px-4 py-2.5 rounded-xl bg-rose-600/10 hover:bg-rose-600/20 text-rose-400 border border-rose-500/30 text-xs font-semibold transition flex items-center gap-1.5 ml-auto">
                 <i class="fa-regular fa-trash-can"></i> Hapus Key
               </button>
             </div>
           </div>
+        </div>
 
-          <!-- KARTU 2: MODEL DEFAULT GEMINI FLASH SERIES -->
+        <!-- TOGGLE PENGATURAN LANJUTAN (COLLAPSIBLE / TERSEMBUNYI SECARA DEFAULT) -->
+        <div class="pt-1">
+          <button type="button" onclick="toggleAdvancedAISettings()" id="btnToggleAdvancedAI" class="w-full flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-slate-700 transition shadow-lg group cursor-pointer">
+            <div class="flex items-center gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-slate-800 text-slate-300 group-hover:text-indigo-400 group-hover:bg-indigo-600/20 border border-slate-700/80 flex items-center justify-center transition text-base shrink-0">
+                <i class="fa-solid fa-sliders"></i>
+              </div>
+              <div class="text-left">
+                <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-indigo-300 transition flex items-center gap-2">
+                  Pengaturan Lanjutan (Pilihan Model, BYOK Guru & Playground Diagnostik)
+                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 font-normal hidden sm:inline">Opsional</span>
+                </h4>
+                <p class="text-[11px] text-slate-400">Ganti varian model Gemini, atur kuota BYOK lokal perangkat guru, atau uji coba prompt interaktif.</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 text-xs font-bold text-indigo-400 group-hover:text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 px-3.5 py-1.5 rounded-xl transition shrink-0">
+              <span id="textToggleAdvancedAI">Buka Pengaturan</span>
+              <i id="iconToggleAdvancedAI" class="fa-solid fa-chevron-down transition-transform duration-300 text-[11px]"></i>
+            </div>
+          </button>
+
+          <!-- CONTAINER PENGATURAN LANJUTAN (DEFAULT: HIDDEN) -->
+          <div id="advancedAISettingsPanel" class="hidden mt-5 space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- KARTU 2: MODEL DEFAULT GEMINI FLASH SERIES -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between mb-4">
@@ -1976,8 +2012,8 @@
               </button>
             </div>
           </div>
-
-          <!-- KARTU 4: LIVE AI DIAGNOSTIC & PROMPT PLAYGROUND -->
+            </div>
+            <!-- KARTU 4: LIVE AI DIAGNOSTIC & PROMPT PLAYGROUND -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between mb-4">
@@ -2040,10 +2076,9 @@
               </button>
             </div>
           </div>
-
+          </div>
         </div>
       </section>
-
 
       <!-- ============================================================== -->
       <!-- TAB 10: KARTU PESERTA UJIAN (MENU MANDIRI & TERPISAH) -->
@@ -10344,6 +10379,45 @@
       if (icon) {
         icon.className = isPass ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
       }
+      const span = btn.querySelector('span');
+      if (span) {
+        span.innerText = isPass ? 'Sembunyikan' : 'Lihat';
+      }
+    };
+
+    window.toggleAdvancedAISettings = function() {
+      const panel = document.getElementById('advancedAISettingsPanel');
+      const text = document.getElementById('textToggleAdvancedAI');
+      const icon = document.getElementById('iconToggleAdvancedAI');
+      if (!panel) return;
+      const isHidden = panel.classList.contains('hidden');
+      if (isHidden) {
+        panel.classList.remove('hidden');
+        if (text) text.innerText = 'Tutup Pengaturan Lanjutan';
+        if (icon) icon.classList.add('rotate-180');
+      } else {
+        panel.classList.add('hidden');
+        if (text) text.innerText = 'Buka Pengaturan Lanjutan';
+        if (icon) icon.classList.remove('rotate-180');
+      }
+    };
+
+    window.copyServerKeyToClipboard = function() {
+      const input = document.getElementById('serverApiKeyInput');
+      const key = (input ? input.value : '').trim();
+      if (!key) {
+        alert('Belum ada Kunci API untuk disalin.');
+        return;
+      }
+      navigator.clipboard.writeText(key).then(() => {
+        alert('Kunci API Server berhasil disalin ke clipboard!');
+      }).catch(() => {
+        if (input) {
+          input.select();
+          document.execCommand('copy');
+        }
+        alert('Kunci API Server berhasil disalin!');
+      });
     };
 
     window.handleModelSelectChange = function(modelVal) {
@@ -10405,10 +10479,16 @@
           srvBadge.innerText = hasServerKey ? 'Terkonfigurasi' : 'Belum Ada';
         }
 
+        const rawKey = data.server_key_raw || '';
+        const inputKey = document.getElementById('serverApiKeyInput');
+        if (inputKey && !inputKey.matches(':focus')) {
+          inputKey.value = rawKey;
+        }
+
         const srvMasked = document.getElementById('serverKeyMaskedText');
         if (srvMasked) {
-          srvMasked.innerText = hasServerKey ? masked : 'Belum Dikonfigurasi (Server Belum Punya Key)';
-          srvMasked.className = hasServerKey ? 'font-mono text-xs font-bold text-emerald-400 tracking-wider' : 'font-mono text-xs font-semibold text-slate-400';
+          srvMasked.innerText = hasServerKey ? rawKey : 'Belum Dikonfigurasi (Server Belum Memiliki Key)';
+          srvMasked.className = hasServerKey ? 'font-mono text-xs font-bold text-emerald-400 tracking-wider break-all' : 'font-mono text-xs font-semibold text-slate-400';
         }
 
         // Card 2: Model select
@@ -10485,7 +10565,6 @@
         });
         const json = await res.json();
         if (json.status === 'success') {
-          input.value = '';
           alert(json.message || 'Kunci API Server berhasil disimpan ke .env!');
           await fetchAISettings();
         } else {

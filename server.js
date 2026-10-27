@@ -2573,18 +2573,18 @@ function generateDocxDocument({ title, school, subject, teacher, targetClass, qu
       }
 
       bodyXml += `
-<w:p><w:pPr><w:spacing w:before="240" w:after="80"/><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="22"/><w:color w:val="1E1B4B"/></w:rPr><w:t>KARTU SOAL NOMOR ${qNum}</w:t></w:r></w:p>
+<w:p><w:pPr><w:spacing w:before="120" w:after="30"/><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="19"/><w:color w:val="1E1B4B"/></w:rPr><w:t>KARTU SOAL NOMOR ${qNum}</w:t></w:r></w:p>
 <w:tbl>
   <w:tblPr>
     <w:tblW w:w="9200" w:type="dxa"/>
     <w:jc w:val="center"/>
     <w:tblBorders>
-      <w:top w:val="single" w:sz="12" w:space="0" w:color="1E1B4B"/>
-      <w:left w:val="single" w:sz="12" w:space="0" w:color="1E1B4B"/>
-      <w:bottom w:val="single" w:sz="12" w:space="0" w:color="1E1B4B"/>
-      <w:right w:val="single" w:sz="12" w:space="0" w:color="1E1B4B"/>
-      <w:insideH w:val="single" w:sz="6" w:space="0" w:color="CBD5E1"/>
-      <w:insideV w:val="single" w:sz="6" w:space="0" w:color="CBD5E1"/>
+      <w:top w:val="single" w:sz="8" w:space="0" w:color="1E1B4B"/>
+      <w:left w:val="single" w:sz="8" w:space="0" w:color="1E1B4B"/>
+      <w:bottom w:val="single" w:sz="8" w:space="0" w:color="1E1B4B"/>
+      <w:right w:val="single" w:sz="8" w:space="0" w:color="1E1B4B"/>
+      <w:insideH w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>
+      <w:insideV w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>
     </w:tblBorders>
   </w:tblPr>
   <w:tblGrid>
@@ -2594,85 +2594,90 @@ function generateDocxDocument({ title, school, subject, teacher, targetClass, qu
     <w:gridCol w:w="2400"/>
   </w:tblGrid>
   <w:tr>
+    <w:trPr><w:cantSplit/></w:trPr>
     <w:tc>
       <w:tcPr><w:tcW w:w="2200" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
-      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Satuan Pendidikan</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="17"/></w:rPr><w:t>Satuan Pendidikan</w:t></w:r></w:p>
     </w:tc>
     <w:tc>
       <w:tcPr><w:tcW w:w="2400" w:type="dxa"/></w:tcPr>
-      <w:p><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${xmlEscape(school || 'SMK NEGERI 5 BANDUNG')}</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr><w:sz w:val="17"/></w:rPr><w:t>${xmlEscape(school || 'SMK NEGERI 5 BANDUNG')}</w:t></w:r></w:p>
     </w:tc>
     <w:tc>
       <w:tcPr><w:tcW w:w="2200" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
-      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Penyusun / Guru</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="17"/></w:rPr><w:t>Penyusun / Guru</w:t></w:r></w:p>
     </w:tc>
     <w:tc>
       <w:tcPr><w:tcW w:w="2400" w:type="dxa"/></w:tcPr>
-      <w:p><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${xmlEscape(teacher || 'Guru Pengampu')}</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr><w:sz w:val="17"/></w:rPr><w:t>${xmlEscape(teacher || 'Guru Pengampu')}</w:t></w:r></w:p>
     </w:tc>
   </w:tr>
   <w:tr>
+    <w:trPr><w:cantSplit/></w:trPr>
     <w:tc>
       <w:tcPr><w:tcW w:w="2200" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
-      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Mata Pelajaran</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="17"/></w:rPr><w:t>Mata Pelajaran</w:t></w:r></w:p>
     </w:tc>
     <w:tc>
       <w:tcPr><w:tcW w:w="2400" w:type="dxa"/></w:tcPr>
-      <w:p><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${xmlEscape(subject || 'Informatika')}</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr><w:sz w:val="17"/></w:rPr><w:t>${xmlEscape(subject || 'Informatika')}</w:t></w:r></w:p>
     </w:tc>
     <w:tc>
       <w:tcPr><w:tcW w:w="2200" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
-      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Bentuk Soal</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="17"/></w:rPr><w:t>Bentuk Soal</w:t></w:r></w:p>
     </w:tc>
     <w:tc>
       <w:tcPr><w:tcW w:w="2400" w:type="dxa"/></w:tcPr>
-      <w:p><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${xmlEscape(typeLabel)}</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr><w:sz w:val="17"/></w:rPr><w:t>${xmlEscape(typeLabel)}</w:t></w:r></w:p>
     </w:tc>
   </w:tr>
   <w:tr>
+    <w:trPr><w:cantSplit/></w:trPr>
     <w:tc>
       <w:tcPr><w:tcW w:w="2200" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
-      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Kelas / Sasaran</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="17"/></w:rPr><w:t>Kelas / Sasaran</w:t></w:r></w:p>
     </w:tc>
     <w:tc>
       <w:tcPr><w:tcW w:w="2400" w:type="dxa"/></w:tcPr>
-      <w:p><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${xmlEscape(targetClass || 'Semua Kelas')}</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr><w:sz w:val="17"/></w:rPr><w:t>${xmlEscape(targetClass || 'Semua Kelas')}</w:t></w:r></w:p>
     </w:tc>
     <w:tc>
       <w:tcPr><w:tcW w:w="2200" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
-      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Level Kognitif</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="17"/></w:rPr><w:t>Level Kognitif</w:t></w:r></w:p>
     </w:tc>
     <w:tc>
       <w:tcPr><w:tcW w:w="2400" w:type="dxa"/></w:tcPr>
-      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="4338CA"/></w:rPr><w:t>${xmlEscape(cogText)}</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="17"/><w:color w:val="4338CA"/></w:rPr><w:t>${xmlEscape(cogText)}</w:t></w:r></w:p>
     </w:tc>
   </w:tr>
   <w:tr>
+    <w:trPr><w:cantSplit/></w:trPr>
     <w:tc>
       <w:tcPr><w:tcW w:w="2200" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
-      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Bobot Butir Soal</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="17"/></w:rPr><w:t>Bobot Butir Soal</w:t></w:r></w:p>
     </w:tc>
     <w:tc>
       <w:tcPr><w:tcW w:w="2400" w:type="dxa"/></w:tcPr>
-      <w:p><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${q.weight || 1.0}</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr><w:sz w:val="17"/></w:rPr><w:t>${q.weight || 1.0}</w:t></w:r></w:p>
     </w:tc>
     <w:tc>
       <w:tcPr><w:tcW w:w="2200" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
-      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Nomor Urut</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="17"/></w:rPr><w:t>Nomor Urut</w:t></w:r></w:p>
     </w:tc>
     <w:tc>
       <w:tcPr><w:tcW w:w="2400" w:type="dxa"/></w:tcPr>
-      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="1E1B4B"/></w:rPr><w:t>Soal Nomor ${qNum}</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="17"/><w:color w:val="1E1B4B"/></w:rPr><w:t>Soal Nomor ${qNum}</w:t></w:r></w:p>
     </w:tc>
   </w:tr>
   <w:tr>
+    <w:trPr><w:cantSplit/></w:trPr>
     <w:tc>
       <w:tcPr>
         <w:gridSpan w:val="4"/>
         <w:tcW w:w="9200" w:type="dxa"/>
         <w:shd w:val="clear" w:color="auto" w:fill="EEF2FF"/>
       </w:tcPr>
-      <w:p><w:pPr><w:spacing w:after="40"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="312E81"/></w:rPr><w:t>RUMUSAN BUTIR SOAL:</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="25" w:after="25"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="17"/><w:color w:val="312E81"/></w:rPr><w:t>RUMUSAN BUTIR SOAL:</w:t></w:r></w:p>
     </w:tc>
   </w:tr>
   <w:tr>
@@ -2681,18 +2686,19 @@ function generateDocxDocument({ title, school, subject, teacher, targetClass, qu
         <w:gridSpan w:val="4"/>
         <w:tcW w:w="9200" w:type="dxa"/>
       </w:tcPr>
-      <w:p><w:pPr><w:spacing w:before="60" w:after="60"/></w:pPr><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${xmlEscape(cleanStem)}</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="35" w:after="35"/></w:pPr><w:r><w:rPr><w:sz w:val="17"/></w:rPr><w:t>${xmlEscape(cleanStem)}</w:t></w:r></w:p>
       ${optionsXml}
     </w:tc>
   </w:tr>
   <w:tr>
+    <w:trPr><w:cantSplit/></w:trPr>
     <w:tc>
       <w:tcPr>
         <w:gridSpan w:val="4"/>
         <w:tcW w:w="9200" w:type="dxa"/>
         <w:shd w:val="clear" w:color="auto" w:fill="ECFDF5"/>
       </w:tcPr>
-      <w:p><w:pPr><w:spacing w:after="40"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="065F46"/></w:rPr><w:t>KUNCI JAWABAN &amp; PEDOMAN PENSKORAN / PEMBAHASAN:</w:t></w:r></w:p>
+      <w:p><w:pPr><w:spacing w:before="25" w:after="25"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="17"/><w:color w:val="065F46"/></w:rPr><w:t>KUNCI JAWABAN &amp; PEDOMAN PENSKORAN / PEMBAHASAN:</w:t></w:r></w:p>
     </w:tc>
   </w:tr>
   <w:tr>
@@ -2706,12 +2712,8 @@ function generateDocxDocument({ title, school, subject, teacher, targetClass, qu
     </w:tc>
   </w:tr>
 </w:tbl>
-<w:p><w:r><w:t></w:t></w:r></w:p>
+<w:p><w:pPr><w:spacing w:before="0" w:after="120"/></w:pPr><w:r><w:t></w:t></w:r></w:p>
 `;
-
-      if (idx < questions.length - 1) {
-        bodyXml += `<w:p><w:r><w:br w:type="page"/></w:r></w:p>`;
-      }
     });
   }
 
@@ -2920,11 +2922,11 @@ function generateWordHtmlDocument({ title, school, subject, teacher, targetClass
       }
 
       cardsHtml += `
-        <div style="page-break-inside: avoid; margin-bottom: 24px;">
+        <div style="page-break-inside: avoid; margin-bottom: 12px;">
           <div style="text-align: center; margin-bottom: 6px;">
             <strong style="font-size: 11pt; color: #1e1b4b; text-transform: uppercase;">KARTU SOAL NOMOR ${qNum}</strong>
           </div>
-          <table border="1" cellpadding="5" cellspacing="0" style="width: 100%; border-collapse: collapse; font-family: 'Times New Roman', serif; font-size: 9.5pt; border: 1.5px solid #1e1b4b;">
+          <table border="1" cellpadding="3.5" cellspacing="0" style="width: 100%; border-collapse: collapse; font-family: 'Times New Roman', serif; font-size: 9pt; border: 1.5px solid #1e1b4b;">
             <tr style="background: #f1f5f9;">
               <td width="22%"><strong>Satuan Pendidikan</strong></td>
               <td width="28%">${esc(school || 'SMK NEGERI 5 BANDUNG')}</td>

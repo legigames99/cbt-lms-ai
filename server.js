@@ -2382,103 +2382,338 @@ const SAMPLE_TEMPLATE_QUESTIONS = [
   }
 ];
 
-function generateDocxDocument({ title, school, subject, teacher, targetClass, questions, includeKeys = true, includeExplanation = true, includeHeader = true }) {
+function getCogLevelLabel(cog) {
+  if (!cog) return 'L2 (Aplikasi Standar Asesmen)';
+  const c = String(cog).toUpperCase().trim();
+  if (c === 'C1') return 'C1 (Mengingat / Pengetahuan - L1)';
+  if (c === 'C2') return 'C2 (Memahami / Pemahaman - L1)';
+  if (c === 'C3') return 'C3 (Menerapkan / Aplikasi - L2)';
+  if (c === 'C4') return 'C4 (Menganalisis / Analisis - L3 HOTS)';
+  if (c === 'C5') return 'C5 (Mengevaluasi / Evaluasi - L3 HOTS)';
+  if (c === 'C6') return 'C6 (Mencipta / Kreasi - L3 HOTS)';
+  if (c === 'MIXED') return 'L2 / L3 (Campuran Aplikasi & HOTS)';
+  return c;
+}
+
+function generateDocxDocument({ title, school, subject, teacher, targetClass, questions, includeQuestions = true, includeCards = true, includeKeys = true, includeExplanation = true, includeHeader = true }) {
   let bodyXml = '';
 
-  if (includeHeader) {
-    bodyXml += `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="28"/><w:color w:val="1e1b4b"/></w:rPr><w:t>${xmlEscape(school || 'SMK NEGERI 5 BANDUNG')}</w:t></w:r></w:p>`;
-    bodyXml += `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="24"/></w:rPr><w:t>${xmlEscape(title || 'NASKAH ASESMEN PEMBELAJARAN')}</w:t></w:r></w:p>`;
-    bodyXml += `<w:p><w:pPr><w:jc w:val="center"/><w:pBdr><w:bottom w:val="single" w:sz="14" w:space="8" w:color="4f46e5"/></w:pBdr></w:pPr><w:r><w:rPr><w:i/><w:sz w:val="20"/><w:color w:val="4b5563"/></w:rPr><w:t>Mata Pelajaran: ${xmlEscape(subject || 'Informatika')} | Kelas: ${xmlEscape(targetClass || 'Semua Kelas')} | Pengampu: ${xmlEscape(teacher || 'Guru Pengampu')}</w:t></w:r></w:p>`;
-    bodyXml += `<w:p><w:r><w:t></w:t></w:r></w:p>`;
-  } else {
-    bodyXml += `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="24"/></w:rPr><w:t>${xmlEscape(title || 'NASKAH ASESMEN PEMBELAJARAN')}</w:t></w:r></w:p>`;
-    bodyXml += `<w:p><w:r><w:t></w:t></w:r></w:p>`;
+  // 1. NASKAH SOAL SECTION
+  if (includeQuestions) {
+    if (includeHeader) {
+      bodyXml += `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="28"/><w:color w:val="1e1b4b"/></w:rPr><w:t>${xmlEscape(school || 'SMK NEGERI 5 BANDUNG')}</w:t></w:r></w:p>`;
+      bodyXml += `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="24"/></w:rPr><w:t>${xmlEscape(title || 'NASKAH ASESMEN PEMBELAJARAN')}</w:t></w:r></w:p>`;
+      bodyXml += `<w:p><w:pPr><w:jc w:val="center"/><w:pBdr><w:bottom w:val="single" w:sz="14" w:space="8" w:color="4f46e5"/></w:pBdr></w:pPr><w:r><w:rPr><w:i/><w:sz w:val="20"/><w:color w:val="4b5563"/></w:rPr><w:t>Mata Pelajaran: ${xmlEscape(subject || 'Informatika')} | Kelas: ${xmlEscape(targetClass || 'Semua Kelas')} | Pengampu: ${xmlEscape(teacher || 'Guru Pengampu')}</w:t></w:r></w:p>`;
+      bodyXml += `<w:p><w:r><w:t></w:t></w:r></w:p>`;
+    } else {
+      bodyXml += `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="24"/></w:rPr><w:t>${xmlEscape(title || 'NASKAH ASESMEN PEMBELAJARAN')}</w:t></w:r></w:p>`;
+      bodyXml += `<w:p><w:r><w:t></w:t></w:r></w:p>`;
+    }
+
+    questions.forEach((q, idx) => {
+      const qNum = idx + 1;
+      const cleanStem = (q.stem || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      
+      bodyXml += `<w:p><w:pPr><w:spacing w:before="240" w:after="80"/></w:pPr>`;
+      bodyXml += `<w:r><w:rPr><w:b/></w:rPr><w:t>${qNum}. </w:t></w:r>`;
+      bodyXml += `<w:r><w:t>${xmlEscape(cleanStem)}</w:t></w:r>`;
+      bodyXml += `</w:p>`;
+
+      let typeLabel = '';
+      if (q.type === 'mcq') typeLabel = 'Pilihan Ganda Tunggal';
+      else if (q.type === 'mcq_complex') typeLabel = 'Pilihan Ganda Kompleks';
+      else if (q.type === 'true_false') typeLabel = 'Pernyataan Benar / Salah';
+      else if (q.type === 'matching') typeLabel = 'Menjodohkan';
+      else if (q.type === 'short_essay') typeLabel = 'Isian Singkat';
+      else if (q.type === 'long_essay') typeLabel = 'Uraian / Esai AI';
+
+      if (typeLabel) {
+        bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="4338ca"/></w:rPr><w:t>TIPE: ${typeLabel}</w:t></w:r></w:p>`;
+      }
+
+      if (q.type === 'mcq' || q.type === 'mcq_complex') {
+        const opts = q.options || [];
+        opts.forEach(opt => {
+          const cleanOpt = (opt.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+          bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="40"/></w:pPr>`;
+          bodyXml += `<w:r><w:rPr><w:b/></w:rPr><w:t>${opt.id}. </w:t></w:r>`;
+          bodyXml += `<w:r><w:t>${xmlEscape(cleanOpt)}</w:t></w:r>`;
+          bodyXml += `</w:p>`;
+        });
+      } else if (q.type === 'true_false') {
+        (q.statements || []).forEach((st, sIdx) => {
+          bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="40"/></w:pPr>`;
+          if (includeKeys && st.key) {
+            bodyXml += `<w:r><w:rPr><w:b/><w:color w:val="047857"/></w:rPr><w:t>[${xmlEscape(st.key)}] </w:t></w:r>`;
+          } else {
+            bodyXml += `<w:r><w:t>[   ] [ B / S ] </w:t></w:r>`;
+          }
+          bodyXml += `<w:r><w:t>${sIdx + 1}. ${xmlEscape(st.text)}</w:t></w:r>`;
+          bodyXml += `</w:p>`;
+        });
+      } else if (q.type === 'matching') {
+        (q.premises || []).forEach((p, pIdx) => {
+          const target = (q.targets || [])[pIdx];
+          bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="40"/></w:pPr>`;
+          if (includeKeys && target) {
+            bodyXml += `<w:r><w:rPr><w:b/></w:rPr><w:t>PREMIS ${pIdx + 1}: ${xmlEscape(p.text)}   --->   TARGET ${target.id}: ${xmlEscape(target.text)}</w:t></w:r>`;
+          } else {
+            bodyXml += `<w:r><w:t>${pIdx + 1}. ${xmlEscape(p.text)}   --->   [ ... ] ${target ? `${target.id}. ${xmlEscape(target.text)}` : ''}</w:t></w:r>`;
+          }
+          bodyXml += `</w:p>`;
+        });
+      } else if (q.type === 'short_essay') {
+        bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:i/><w:color w:val="6b7280"/></w:rPr><w:t>Jawaban Singkat: _____________________________________________</w:t></w:r></w:p>`;
+      } else if (q.type === 'long_essay') {
+        if (q.rubric) {
+          bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="40"/></w:pPr><w:r><w:rPr><w:i/><w:color w:val="4b5563"/></w:rPr><w:t>RUBRIK: ${xmlEscape(q.rubric)}</w:t></w:r></w:p>`;
+        }
+        bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:i/><w:color w:val="6b7280"/></w:rPr><w:t>Lembar Uraian / Jawaban: [ ............................................................................................................ ]</w:t></w:r></w:p>`;
+      }
+
+      if (includeKeys) {
+        let keyText = '';
+        if (q.type === 'mcq') keyText = q.answer || '-';
+        else if (q.type === 'mcq_complex') keyText = Array.isArray(q.answer) ? q.answer.join(', ') : q.answer;
+        else if (q.type === 'true_false') keyText = (q.statements || []).map(s => s.key).join('-');
+        else if (q.type === 'matching') {
+          if (typeof q.answer === 'object' && q.answer !== null) {
+            keyText = Object.entries(q.answer).map(([k, v]) => `${Number(k) + 1}-${v}`).join(', ');
+          } else {
+            keyText = (q.premises || []).map((_, i) => `${i + 1}-${String.fromCharCode(65 + i)}`).join(', ');
+          }
+        }
+        else if (q.type === 'short_essay') keyText = (q.answer_keys || []).join(' / ');
+        else if (q.type === 'long_essay') keyText = q.ideal_answer || (q.keywords ? `Kata Kunci: ${(q.keywords || []).join(', ')}` : 'Jawaban Esai Komprehensif');
+
+        bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:pBdr><w:left w:val="single" w:sz="14" w:space="8" w:color="10b981"/></w:pBdr><w:shd w:val="clear" w:color="auto" w:fill="ecfdf5"/><w:spacing w:before="60" w:after="100"/></w:pPr>`;
+        bodyXml += `<w:r><w:rPr><w:b/><w:color w:val="065f46"/></w:rPr><w:t>KUNCI JAWABAN: ${xmlEscape(keyText)}</w:t></w:r>`;
+        if (includeExplanation && q.explanation) {
+          bodyXml += `<w:r><w:t> | Pembahasan: ${xmlEscape(q.explanation.replace(/<[^>]+>/g, ' '))}</w:t></w:r>`;
+        }
+        bodyXml += `</w:p>`;
+      }
+    });
   }
 
-  questions.forEach((q, idx) => {
-    const qNum = idx + 1;
-    const cleanStem = (q.stem || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-    
-    bodyXml += `<w:p><w:pPr><w:spacing w:before="240" w:after="80"/></w:pPr>`;
-    bodyXml += `<w:r><w:rPr><w:b/></w:rPr><w:t>${qNum}. </w:t></w:r>`;
-    bodyXml += `<w:r><w:t>${xmlEscape(cleanStem)}</w:t></w:r>`;
-    bodyXml += `</w:p>`;
-
-    let typeLabel = '';
-    if (q.type === 'mcq') typeLabel = 'Pilihan Ganda Tunggal';
-    else if (q.type === 'mcq_complex') typeLabel = 'Pilihan Ganda Kompleks';
-    else if (q.type === 'true_false') typeLabel = 'Pernyataan Benar / Salah';
-    else if (q.type === 'matching') typeLabel = 'Menjodohkan';
-    else if (q.type === 'short_essay') typeLabel = 'Isian Singkat';
-    else if (q.type === 'long_essay') typeLabel = 'Uraian / Esai AI';
-
-    if (typeLabel) {
-      bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="4338ca"/></w:rPr><w:t>TIPE: ${typeLabel}</w:t></w:r></w:p>`;
+  // 2. KARTU SOAL SECTION
+  if (includeCards) {
+    if (includeQuestions) {
+      bodyXml += `<w:p><w:r><w:br w:type="page"/></w:r></w:p>`;
     }
 
-    if (q.type === 'mcq' || q.type === 'mcq_complex') {
-      const opts = q.options || [];
-      opts.forEach(opt => {
-        const cleanOpt = (opt.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-        bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="40"/></w:pPr>`;
-        bodyXml += `<w:r><w:rPr><w:b/></w:rPr><w:t>${opt.id}. </w:t></w:r>`;
-        bodyXml += `<w:r><w:t>${xmlEscape(cleanOpt)}</w:t></w:r>`;
-        bodyXml += `</w:p>`;
-      });
-    } else if (q.type === 'true_false') {
-      (q.statements || []).forEach((st, sIdx) => {
-        bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="40"/></w:pPr>`;
-        if (includeKeys && st.key) {
-          bodyXml += `<w:r><w:rPr><w:b/><w:color w:val="047857"/></w:rPr><w:t>[${xmlEscape(st.key)}] </w:t></w:r>`;
-        } else {
-          bodyXml += `<w:r><w:t>[   ] [ B / S ] </w:t></w:r>`;
-        }
-        bodyXml += `<w:r><w:t>${sIdx + 1}. ${xmlEscape(st.text)}</w:t></w:r>`;
-        bodyXml += `</w:p>`;
-      });
-    } else if (q.type === 'matching') {
-      (q.premises || []).forEach((p, pIdx) => {
-        const target = (q.targets || [])[pIdx];
-        bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="40"/></w:pPr>`;
-        if (includeKeys && target) {
-          bodyXml += `<w:r><w:rPr><w:b/></w:rPr><w:t>PREMIS ${pIdx + 1}: ${xmlEscape(p.text)}   --->   TARGET ${target.id}: ${xmlEscape(target.text)}</w:t></w:r>`;
-        } else {
-          bodyXml += `<w:r><w:t>${pIdx + 1}. ${xmlEscape(p.text)}   --->   [ ... ] ${target ? `${target.id}. ${xmlEscape(target.text)}` : ''}</w:t></w:r>`;
-        }
-        bodyXml += `</w:p>`;
-      });
-    } else if (q.type === 'short_essay') {
-      bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:i/><w:color w:val="6b7280"/></w:rPr><w:t>Jawaban Singkat: _____________________________________________</w:t></w:r></w:p>`;
-    } else if (q.type === 'long_essay') {
-      if (q.rubric) {
-        bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="40"/></w:pPr><w:r><w:rPr><w:i/><w:color w:val="4b5563"/></w:rPr><w:t>RUBRIK: ${xmlEscape(q.rubric)}</w:t></w:r></w:p>`;
-      }
-      bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:i/><w:color w:val="6b7280"/></w:rPr><w:t>Lembar Uraian / Jawaban: [ ............................................................................................................ ]</w:t></w:r></w:p>`;
-    }
+    bodyXml += `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="28"/><w:color w:val="1e1b4b"/></w:rPr><w:t>${xmlEscape(school || 'SMK NEGERI 5 BANDUNG')}</w:t></w:r></w:p>`;
+    bodyXml += `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="24"/><w:color w:val="312e81"/></w:rPr><w:t>KUMPULAN KARTU SOAL &amp; KISI-KISI ASESMEN</w:t></w:r></w:p>`;
+    bodyXml += `<w:p><w:pPr><w:jc w:val="center"/><w:pBdr><w:bottom w:val="single" w:sz="14" w:space="8" w:color="4f46e5"/></w:pBdr></w:pPr><w:r><w:rPr><w:i/><w:sz w:val="18"/><w:color w:val="4b5563"/></w:rPr><w:t>Mata Pelajaran: ${xmlEscape(subject || 'Informatika')} | Kelas: ${xmlEscape(targetClass || 'Semua Kelas')} | Pengampu: ${xmlEscape(teacher || 'Guru Pengampu')} | Total: ${questions.length} Butir Soal</w:t></w:r></w:p>`;
+    bodyXml += `<w:p><w:r><w:t></w:t></w:r></w:p>`;
 
-    if (includeKeys) {
-      let keyText = '';
+    questions.forEach((q, idx) => {
+      const qNum = idx + 1;
+      const cleanStem = (q.stem || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      const cogText = getCogLevelLabel(q.cog);
+
+      let typeLabel = 'Pilihan Ganda';
+      if (q.type === 'mcq') typeLabel = 'Pilihan Ganda Tunggal (PG)';
+      else if (q.type === 'mcq_complex') typeLabel = 'Pilihan Ganda Kompleks (Multi)';
+      else if (q.type === 'true_false') typeLabel = 'Pernyataan Benar / Salah';
+      else if (q.type === 'matching') typeLabel = 'Menjodohkan (Matching)';
+      else if (q.type === 'short_essay') typeLabel = 'Isian Singkat';
+      else if (q.type === 'long_essay') typeLabel = 'Uraian / Esai AI';
+
+      let keyText = '-';
       if (q.type === 'mcq') keyText = q.answer || '-';
-      else if (q.type === 'mcq_complex') keyText = Array.isArray(q.answer) ? q.answer.join(', ') : q.answer;
+      else if (q.type === 'mcq_complex') keyText = Array.isArray(q.answer) ? q.answer.join(', ') : (q.answer || '-');
       else if (q.type === 'true_false') keyText = (q.statements || []).map(s => s.key).join('-');
       else if (q.type === 'matching') {
         if (typeof q.answer === 'object' && q.answer !== null) {
           keyText = Object.entries(q.answer).map(([k, v]) => `${Number(k) + 1}-${v}`).join(', ');
         } else {
-          keyText = (q.premises || []).map((_, idx) => `${idx + 1}-${String.fromCharCode(65 + idx)}`).join(', ');
+          keyText = (q.premises || []).map((_, i) => `${i + 1}-${String.fromCharCode(65 + i)}`).join(', ');
         }
       }
       else if (q.type === 'short_essay') keyText = (q.answer_keys || []).join(' / ');
       else if (q.type === 'long_essay') keyText = q.ideal_answer || (q.keywords ? `Kata Kunci: ${(q.keywords || []).join(', ')}` : 'Jawaban Esai Komprehensif');
 
-      bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:pBdr><w:left w:val="single" w:sz="14" w:space="8" w:color="10b981"/></w:pBdr><w:shd w:val="clear" w:color="auto" w:fill="ecfdf5"/><w:spacing w:before="60" w:after="100"/></w:pPr>`;
-      bodyXml += `<w:r><w:rPr><w:b/><w:color w:val="065f46"/></w:rPr><w:t>KUNCI JAWABAN: ${xmlEscape(keyText)}</w:t></w:r>`;
-      if (includeExplanation && q.explanation) {
-        bodyXml += `<w:r><w:t> | Pembahasan: ${xmlEscape(q.explanation.replace(/<[^>]+>/g, ' '))}</w:t></w:r>`;
+      let optionsXml = '';
+      if (q.type === 'mcq' || q.type === 'mcq_complex') {
+        (q.options || []).forEach(opt => {
+          const cleanOpt = (opt.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+          optionsXml += `<w:p><w:pPr><w:ind w:left="240"/><w:spacing w:after="30"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>${opt.id}. </w:t></w:r><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${xmlEscape(cleanOpt)}</w:t></w:r></w:p>`;
+        });
+      } else if (q.type === 'true_false') {
+        (q.statements || []).forEach((st, sIdx) => {
+          optionsXml += `<w:p><w:pPr><w:ind w:left="240"/><w:spacing w:after="30"/></w:pPr><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>[  ] [ B / S ] ${sIdx + 1}. ${xmlEscape(st.text)}</w:t></w:r></w:p>`;
+        });
+      } else if (q.type === 'matching') {
+        (q.premises || []).forEach((p, pIdx) => {
+          const target = (q.targets || [])[pIdx];
+          optionsXml += `<w:p><w:pPr><w:ind w:left="240"/><w:spacing w:after="30"/></w:pPr><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${pIdx + 1}. ${xmlEscape(p.text)}   --->   [ ... ] ${target ? `${target.id}. ${xmlEscape(target.text)}` : ''}</w:t></w:r></w:p>`;
+        });
+      } else if (q.type === 'short_essay') {
+        optionsXml += `<w:p><w:pPr><w:ind w:left="240"/><w:spacing w:after="40"/></w:pPr><w:r><w:rPr><w:i/><w:sz w:val="18"/><w:color w:val="6B7280"/></w:rPr><w:t>Ruang Isian: _____________________________________________</w:t></w:r></w:p>`;
+      } else if (q.type === 'long_essay') {
+        optionsXml += `<w:p><w:pPr><w:ind w:left="240"/><w:spacing w:after="40"/></w:pPr><w:r><w:rPr><w:i/><w:sz w:val="18"/><w:color w:val="6B7280"/></w:rPr><w:t>Ruang Jawaban Uraian / Esai Siswa...</w:t></w:r></w:p>`;
       }
-      bodyXml += `</w:p>`;
-    }
-  });
+
+      let keyRubricXml = '';
+      if (includeKeys) {
+        keyRubricXml += `<w:p><w:pPr><w:spacing w:after="40"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="065F46"/></w:rPr><w:t>Kunci Jawaban: </w:t></w:r><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="047857"/></w:rPr><w:t>${xmlEscape(keyText)}</w:t></w:r></w:p>`;
+        if (includeExplanation && q.explanation) {
+          const cleanExp = (q.explanation || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+          keyRubricXml += `<w:p><w:pPr><w:spacing w:after="40"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="1F2937"/></w:rPr><w:t>Pembahasan: </w:t></w:r><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${xmlEscape(cleanExp)}</w:t></w:r></w:p>`;
+        }
+        if (q.rubric) {
+          keyRubricXml += `<w:p><w:pPr><w:spacing w:after="40"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="4338CA"/></w:rPr><w:t>Rubrik Penskoran: </w:t></w:r><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${xmlEscape(q.rubric)}</w:t></w:r></w:p>`;
+        }
+        if (Array.isArray(q.keywords) && q.keywords.length > 0) {
+          keyRubricXml += `<w:p><w:pPr><w:spacing w:after="40"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="4338CA"/></w:rPr><w:t>Kata Kunci: </w:t></w:r><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${xmlEscape(q.keywords.join(', '))}</w:t></w:r></w:p>`;
+        }
+      } else {
+        keyRubricXml += `<w:p><w:pPr><w:spacing w:after="40"/></w:pPr><w:r><w:rPr><w:i/><w:sz w:val="18"/><w:color w:val="6B7280"/></w:rPr><w:t>(Kunci jawaban disembunyikan)</w:t></w:r></w:p>`;
+      }
+
+      bodyXml += `
+<w:p><w:pPr><w:spacing w:before="240" w:after="80"/><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="22"/><w:color w:val="1E1B4B"/></w:rPr><w:t>KARTU SOAL NOMOR ${qNum}</w:t></w:r></w:p>
+<w:tbl>
+  <w:tblPr>
+    <w:tblW w:w="9200" w:type="dxa"/>
+    <w:jc w:val="center"/>
+    <w:tblBorders>
+      <w:top w:val="single" w:sz="12" w:space="0" w:color="1E1B4B"/>
+      <w:left w:val="single" w:sz="12" w:space="0" w:color="1E1B4B"/>
+      <w:bottom w:val="single" w:sz="12" w:space="0" w:color="1E1B4B"/>
+      <w:right w:val="single" w:sz="12" w:space="0" w:color="1E1B4B"/>
+      <w:insideH w:val="single" w:sz="6" w:space="0" w:color="CBD5E1"/>
+      <w:insideV w:val="single" w:sz="6" w:space="0" w:color="CBD5E1"/>
+    </w:tblBorders>
+  </w:tblPr>
+  <w:tblGrid>
+    <w:gridCol w:w="2200"/>
+    <w:gridCol w:w="2400"/>
+    <w:gridCol w:w="2200"/>
+    <w:gridCol w:w="2400"/>
+  </w:tblGrid>
+  <w:tr>
+    <w:tc>
+      <w:tcPr><w:tcW w:w="2200" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
+      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Satuan Pendidikan</w:t></w:r></w:p>
+    </w:tc>
+    <w:tc>
+      <w:tcPr><w:tcW w:w="2400" w:type="dxa"/></w:tcPr>
+      <w:p><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${xmlEscape(school || 'SMK NEGERI 5 BANDUNG')}</w:t></w:r></w:p>
+    </w:tc>
+    <w:tc>
+      <w:tcPr><w:tcW w:w="2200" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
+      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Penyusun / Guru</w:t></w:r></w:p>
+    </w:tc>
+    <w:tc>
+      <w:tcPr><w:tcW w:w="2400" w:type="dxa"/></w:tcPr>
+      <w:p><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${xmlEscape(teacher || 'Guru Pengampu')}</w:t></w:r></w:p>
+    </w:tc>
+  </w:tr>
+  <w:tr>
+    <w:tc>
+      <w:tcPr><w:tcW w:w="2200" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
+      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Mata Pelajaran</w:t></w:r></w:p>
+    </w:tc>
+    <w:tc>
+      <w:tcPr><w:tcW w:w="2400" w:type="dxa"/></w:tcPr>
+      <w:p><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${xmlEscape(subject || 'Informatika')}</w:t></w:r></w:p>
+    </w:tc>
+    <w:tc>
+      <w:tcPr><w:tcW w:w="2200" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
+      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Bentuk Soal</w:t></w:r></w:p>
+    </w:tc>
+    <w:tc>
+      <w:tcPr><w:tcW w:w="2400" w:type="dxa"/></w:tcPr>
+      <w:p><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${xmlEscape(typeLabel)}</w:t></w:r></w:p>
+    </w:tc>
+  </w:tr>
+  <w:tr>
+    <w:tc>
+      <w:tcPr><w:tcW w:w="2200" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
+      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Kelas / Sasaran</w:t></w:r></w:p>
+    </w:tc>
+    <w:tc>
+      <w:tcPr><w:tcW w:w="2400" w:type="dxa"/></w:tcPr>
+      <w:p><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${xmlEscape(targetClass || 'Semua Kelas')}</w:t></w:r></w:p>
+    </w:tc>
+    <w:tc>
+      <w:tcPr><w:tcW w:w="2200" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
+      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Level Kognitif</w:t></w:r></w:p>
+    </w:tc>
+    <w:tc>
+      <w:tcPr><w:tcW w:w="2400" w:type="dxa"/></w:tcPr>
+      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="4338CA"/></w:rPr><w:t>${xmlEscape(cogText)}</w:t></w:r></w:p>
+    </w:tc>
+  </w:tr>
+  <w:tr>
+    <w:tc>
+      <w:tcPr><w:tcW w:w="2200" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
+      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Bobot Butir Soal</w:t></w:r></w:p>
+    </w:tc>
+    <w:tc>
+      <w:tcPr><w:tcW w:w="2400" w:type="dxa"/></w:tcPr>
+      <w:p><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${q.weight || 1.0}</w:t></w:r></w:p>
+    </w:tc>
+    <w:tc>
+      <w:tcPr><w:tcW w:w="2200" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
+      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Nomor Urut</w:t></w:r></w:p>
+    </w:tc>
+    <w:tc>
+      <w:tcPr><w:tcW w:w="2400" w:type="dxa"/></w:tcPr>
+      <w:p><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="1E1B4B"/></w:rPr><w:t>Soal Nomor ${qNum}</w:t></w:r></w:p>
+    </w:tc>
+  </w:tr>
+  <w:tr>
+    <w:tc>
+      <w:tcPr>
+        <w:gridSpan w:val="4"/>
+        <w:tcW w:w="9200" w:type="dxa"/>
+        <w:shd w:val="clear" w:color="auto" w:fill="EEF2FF"/>
+      </w:tcPr>
+      <w:p><w:pPr><w:spacing w:after="40"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="312E81"/></w:rPr><w:t>RUMUSAN BUTIR SOAL:</w:t></w:r></w:p>
+    </w:tc>
+  </w:tr>
+  <w:tr>
+    <w:tc>
+      <w:tcPr>
+        <w:gridSpan w:val="4"/>
+        <w:tcW w:w="9200" w:type="dxa"/>
+      </w:tcPr>
+      <w:p><w:pPr><w:spacing w:before="60" w:after="60"/></w:pPr><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${xmlEscape(cleanStem)}</w:t></w:r></w:p>
+      ${optionsXml}
+    </w:tc>
+  </w:tr>
+  <w:tr>
+    <w:tc>
+      <w:tcPr>
+        <w:gridSpan w:val="4"/>
+        <w:tcW w:w="9200" w:type="dxa"/>
+        <w:shd w:val="clear" w:color="auto" w:fill="ECFDF5"/>
+      </w:tcPr>
+      <w:p><w:pPr><w:spacing w:after="40"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="065F46"/></w:rPr><w:t>KUNCI JAWABAN &amp; PEDOMAN PENSKORAN / PEMBAHASAN:</w:t></w:r></w:p>
+    </w:tc>
+  </w:tr>
+  <w:tr>
+    <w:tc>
+      <w:tcPr>
+        <w:gridSpan w:val="4"/>
+        <w:tcW w:w="9200" w:type="dxa"/>
+        <w:shd w:val="clear" w:color="auto" w:fill="F0FDF4"/>
+      </w:tcPr>
+      ${keyRubricXml}
+    </w:tc>
+  </w:tr>
+</w:tbl>
+<w:p><w:r><w:t></w:t></w:r></w:p>
+`;
+
+      if (idx < questions.length - 1) {
+        bodyXml += `<w:p><w:r><w:br w:type="page"/></w:r></w:p>`;
+      }
+    });
+  }
 
   const contentTypesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
@@ -2524,88 +2759,228 @@ function generateDocxTemplate() {
   });
 }
 
-function generateWordHtmlDocument({ title, school, subject, teacher, targetClass, questions, includeKeys = true, includeExplanation = true, includeHeader = true }) {
+function generateWordHtmlDocument({ title, school, subject, teacher, targetClass, questions, includeQuestions = true, includeCards = true, includeKeys = true, includeExplanation = true, includeHeader = true }) {
   const esc = (s) => (s || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   let qHtml = '';
 
-  questions.forEach((q, idx) => {
-    const qNum = idx + 1;
-    qHtml += `<div style="margin-bottom: 16px; page-break-inside: avoid;">`;
-    qHtml += `<p style="margin: 0 0 6px 0; font-weight: bold;">${qNum}. ${q.stem || ''}</p>`;
+  // 1. NASKAH SOAL SECTION
+  if (includeQuestions) {
+    questions.forEach((q, idx) => {
+      const qNum = idx + 1;
+      qHtml += `<div style="margin-bottom: 16px; page-break-inside: avoid;">`;
+      qHtml += `<p style="margin: 0 0 6px 0; font-weight: bold;">${qNum}. ${q.stem || ''}</p>`;
 
-    let typeLabel = '';
-    if (q.type === 'mcq') typeLabel = 'Pilihan Ganda Tunggal';
-    else if (q.type === 'mcq_complex') typeLabel = 'Pilihan Ganda Kompleks';
-    else if (q.type === 'true_false') typeLabel = 'Pernyataan Benar / Salah';
-    else if (q.type === 'matching') typeLabel = 'Menjodohkan';
-    else if (q.type === 'short_essay') typeLabel = 'Isian Singkat';
-    else if (q.type === 'long_essay') typeLabel = 'Uraian / Esai AI';
+      let typeLabel = '';
+      if (q.type === 'mcq') typeLabel = 'Pilihan Ganda Tunggal';
+      else if (q.type === 'mcq_complex') typeLabel = 'Pilihan Ganda Kompleks';
+      else if (q.type === 'true_false') typeLabel = 'Pernyataan Benar / Salah';
+      else if (q.type === 'matching') typeLabel = 'Menjodohkan';
+      else if (q.type === 'short_essay') typeLabel = 'Isian Singkat';
+      else if (q.type === 'long_essay') typeLabel = 'Uraian / Esai AI';
 
-    if (typeLabel) {
-      qHtml += `<p style="margin: 0 0 6px 24px; font-size: 9.5pt; color: #4338ca; font-weight: bold;">TIPE: ${typeLabel}</p>`;
-    }
-
-    if (q.type === 'mcq' || q.type === 'mcq_complex') {
-      (q.options || []).forEach(opt => {
-        qHtml += `<p style="margin: 0 0 4px 24px;"><strong>${opt.id}.</strong> ${opt.text || ''}</p>`;
-      });
-    } else if (q.type === 'true_false') {
-      qHtml += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse: collapse; margin-left: 24px; margin-bottom: 6px; font-size: 10pt;">`;
-      qHtml += `<tr style="background:#f3f4f6;"><th>No</th><th>Pernyataan</th>${includeKeys ? '<th>Kunci</th>' : '<th>Benar</th><th>Salah</th>'}</tr>`;
-      (q.statements || []).forEach((st, sIdx) => {
-        if (includeKeys) {
-          qHtml += `<tr><td align="center">${sIdx + 1}</td><td>${st.text}</td><td align="center" style="font-weight:bold;color:${st.key === 'B' ? '#059669' : '#dc2626'};">${st.key || 'B'}</td></tr>`;
-        } else {
-          qHtml += `<tr><td align="center">${sIdx + 1}</td><td>${st.text}</td><td align="center">[ &nbsp; ]</td><td align="center">[ &nbsp; ]</td></tr>`;
-        }
-      });
-      qHtml += `</table>`;
-    } else if (q.type === 'matching') {
-      qHtml += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse: collapse; margin-left: 24px; margin-bottom: 6px; font-size: 10pt;">`;
-      qHtml += `<tr style="background:#f3f4f6;"><th>Premis / Konsep</th><th>Jodohkan dengan</th><th>Pilihan Target</th></tr>`;
-      (q.premises || []).forEach((p, pIdx) => {
-        const target = (q.targets || [])[pIdx];
-        const arrow = (includeKeys && target) ? `➔ <strong>${target.id}</strong>` : '➔ [ &nbsp;&nbsp;&nbsp; ]';
-        qHtml += `<tr><td>${p.text}</td><td align="center">${arrow}</td><td>${target ? `<strong>${target.id}.</strong> ${target.text}` : ''}</td></tr>`;
-      });
-      qHtml += `</table>`;
-    } else if (q.type === 'short_essay') {
-      qHtml += `<p style="margin: 0 0 4px 24px; color: #4b5563;"><em>Jawaban Singkat: _____________________________________________</em></p>`;
-    } else if (q.type === 'long_essay') {
-      if (q.rubric) {
-        qHtml += `<p style="margin: 0 0 4px 24px; font-size: 9pt; color: #4b5563;"><em>RUBRIK: ${q.rubric}</em></p>`;
+      if (typeLabel) {
+        qHtml += `<p style="margin: 0 0 6px 24px; font-size: 9.5pt; color: #4338ca; font-weight: bold;">TIPE: ${typeLabel}</p>`;
       }
-      qHtml += `<div style="margin: 4px 0 6px 24px; border: 1px dashed #9ca3af; height: 100px; padding: 6px; font-size: 9pt; color: #6b7280;"><em>Lembar Uraian / Jawaban Siswa...</em></div>`;
-    }
 
-    if (includeKeys) {
-      let keyVal = '';
+      if (q.type === 'mcq' || q.type === 'mcq_complex') {
+        (q.options || []).forEach(opt => {
+          qHtml += `<p style="margin: 0 0 4px 24px;"><strong>${opt.id}.</strong> ${opt.text || ''}</p>`;
+        });
+      } else if (q.type === 'true_false') {
+        qHtml += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse: collapse; margin-left: 24px; margin-bottom: 6px; font-size: 10pt;">`;
+        qHtml += `<tr style="background:#f3f4f6;"><th>No</th><th>Pernyataan</th>${includeKeys ? '<th>Kunci</th>' : '<th>Benar</th><th>Salah</th>'}</tr>`;
+        (q.statements || []).forEach((st, sIdx) => {
+          if (includeKeys) {
+            qHtml += `<tr><td align="center">${sIdx + 1}</td><td>${st.text}</td><td align="center" style="font-weight:bold;color:${st.key === 'B' ? '#059669' : '#dc2626'};">${st.key || 'B'}</td></tr>`;
+          } else {
+            qHtml += `<tr><td align="center">${sIdx + 1}</td><td>${st.text}</td><td align="center">[ &nbsp; ]</td><td align="center">[ &nbsp; ]</td></tr>`;
+          }
+        });
+        qHtml += `</table>`;
+      } else if (q.type === 'matching') {
+        qHtml += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse: collapse; margin-left: 24px; margin-bottom: 6px; font-size: 10pt;">`;
+        qHtml += `<tr style="background:#f3f4f6;"><th>Premis / Konsep</th><th>Jodohkan dengan</th><th>Pilihan Target</th></tr>`;
+        (q.premises || []).forEach((p, pIdx) => {
+          const target = (q.targets || [])[pIdx];
+          const arrow = (includeKeys && target) ? `➔ <strong>${target.id}</strong>` : '➔ [ &nbsp;&nbsp;&nbsp; ]';
+          qHtml += `<tr><td>${p.text}</td><td align="center">${arrow}</td><td>${target ? `<strong>${target.id}.</strong> ${target.text}` : ''}</td></tr>`;
+        });
+        qHtml += `</table>`;
+      } else if (q.type === 'short_essay') {
+        qHtml += `<p style="margin: 0 0 4px 24px; color: #4b5563;"><em>Jawaban Singkat: _____________________________________________</em></p>`;
+      } else if (q.type === 'long_essay') {
+        if (q.rubric) {
+          qHtml += `<p style="margin: 0 0 4px 24px; font-size: 9pt; color: #4b5563;"><em>RUBRIK: ${q.rubric}</em></p>`;
+        }
+        qHtml += `<div style="margin: 4px 0 6px 24px; border: 1px dashed #9ca3af; height: 100px; padding: 6px; font-size: 9pt; color: #6b7280;"><em>Lembar Uraian / Jawaban Siswa...</em></div>`;
+      }
+
+      if (includeKeys) {
+        let keyVal = '';
+        if (q.type === 'mcq') keyVal = q.answer || '-';
+        else if (q.type === 'mcq_complex') keyVal = Array.isArray(q.answer) ? q.answer.join(', ') : q.answer;
+        else if (q.type === 'true_false') keyVal = (q.statements || []).map(s => s.key).join('-');
+        else if (q.type === 'matching') {
+          if (typeof q.answer === 'object' && q.answer !== null) {
+            keyVal = Object.entries(q.answer).map(([k, v]) => `${Number(k) + 1}-${v}`).join(', ');
+          } else {
+            keyVal = (q.premises || []).map((_, i) => `${i + 1}-${String.fromCharCode(65 + i)}`).join(', ');
+          }
+        }
+        else if (q.type === 'short_essay') keyVal = (q.answer_keys || []).join(' / ');
+        else if (q.type === 'long_essay') keyVal = q.ideal_answer || (q.keywords ? `Kata Kunci: ${(q.keywords || []).join(', ')}` : 'Jawaban Esai Komprehensif');
+
+        qHtml += `<div style="margin: 6px 0 0 24px; padding: 6px 10px; background: #ecfdf5; border-left: 4px solid #10b981; font-size: 9.5pt; color: #065f46;">`;
+        qHtml += `<strong>KUNCI JAWABAN:</strong> ${keyVal}`;
+        if (includeExplanation && q.explanation) {
+          qHtml += ` &bull; <em>Pembahasan: ${q.explanation.replace(/<[^>]+>/g, ' ')}</em>`;
+        }
+        qHtml += `</div>`;
+      }
+      qHtml += `</div>`;
+    });
+  }
+
+  // 2. KARTU SOAL SECTION
+  let cardsHtml = '';
+  if (includeCards) {
+    const pageBreakStyle = includeQuestions ? 'page-break-before: always; margin-top: 30px;' : 'margin-top: 10px;';
+    cardsHtml += `<div style="${pageBreakStyle}">`;
+    cardsHtml += `
+      <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #312e81; padding-bottom: 8px;">
+        <h2 style="margin: 0; font-size: 15pt; text-transform: uppercase; color: #1e1b4b;">${esc(school || 'SMK NEGERI 5 BANDUNG')}</h2>
+        <h3 style="margin: 3px 0; font-size: 13pt; color: #4338ca;">KUMPULAN KARTU SOAL &amp; KISI-KISI ASESMEN</h3>
+        <p style="margin: 2px 0 0 0; font-size: 9.5pt; color: #4b5563;">Mata Pelajaran: <strong>${esc(subject)}</strong> | Kelas: <strong>${esc(targetClass || 'Semua Kelas')}</strong> | Pengampu: <strong>${esc(teacher || 'Guru Pengampu')}</strong> | Total: <strong>${questions.length} Butir Soal</strong></p>
+      </div>`;
+
+    questions.forEach((q, idx) => {
+      const qNum = idx + 1;
+      const cleanStem = (q.stem || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      const cogText = getCogLevelLabel(q.cog);
+
+      let typeLabel = 'Pilihan Ganda';
+      if (q.type === 'mcq') typeLabel = 'Pilihan Ganda Tunggal (PG)';
+      else if (q.type === 'mcq_complex') typeLabel = 'Pilihan Ganda Kompleks (Multi-Jawaban)';
+      else if (q.type === 'true_false') typeLabel = 'Pernyataan Benar / Salah';
+      else if (q.type === 'matching') typeLabel = 'Menjodohkan (Matching)';
+      else if (q.type === 'short_essay') typeLabel = 'Isian Singkat';
+      else if (q.type === 'long_essay') typeLabel = 'Uraian / Esai AI';
+
+      let optionsListHtml = '';
+      if (q.type === 'mcq' || q.type === 'mcq_complex') {
+        (q.options || []).forEach(opt => {
+          optionsListHtml += `<p style="margin: 2px 0 2px 18px;"><strong>${opt.id}.</strong> ${esc(opt.text || '')}</p>`;
+        });
+      } else if (q.type === 'true_false') {
+        optionsListHtml += `<table border="1" cellpadding="3" cellspacing="0" style="border-collapse: collapse; margin-left: 18px; margin-top: 4px; font-size: 9.5pt; width: 90%;">`;
+        optionsListHtml += `<tr style="background:#f3f4f6;"><th width="40">No</th><th>Pernyataan</th><th width="80">Pilihan</th></tr>`;
+        (q.statements || []).forEach((st, sIdx) => {
+          optionsListHtml += `<tr><td align="center">${sIdx + 1}</td><td>${esc(st.text)}</td><td align="center">[ B / S ]</td></tr>`;
+        });
+        optionsListHtml += `</table>`;
+      } else if (q.type === 'matching') {
+        optionsListHtml += `<table border="1" cellpadding="3" cellspacing="0" style="border-collapse: collapse; margin-left: 18px; margin-top: 4px; font-size: 9.5pt; width: 90%;">`;
+        optionsListHtml += `<tr style="background:#f3f4f6;"><th>Premis / Konsep</th><th width="40">➔</th><th>Pilihan Sasaran Target</th></tr>`;
+        (q.premises || []).forEach((p, pIdx) => {
+          const target = (q.targets || [])[pIdx];
+          optionsListHtml += `<tr><td>${esc(p.text)}</td><td align="center">➔</td><td>${target ? `<strong>${target.id}.</strong> ${esc(target.text)}` : ''}</td></tr>`;
+        });
+        optionsListHtml += `</table>`;
+      } else if (q.type === 'short_essay') {
+        optionsListHtml += `<p style="margin: 4px 0 2px 18px; color: #6b7280;"><em>Jawaban Singkat: _____________________________________________</em></p>`;
+      } else if (q.type === 'long_essay') {
+        optionsListHtml += `<div style="margin: 4px 0 2px 18px; border: 1px dashed #9ca3af; height: 80px; padding: 6px; font-size: 8.5pt; color: #6b7280;"><em>Ruang Lembar Jawaban Uraian Siswa...</em></div>`;
+      }
+
+      let keyVal = '-';
       if (q.type === 'mcq') keyVal = q.answer || '-';
-      else if (q.type === 'mcq_complex') keyVal = Array.isArray(q.answer) ? q.answer.join(', ') : q.answer;
+      else if (q.type === 'mcq_complex') keyVal = Array.isArray(q.answer) ? q.answer.join(', ') : (q.answer || '-');
       else if (q.type === 'true_false') keyVal = (q.statements || []).map(s => s.key).join('-');
       else if (q.type === 'matching') {
         if (typeof q.answer === 'object' && q.answer !== null) {
           keyVal = Object.entries(q.answer).map(([k, v]) => `${Number(k) + 1}-${v}`).join(', ');
         } else {
-          keyVal = (q.premises || []).map((_, idx) => `${idx + 1}-${String.fromCharCode(65 + idx)}`).join(', ');
+          keyVal = (q.premises || []).map((_, i) => `${i + 1}-${String.fromCharCode(65 + i)}`).join(', ');
         }
       }
       else if (q.type === 'short_essay') keyVal = (q.answer_keys || []).join(' / ');
       else if (q.type === 'long_essay') keyVal = q.ideal_answer || (q.keywords ? `Kata Kunci: ${(q.keywords || []).join(', ')}` : 'Jawaban Esai Komprehensif');
 
-      qHtml += `<div style="margin: 6px 0 0 24px; padding: 6px 10px; background: #ecfdf5; border-left: 4px solid #10b981; font-size: 9.5pt; color: #065f46;">`;
-      qHtml += `<strong>KUNCI JAWABAN:</strong> ${keyVal}`;
-      if (includeExplanation && q.explanation) {
-        qHtml += ` &bull; <em>Pembahasan: ${q.explanation.replace(/<[^>]+>/g, ' ')}</em>`;
+      let cardKeyRubricHtml = '';
+      if (includeKeys) {
+        cardKeyRubricHtml = `
+          <div style="margin-top: 6px; padding: 6px 10px; background: #f0fdf4; border-left: 4px solid #10b981; font-size: 9.5pt; color: #065f46;">
+            <p style="margin: 0 0 3px 0;"><strong>KUNCI JAWABAN:</strong> <span style="font-size: 10pt; font-weight: bold; color: #047857;">${esc(keyVal)}</span></p>
+            ${(includeExplanation && q.explanation) ? `<p style="margin: 2px 0; color: #1f2937;"><strong>Pembahasan:</strong> <em>${esc(q.explanation.replace(/<[^>]+>/g, ' '))}</em></p>` : ''}
+            ${q.rubric ? `<p style="margin: 2px 0; color: #4338ca;"><strong>Rubrik Penskoran:</strong> <em>${esc(q.rubric)}</em></p>` : ''}
+            ${(Array.isArray(q.keywords) && q.keywords.length > 0) ? `<p style="margin: 2px 0; color: #4338ca;"><strong>Kata Kunci:</strong> ${esc(q.keywords.join(', '))}</p>` : ''}
+          </div>`;
+      } else {
+        cardKeyRubricHtml = `<p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 9pt; font-style: italic;">(Kunci jawaban disembunyikan)</p>`;
       }
-      qHtml += `</div>`;
-    }
-    qHtml += `</div>`;
-  });
+
+      cardsHtml += `
+        <div style="page-break-inside: avoid; margin-bottom: 24px;">
+          <div style="text-align: center; margin-bottom: 6px;">
+            <strong style="font-size: 11pt; color: #1e1b4b; text-transform: uppercase;">KARTU SOAL NOMOR ${qNum}</strong>
+          </div>
+          <table border="1" cellpadding="5" cellspacing="0" style="width: 100%; border-collapse: collapse; font-family: 'Times New Roman', serif; font-size: 9.5pt; border: 1.5px solid #1e1b4b;">
+            <tr style="background: #f1f5f9;">
+              <td width="22%"><strong>Satuan Pendidikan</strong></td>
+              <td width="28%">${esc(school || 'SMK NEGERI 5 BANDUNG')}</td>
+              <td width="22%"><strong>Penyusun / Guru</strong></td>
+              <td width="28%">${esc(teacher || 'Guru Pengampu')}</td>
+            </tr>
+            <tr>
+              <td><strong>Mata Pelajaran</strong></td>
+              <td>${esc(subject || 'Informatika')}</td>
+              <td><strong>Bentuk Soal</strong></td>
+              <td><strong>${esc(typeLabel)}</strong></td>
+            </tr>
+            <tr style="background: #f8fafc;">
+              <td><strong>Kelas / Sasaran</strong></td>
+              <td>${esc(targetClass || 'Semua Kelas')}</td>
+              <td><strong>Level Kognitif</strong></td>
+              <td><strong style="color: #4338ca;">${esc(cogText)}</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Bobot Butir Soal</strong></td>
+              <td>${q.weight || 1.0}</td>
+              <td><strong>Nomor Soal</strong></td>
+              <td><strong>Butir Soal #${qNum}</strong></td>
+            </tr>
+            <tr style="background: #eef2ff;">
+              <td colspan="4" style="font-weight: bold; color: #312e81; padding: 5px 8px;">RUMUSAN BUTIR SOAL:</td>
+            </tr>
+            <tr>
+              <td colspan="4" style="padding: 10px; line-height: 1.45;">
+                <p style="margin: 0 0 6px 0; font-weight: bold;">${esc(cleanStem)}</p>
+                ${optionsListHtml}
+              </td>
+            </tr>
+            <tr style="background: #ecfdf5;">
+              <td colspan="4" style="font-weight: bold; color: #065f46; padding: 5px 8px;">KUNCI JAWABAN &amp; PEDOMAN PENSKORAN / PEMBAHASAN:</td>
+            </tr>
+            <tr>
+              <td colspan="4" style="padding: 8px 10px;">
+                ${cardKeyRubricHtml}
+              </td>
+            </tr>
+          </table>
+        </div>
+      `;
+    });
+
+    cardsHtml += `</div>`;
+  }
 
   let modeDesc = 'Naskah Ujian Siswa (Siap Cetak)';
-  if (includeKeys) {
-    modeDesc = includeExplanation ? '<span style="color:#059669;font-weight:bold;">Master Guru (Kunci & Pembahasan)</span>' : '<span style="color:#059669;font-weight:bold;">Master Guru (Kunci Saja / Ringkas)</span>';
+  if (includeQuestions && includeCards) {
+    modeDesc = '<span style="color:#4338ca;font-weight:bold;">Paket Bundel Lengkap (Naskah Soal &amp; Kartu Soal Asesmen)</span>';
+  } else if (includeCards && !includeQuestions) {
+    modeDesc = '<span style="color:#4338ca;font-weight:bold;">Kumpulan Kartu Soal &amp; Kisi-Kisi Asesmen Standar</span>';
+  } else if (includeKeys) {
+    modeDesc = includeExplanation ? '<span style="color:#059669;font-weight:bold;">Master Guru (Kunci &amp; Pembahasan)</span>' : '<span style="color:#059669;font-weight:bold;">Master Guru (Kunci Saja / Ringkas)</span>';
   }
 
   let headerHtml = '';
@@ -2616,7 +2991,7 @@ function generateWordHtmlDocument({ title, school, subject, teacher, targetClass
         <td style="text-align: center; padding-bottom: 8px;">
           <h2 style="margin: 0; font-size: 16pt; text-transform: uppercase;">${esc(school || 'SMK NEGERI 5 BANDUNG')}</h2>
           <h3 style="margin: 2px 0; font-size: 13pt;">${esc(title)}</h3>
-          <p style="margin: 0; font-size: 9.5pt; color: #4b5563;">NASKAH ASESMEN PEMBELAJARAN STANDAR TKA / CBT & LMS AI</p>
+          <p style="margin: 0; font-size: 9.5pt; color: #4b5563;">NASKAH ASESMEN PEMBELAJARAN STANDAR TKA / CBT &amp; LMS AI</p>
         </td>
       </tr>
     </table>
@@ -2661,6 +3036,7 @@ function generateWordHtmlDocument({ title, school, subject, teacher, targetClass
   <body>
     ${headerHtml}
     ${qHtml}
+    ${cardsHtml}
   </body>
   </html>`;
 }
@@ -4916,7 +5292,7 @@ const server = http.createServer(async (req, res) => {
     return res.end(docxBuf);
   }
 
-  // GET /api/v1/cbt/question-banks/:id/export-word (Export Bank Soal ke Word .docx / .doc)
+  // GET /api/v1/cbt/question-banks/:id/export-word (Export Bank Soal & Kartu Soal ke Word .docx / .doc)
   if (pathname.startsWith('/api/v1/cbt/question-banks/') && pathname.endsWith('/export-word') && req.method === 'GET') {
     const parts = pathname.split('/');
     const bankId = parseInt(parts[5], 10);
@@ -4925,15 +5301,25 @@ const server = http.createServer(async (req, res) => {
       return sendJSON(404, { status: 'error', message: 'Bank soal tidak ditemukan' });
     }
 
-    const mode = parsedUrl.searchParams.get('mode') || 'teacher'; // 'teacher' | 'teacher_compact' | 'student'
+    const mode = parsedUrl.searchParams.get('mode') || 'bundle'; // 'bundle' | 'teacher' | 'teacher_compact' | 'cards_only' | 'student'
     const format = parsedUrl.searchParams.get('format') || 'docx'; // 'docx' vs 'doc'
     
+    let includeQuestions = (mode !== 'cards_only');
+    if (parsedUrl.searchParams.has('include_questions')) {
+      includeQuestions = parsedUrl.searchParams.get('include_questions') === '1' || parsedUrl.searchParams.get('include_questions') === 'true';
+    }
+
+    let includeCards = (mode === 'bundle' || mode === 'all' || mode === 'cards_only');
+    if (parsedUrl.searchParams.has('include_cards')) {
+      includeCards = parsedUrl.searchParams.get('include_cards') === '1' || parsedUrl.searchParams.get('include_cards') === 'true';
+    }
+
     let includeKeys = (mode !== 'student');
     if (parsedUrl.searchParams.has('include_keys')) {
       includeKeys = parsedUrl.searchParams.get('include_keys') === '1' || parsedUrl.searchParams.get('include_keys') === 'true';
     }
 
-    let includeExplanation = (mode === 'teacher');
+    let includeExplanation = (mode === 'bundle' || mode === 'teacher' || mode === 'cards_only');
     if (parsedUrl.searchParams.has('include_expl')) {
       includeExplanation = parsedUrl.searchParams.get('include_expl') === '1' || parsedUrl.searchParams.get('include_expl') === 'true';
     }
@@ -4944,11 +5330,15 @@ const server = http.createServer(async (req, res) => {
     }
 
     const safeTitle = (bank.title || 'Bank_Soal').replace(/[^a-zA-Z0-9_-]/g, '_');
-    let labelMode = 'Guru_Lengkap';
-    if (!includeKeys) {
-      labelMode = 'Siswa';
-    } else if (!includeExplanation) {
-      labelMode = 'Guru_Kunci_Saja';
+    let labelMode = 'Soal_dan_Kartu_Soal';
+    if (includeQuestions && includeCards) {
+      labelMode = 'Naskah_dan_Kartu_Soal';
+    } else if (includeCards && !includeQuestions) {
+      labelMode = 'Kartu_Soal_Resmi';
+    } else if (includeQuestions && !includeCards) {
+      if (!includeKeys) labelMode = 'Naskah_Siswa';
+      else if (!includeExplanation) labelMode = 'Naskah_Kunci_Saja';
+      else labelMode = 'Naskah_Guru_Lengkap';
     }
 
     if (format === 'doc') {
@@ -4959,6 +5349,8 @@ const server = http.createServer(async (req, res) => {
         teacher: bank.teacher,
         targetClass: bank.target_class,
         questions: bank.questions || [],
+        includeQuestions,
+        includeCards,
         includeKeys,
         includeExplanation,
         includeHeader
@@ -4978,6 +5370,8 @@ const server = http.createServer(async (req, res) => {
       teacher: bank.teacher,
       targetClass: bank.target_class,
       questions: bank.questions || [],
+      includeQuestions,
+      includeCards,
       includeKeys,
       includeExplanation,
       includeHeader

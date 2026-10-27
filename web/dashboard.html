@@ -3224,32 +3224,44 @@
       <!-- PILIHAN PROFIL NASKAH CEPAT -->
       <div class="space-y-2">
         <label class="block text-xs font-bold text-slate-300">Pilih Profil Dokumen:</label>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-          <!-- Preset 1: Guru Lengkap -->
-          <div id="presetCard_teacher" onclick="setExportWordPreset('teacher')" class="p-3 rounded-xl border border-indigo-500 bg-indigo-950/40 cursor-pointer hover:border-indigo-400 transition flex flex-col justify-between">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <!-- Preset 1: Soal & Kartu Soal (Bundel Otomatis) -->
+          <div id="presetCard_bundle" onclick="setExportWordPreset('bundle')" class="p-3 rounded-xl border border-indigo-500 bg-indigo-950/40 cursor-pointer hover:border-indigo-400 transition flex flex-col justify-between ring-1 ring-indigo-500">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <i class="fa-solid fa-layer-group text-amber-400 text-sm"></i>
+                <span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-semibold">Bundel</span>
+              </div>
+              <strong class="text-xs text-white block">Soal &amp; Kartu Soal</strong>
+              <p class="text-[10px] text-slate-400 mt-1 leading-tight">Naskah Soal + Kartu Soal otomatis standar asesmen.</p>
+            </div>
+          </div>
+
+          <!-- Preset 2: Naskah Guru Lengkap -->
+          <div id="presetCard_teacher" onclick="setExportWordPreset('teacher')" class="p-3 rounded-xl border border-slate-800 bg-slate-950/40 cursor-pointer hover:border-indigo-400 transition flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between mb-1">
                 <i class="fa-solid fa-graduation-cap text-emerald-400 text-sm"></i>
                 <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-semibold">Master</span>
               </div>
-              <strong class="text-xs text-white block">Guru Lengkap</strong>
-              <p class="text-[10px] text-slate-400 mt-1 leading-tight">Kunci & pembahasan lengkap disertakan.</p>
+              <strong class="text-xs text-white block">Naskah Soal Saja</strong>
+              <p class="text-[10px] text-slate-400 mt-1 leading-tight">Naskah soal beserta kunci &amp; pembahasan lengkap.</p>
             </div>
           </div>
 
-          <!-- Preset 2: Guru Ringkas (Kunci Saja, Tanpa Pembahasan) -->
-          <div id="presetCard_teacher_compact" onclick="setExportWordPreset('teacher_compact')" class="p-3 rounded-xl border border-slate-800 bg-slate-950/40 cursor-pointer hover:border-indigo-400 transition flex flex-col justify-between">
+          <!-- Preset 3: Kartu Soal Saja -->
+          <div id="presetCard_cards_only" onclick="setExportWordPreset('cards_only')" class="p-3 rounded-xl border border-slate-800 bg-slate-950/40 cursor-pointer hover:border-indigo-400 transition flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between mb-1">
-                <i class="fa-solid fa-key text-amber-400 text-sm"></i>
-                <span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-semibold">Ringkas</span>
+                <i class="fa-solid fa-id-card text-cyan-400 text-sm"></i>
+                <span class="text-[9px] bg-cyan-500/20 text-cyan-300 px-1.5 py-0.5 rounded font-semibold">Kisi-Kisi</span>
               </div>
-              <strong class="text-xs text-white block">Kunci Saja</strong>
-              <p class="text-[10px] text-slate-400 mt-1 leading-tight">Kunci jawaban ADA, pembahasan DIHILANGKAN.</p>
+              <strong class="text-xs text-white block">Kartu Soal Saja</strong>
+              <p class="text-[10px] text-slate-400 mt-1 leading-tight">Tabel Kartu Soal per butir (administrasi guru &amp; pengawas).</p>
             </div>
           </div>
 
-          <!-- Preset 3: Siswa (Tanpa Kunci) -->
+          <!-- Preset 4: Siswa (Tanpa Kunci) -->
           <div id="presetCard_student" onclick="setExportWordPreset('student')" class="p-3 rounded-xl border border-slate-800 bg-slate-950/40 cursor-pointer hover:border-indigo-400 transition flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between mb-1">
@@ -3257,16 +3269,34 @@
                 <span class="text-[9px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded font-semibold">Ujian</span>
               </div>
               <strong class="text-xs text-white block">Naskah Siswa</strong>
-              <p class="text-[10px] text-slate-400 mt-1 leading-tight">Siap cetak ujian kertas (tanpa kunci & pembahasan).</p>
+              <p class="text-[10px] text-slate-400 mt-1 leading-tight">Siap cetak ujian kertas (tanpa kunci &amp; kartu soal).</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- KUSTOMISASI KONTEN (CHECKBOXES) -->
+            <!-- KUSTOMISASI KONTEN (CHECKBOXES) -->
       <div class="p-3.5 bg-slate-950/70 border border-slate-800 rounded-xl space-y-2.5">
-        <label class="block text-xs font-bold text-slate-300">Sesuaikan Kelengkapan Soal:</label>
+        <label class="block text-xs font-bold text-slate-300">Sesuaikan Kelengkapan Dokumen:</label>
         
+        <label class="flex items-start gap-2.5 cursor-pointer">
+          <input type="checkbox" id="exportWordIncludeQuestions" checked class="mt-0.5 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-0">
+          <div class="text-xs">
+            <span class="text-slate-200 font-semibold block">Sertakan Lembar Naskah Soal</span>
+            <span class="text-[11px] text-slate-400">Menyusun format lembar naskah soal ujian dari nomor pertama hingga akhir.</span>
+          </div>
+        </label>
+
+        <label class="flex items-start gap-2.5 cursor-pointer">
+          <input type="checkbox" id="exportWordIncludeCards" checked class="mt-0.5 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-0">
+          <div class="text-xs">
+            <span class="text-amber-300 font-semibold block flex items-center gap-1.5">
+              <i class="fa-solid fa-id-card text-amber-400"></i>Sertakan Kartu Soal Otomatis (Standar Kemendikbud)
+            </span>
+            <span class="text-[11px] text-slate-400">Tabel Kartu Soal per butir lengkap dengan: Bentuk Soal, Level Kognitif (C1-C6/HOTS), Bobot, Rumusan Soal, Kunci, &amp; Rubrik.</span>
+          </div>
+        </label>
+
         <label class="flex items-start gap-2.5 cursor-pointer">
           <input type="checkbox" id="exportWordIncludeKeys" onchange="onExportKeysToggled()" checked class="mt-0.5 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-0">
           <div class="text-xs">
@@ -3278,15 +3308,15 @@
         <label class="flex items-start gap-2.5 cursor-pointer">
           <input type="checkbox" id="exportWordIncludeExpl" checked class="mt-0.5 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-0">
           <div class="text-xs">
-            <span class="text-slate-200 font-semibold block">Sertakan Pembahasan Soal</span>
-            <span class="text-[11px] text-slate-400">Hilangkan centang jika Anda tidak ingin pembahasan dimasukkan ke dalam format Word.</span>
+            <span class="text-slate-200 font-semibold block">Sertakan Pembahasan Soal &amp; Rubrik Penskoran</span>
+            <span class="text-[11px] text-slate-400">Menyertakan pembahasan detail dan rubrik penskoran esai/uraian.</span>
           </div>
         </label>
 
         <label class="flex items-start gap-2.5 cursor-pointer">
           <input type="checkbox" id="exportWordIncludeHeader" checked class="mt-0.5 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-0">
           <div class="text-xs">
-            <span class="text-slate-200 font-semibold block">Sertakan Kop Sekolah & Informasi Asesmen</span>
+            <span class="text-slate-200 font-semibold block">Sertakan Kop Sekolah &amp; Informasi Asesmen</span>
             <span class="text-[11px] text-slate-400">Menyertakan kop sekolah, nama mapel, kelas, dan nama guru pengampu.</span>
           </div>
         </label>
@@ -6066,33 +6096,46 @@
         }
       }
 
-      setExportWordPreset('teacher');
+      setExportWordPreset('bundle');
       openModal('modalExportWord');
     };
 
     window.setExportWordPreset = function(preset) {
+      const chkQuestions = document.getElementById("exportWordIncludeQuestions");
+      const chkCards = document.getElementById("exportWordIncludeCards");
       const chkKeys = document.getElementById("exportWordIncludeKeys");
       const chkExpl = document.getElementById("exportWordIncludeExpl");
       const chkHeader = document.getElementById("exportWordIncludeHeader");
 
-      ['teacher', 'teacher_compact', 'student'].forEach(p => {
+      ['bundle', 'teacher', 'cards_only', 'student'].forEach(p => {
         const el = document.getElementById("presetCard_" + p);
         if (el) {
           if (p === preset) {
-            el.className = "p-3 rounded-xl border border-indigo-500 bg-indigo-950/40 cursor-pointer hover:border-indigo-400 transition flex flex-col justify-between";
+            el.className = "p-3 rounded-xl border border-indigo-500 bg-indigo-950/40 cursor-pointer hover:border-indigo-400 transition flex flex-col justify-between ring-1 ring-indigo-500";
           } else {
             el.className = "p-3 rounded-xl border border-slate-800 bg-slate-950/40 cursor-pointer hover:border-indigo-400 transition flex flex-col justify-between";
           }
         }
       });
 
-      if (preset === 'teacher') {
+      if (preset === 'bundle') {
+        if (chkQuestions) chkQuestions.checked = true;
+        if (chkCards) chkCards.checked = true;
         if (chkKeys) chkKeys.checked = true;
         if (chkExpl) { chkExpl.checked = true; chkExpl.disabled = false; }
-      } else if (preset === 'teacher_compact') {
+      } else if (preset === 'teacher') {
+        if (chkQuestions) chkQuestions.checked = true;
+        if (chkCards) chkCards.checked = false;
         if (chkKeys) chkKeys.checked = true;
-        if (chkExpl) { chkExpl.checked = false; chkExpl.disabled = false; }
+        if (chkExpl) { chkExpl.checked = true; chkExpl.disabled = false; }
+      } else if (preset === 'cards_only') {
+        if (chkQuestions) chkQuestions.checked = false;
+        if (chkCards) chkCards.checked = true;
+        if (chkKeys) chkKeys.checked = true;
+        if (chkExpl) { chkExpl.checked = true; chkExpl.disabled = false; }
       } else if (preset === 'student') {
+        if (chkQuestions) chkQuestions.checked = true;
+        if (chkCards) chkCards.checked = false;
         if (chkKeys) chkKeys.checked = false;
         if (chkExpl) { chkExpl.checked = false; chkExpl.disabled = true; }
       }
@@ -6115,13 +6158,21 @@
     window.submitExportWord = function() {
       const expSel = document.getElementById("exportWordBankSelect");
       const bankId = (expSel && expSel.value) ? parseInt(expSel.value, 10) : (currentActiveBankId || 1);
+      const chkQuestions = document.getElementById("exportWordIncludeQuestions")?.checked ?? true;
+      const chkCards = document.getElementById("exportWordIncludeCards")?.checked ?? true;
       const chkKeys = document.getElementById("exportWordIncludeKeys")?.checked ?? true;
       const chkExpl = document.getElementById("exportWordIncludeExpl")?.checked ?? true;
       const chkHeader = document.getElementById("exportWordIncludeHeader")?.checked ?? true;
       const format = document.querySelector('input[name="exportWordFormat"]:checked')?.value || 'docx';
 
-      const mode = (!chkKeys) ? 'student' : (!chkExpl ? 'teacher_compact' : 'teacher');
-      const downloadUrl = `/api/v1/cbt/question-banks/${bankId}/export-word?mode=${mode}&include_keys=${chkKeys ? 1 : 0}&include_expl=${chkExpl ? 1 : 0}&include_header=${chkHeader ? 1 : 0}&format=${format}`;
+      let mode = 'bundle';
+      if (chkQuestions && chkCards) mode = 'bundle';
+      else if (chkCards && !chkQuestions) mode = 'cards_only';
+      else if (!chkKeys) mode = 'student';
+      else if (!chkExpl) mode = 'teacher_compact';
+      else mode = 'teacher';
+
+      const downloadUrl = `/api/v1/cbt/question-banks/${bankId}/export-word?mode=${mode}&include_questions=${chkQuestions ? 1 : 0}&include_cards=${chkCards ? 1 : 0}&include_keys=${chkKeys ? 1 : 0}&include_expl=${chkExpl ? 1 : 0}&include_header=${chkHeader ? 1 : 0}&format=${format}`;
 
       const a = document.createElement("a");
       a.href = downloadUrl;

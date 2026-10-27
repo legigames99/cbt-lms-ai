@@ -1453,7 +1453,7 @@
         // Detail tampilan konten opsi/stimulus berdasarkan tipe soal
         let bodyHtml = '';
         if (q.type === 'mcq') {
-          const opts = q.options || [];
+          const opts = [...(q.options || [])].sort((a, b) => String(a.id || '').localeCompare(String(b.id || '')));
           bodyHtml = `
             <div class="text-xs text-slate-300 space-y-1.5 pl-2">
               ${opts.map((o, optIdx) => {
@@ -1488,7 +1488,7 @@
             </div>
           `;
         } else if (q.type === 'mcq_complex') {
-          const opts = q.options || [];
+          const opts = [...(q.options || [])].sort((a, b) => String(a.id || '').localeCompare(String(b.id || '')));
           const correctKeys = (Array.isArray(q.answer) ? q.answer : [q.answer]).map(k => String(k).toUpperCase());
           bodyHtml = `
             <div class="text-xs text-slate-300 space-y-1.5 pl-2">
@@ -2725,7 +2725,7 @@ window.setAIBasisMode = function(basis) {
               <div class="text-slate-200 font-medium leading-relaxed">${q.stem}</div>
               ${q.options && q.options.length > 0 ? `
                 <div class="space-y-1 pl-3 border-l-2 border-slate-800">
-                  ${q.options.map(opt => `
+                  ${[...(q.options || [])].sort((a, b) => String(a.id || '').localeCompare(String(b.id || ''))).map(opt => `
                     <div class="text-slate-300"><strong class="text-slate-400">${opt.id}.</strong> ${opt.text}</div>
                   `).join("")}
                 </div>

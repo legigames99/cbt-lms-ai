@@ -386,7 +386,7 @@ function normalizeQuestionOptions(rawOptions) {
     }
 
     return { id: fallbackId, text: sanitizeQuestionText(String(opt || '')) };
-  });
+  }).sort((a, b) => String(a.id || '').localeCompare(String(b.id || '')));
 }
 
 function normalizeStatements(rawStatements) {
@@ -2432,7 +2432,7 @@ function generateDocxDocument({ title, school, subject, teacher, targetClass, qu
       }
 
       if (q.type === 'mcq' || q.type === 'mcq_complex') {
-        const opts = q.options || [];
+        const opts = [...(q.options || [])].sort((a, b) => String(a.id || '').localeCompare(String(b.id || '')));
         opts.forEach(opt => {
           const cleanOpt = (opt.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
           bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="40"/></w:pPr>`;
@@ -2536,7 +2536,8 @@ function generateDocxDocument({ title, school, subject, teacher, targetClass, qu
 
       let optionsXml = '';
       if (q.type === 'mcq' || q.type === 'mcq_complex') {
-        (q.options || []).forEach(opt => {
+        const sortedOpts = [...(q.options || [])].sort((a, b) => String(a.id || '').localeCompare(String(b.id || '')));
+        sortedOpts.forEach(opt => {
           const cleanOpt = (opt.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
           optionsXml += `<w:p><w:pPr><w:ind w:left="240"/><w:spacing w:after="30"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>${opt.id}. </w:t></w:r><w:r><w:rPr><w:sz w:val="18"/></w:rPr><w:t>${xmlEscape(cleanOpt)}</w:t></w:r></w:p>`;
         });
@@ -2573,7 +2574,7 @@ function generateDocxDocument({ title, school, subject, teacher, targetClass, qu
       }
 
       bodyXml += `
-<w:p><w:pPr><w:spacing w:before="120" w:after="30"/><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="19"/><w:color w:val="1E1B4B"/></w:rPr><w:t>KARTU SOAL NOMOR ${qNum}</w:t></w:r></w:p>
+<w:p><w:pPr><w:keepNext/><w:spacing w:before="120" w:after="30"/><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="19"/><w:color w:val="1E1B4B"/></w:rPr><w:t>KARTU SOAL NOMOR ${qNum}</w:t></w:r></w:p>
 <w:tbl>
   <w:tblPr>
     <w:tblW w:w="9200" w:type="dxa"/>
@@ -2681,6 +2682,7 @@ function generateDocxDocument({ title, school, subject, teacher, targetClass, qu
     </w:tc>
   </w:tr>
   <w:tr>
+    <w:trPr><w:cantSplit/></w:trPr>
     <w:tc>
       <w:tcPr>
         <w:gridSpan w:val="4"/>
@@ -2702,6 +2704,7 @@ function generateDocxDocument({ title, school, subject, teacher, targetClass, qu
     </w:tc>
   </w:tr>
   <w:tr>
+    <w:trPr><w:cantSplit/></w:trPr>
     <w:tc>
       <w:tcPr>
         <w:gridSpan w:val="4"/>
@@ -2785,7 +2788,8 @@ function generateWordHtmlDocument({ title, school, subject, teacher, targetClass
       }
 
       if (q.type === 'mcq' || q.type === 'mcq_complex') {
-        (q.options || []).forEach(opt => {
+        const sortedOpts = [...(q.options || [])].sort((a, b) => String(a.id || '').localeCompare(String(b.id || '')));
+        sortedOpts.forEach(opt => {
           qHtml += `<p style="margin: 0 0 4px 24px;"><strong>${opt.id}.</strong> ${opt.text || ''}</p>`;
         });
       } else if (q.type === 'true_false') {
@@ -2870,7 +2874,8 @@ function generateWordHtmlDocument({ title, school, subject, teacher, targetClass
 
       let optionsListHtml = '';
       if (q.type === 'mcq' || q.type === 'mcq_complex') {
-        (q.options || []).forEach(opt => {
+        const sortedOpts = [...(q.options || [])].sort((a, b) => String(a.id || '').localeCompare(String(b.id || '')));
+        sortedOpts.forEach(opt => {
           optionsListHtml += `<p style="margin: 2px 0 2px 18px;"><strong>${opt.id}.</strong> ${esc(opt.text || '')}</p>`;
         });
       } else if (q.type === 'true_false') {

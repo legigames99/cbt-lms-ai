@@ -2050,7 +2050,7 @@
     "id": 6,
     "subject": "Jaringan Komputer & Telekomunikasi",
     "title": "ASJ - Administrasi Sistem Jaringan",
-    "teacher": "Ahmad Fauzi, S.Kom., M.T.",
+    "teacher": "Legiyanto, S.Pd",
     "target_class": "Semua Kelas",
     "description": "",
     "questions": [
@@ -2058,31 +2058,31 @@
         "id": 1,
         "type": "mcq",
         "cog": "C2",
-        "stem": "Saat melakukan praktikum administrasi server pada sistem operasi Ubuntu 24.04, langkah pertama yang harus dilakukan sebelum menginstal paket layanan web server Apache adalah memperbarui daftar repositori paket sistem. Perintah manakah yang tepat digunakan untuk memperbarui repositori tersebut melalui terminal?",
+        "stem": "Saat praktikum jaringan komputer di kelas XI TKJ, siswa diminta untuk meratakan akses pengelolaan server Ubuntu 24.04 dari jarak jauh. Guru menjelaskan bahwa protokol pengelolaan jarak jauh terbagi menjadi dua jenis, yaitu yang mengenkripsi data dan yang mengirimkan data dalam bentuk teks biasa (plaintext). Protokol manakah yang direkomendasikan untuk digunakan karena faktor keamanan data?",
         "weight": 1,
-        "explanation": "Perintah `sudo apt update` digunakan untuk menyinkronkan daftar paket terbaru dari repositori resmi ke sistem lokal Ubuntu 24.04 sehingga paket seperti Apache dapat diunduh dengan versi yang benar.",
+        "explanation": "SSH (Secure Shell) adalah protokol standar yang aman untuk administrasi jarak jauh karena menerapkan enkripsi kriptografi pada lalu lintas datanya. Sebaliknya, Telnet mengirimkan data termasuk kata sandi dalam bentuk plaintext (teks biasa) sehingga sangat rentan terhadap penyadapan.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "sudo apt install apache2"
+            "text": "Telnet karena menggunakan port 23 yang lebih cepat dalam transmisi data."
           },
           {
             "id": "B",
-            "text": "sudo apt update"
+            "text": "SSH (Secure Shell) karena melakukan enkripsi pada seluruh data yang dikirimkan."
           },
           {
             "id": "C",
-            "text": "sudo systemctl start apache2"
+            "text": "FTP karena mendukung transfer berkas konfigurasi dengan baik."
           },
           {
             "id": "D",
-            "text": "sudo ufw allow 'Apache'"
+            "text": "HTTP karena berbasis web browser yang mudah diakses."
           },
           {
             "id": "E",
-            "text": "sudo apt upgrade -y"
+            "text": "DHCP karena otomatis memberikan alamat IP ke server."
           }
         ],
         "answer": "B"
@@ -2091,298 +2091,133 @@
         "id": 2,
         "type": "mcq",
         "cog": "C3",
-        "stem": "Siswa kelas XI TKJ sedang memasang layanan Web Server Apache pada server Ubuntu 24.04 di laboratorium. Setelah proses instalasi selesai menggunakan perintah <code>sudo apt install apache2</code>, langkah apa yang perlu dilakukan untuk memastikan layanan tersebut langsung berjalan otomatis saat komputer server dinyalakan ulang?",
+        "stem": "Sebelum melakukan instalasi layanan SSH server pada sistem operasi Ubuntu 24.04, langkah awal yang harus dilakukan oleh siswa di terminal adalah memperbarui daftar paket repositori sistem. Perintah manakah yang paling tepat untuk menjalankan tugas tersebut?",
         "weight": 1,
-        "explanation": "Perintah `sudo systemctl enable apache2` berfungsi untuk mengaktifkan layanan agar berjalan otomatis saat sistem booting (startup).",
+        "explanation": "Perintah <code>sudo apt update</code> digunakan untuk menyegarkan dan memperbarui daftar paket dari repositori resmi Ubuntu agar sistem mengenali versi terbaru dari paket yang akan diinstal.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "sudo systemctl status apache2"
+            "text": "<code>sudo apt update</code>"
           },
           {
             "id": "B",
-            "text": "sudo systemctl stop apache2"
+            "text": "<code>sudo systemctl start ssh</code>"
           },
           {
             "id": "C",
-            "text": "sudo systemctl enable apache2"
+            "text": "<code>sudo apt install telnetd</code>"
           },
           {
             "id": "D",
-            "text": "sudo systemctl restart apache2"
+            "text": "<code>sudo ufw allow ssh</code>"
           },
           {
             "id": "E",
-            "text": "sudo apt purge apache2"
+            "text": "<code>ssh -v localhost</code>"
           }
         ],
-        "answer": "C"
+        "answer": "A"
       },
       {
         "id": 3,
         "type": "mcq",
         "cog": "C3",
-        "stem": "Dalam praktikum pembuatan halaman web dinamis, PHP perlu diintegrasikan dengan web server Apache di Ubuntu 24.04. Paket modul PHP manakah yang umumnya harus diinstal agar Apache dapat memproses dan mengeksekusi berkas berformat <code>.php</code>?",
+        "stem": "Siswa kelas XI TKJ sedang memasang paket OpenSSH server pada Ubuntu 24.04 di komputer server laboratorium. Setelah proses instalasi selesai, paket aplikasi apa yang harus diinstal agar server tersebut dapat menerima koneksi melalui Telnet?",
         "weight": 1,
-        "explanation": "Paket `libapache2-mod-php` adalah modul yang menghubungkan Apache dengan interpreter PHP agar server dapat memproses halaman web dinamis berbasis PHP.",
+        "explanation": "Untuk mengaktifkan layanan Telnet Server pada Ubuntu, paket yang harus diinstal adalah pelayan Telnet seperti <code>telnetd</code> atau <code>inetutils-telnetd</code>. Paket <code>openssh-client</code> digunakan untuk klien SSH, sedangkan <code>apache2</code> untuk web server.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "libapache2-mod-php"
+            "text": "openssh-client"
           },
           {
             "id": "B",
-            "text": "php-mysql"
+            "text": "telnetd atau inetutils-telnetd"
           },
           {
             "id": "C",
-            "text": "mariadb-server"
+            "text": "apache2"
           },
           {
             "id": "D",
-            "text": "apache2-utils"
+            "text": "vsftpd"
           },
           {
             "id": "E",
-            "text": "php-cli"
+            "text": "net-tools"
           }
         ],
-        "answer": "A"
+        "answer": "B"
       },
       {
         "id": 4,
         "type": "mcq",
-        "cog": "C2",
-        "stem": "Direktori default tempat penyimpanan berkas-berkas web utama (seperti <code>index.html</code> atau <code>index.php</code>) pada instalasi standar Apache di Ubuntu 24.04 terletak pada...",
+        "cog": "C3",
+        "stem": "Perhatikan baris perintah berikut yang dijalankan di terminal klien untuk mengakses server Ubuntu 24.04 dengan alamat IP 192.168.10.5 menggunakan akun pengguna <code>adminjar</code>:<br><code>ssh adminjar@192.168.10.5</code><br>Port default berapakah yang secara otomatis digunakan oleh protokol SSH pada koneksi tersebut jika tidak didefinisikan secara khusus?",
         "weight": 1,
-        "explanation": "Secara default, dokumen root untuk web server Apache di Ubuntu 24.04 berada di dalam direktori `/var/www/html/`.",
+        "explanation": "Secara default, layanan SSH berjalan pada port TCP 22. Port 21 digunakan untuk FTP, port 23 untuk Telnet, port 80 untuk HTTP, dan port 443 untuk HTTPS.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "/etc/apache2/"
+            "text": "Port 21"
           },
           {
             "id": "B",
-            "text": "/var/www/html/"
+            "text": "Port 23"
           },
           {
             "id": "C",
-            "text": "/home/ubuntu/public_html/"
+            "text": "Port 80"
           },
           {
             "id": "D",
-            "text": "/usr/share/apache2/"
+            "text": "Port 443"
           },
           {
             "id": "E",
-            "text": "/var/log/apache2/"
+            "text": "Port 22"
           }
         ],
-        "answer": "B"
+        "answer": "E"
       },
       {
         "id": 5,
         "type": "mcq",
-        "cog": "C3",
-        "stem": "Setelah menginstal basis data MariaDB pada server Ubuntu 24.04, disarankan untuk menjalankan skrip pengamanan awal guna menghapus basis data uji dan menonaktifkan login root jarak jauh. Perintah apakah yang digunakan untuk menjalankan konfigurasi keamanan tersebut?",
-        "weight": 1,
-        "explanation": "Perintah `sudo mysql_secure_installation` adalah utilitas bawaan untuk meningkatkan keamanan dasar instalasi MariaDB/MySQL.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "options": [
-          {
-            "id": "A",
-            "text": "sudo mysql_secure_installation"
-          },
-          {
-            "id": "B",
-            "text": "sudo mysql -u root -p"
-          },
-          {
-            "id": "C",
-            "text": "sudo systemctl secure mariadb"
-          },
-          {
-            "id": "D",
-            "text": "sudo apt install mysql-client"
-          },
-          {
-            "id": "E",
-            "text": "sudo mariadb-config --secure"
-          }
-        ],
-        "answer": "A"
-      },
-      {
-        "id": 6,
-        "type": "mcq",
         "cog": "C4",
-        "stem": "Seorang siswa mencoba mengakses halaman <code>http://localhost/info.php</code> dari browser setelah membuat berkas tersebut di direktori web server. Namun, yang muncul di layar bukan informasi versi PHP, melainkan teks mentah kode PHP itu sendiri (source code). Kemungkinan besar penyebab utama masalah ini adalah...",
+        "stem": "Seorang siswa mencoba melakukan koneksi Telnet dari komputer klien ke server Ubuntu 24.04 di jaringan lokal. Namun, koneksi selalu ditolak atau mengalami waktu habis (connection timed out), meskipun koneksi ping ke IP server berhasil. Berdasarkan analisis praktikum jaringan, apa penyebab paling umum dari masalah tersebut pada sistem Ubuntu baru?",
         "weight": 1,
-        "explanation": "Jika kode PHP tampil mentah di browser, artinya web server Apache tidak mengenali sintaks PHP karena modul penghubung (seperti `libapache2-mod-php`) belum terpasang atau belum diaktifkan.",
+        "explanation": "Jika ping berhasil tetapi layanan Telnet tidak bisa diakses (connection timed out atau connection refused), penyebab utamanya adalah paket Telnet server belum terinstal dengan benar atau layanan daemon-nya belum aktif di server. Ping hanya menguji lapisan jaringan (ICMP), bukan ketersediaan aplikasi port layanan tertentu.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "Layanan MariaDB belum dinyalakan dengan benar."
+            "text": "Kabel UTP yang digunakan rusak total sehingga tidak bisa melewatkan paket data."
           },
           {
             "id": "B",
-            "text": "Modul PHP untuk Apache belum terinstal atau belum diaktifkan."
+            "text": "Layanan Telnet server belum diinstal atau daemon Telnet belum diaktifkan/dijalankan."
           },
           {
             "id": "C",
-            "text": "Alamat IP server pada komputer klien salah ketik."
+            "text": "Alamat IP klien berada dalam satu segmen yang sama dengan server."
           },
           {
             "id": "D",
-            "text": "Izin akses berkas (chmod) terlalu longgar."
+            "text": "Kunci SSH pada klien belum disalin ke server."
           },
           {
             "id": "E",
-            "text": "Port 80 pada firewall diblokir total oleh administrator."
+            "text": "Versi kernel Linux pada klien tidak kompatibel dengan server."
           }
         ],
         "answer": "B"
-      },
-      {
-        "id": 7,
-        "type": "mcq",
-        "cog": "C2",
-        "stem": "Untuk menguji apakah layanan basis data MariaDB di Ubuntu 24.04 sudah berjalan dengan baik dan dapat diakses melalui antarmuka baris perintah (CLI), perintah apa yang harus diketikkan oleh administrator?",
-        "weight": 1,
-        "explanation": "Perintah `sudo mysql -u root -p` digunakan untuk masuk ke prompt MariaDB/MySQL menggunakan akun pengguna root dengan permintaan kata sandi.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "options": [
-          {
-            "id": "A",
-            "text": "php -v"
-          },
-          {
-            "id": "B",
-            "text": "apache2 -v"
-          },
-          {
-            "id": "C",
-            "text": "sudo mysql -u root -p"
-          },
-          {
-            "id": "D",
-            "text": "sudo ufw status"
-          },
-          {
-            "id": "E",
-            "text": "sudo systemctl enable mariadb"
-          }
-        ],
-        "answer": "C"
-      },
-      {
-        "id": 8,
-        "type": "mcq",
-        "cog": "C3",
-        "stem": "Di dalam skrip PHP, koneksi ke basis data MariaDB sering kali dibuat menggunakan ekstensi PHP Data Objects (PDO) atau MySQLi. Baris kode PHP manakah yang paling tepat untuk menguji koneksi dasar ke database lokal?",
-        "weight": 1,
-        "explanation": "Kelas `mysqli` dengan parameter host ('localhost'), username ('root'), dan password adalah cara standar di PHP untuk menghubungkan aplikasi web ke server database MySQL/MariaDB.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "options": [
-          {
-            "id": "A",
-            "text": "$conn = new mysqli('localhost', 'root', 'password');"
-          },
-          {
-            "id": "B",
-            "text": "include('apache2.conf');"
-          },
-          {
-            "id": "C",
-            "text": "system('apt update');"
-          },
-          {
-            "id": "D",
-            "text": "echo apache_get_version();"
-          },
-          {
-            "id": "E",
-            "text": "SELECT * FROM users;"
-          }
-        ],
-        "answer": "A"
-      },
-      {
-        "id": 9,
-        "type": "mcq",
-        "cog": "C4",
-        "stem": "Seorang siswa mendapati bahwa web server Apache di Ubuntu 24.04 tidak dapat diakses dari komputer lain dalam satu jaringan LAN sekolah. Padahal, layanan Apache sudah aktif dan berjalan normal saat diuji dari komputer server itu sendiri (localhost). Tindakan konfigurasi apa yang paling tepat untuk mengatasi masalah tersebut?",
-        "weight": 1,
-        "explanation": "Jika server bisa diakses secara lokal tetapi gagal dari jaringan luar, seringkali firewall bawaan Ubuntu (UFW) memblokir port HTTP (80). Perlu dibuka dengan aturan UFW yang sesuai.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "options": [
-          {
-            "id": "A",
-            "text": "Menghapus seluruh berkas di direktori /var/www/html/"
-          },
-          {
-            "id": "B",
-            "text": "Mengaktifkan aturan firewall UFW untuk mengizinkan lalu lintas HTTP atau port 80"
-          },
-          {
-            "id": "C",
-            "text": "Mengganti sistem operasi server ke versi yang lebih lama"
-          },
-          {
-            "id": "D",
-            "text": "Mengubah password akun root MariaDB"
-          },
-          {
-            "id": "E",
-            "text": "Menonaktifkan bahasa pemrograman PHP pada server"
-          }
-        ],
-        "answer": "B"
-      },
-      {
-        "id": 10,
-        "type": "mcq",
-        "cog": "C3",
-        "stem": "Untuk memeriksa apakah server web Apache sedang berjalan dan mendengarkan pada port yang benar di Ubuntu 24.04, utilitas manajemen layanan sistem apa yang paling tepat digunakan?",
-        "weight": 1,
-        "explanation": "Perintah `sudo systemctl status apache2` menampilkan status aktif (running), ID proses (PID), serta log aktivitas terakhir dari layanan Apache.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "options": [
-          {
-            "id": "A",
-            "text": "sudo systemctl status apache2"
-          },
-          {
-            "id": "B",
-            "text": "sudo mysqladmin status"
-          },
-          {
-            "id": "C",
-            "text": "php --ini"
-          },
-          {
-            "id": "D",
-            "text": "sudo apt-cache policy apache2"
-          },
-          {
-            "id": "E",
-            "text": "sudo hostname -I"
-          }
-        ],
-        "answer": "A"
       }
     ]
   }

@@ -3914,7 +3914,7 @@
             </label>
             <select id="aiModelSelect" class="w-full bg-slate-950 border border-indigo-500/40 rounded-xl p-2.5 text-white font-medium focus:border-indigo-500">
               <option value="gemini-3.5-flash-lite">⚡ Gemini 3.5 Flash Lite (Super Cepat & Efisien)</option>
-              <option value="gemini-3.5-flash" selected>🔥 Gemini 3.5 Flash (Keseimbangan Terbaik - Standar)</option>
+              <option value="gemini-3.5-flash">🔥 Gemini 3.5 Flash (Keseimbangan Terbaik - Standar)</option>
               <option value="gemini-3.6-flash">🚀 Gemini 3.6 Flash (Penalaran TKA Ditingkatkan)</option>
               <option value="gemini-3.7-flash">✨ Gemini 3.7 Flash (Hybrid Reasoning & Multimodal)</option>
               <option value="gemini-3.8-flash">🌟 Gemini 3.8 Flash (Deep Cognitive & HOTS SMA/SMK)</option>
@@ -5033,6 +5033,7 @@
       fetchMasterStudents();
       fetchMasterClasses();
       fetchMasterSubjects();
+      if (typeof window.syncAIGeneratorModelDefault === 'function') window.syncAIGeneratorModelDefault();
       fetchQuestionBanks();
 
       // Inisialisasi Kredensial AI & BYOK
@@ -5166,12 +5167,47 @@
       document.getElementById('topbarTitle').innerText = titleMap[tabName] || 'Portal CBT & LMS';
     };
 
+    // Sinkronkan Model Default AI Otomatis dari Pengaturan Server
+    window.cachedDefaultAIModel = null;
+    window.syncAIGeneratorModelDefault = function() {
+      const sel = document.getElementById('aiModelSelect');
+      if (!sel) return;
+      if (window.cachedDefaultAIModel) {
+        sel.value = window.cachedDefaultAIModel;
+      }
+      fetch('/api/v1/cbt/ai/config')
+        .then(res => res.json())
+        .then(json => {
+          if (json.status === 'success' && json.data) {
+            const defModel = json.data.default_model;
+            if (defModel) {
+              window.cachedDefaultAIModel = defModel;
+              sel.value = defModel;
+            }
+            const srvBadge = document.getElementById('aiServerKeyBadge');
+            if (srvBadge) {
+              srvBadge.innerHTML = json.data.has_server_key
+                ? '<i class="fa-solid fa-circle-check mr-1"></i>Kunci Server Aktif'
+                : '<i class="fa-solid fa-circle-exclamation mr-1"></i>Kunci Server Belum Ada';
+              srvBadge.className = json.data.has_server_key
+                ? 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold'
+                : 'text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold';
+            }
+          }
+        })
+        .catch(() => {});
+    };
+
     // Modal Helpers
     window.openModal = function(id) {
-      document.getElementById(id).classList.remove('hidden');
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('hidden');
       if (id === 'modalCreateSchedule') {
         if (typeof initAvailableClassPool === 'function') initAvailableClassPool();
         if (typeof toggleScheduleClassMode === 'function') toggleScheduleClassMode('create');
+      }
+      if (id === 'modalAIGenerator') {
+        window.syncAIGeneratorModelDefault();
       }
     };
     window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); };
@@ -6343,7 +6379,7 @@
       const questionType = document.getElementById('aiQuestionType')?.value || 'all';
       const cogLevel = document.getElementById('aiCogLevel')?.value || 'mixed';
       const count = parseInt(document.getElementById('aiCountInput')?.value, 10) || 5;
-      const model = document.getElementById('aiModelSelect')?.value || 'gemini-3.5-flash';
+      const model = document.getElementById('aiModelSelect')?.value || window.cachedDefaultAIModel || 'gemini-3.5-flash-lite';
       const apiSourceRadio = document.querySelector('input[name="aiApiSourceRadio"]:checked');
       const apiSource = apiSourceRadio ? apiSourceRadio.value : 'server';
       const byokKey = document.getElementById('aiByokKeyInput')?.value.trim() || '';
@@ -11739,6 +11775,7 @@
         }
 
         // Card 2: Model select
+        window.cachedDefaultAIModel = curModel;
         const modelSelect = document.getElementById('defaultModelSelect');
         if (modelSelect && curModel) {
           modelSelect.value = curModel;
@@ -11748,6 +11785,11 @@
         const playModelSelect = document.getElementById('playgroundModelSelect');
         if (playModelSelect && curModel) {
           playModelSelect.value = curModel;
+        }
+
+        const genModelSelect = document.getElementById('aiModelSelect');
+        if (genModelSelect && curModel) {
+          genModelSelect.value = curModel;
         }
 
         // Card 3: BYOK Status from localStorage
@@ -11900,6 +11942,11 @@
         });
         const json = await res.json();
         if (json.status === 'success') {
+          window.cachedDefaultAIModel = model;
+          const genModelSelect = document.getElementById('aiModelSelect');
+          if (genModelSelect && model) {
+            genModelSelect.value = model;
+          }
           alert('Model default berhasil diatur ke ' + model + '!');
           await fetchAISettings();
         } else {

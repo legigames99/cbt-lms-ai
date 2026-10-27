@@ -1102,7 +1102,7 @@
             </label>
             <select id="aiModelSelect" class="w-full bg-slate-950 border border-indigo-500/40 rounded-xl p-2.5 text-white font-medium focus:border-indigo-500">
               <option value="gemini-3.5-flash-lite">⚡ Gemini 3.5 Flash Lite (Super Cepat & Efisien)</option>
-              <option value="gemini-3.5-flash" selected>🔥 Gemini 3.5 Flash (Keseimbangan Terbaik - Standar)</option>
+              <option value="gemini-3.5-flash">🔥 Gemini 3.5 Flash (Keseimbangan Terbaik - Standar)</option>
               <option value="gemini-3.6-flash">🚀 Gemini 3.6 Flash (Penalaran TKA Ditingkatkan)</option>
               <option value="gemini-3.7-flash">✨ Gemini 3.7 Flash (Hybrid Reasoning & Multimodal)</option>
               <option value="gemini-3.8-flash">🌟 Gemini 3.8 Flash (Deep Cognitive & HOTS SMA/SMK)</option>
@@ -1218,10 +1218,43 @@
       'long_essay': { name: 'Uraian / Esai AI', badge: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30 ring-1 ring-amber-400/30' }
     };
 
+    // Sinkronkan Model Default AI Otomatis dari Pengaturan Server
+    window.cachedDefaultAIModel = null;
+    window.syncAIGeneratorModelDefault = async function() {
+      const sel = document.getElementById('aiModelSelect');
+      if (window.cachedDefaultAIModel && sel) {
+        sel.value = window.cachedDefaultAIModel;
+      }
+      try {
+        const res = await fetch('/api/v1/cbt/ai/config');
+        const json = await res.json();
+        if (json.status === 'success' && json.data) {
+          const defModel = json.data.default_model;
+          if (defModel) {
+            window.cachedDefaultAIModel = defModel;
+            if (sel) sel.value = defModel;
+          }
+          const badge = document.getElementById('aiServerKeyBadge');
+          if (badge) {
+            if (json.data.has_server_key) {
+              badge.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-400"></i>Kunci Server Aktif (${json.data.server_key_masked || 'Tersedia'})`;
+              badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold';
+            } else {
+              badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1 text-amber-400"></i>Kunci Server Belum Diatur (Disarankan BYOK)`;
+              badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold';
+            }
+          }
+        }
+      } catch (e) {}
+    };
+
     // Modal Helpers
     function openModal(id) {
       const el = document.getElementById(id);
       if (el) el.classList.remove('hidden');
+      if (id === 'modalAIGenerator' && typeof window.syncAIGeneratorModelDefault === 'function') {
+        window.syncAIGeneratorModelDefault();
+      }
     }
     function closeModal(id) {
       const el = document.getElementById(id);
@@ -1281,23 +1314,10 @@
         const byokInput = document.getElementById('aiByokKeyInput');
         if (savedByokKey && byokInput) byokInput.value = savedByokKey;
 
-        // Check server AI config
-        try {
-          const cfgRes = await fetch('/api/v1/cbt/ai/config');
-          const cfgJson = await cfgRes.json();
-          if (cfgJson.data) {
-            const badge = document.getElementById('aiServerKeyBadge');
-            if (badge) {
-              if (cfgJson.data.has_server_key) {
-                badge.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-400"></i>Kunci Server Aktif (${cfgJson.data.server_key_masked || 'Tersedia'})`;
-                badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold';
-              } else {
-                badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1 text-amber-400"></i>Kunci Server Belum Diatur (Disarankan BYOK)`;
-                badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold';
-              }
-            }
-          }
-        } catch (e) {}
+        // Check server AI config & sync model default
+        if (typeof window.syncAIGeneratorModelDefault === 'function') {
+          await window.syncAIGeneratorModelDefault();
+        }
       } catch (err) {
         console.error('Gagal memuat daftar bank soal:', err);
       }
@@ -2314,7 +2334,7 @@ window.setAIBasisMode = function(basis) {
       const questionType = document.getElementById('aiQuestionType')?.value || 'all';
       const cogLevel = document.getElementById('aiCogInput')?.value || 'mixed';
       const count = parseInt(document.getElementById('aiCountInput')?.value, 10) || 5;
-      const model = document.getElementById('aiModelSelect')?.value || 'gemini-3.5-flash';
+      const model = document.getElementById('aiModelSelect')?.value || window.cachedDefaultAIModel || 'gemini-3.5-flash-lite';
       const apiSourceRadio = document.querySelector('input[name="aiApiSourceRadio"]:checked');
       const apiSource = apiSourceRadio ? apiSourceRadio.value : 'server';
       const byokKey = document.getElementById('aiByokKeyInput')?.value.trim() || '';

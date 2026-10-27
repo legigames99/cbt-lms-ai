@@ -375,6 +375,12 @@
           <span>Pengaturan Sekolah</span>
         </a>
 
+        <a href="#pengaturan-redis" onclick="switchTab('pengaturan-redis')" id="nav-pengaturan-redis" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+          <i class="fa-solid fa-database w-4 text-center text-rose-500"></i>
+          <span>Pengaturan Redis Cache</span>
+          <span id="sidebarRedisBadge" class="ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-slate-800 text-slate-400 font-semibold font-mono">RAM</span>
+        </a>
+
         <a href="#pengaturan-ai" onclick="switchTab('pengaturan-ai')" id="nav-pengaturan-ai" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
           <i class="fa-solid fa-wand-magic-sparkles w-4 text-center text-indigo-400"></i>
           <span>Pengaturan AI & Model</span>
@@ -2043,6 +2049,230 @@
       <!-- ============================================================== -->
       <!-- TAB 11: PENGATURAN AI & MODEL GEMINI (SERVER & BYOK) -->
       <!-- ============================================================== -->
+
+      <!-- ============================================================== -->
+      <!-- TAB PENGATURAN REDIS CACHE & IN-MEMORY CLUSTER (1.700 SISWA) -->
+      <!-- ============================================================== -->
+      <section id="tab-pengaturan-redis" class="hidden space-y-6">
+        <!-- Banner Header -->
+        <div class="bg-gradient-to-r from-rose-950/70 via-slate-900 to-indigo-950/50 border border-rose-500/30 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/30 font-mono">
+                High-Throughput In-Memory Engine
+              </span>
+              <span id="redisBannerModePill" class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-400 border border-slate-700 font-mono">
+                Fallback RAM Internal
+              </span>
+            </div>
+            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-database text-rose-500"></i>
+              <span>Pengaturan Redis & In-Memory Cache Cluster</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              Arsitektur <em>Shared Session Store</em> & antrean real-time untuk mendukung pengerjaan ujian <strong>1.700 siswa serentak</strong> pada Ubuntu Server 4-Core / Multi-Core. Jika server Redis tidak aktif, sistem otomatis berjalan dengan mode aman <strong>Fallback RAM Internal bawaan</strong> tanpa galat.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3 flex-wrap">
+            <button type="button" onclick="testRedisConnectionDirect()" id="btnRedisTestTop" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-300 border border-rose-500/30 text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-bolt" id="iconRedisTestTop"></i>
+              <span>Uji Koneksi (Ping)</span>
+            </button>
+            <button type="button" onclick="saveRedisSettings()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-lg shadow-rose-600/30">
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span>Simpan Pengaturan</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Live Metrik Redis -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Card 1: Status Konektivitas -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+            <div class="text-xs text-slate-400 mb-1 font-medium">Status Server Redis</div>
+            <div id="redisStatConnected" class="text-2xl font-bold font-mono text-slate-300 flex items-center gap-2">
+              <i class="fa-solid fa-circle text-xs text-slate-500"></i> Memeriksa...
+            </div>
+            <div class="text-[11px] text-slate-500 mt-1 truncate" id="redisStatHostPort">127.0.0.1:6379</div>
+            <div class="absolute -right-3 -bottom-3 text-slate-800/40 text-6xl pointer-events-none">
+              <i class="fa-solid fa-server"></i>
+            </div>
+          </div>
+
+          <!-- Card 2: Latensi Respons -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+            <div class="text-xs text-slate-400 mb-1 font-medium">Latensi Ping Socket</div>
+            <div id="redisStatLatency" class="text-2xl font-bold font-mono text-emerald-400">0 ms</div>
+            <div class="text-[11px] text-slate-500 mt-1">Benchmark Native RESP Socket</div>
+            <div class="absolute -right-3 -bottom-3 text-slate-800/40 text-6xl pointer-events-none">
+              <i class="fa-solid fa-gauge-high"></i>
+            </div>
+          </div>
+
+          <!-- Card 3: Versi & Platform -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+            <div class="text-xs text-slate-400 mb-1 font-medium">Versi Redis Engine</div>
+            <div id="redisStatVersion" class="text-2xl font-bold font-mono text-amber-400">-</div>
+            <div class="text-[11px] text-slate-500 mt-1 truncate" id="redisStatOS">Sistem: -</div>
+            <div class="absolute -right-3 -bottom-3 text-slate-800/40 text-6xl pointer-events-none">
+              <i class="fa-brands fa-redhat"></i>
+            </div>
+          </div>
+
+          <!-- Card 4: Memori RAM & Kunci CBT -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+            <div class="text-xs text-slate-400 mb-1 font-medium">RAM Cache & Kunci CBT</div>
+            <div id="redisStatMemory" class="text-2xl font-bold font-mono text-rose-400">0B</div>
+            <div class="text-[11px] text-slate-500 mt-1" id="redisStatKeys">0 Kunci Sesi CBT Aktif</div>
+            <div class="absolute -right-3 -bottom-3 text-slate-800/40 text-6xl pointer-events-none">
+              <i class="fa-solid fa-memory"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Konfigurasi Redis -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-slate-800 gap-3">
+            <div>
+              <h4 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-rose-400"></i> Parameter Koneksi Redis Server
+              </h4>
+              <p class="text-xs text-slate-400 mt-0.5">Konfigurasi alamat host, port, kata sandi autentikasi, serta nomor basis data Redis.</p>
+            </div>
+            <!-- Switch Utama Aktifkan Redis -->
+            <label class="relative inline-flex items-center cursor-pointer select-none">
+              <input type="checkbox" id="redisEnabled" class="sr-only peer" onchange="handleRedisToggle(this.checked)">
+              <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-600"></div>
+              <span class="ml-3 text-xs font-bold text-white" id="redisToggleLabel">Redis Cache Non-Aktif</span>
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+            <!-- Host Server -->
+            <div>
+              <label class="block font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
+                <span>Alamat Host / IP Redis</span>
+                <span class="text-[10px] text-slate-500 font-mono">Default: 127.0.0.1</span>
+              </label>
+              <input type="text" id="redisHost" placeholder="127.0.0.1 atau localhost" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white font-mono focus:outline-none focus:border-rose-500 transition">
+            </div>
+
+            <!-- Port -->
+            <div>
+              <label class="block font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
+                <span>Port Redis</span>
+                <span class="text-[10px] text-slate-500 font-mono">Port standar: 6379</span>
+              </label>
+              <input type="number" id="redisPort" placeholder="6379" value="6379" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white font-mono focus:outline-none focus:border-rose-500 transition">
+            </div>
+
+            <!-- Password AUTH -->
+            <div>
+              <label class="block font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
+                <span>Kata Sandi (AUTH Password)</span>
+                <span class="text-[10px] text-slate-500">Opsional</span>
+              </label>
+              <input type="password" id="redisPassword" placeholder="Kosongkan jika tanpa password" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white font-mono focus:outline-none focus:border-rose-500 transition">
+            </div>
+
+            <!-- Database Index -->
+            <div>
+              <label class="block font-semibold text-slate-300 mb-1.5">Nomor Database (DB Index)</label>
+              <select id="redisDb" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white font-mono focus:outline-none focus:border-rose-500 transition">
+                <option value="0">DB 0 (Default CBT Utama)</option>
+                <option value="1">DB 1</option>
+                <option value="2">DB 2</option>
+                <option value="3">DB 3</option>
+                <option value="4">DB 4</option>
+                <option value="5">DB 5</option>
+                <option value="6">DB 6</option>
+                <option value="7">DB 7</option>
+              </select>
+            </div>
+
+            <!-- Key Prefix -->
+            <div>
+              <label class="block font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
+                <span>Prefix Kunci Cache</span>
+                <span class="text-[10px] text-slate-500 font-mono">Contoh: cbt:</span>
+              </label>
+              <input type="text" id="redisPrefix" placeholder="cbt:" value="cbt:" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white font-mono focus:outline-none focus:border-rose-500 transition">
+            </div>
+
+            <!-- Auto Sync Option -->
+            <div class="flex items-center pt-6">
+              <label class="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" id="redisAutoSync" checked class="w-4 h-4 rounded text-rose-600 bg-slate-950 border-slate-800 focus:ring-rose-500">
+                <span class="text-slate-300 font-medium">Sinkronkan sesi otomatis ke Redis saat siswa login / submit ujian</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Action Buttons Bar -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between pt-4 border-t border-slate-800 gap-3">
+            <div class="flex items-center gap-2 flex-wrap">
+              <button type="button" onclick="testRedisConnectionDirect()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-300 border border-rose-500/30 text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                <i class="fa-solid fa-bolt text-rose-400"></i> Uji Koneksi Langsung (Test Ping)
+              </button>
+              <button type="button" onclick="syncRamSessionsToRedis()" class="px-4 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition flex items-center gap-2" title="Salin seluruh data siswa dan jawaban di RAM ke Redis">
+                <i class="fa-solid fa-arrows-rotate text-indigo-400"></i> Sinkronkan RAM ke Redis
+              </button>
+              <button type="button" onclick="flushCbtRedisCache()" class="px-3.5 py-2 rounded-xl bg-rose-950/30 hover:bg-rose-950/50 text-rose-400 border border-rose-500/30 text-xs font-semibold transition flex items-center gap-2" title="Hapus seluruh cache kunci CBT di Redis">
+                <i class="fa-solid fa-trash-can"></i> Bersihkan Cache CBT
+              </button>
+            </div>
+
+            <button type="button" onclick="saveRedisSettings()" class="px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-rose-600/30">
+              <i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan
+            </button>
+          </div>
+        </div>
+
+        <!-- Panduan Deploy Ubuntu Server 24.04 (1.700 Siswa) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center justify-center text-lg">
+                <i class="fa-brands fa-ubuntu"></i>
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-white">Panduan Instalasi & Aktivasi di Ubuntu Server 24.04 (4 Core / 8 GB RAM)</h4>
+                <p class="text-xs text-slate-400">Jalankan 3 baris perintah berikut di terminal Ubuntu untuk mengaktifkan Redis engine lokal:</p>
+              </div>
+            </div>
+            <button type="button" onclick="copyUbuntuRedisCommands()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold transition flex items-center gap-1.5">
+              <i class="fa-regular fa-copy"></i>
+              <span id="btnCopyUbuntuText">Salin Perintah</span>
+            </button>
+          </div>
+
+          <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-4 font-mono text-xs text-emerald-400 space-y-2 overflow-x-auto select-all">
+            <div class="text-slate-500"># 1. Pasang paket server Redis resmi di Ubuntu 24.04 LTS:</div>
+            <div>sudo apt update && sudo apt install redis-server -y</div>
+            <div class="text-slate-500 pt-1"># 2. Aktifkan service agar otomatis menyala saat server booting:</div>
+            <div>sudo systemctl enable redis-server && sudo systemctl start redis-server</div>
+            <div class="text-slate-500 pt-1"># 3. Verifikasi koneksi Redis (harus menjawab PONG):</div>
+            <div>redis-cli ping</div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs pt-1">
+            <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
+              <span class="font-bold text-rose-400 block mb-1">⚡ Throughput 100K+ Req/s</span>
+              <p class="text-slate-400 text-[11px] leading-relaxed">Redis beroperasi murni di RAM dengan bahasa C, menyerap serbuan sinkronisasi jawaban 1.700 siswa tanpa beban disk I/O.</p>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
+              <span class="font-bold text-blue-400 block mb-1">🔗 Shared Cluster Multi-Core</span>
+              <p class="text-slate-400 text-[11px] leading-relaxed">Seluruh 4 Worker PM2 Node.js mengakses data sesi siswa yang sama secara instan tanpa tumpang-tindih (*cross-process sync*).</p>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
+              <span class="font-bold text-emerald-400 block mb-1">🛡️ Anti-Crash Persistence</span>
+              <p class="text-slate-400 text-[11px] leading-relaxed">Jika proses Node.js restart, jawaban seluruh peserta di Redis tetap tersimpan aman berkat mekanisme persistensi RDB/AOF.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="tab-pengaturan-ai" class="hidden space-y-6">
         <!-- Banner Header -->
         <div class="bg-gradient-to-r from-indigo-950/70 via-slate-900 to-purple-950/50 border border-indigo-500/30 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -4912,6 +5142,9 @@
       if (tabName === 'pengaturan-ai') {
         fetchAISettings();
       }
+      if (tabName === 'pengaturan-redis') {
+        fetchRedisStatus();
+      }
 
       const titleMap = {
         'overview': 'Dashboard Utama',
@@ -4927,6 +5160,7 @@
         'kartu-peserta': 'Kartu Peserta Ujian Siswa',
         'server': 'Sistem & Server',
         'pengaturan': 'Pengaturan Profil Sekolah',
+        'pengaturan-redis': 'Pengaturan Redis Cache & Shared Memory (1.700 Siswa)',
         'pengaturan-ai': 'Pengaturan AI, Kredensial & Model Gemini'
       };
       document.getElementById('topbarTitle').innerText = titleMap[tabName] || 'Portal CBT & LMS';
@@ -12725,7 +12959,199 @@
       }
     };
 
-        window.addEventListener('focus', purgeDashboardAutofill);
+    
+    // ==============================================================
+    // LOGIKA PENGATURAN REDIS CACHE & IN-MEMORY ENGINE
+    // ==============================================================
+    window.currentRedisData = null;
+
+    window.fetchRedisStatus = async function() {
+      try {
+        const res = await fetch('/api/v1/admin/redis/status');
+        if (!res.ok) throw new Error('Gagal menghubungi endpoint status Redis');
+        const json = await res.json();
+        window.currentRedisData = json.data;
+        window.renderRedisUI(json.data);
+      } catch (err) {
+        console.error('Kendala fetch Redis status:', err);
+      }
+    };
+
+    window.renderRedisUI = function(data) {
+      if (!data) return;
+      const cfg = data.config || {};
+      const hl = data.health || {};
+      const isConn = Boolean(hl.connected);
+      const isEnabled = Boolean(cfg.enabled);
+
+      // Populate Inputs
+      const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = (val !== undefined && val !== null) ? val : ''; };
+      setVal('redisHost', cfg.host || '127.0.0.1');
+      setVal('redisPort', cfg.port || 6379);
+      setVal('redisPassword', cfg.password || '');
+      setVal('redisDb', cfg.db !== undefined ? cfg.db : 0);
+      setVal('redisPrefix', cfg.key_prefix || 'cbt:');
+
+      const autoSyncCheck = document.getElementById('redisAutoSync');
+      if (autoSyncCheck) autoSyncCheck.checked = (cfg.auto_sync_sessions !== false);
+
+      const enabledSwitch = document.getElementById('redisEnabled');
+      if (enabledSwitch) {
+        enabledSwitch.checked = isEnabled;
+        window.handleRedisToggle(isEnabled);
+      }
+
+      // Update Live Metric Cards
+      const setTxt = (id, txt) => { const el = document.getElementById(id); if (el) el.innerText = txt; };
+      const setHtml = (id, h) => { const el = document.getElementById(id); if (el) el.innerHTML = h; };
+
+      if (isConn) {
+        setHtml('redisStatConnected', '<span class="text-emerald-400 flex items-center gap-1.5"><i class="fa-solid fa-circle text-xs text-emerald-400 animate-pulse"></i> Terhubung</span>');
+      } else {
+        setHtml('redisStatConnected', '<span class="text-rose-400 flex items-center gap-1.5"><i class="fa-solid fa-circle text-xs text-rose-500"></i> Terputus (Offline)</span>');
+      }
+
+      setTxt('redisStatHostPort', `${hl.host || cfg.host || '127.0.0.1'}:${hl.port || cfg.port || 6379} (DB ${hl.db !== undefined ? hl.db : cfg.db || 0})`);
+      setTxt('redisStatLatency', isConn ? `${hl.latency_ms || 0} ms` : 'N/A');
+      setTxt('redisStatVersion', isConn ? `v${hl.version || '5.x'}` : '-');
+      setTxt('redisStatOS', isConn ? `OS: ${hl.os || 'Linux/Windows'} (${hl.connected_clients || 1} client)` : 'Redis service mati');
+      setTxt('redisStatMemory', isConn ? (hl.used_memory || '0B') : 'RAM Bawaan');
+      setTxt('redisStatKeys', isConn ? `${hl.cbt_keys_count || 0} Kunci Sesi CBT Aktif` : 'Fallback RAM Internal');
+
+      // Banner pill & Sidebar badge
+      const bannerPill = document.getElementById('redisBannerModePill');
+      const sideBadge = document.getElementById('sidebarRedisBadge');
+
+      if (isEnabled && isConn) {
+        if (bannerPill) {
+          bannerPill.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono';
+          bannerPill.innerText = 'Redis Cache AKTIF';
+        }
+        if (sideBadge) {
+          sideBadge.className = 'ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold font-mono';
+          sideBadge.innerText = 'REDIS';
+        }
+      } else {
+        if (bannerPill) {
+          bannerPill.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-400 border border-slate-700 font-mono';
+          bannerPill.innerText = isEnabled ? 'Redis Offline (RAM Fallback)' : 'RAM Internal';
+        }
+        if (sideBadge) {
+          sideBadge.className = 'ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-slate-800 text-slate-400 font-semibold font-mono';
+          sideBadge.innerText = 'RAM';
+        }
+      }
+    };
+
+    window.handleRedisToggle = function(isChecked) {
+      const label = document.getElementById('redisToggleLabel');
+      if (label) {
+        label.innerText = isChecked ? 'Redis In-Memory Cache AKTIF' : 'Redis Cache Non-Aktif (RAM Bawaan)';
+        label.className = isChecked ? 'ml-3 text-xs font-bold text-rose-400' : 'ml-3 text-xs font-medium text-slate-400';
+      }
+    };
+
+    window.testRedisConnectionDirect = async function() {
+      const btn = document.getElementById('btnRedisTestTop');
+      const icon = document.getElementById('iconRedisTestTop');
+      if (icon) icon.className = 'fa-solid fa-circle-notch fa-spin text-rose-400';
+
+      const host = (document.getElementById('redisHost')?.value || '127.0.0.1').trim();
+      const port = parseInt(document.getElementById('redisPort')?.value, 10) || 6379;
+      const password = (document.getElementById('redisPassword')?.value || '').trim();
+      const db = parseInt(document.getElementById('redisDb')?.value, 10) || 0;
+      const key_prefix = (document.getElementById('redisPrefix')?.value || 'cbt:').trim();
+
+      try {
+        const res = await fetch('/api/v1/admin/redis/test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ host, port, password, db, key_prefix })
+        });
+        const json = await res.json();
+
+        if (json.status === 'success') {
+          alert(`✅ ${json.message}\n\n• Host: ${host}:${port}\n• Versi: ${json.data.version}\n• Latensi Socket: ${json.data.latency_ms} ms\n• Memori Terpakai: ${json.data.used_memory}\n• Client Terhubung: ${json.data.connected_clients}`);
+          await window.fetchRedisStatus();
+        } else {
+          alert(`❌ ${json.message}\n\nTips:\n1. Pastikan server Redis sudah berjalan di ${host}:${port}.\n2. Di Ubuntu 24.04 jalankan: sudo systemctl start redis-server\n3. Pastikan port 6379 tidak terhalang firewall.`);
+        }
+      } catch (err) {
+        alert('Kendala koneksi ke server: ' + err.message);
+      } finally {
+        if (icon) icon.className = 'fa-solid fa-bolt';
+      }
+    };
+
+    window.saveRedisSettings = async function() {
+      const enabled = Boolean(document.getElementById('redisEnabled')?.checked);
+      const host = (document.getElementById('redisHost')?.value || '127.0.0.1').trim();
+      const port = parseInt(document.getElementById('redisPort')?.value, 10) || 6379;
+      const password = (document.getElementById('redisPassword')?.value || '').trim();
+      const db = parseInt(document.getElementById('redisDb')?.value, 10) || 0;
+      const key_prefix = (document.getElementById('redisPrefix')?.value || 'cbt:').trim();
+      const auto_sync_sessions = Boolean(document.getElementById('redisAutoSync')?.checked);
+
+      try {
+        const res = await fetch('/api/v1/admin/redis/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            enabled, host, port, password, db, key_prefix, auto_sync_sessions
+          })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Gagal menyimpan');
+
+        alert(json.message || 'Pengaturan Redis berhasil disimpan!');
+        await window.fetchRedisStatus();
+      } catch (err) {
+        alert('Kendala menyimpan pengaturan: ' + err.message);
+      }
+    };
+
+    window.syncRamSessionsToRedis = async function() {
+      if (!confirm('Sinkronkan seluruh data sesi siswa aktif dan jawaban dari RAM server ke Redis sekarang?')) return;
+      try {
+        const res = await fetch('/api/v1/admin/redis/sync-sessions', { method: 'POST' });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Gagal sinkron');
+        alert(`✅ ${json.message}`);
+        await window.fetchRedisStatus();
+      } catch (err) {
+        alert('Kendala sinkronisasi: ' + err.message);
+      }
+    };
+
+    window.flushCbtRedisCache = async function() {
+      const prefix = (document.getElementById('redisPrefix')?.value || 'cbt:').trim();
+      if (!confirm(`PERINGATAN: Anda yakin ingin menghapus seluruh kunci cache yang diawali prefix "${prefix}*" di Redis?\n\nData file JSON dan database master tidak akan terhapus.`)) return;
+
+      try {
+        const res = await fetch('/api/v1/admin/redis/flush', { method: 'POST' });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Gagal membersihkan cache');
+        alert(`✅ ${json.message}`);
+        await window.fetchRedisStatus();
+      } catch (err) {
+        alert('Kendala membersihkan cache: ' + err.message);
+      }
+    };
+
+    window.copyUbuntuRedisCommands = function() {
+      const cmds = "sudo apt update && sudo apt install redis-server -y\nsudo systemctl enable redis-server && sudo systemctl start redis-server\nredis-cli ping";
+      navigator.clipboard.writeText(cmds).then(() => {
+        const txt = document.getElementById('btnCopyUbuntuText');
+        if (txt) {
+          txt.innerText = 'Tersalin!';
+          setTimeout(() => txt.innerText = 'Salin Perintah', 2000);
+        }
+      }).catch(() => {
+        prompt('Salin perintah manual berikut:', cmds);
+      });
+    };
+
+    window.addEventListener('focus', purgeDashboardAutofill);
   </script>
 </body>
 </html>

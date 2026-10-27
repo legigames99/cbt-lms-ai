@@ -8,6 +8,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const redisManager = require('./redis_client');
 
 const PORT = process.env.PORT || 8080;
 const STATIC_PKG_DIR = path.join(__dirname, 'static', 'packages');
@@ -5439,6 +5440,116 @@ const server = http.createServer(async (req, res) => {
       message: `Berhasil mengoreksi ${gradedCount} lembar jawaban esai dengan asistensi AI!`,
       graded_count: gradedCount
     });
+  }
+
+  // ==============================================================
+  // API REDIS CACHE & SHARED MEMORY MANAGEMENT (1.700 SISWA)
+  // ==============================================================
+
+  // GET /api/v1/admin/redis/status
+  if (pathname === '/api/v1/admin/redis/status' && req.method === 'GET') {
+    const health = await redisManager.refreshRedisHealth();
+    const cfg = redisManager.getRedisConfig();
+    return sendJSON(200, {
+      status: 'success',
+      data: {
+        config: cfg,
+        health: health,
+        active_mode: (cfg.enabled && health.connected) ? 'redis_cluster' : 'ram_fallback',
+        active_mode_label: (cfg.enabled && health.connected) ? 'Redis In-Memory Cache (Aktif)' : 'Fallback RAM Internal (Aktif)',
+        cached_sessions_count: Object.keys(studentSessions).length,
+        active_students_count: activeExamStudents.size
+      }
+    });
+  }
+
+  // POST /api/v1/admin/redis/test (Uji Coba Ping ke Host / Port Tertentu)
+  if (pathname === '/api/v1/admin/redis/test' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const testCfg = {
+      host: (body.host || '127.0.0.1').trim(),
+      port: parseInt(body.port, 10) || 6379,
+      password: (body.password || '').trim(),
+      db: parseInt(body.db, 10) || 0,
+      key_prefix: (body.key_prefix || 'cbt:').trim()
+    };
+
+    const result = await redisManager.testRedisConnection(testCfg);
+    if (result.connected) {
+      return sendJSON(200, {
+        status: 'success',
+        message: `Koneksi Redis Berhasil Terhubung! Latensi: ${result.latency_ms} ms (v${result.version}, Memori: ${result.used_memory}).`,
+        data: result
+      });
+    } else {
+      return sendJSON(200, {
+        status: 'error',
+        message: `Gagal terhubung ke Redis: ${result.error}`,
+        data: result
+      });
+    }
+  }
+
+  // POST /api/v1/admin/redis/save (Simpan Pengaturan Redis)
+  if (pathname === '/api/v1/admin/redis/save' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const updated = redisManager.saveRedisConfig({
+      enabled: Boolean(body.enabled),
+      host: (body.host || '127.0.0.1').trim(),
+      port: parseInt(body.port, 10) || 6379,
+      password: body.password !== undefined ? String(body.password).trim() : '',
+      db: parseInt(body.db, 10) || 0,
+      key_prefix: (body.key_prefix || 'cbt:').trim(),
+      auto_sync_sessions: Boolean(body.auto_sync_sessions)
+    });
+
+    const health = await redisManager.refreshRedisHealth();
+    let syncedCount = 0;
+    if (updated.enabled && health.connected) {
+      try {
+        syncedCount = await redisManager.syncAllSessionsToRedis(studentSessions, studentAnswersStore, activeExamStudents);
+      } catch (e) {}
+    }
+
+    return sendJSON(200, {
+      status: 'success',
+      message: updated.enabled
+        ? (health.connected ? `Pengaturan Redis berhasil disimpan dan terhubung aktif! (${syncedCount} sesi tersinkronisasi)` : 'Pengaturan disimpan. Server Redis saat ini belum aktif/terjangkau, sistem otomatis menggunakan Fallback RAM Internal.')
+        : 'Pengaturan disimpan. Redis dinonaktifkan, sistem menggunakan In-Memory RAM lokal.',
+      data: {
+        config: updated,
+        health,
+        synced_sessions: syncedCount
+      }
+    });
+  }
+
+  // POST /api/v1/admin/redis/sync-sessions (Sinkronkan Manual Seluruh Sesi RAM ke Redis)
+  if (pathname === '/api/v1/admin/redis/sync-sessions' && req.method === 'POST') {
+    try {
+      const count = await redisManager.syncAllSessionsToRedis(studentSessions, studentAnswersStore, activeExamStudents);
+      return sendJSON(200, {
+        status: 'success',
+        message: `Berhasil menyinkronkan ${count} item sesi ujian siswa ke dalam Redis Cache!`,
+        data: { synced_count: count }
+      });
+    } catch (err) {
+      return sendJSON(400, { status: 'error', message: err.message });
+    }
+  }
+
+  // POST /api/v1/admin/redis/flush (Bersihkan Seluruh Cache CBT di Redis)
+  if (pathname === '/api/v1/admin/redis/flush' && req.method === 'POST') {
+    try {
+      const count = await redisManager.flushAllCbtKeys();
+      return sendJSON(200, {
+        status: 'success',
+        message: `Berhasil membersihkan ${count} kunci cache CBT dari Redis!`,
+        data: { deleted_count: count }
+      });
+    } catch (err) {
+      return sendJSON(400, { status: 'error', message: err.message });
+    }
   }
 
   // GET /api/v1/system/metrics

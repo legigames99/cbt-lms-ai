@@ -1,0 +1,10 @@
+{
+  "enabled": true,
+  "host": "127.0.0.1",
+  "port": 6379,
+  "password": "",
+  "db": 0,
+  "key_prefix": "cbt:",
+  "auto_sync_sessions": true,
+  "timeout_ms": 2500
+}

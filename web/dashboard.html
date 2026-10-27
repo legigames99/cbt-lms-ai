@@ -12865,101 +12865,97 @@
             </div>
           </div>
 
-          <!-- Yang membuat berita acara -->
-          <div style="margin-bottom: 14px; font-size: 10pt;">
-            <div style="margin-bottom: 8px;">Yang membuat berita acara :</div>
+          <!-- Yang membuat berita acara & TTD Sejajar -->
+          <div style="margin-bottom: 24px; font-size: 10pt;">
             
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <!-- Kolom Kiri: Proktor, Pengawas, Penanggung Jawab (width: 58%) -->
-              <div style="width: 58%;">
-                
-                <!-- 1. Proktor -->
-                <div style="display: flex; align-items: flex-start; margin-bottom: 10px;">
-                  <div style="width: 22px; flex-shrink: 0;">1.</div>
-                  <div style="width: 125px; flex-shrink: 0;">Proktor</div>
-                  <div style="flex: 1;">
-                    <div style="border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
-                      ${proctorName || ''}
-                    </div>
-                    <div style="display: flex; align-items: flex-end; margin-top: 4px;">
-                      <div style="width: 35px; flex-shrink: 0;">NIP</div>
-                      <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
-                        ${proctorNip || ''}
-                      </div>
+            <!-- Header baris TTD sejajar dengan 'Yang membuat berita acara :' -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px;">
+              <div style="width: 56%; font-weight: normal;">Yang membuat berita acara :</div>
+              <div style="width: 40%; text-align: center; font-weight: bold; font-size: 10pt;">TTD</div>
+            </div>
+
+            <!-- Baris 1: Proktor & TTD 1 (Sejajar Horisontal) -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 14px;">
+              <!-- Kolom Kiri: 1. Proktor -->
+              <div style="width: 56%; display: flex; align-items: flex-start;">
+                <div style="width: 22px; flex-shrink: 0;">1.</div>
+                <div style="width: 125px; flex-shrink: 0;">Proktor</div>
+                <div style="flex: 1;">
+                  <div style="border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                    ${proctorName || ''}
+                  </div>
+                  <div style="display: flex; align-items: flex-end; margin-top: 4px;">
+                    <div style="width: 35px; flex-shrink: 0;">NIP</div>
+                    <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                      ${proctorNip || ''}
                     </div>
                   </div>
                 </div>
-
-                <!-- 2. Pengawas -->
-                <div style="display: flex; align-items: flex-start; margin-bottom: 10px;">
-                  <div style="width: 22px; flex-shrink: 0;">2.</div>
-                  <div style="width: 125px; flex-shrink: 0;">Pengawas</div>
-                  <div style="flex: 1;">
-                    <div style="border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
-                      ${supervisorName || ''}
-                    </div>
-                    <div style="display: flex; align-items: flex-end; margin-top: 4px;">
-                      <div style="width: 35px; flex-shrink: 0;">NIP</div>
-                      <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
-                        ${supervisorNip || ''}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 3. Penanggung Jawab -->
-                <div style="display: flex; align-items: flex-start; margin-bottom: 4px;">
-                  <div style="width: 22px; flex-shrink: 0;">3.</div>
-                  <div style="width: 125px; flex-shrink: 0;">Penanggung Jawab</div>
-                  <div style="flex: 1;">
-                    <div style="border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
-                      ${headmasterName || ''}
-                    </div>
-                    <div style="display: flex; align-items: flex-end; margin-top: 4px;">
-                      <div style="width: 35px; flex-shrink: 0;">NIP</div>
-                      <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
-                        ${headmasterNip || ''}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
               </div>
 
-              <!-- Kolom Kanan: TTD (width: 38%) -->
-              <div style="width: 38%; padding-left: 20px; box-sizing: border-box;">
-                <div style="text-align: center; font-weight: bold; margin-bottom: 12px; font-size: 10pt;">TTD</div>
-                
-                <!-- TTD 1 -->
-                <div style="display: flex; align-items: flex-end; height: 34px; margin-bottom: 12px;">
-                  <div style="width: 22px; flex-shrink: 0;">1.</div>
-                  <div style="flex: 1; border-bottom: 1px solid #000; height: 100%;"></div>
-                </div>
-
-                <!-- TTD 2 -->
-                <div style="display: flex; align-items: flex-end; height: 34px; margin-bottom: 12px;">
-                  <div style="width: 22px; flex-shrink: 0;">2.</div>
-                  <div style="flex: 1; border-bottom: 1px solid #000; height: 100%;"></div>
-                </div>
-
-                <!-- TTD 3 -->
-                <div style="display: flex; align-items: flex-end; height: 34px; margin-bottom: 4px;">
-                  <div style="width: 22px; flex-shrink: 0;">3.</div>
-                  <div style="flex: 1; border-bottom: 1px solid #000; height: 100%;"></div>
-                </div>
+              <!-- Kolom Kanan: TTD 1 (Sejajar dengan Proktor) -->
+              <div style="width: 40%; padding-left: 15px; box-sizing: border-box; display: flex; align-items: flex-end;">
+                <div style="width: 22px; flex-shrink: 0;">1.</div>
+                <div style="flex: 1; border-bottom: 1px solid #000; height: 16px;"></div>
               </div>
             </div>
-          </div>
 
-          <!-- Catatan Box (Rangkap 3 & Upload Web TKA) -->
-          <div style="border: 1px solid #000; width: 62%; padding: 4px 8px; margin-top: 14px; margin-bottom: 20px; font-size: 9pt; line-height: 1.35; box-sizing: border-box;">
-            <div style="font-weight: bold; font-style: italic;">Catatan:</div>
-            <div>- Dibuat rangkap 3 (tiga), masing-masing untuk Sekolah, Kota/Kabupaten dan Provinsi</div>
-            <div>- Untuk pusat di upload melalui web TKA</div>
+            <!-- Baris 2: Pengawas & TTD 2 (Sejajar Horisontal) -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 14px;">
+              <!-- Kolom Kiri: 2. Pengawas -->
+              <div style="width: 56%; display: flex; align-items: flex-start;">
+                <div style="width: 22px; flex-shrink: 0;">2.</div>
+                <div style="width: 125px; flex-shrink: 0;">Pengawas</div>
+                <div style="flex: 1;">
+                  <div style="border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                    ${supervisorName || ''}
+                  </div>
+                  <div style="display: flex; align-items: flex-end; margin-top: 4px;">
+                    <div style="width: 35px; flex-shrink: 0;">NIP</div>
+                    <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                      ${supervisorNip || ''}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Kolom Kanan: TTD 2 (Sejajar dengan Pengawas) -->
+              <div style="width: 40%; padding-left: 15px; box-sizing: border-box; display: flex; align-items: flex-end;">
+                <div style="width: 22px; flex-shrink: 0;">2.</div>
+                <div style="flex: 1; border-bottom: 1px solid #000; height: 16px;"></div>
+              </div>
+            </div>
+
+            <!-- Baris 3: Penanggung Jawab & TTD 3 (Sejajar Horisontal) -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;">
+              <!-- Kolom Kiri: 3. Penanggung Jawab -->
+              <div style="width: 56%; display: flex; align-items: flex-start;">
+                <div style="width: 22px; flex-shrink: 0;">3.</div>
+                <div style="width: 125px; flex-shrink: 0;">Penanggung Jawab</div>
+                <div style="flex: 1;">
+                  <div style="border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                    ${headmasterName || ''}
+                  </div>
+                  <div style="display: flex; align-items: flex-end; margin-top: 4px;">
+                    <div style="width: 35px; flex-shrink: 0;">NIP</div>
+                    <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                      ${headmasterNip || ''}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Kolom Kanan: TTD 3 (Sejajar dengan Penanggung Jawab) -->
+              <div style="width: 40%; padding-left: 15px; box-sizing: border-box; display: flex; align-items: flex-end;">
+                <div style="width: 22px; flex-shrink: 0;">3.</div>
+                <div style="flex: 1; border-bottom: 1px solid #000; height: 16px;"></div>
+              </div>
+            </div>
+
           </div>
 
           <!-- Footer: Bar Pemindai Optical Pusmendik Kemendikbud -->
-          <div style="display: flex; align-items: stretch; justify-content: space-between; width: 100%; height: 26px; box-sizing: border-box;">
+          <div style="display: flex; align-items: stretch; justify-content: space-between; width: 100%; height: 26px; box-sizing: border-box; margin-top: 36px;">
             <div style="width: 26px; height: 26px; border: 1.5px solid #000; box-sizing: border-box; flex-shrink: 0;"></div>
             <div style="flex: 1; border: 1.5px solid #000; margin: 0 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10.5pt; letter-spacing: 0.5px; box-sizing: border-box;">
               KEMENTERIAN PENDIDIKAN DASAR DAN MENENGAH

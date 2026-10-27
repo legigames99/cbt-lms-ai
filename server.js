@@ -3989,17 +3989,19 @@ const server = http.createServer(async (req, res) => {
         school_profile: schoolProfile,
         attendance: {
           exam_date: savedMeta.exam_date || getIndonesianDateString(),
-          start_time: savedMeta.start_time || sch.start_time || '07:30 WIB',
-          end_time: savedMeta.end_time || '09:00 WIB',
-          room: savedMeta.room || (populatedStudents[0]?.room || 'Ruang Lab Komputer 01'),
-          session: savedMeta.session || (populatedStudents[0]?.session || 'Sesi 1'),
-          proctor_1_name: savedMeta.proctor_1_name || 'Dra. Hj. Siti Aminah, M.Pd.',
-          proctor_1_nip: savedMeta.proctor_1_nip || '19680512 199403 2 004',
-          proctor_2_name: savedMeta.proctor_2_name || 'Rahmat Hidayat, S.Pd.',
-          proctor_2_nip: savedMeta.proctor_2_nip || '19820719 200801 1 009',
-          headmaster_name: savedMeta.headmaster_name || schoolProfile.headmaster_name || 'Drs. H. Ahmad Fauzi, M.Pd.',
-          headmaster_nip: savedMeta.headmaster_nip || schoolProfile.headmaster_nip || '19710815 199802 1 003',
-          notes: savedMeta.notes || 'Pelaksanaan ujian berlangsung tertib, aman, dan lancar.'
+          start_time: savedMeta.start_time || sch.start_time || '09:30',
+          end_time: savedMeta.end_time || '11:15',
+          username: savedMeta.username || schoolProfile.school_code || 'K02010105',
+          server_id: savedMeta.server_id || 'K02010105-AJ6K',
+          room: savedMeta.room || (populatedStudents[0]?.room || 'LAB 1'),
+          session: savedMeta.session || (populatedStudents[0]?.session || '2'),
+          proctor_1_name: savedMeta.proctor_1_name || 'Maulana Firdaus Nurrokhim, S.Pd',
+          proctor_1_nip: savedMeta.proctor_1_nip || '199508162025211133',
+          proctor_2_name: savedMeta.proctor_2_name || 'Tissa Yuanita',
+          proctor_2_nip: savedMeta.proctor_2_nip || '197311072022212005',
+          headmaster_name: savedMeta.headmaster_name || schoolProfile.headmaster_name || 'Eddy Mustofa, S.Pd., M.MPd',
+          headmaster_nip: savedMeta.headmaster_nip || schoolProfile.headmaster_nip || '197811022008011003',
+          notes: savedMeta.notes !== undefined ? savedMeta.notes : ''
         },
         students: populatedStudents,
         summary: {
@@ -4041,15 +4043,19 @@ const server = http.createServer(async (req, res) => {
 
     const metaObj = {
       exam_date: body.exam_date || getIndonesianDateString(),
-      start_time: body.start_time || '07:30 WIB',
-      end_time: body.end_time || '09:00 WIB',
-      room: body.room || 'Ruang Lab Komputer 01',
-      session: body.session || 'Sesi 1',
+      start_time: body.start_time || '09:30',
+      end_time: body.end_time || '11:15',
+      username: body.username || 'K02010105',
+      server_id: body.server_id || 'K02010105-AJ6K',
+      room: body.room || 'LAB 1',
+      session: body.session || '2',
       proctor_1_name: body.proctor_1_name || '',
       proctor_1_nip: body.proctor_1_nip || '',
       proctor_2_name: body.proctor_2_name || '',
       proctor_2_nip: body.proctor_2_nip || '',
-      notes: body.notes || 'Pelaksanaan ujian berlangsung tertib, aman, dan lancar.',
+      headmaster_name: body.headmaster_name || '',
+      headmaster_nip: body.headmaster_nip || '',
+      notes: body.notes !== undefined ? body.notes : '',
       updated_at: Date.now()
     };
 

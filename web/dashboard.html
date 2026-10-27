@@ -132,6 +132,9 @@
         box-sizing: border-box !important;
         font-family: 'Times New Roman', Times, serif !important;
       }
+      .official-a4-page.tka-berita-acara {
+        font-family: Arial, Helvetica, sans-serif !important;
+      }
       .official-a4-page:last-child {
         page-break-after: auto !important;
         break-after: auto !important;
@@ -969,53 +972,73 @@
               <span class="text-[11px] text-slate-400">Data ini akan tercetak otomatis pada Berita Acara & Daftar Hadir</span>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 text-xs">
               <div>
                 <label class="block font-semibold text-slate-300 mb-1">Hari & Tanggal Pelaksanaan</label>
-                <input type="text" id="baExamDate" placeholder="Contoh: Senin, 26 Oktober 2026" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
+                <input type="text" id="baExamDate" oninput="if(window.renderBAPreviewOfficialDoc) window.renderBAPreviewOfficialDoc()" placeholder="Contoh: Selasa, 27 Oktober 2026" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
               </div>
 
               <div>
                 <label class="block font-semibold text-slate-300 mb-1">Jam Pelaksanaan (Mulai - Selesai)</label>
                 <div class="grid grid-cols-2 gap-2">
-                  <input type="text" id="baStartTime" placeholder="07:30 WIB" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-white text-center focus:outline-none focus:border-indigo-500">
-                  <input type="text" id="baEndTime" placeholder="09:00 WIB" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-white text-center focus:outline-none focus:border-indigo-500">
+                  <input type="text" id="baStartTime" oninput="if(window.renderBAPreviewOfficialDoc) window.renderBAPreviewOfficialDoc()" placeholder="09:30" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-white text-center focus:outline-none focus:border-indigo-500">
+                  <input type="text" id="baEndTime" oninput="if(window.renderBAPreviewOfficialDoc) window.renderBAPreviewOfficialDoc()" placeholder="11:15" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-white text-center focus:outline-none focus:border-indigo-500">
                 </div>
               </div>
 
               <div>
+                <label class="block font-semibold text-slate-300 mb-1">Username / Kode Sekolah (TKA)</label>
+                <input type="text" id="baUsername" oninput="if(window.renderBAPreviewOfficialDoc) window.renderBAPreviewOfficialDoc()" placeholder="Contoh: K02010105" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500 transition">
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">ID Server</label>
+                <input type="text" id="baServerId" oninput="if(window.renderBAPreviewOfficialDoc) window.renderBAPreviewOfficialDoc()" placeholder="Contoh: K02010105-AJ6K" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500 transition">
+              </div>
+
+              <div>
                 <label class="block font-semibold text-slate-300 mb-1">Ruang Ujian / Laboratorium</label>
-                <input type="text" id="baRoom" placeholder="Contoh: Ruang Lab Komputer 01" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
-              </div>
-
-              <div>
-                <label class="block font-semibold text-slate-300 mb-1">Nama Pengawas Ruang 1</label>
-                <input type="text" id="baProctor1Name" placeholder="Nama Lengkap & Gelar Pengawas 1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
-              </div>
-
-              <div>
-                <label class="block font-semibold text-slate-300 mb-1">NIP Pengawas Ruang 1</label>
-                <input type="text" id="baProctor1Nip" placeholder="19680512 199403 2 004 / -" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500 transition">
+                <input type="text" id="baRoom" oninput="if(window.renderBAPreviewOfficialDoc) window.renderBAPreviewOfficialDoc()" placeholder="Contoh: LAB 1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
               </div>
 
               <div>
                 <label class="block font-semibold text-slate-300 mb-1">Sesi Ujian</label>
-                <input type="text" id="baSession" placeholder="Contoh: Sesi 1 (Pagi)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
+                <input type="text" id="baSession" oninput="if(window.renderBAPreviewOfficialDoc) window.renderBAPreviewOfficialDoc()" placeholder="Contoh: 2" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
               </div>
 
               <div>
-                <label class="block font-semibold text-slate-300 mb-1">Nama Pengawas Ruang 2 (Opsional)</label>
-                <input type="text" id="baProctor2Name" placeholder="Nama Lengkap & Gelar Pengawas 2" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
+                <label class="block font-semibold text-slate-300 mb-1">1. Nama Proktor Ruang</label>
+                <input type="text" id="baProctor1Name" oninput="if(window.renderBAPreviewOfficialDoc) window.renderBAPreviewOfficialDoc()" placeholder="Nama Lengkap & Gelar Proktor" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
               </div>
 
               <div>
-                <label class="block font-semibold text-slate-300 mb-1">NIP Pengawas Ruang 2</label>
-                <input type="text" id="baProctor2Nip" placeholder="NIP Pengawas 2 / -" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500 transition">
+                <label class="block font-semibold text-slate-300 mb-1">NIP Proktor Ruang</label>
+                <input type="text" id="baProctor1Nip" oninput="if(window.renderBAPreviewOfficialDoc) window.renderBAPreviewOfficialDoc()" placeholder="199508162025211133 / -" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500 transition">
               </div>
 
-              <div class="sm:col-span-2 lg:col-span-1">
-                <label class="block font-semibold text-slate-300 mb-1">Catatan Khusus Kejadian Ujian</label>
-                <input type="text" id="baNotes" placeholder="Contoh: Ujian berjalan tertib, lancar, dan aman." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">2. Nama Pengawas Ruang</label>
+                <input type="text" id="baProctor2Name" oninput="if(window.renderBAPreviewOfficialDoc) window.renderBAPreviewOfficialDoc()" placeholder="Nama Lengkap & Gelar Pengawas" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">NIP Pengawas Ruang</label>
+                <input type="text" id="baProctor2Nip" oninput="if(window.renderBAPreviewOfficialDoc) window.renderBAPreviewOfficialDoc()" placeholder="197311072022212005 / -" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500 transition">
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">3. Nama Penanggung Jawab (Kepsek)</label>
+                <input type="text" id="baHeadmasterName" oninput="if(window.renderBAPreviewOfficialDoc) window.renderBAPreviewOfficialDoc()" placeholder="Nama Penanggung Jawab / Kepala Sekolah" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">NIP Penanggung Jawab</label>
+                <input type="text" id="baHeadmasterNip" oninput="if(window.renderBAPreviewOfficialDoc) window.renderBAPreviewOfficialDoc()" placeholder="197811022008011003 / -" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500 transition">
+              </div>
+
+              <div class="sm:col-span-2 lg:col-span-4">
+                <label class="block font-semibold text-slate-300 mb-1">Catatan selama Tes (Kosongkan jika nihil / tidak ada kendala)</label>
+                <input type="text" id="baNotes" oninput="if(window.renderBAPreviewOfficialDoc) window.renderBAPreviewOfficialDoc()" placeholder="Catatan selama ujian..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
               </div>
             </div>
           </div>
@@ -1078,7 +1101,7 @@
           </div>
 
           <!-- Kertas Putih A4 Berita Acara -->
-          <div class="max-w-4xl mx-auto bg-white text-black p-8 sm:p-12 rounded-2xl shadow-2xl border border-slate-300" style="font-family: 'Times New Roman', Times, serif;">
+          <div class="max-w-4xl mx-auto bg-white text-black p-6 sm:p-10 rounded-2xl shadow-2xl border border-slate-300" style="font-family: Arial, Helvetica, sans-serif;">
             <div id="baOfficialPreviewContent">
               <!-- Dynamically populated via renderBAPreviewOfficialDoc() -->
             </div>
@@ -12326,12 +12349,16 @@
         setVal('baExamDate', att.exam_date);
         setVal('baStartTime', att.start_time);
         setVal('baEndTime', att.end_time);
+        setVal('baUsername', att.username || sp.school_code || 'K02010105');
+        setVal('baServerId', att.server_id || 'K02010105-AJ6K');
         setVal('baRoom', att.room);
         setVal('baSession', att.session);
         setVal('baProctor1Name', att.proctor_1_name);
         setVal('baProctor1Nip', att.proctor_1_nip);
         setVal('baProctor2Name', att.proctor_2_name);
         setVal('baProctor2Nip', att.proctor_2_nip);
+        setVal('baHeadmasterName', att.headmaster_name || sp.headmaster_name || 'Eddy Mustofa, S.Pd., M.MPd');
+        setVal('baHeadmasterNip', att.headmaster_nip || sp.headmaster_nip || '197811022008011003');
         setVal('baNotes', att.notes);
 
         window.renderBeritaAcaraUI();
@@ -12536,12 +12563,16 @@
       const exam_date = getVal('baExamDate');
       const start_time = getVal('baStartTime');
       const end_time = getVal('baEndTime');
+      const username = getVal('baUsername');
+      const server_id = getVal('baServerId');
       const room = getVal('baRoom');
       const session = getVal('baSession');
       const proctor_1_name = getVal('baProctor1Name');
       const proctor_1_nip = getVal('baProctor1Nip');
       const proctor_2_name = getVal('baProctor2Name');
       const proctor_2_nip = getVal('baProctor2Nip');
+      const headmaster_name = getVal('baHeadmasterName');
+      const headmaster_nip = getVal('baHeadmasterNip');
       const notes = getVal('baNotes');
 
       const studentDict = {};
@@ -12562,12 +12593,16 @@
             exam_date,
             start_time,
             end_time,
+            username,
+            server_id,
             room,
             session,
             proctor_1_name,
             proctor_1_nip,
             proctor_2_name,
             proctor_2_nip,
+            headmaster_name,
+            headmaster_nip,
             notes,
             students: studentDict
           })
@@ -12615,7 +12650,59 @@
       `;
     }
 
-    // Helper Generator Dokumen Berita Acara Resmi (A4)
+    // Helper Parser Tanggal Bahasa Indonesia (Hari, Tanggal, Bulan, Tahun)
+    function parseIndonesianDateParts(rawDate) {
+      const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const monthNames = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      ];
+
+      let day = 'Selasa';
+      let date = '27';
+      let month = 'Oktober';
+      let year = '2026';
+
+      if (!rawDate || typeof rawDate !== 'string') {
+        const now = new Date();
+        return {
+          day: dayNames[now.getDay()],
+          date: String(now.getDate()),
+          month: monthNames[now.getMonth()],
+          year: String(now.getFullYear())
+        };
+      }
+
+      const str = rawDate.trim();
+
+      const dayMatch = str.match(/^(Minggu|Senin|Selasa|Rabu|Kamis|Jum['’]?at|Sabtu)/i);
+      if (dayMatch) {
+        day = dayMatch[1].charAt(0).toUpperCase() + dayMatch[1].slice(1).toLowerCase();
+        if (day.toLowerCase().startsWith('jum')) day = 'Jumat';
+      }
+
+      const mMatch = str.match(/(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/);
+      if (mMatch) {
+        date = mMatch[1];
+        month = mMatch[2].charAt(0).toUpperCase() + mMatch[2].slice(1).toLowerCase();
+        year = mMatch[3];
+      } else {
+        const isoMatch = str.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+        if (isoMatch) {
+          const dObj = new Date(`${isoMatch[1]}-${isoMatch[2].padStart(2, '0')}-${isoMatch[3].padStart(2, '0')}`);
+          if (!isNaN(dObj.getTime())) {
+            day = dayNames[dObj.getDay()];
+            date = String(dObj.getDate());
+            month = monthNames[dObj.getMonth()];
+            year = String(dObj.getFullYear());
+          }
+        }
+      }
+
+      return { day, date, month, year };
+    }
+
+    // Helper Generator Dokumen Berita Acara Resmi Format Standar TKA Kemendikbudristek 2026
     window.renderBAPreviewOfficialDoc = function() {
       const container = document.getElementById('baOfficialPreviewContent');
       if (!container || !window.currentBAData) return;
@@ -12627,170 +12714,263 @@
       const students = d.students || [];
 
       const getVal = (id, fallback) => (document.getElementById(id)?.value || fallback || '').trim();
-      const examDate = getVal('baExamDate', att.exam_date);
-      const startTime = getVal('baStartTime', att.start_time);
-      const endTime = getVal('baEndTime', att.end_time);
-      const room = getVal('baRoom', att.room);
-      const session = getVal('baSession', att.session);
-      const p1Name = getVal('baProctor1Name', att.proctor_1_name);
-      const p1Nip = getVal('baProctor1Nip', att.proctor_1_nip);
-      const p2Name = getVal('baProctor2Name', att.proctor_2_name);
-      const p2Nip = getVal('baProctor2Nip', att.proctor_2_nip);
-      const notes = getVal('baNotes', att.notes);
-      const headmaster = att.headmaster_name || sp.headmaster_name || 'Drs. H. Ahmad Fauzi, M.Pd.';
-      const headmasterNip = att.headmaster_nip || sp.headmaster_nip || '19710815 199802 1 003';
+      const examDate = getVal('baExamDate', att.exam_date || 'Selasa, 27 Oktober 2026');
+      const startTime = getVal('baStartTime', att.start_time || '09:30');
+      const endTime = getVal('baEndTime', att.end_time || '11:15');
+      const cleanStartTime = startTime.replace(/\s*wib/i, '').trim();
+      const cleanEndTime = endTime.replace(/\s*wib/i, '').trim();
+
+      const username = getVal('baUsername', att.username || sp.school_code || 'K02010105');
+      const serverId = getVal('baServerId', att.server_id || 'K02010105-AJ6K');
+      const schoolName = (sp.name || 'SMKN 5 BANDUNG').toUpperCase();
+      const room = getVal('baRoom', att.room || 'LAB 1');
+      const session = getVal('baSession', att.session || '2');
+
+      const proctorName = getVal('baProctor1Name', att.proctor_1_name || 'Maulana Firdaus Nurrokhim, S.Pd');
+      const proctorNip = getVal('baProctor1Nip', att.proctor_1_nip || '199508162025211133');
+      const supervisorName = getVal('baProctor2Name', att.proctor_2_name || 'Tissa Yuanita');
+      const supervisorNip = getVal('baProctor2Nip', att.proctor_2_nip || '197311072022212005');
+      const headmasterName = getVal('baHeadmasterName', att.headmaster_name || sp.headmaster_name || 'Eddy Mustofa, S.Pd., M.MPd');
+      const headmasterNip = getVal('baHeadmasterNip', att.headmaster_nip || sp.headmaster_nip || '197811022008011003');
+      const notes = getVal('baNotes', att.notes || '');
 
       const total = students.length;
       const present = students.filter(s => s.status === 'hadir').length;
       const absentStudents = students.filter(s => s.status === 'tidak_hadir');
       const absent = absentStudents.length;
+      const absentUsernames = absentStudents.map(s => s.exam_no || s.username || s.full_name).join(', ');
 
-      const classLabel = (window.currentBAClassFilter && window.currentBAClassFilter !== 'all')
-        ? 'Kelas ' + window.currentBAClassFilter
-        : (sch.class_target || 'Semua Kelas');
+      const dateParts = parseIndonesianDateParts(examDate);
+      const examYear = dateParts.year || '2026';
+      const assessmentTitle = (sch.title ? sch.title.toUpperCase() : 'TES KEMAMPUAN AKADEMIK SMK');
 
       container.innerHTML = `
-        <div class="official-a4-page" style="font-family: 'Times New Roman', Times, serif; color: #000; line-height: 1.45;">
-          ${generateOfficialSchoolKop(sp)}
-
-          <div style="text-align: center; margin: 12px 0 16px 0;">
-            <div style="font-size: 14px; font-weight: bold; text-decoration: underline; letter-spacing: 0.5px; text-transform: uppercase;">
-              BERITA ACARA PELAKSANAAN ASESMEN / UJIAN SEKOLAH
+        <div class="official-a4-page tka-berita-acara" style="font-family: Arial, Helvetica, sans-serif; color: #000; line-height: 1.35; padding: 6mm 10mm; width: 100%; max-width: 210mm; margin: 0 auto; box-sizing: border-box; background: #ffffff;">
+          
+          <!-- Header: Logo Tut Wuri Handayani & Judul 3 Baris Centered -->
+          <div style="display: flex; align-items: center; position: relative; margin-bottom: 20px; min-height: 55px;">
+            <div style="position: absolute; left: 0; top: -2px;">
+              <img src="/static/images/tut_wuri_handayani.svg" alt="Tut Wuri Handayani" style="width: 52px; height: 52px; object-fit: contain; filter: grayscale(100%);">
             </div>
-            <div style="font-size: 11px; font-weight: bold; margin-top: 3px;">
-              TAHUN PELAJARAN ${sp.academic_year || '2026/2027'} - SEMESTER ${(sp.semester || 'GANJIL').toUpperCase()}
+            <div style="width: 100%; text-align: center;">
+              <div style="font-size: 13.5pt; font-weight: bold; letter-spacing: 0.3px; line-height: 1.25; text-transform: uppercase;">
+                BERITA ACARA PELAKSANAAN
+              </div>
+              <div style="font-size: 13.5pt; font-weight: bold; letter-spacing: 0.3px; line-height: 1.25; text-transform: uppercase;">
+                ${assessmentTitle}
+              </div>
+              <div style="font-size: 13.5pt; font-weight: bold; letter-spacing: 0.3px; line-height: 1.25; text-transform: uppercase;">
+                TAHUN ${examYear}
+              </div>
             </div>
           </div>
 
-          <p style="font-size: 12px; text-align: justify; margin-bottom: 10px;">
-            Pada hari ini <strong>${examDate || '........................'}</strong>, bertempat di <strong>${sp.name || 'Sekolah'}</strong>, telah diselenggarakan Ujian Berbasis Komputer (Computer Based Test - CBT) untuk mengukur capaian kompetensi peserta didik dengan rincian pelaksanaan sebagai berikut:
+          <!-- Paragraf Pembuka -->
+          <p style="font-size: 10.5pt; text-align: justify; line-height: 1.45; margin: 0 0 14px 0;">
+            Pada hari ini ${dateParts.day} tanggal ${dateParts.date} bulan ${dateParts.month} tahun ${dateParts.year}, di ${schoolName} telah diselenggarakan ${assessmentTitle}, dari pukul ${cleanStartTime} sampai dengan pukul ${cleanEndTime}
           </p>
 
-          <table style="width: 100%; font-size: 11.5px; border-collapse: collapse; margin-bottom: 12px;">
-            <tr>
-              <td style="width: 170px; padding: 3px 0; font-weight: 600;">Mata Pelajaran / Asesmen</td>
-              <td style="width: 15px; padding: 3px 0;">:</td>
-              <td style="padding: 3px 0; font-weight: bold;">${sch.title || 'Ujian Sekolah'} (${sch.bank_name || '-'})</td>
-            </tr>
-            <tr>
-              <td style="padding: 3px 0; font-weight: 600;">Tingkat / Rombel (Kelas)</td>
-              <td style="padding: 3px 0;">:</td>
-              <td style="padding: 3px 0;">${classLabel}</td>
-            </tr>
-            <tr>
-              <td style="padding: 3px 0; font-weight: 600;">Ruang / Laboratorium</td>
-              <td style="padding: 3px 0;">:</td>
-              <td style="padding: 3px 0;">${room || 'Ruang Lab CBT'}</td>
-            </tr>
-            <tr>
-              <td style="padding: 3px 0; font-weight: 600;">Sesi Ujian & Waktu</td>
-              <td style="padding: 3px 0;">:</td>
-              <td style="padding: 3px 0;">${session || 'Sesi 1'} (${startTime || '07:30'} s.d. ${endTime || '09:00'}) - Durasi: ${sch.duration_minutes || 90} Menit</td>
-            </tr>
-          </table>
-
-          <!-- REKAPITULASI PESERTA -->
-          <div style="border: 1px solid #000; padding: 8px 12px; margin-bottom: 12px; background: #fafafa;">
-            <div style="font-size: 11.5px; font-weight: bold; margin-bottom: 6px;">Rekapitulasi Kehadiran Peserta Ujian:</div>
-            <table style="width: 100%; font-size: 11px; text-align: center; border-collapse: collapse;">
-              <tr>
-                <td style="border: 1px solid #000; padding: 6px; width: 33.3%;">
-                  <span style="font-size: 10px; color: #444; display: block;">Jumlah Peserta Terdaftar</span>
-                  <strong style="font-size: 14px;">${total} Orang</strong>
-                </td>
-                <td style="border: 1px solid #000; padding: 6px; width: 33.3%; background: #f0fdf4;">
-                  <span style="font-size: 10px; color: #166534; display: block;">Jumlah Peserta Hadir</span>
-                  <strong style="font-size: 14px; color: #166534;">${present} Orang</strong>
-                </td>
-                <td style="border: 1px solid #000; padding: 6px; width: 33.3%; background: #fef2f2;">
-                  <span style="font-size: 10px; color: #991b1b; display: block;">Jumlah Tidak Hadir</span>
-                  <strong style="font-size: 14px; color: #991b1b;">${absent} Orang</strong>
-                </td>
-              </tr>
-            </table>
-          </div>
-
-          <!-- DAFTAR PESERTA TIDAK HADIR -->
-          <div style="margin-bottom: 12px;">
-            <div style="font-size: 11.5px; font-weight: bold; margin-bottom: 4px;">Daftar Peserta Yang Tidak Hadir:</div>
-            ${absent === 0 ? `
-              <div style="border: 1px solid #000; padding: 8px; text-align: center; font-style: italic; font-size: 11px; background: #ffffff;">
-                <strong>NIHIL</strong> — Seluruh peserta terdaftar (${total} siswa) hadir lengkap mengikuti ujian.
+          <!-- Poin 1: Data Rincian Pelaksanaan dengan Garis Bawah Solid Sepenuhnya -->
+          <div style="display: flex; align-items: flex-start; margin-bottom: 12px; font-size: 10pt; line-height: 1.45;">
+            <div style="width: 22px; flex-shrink: 0;">1.</div>
+            <div style="flex: 1;">
+              
+              <!-- Username -->
+              <div style="display: flex; align-items: flex-end; margin-bottom: 4px;">
+                <div style="width: 195px; flex-shrink: 0;">Username</div>
+                <div style="width: 14px; text-align: center; flex-shrink: 0;">:</div>
+                <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                  ${username}
+                </div>
               </div>
-            ` : `
-              <table style="width: 100%; font-size: 10.5px; border-collapse: collapse; border: 1px solid #000;">
-                <thead style="background: #e2e8f0; font-weight: bold;">
-                  <tr>
-                    <th style="border: 1px solid #000; padding: 4px; text-align: center; width: 30px;">No</th>
-                    <th style="border: 1px solid #000; padding: 4px; text-align: center; width: 110px;">No. Peserta</th>
-                    <th style="border: 1px solid #000; padding: 4px; text-align: center; width: 90px;">NISN</th>
-                    <th style="border: 1px solid #000; padding: 4px; text-align: left;">Nama Lengkap Siswa</th>
-                    <th style="border: 1px solid #000; padding: 4px; text-align: center; width: 80px;">Kelas</th>
-                    <th style="border: 1px solid #000; padding: 4px; text-align: center; width: 100px;">Keterangan</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${absentStudents.map((st, i) => `
-                    <tr>
-                      <td style="border: 1px solid #000; padding: 3px 5px; text-align: center;">${i + 1}</td>
-                      <td style="border: 1px solid #000; padding: 3px 5px; text-align: center; font-family: monospace;">${st.exam_no || '-'}</td>
-                      <td style="border: 1px solid #000; padding: 3px 5px; text-align: center; font-family: monospace;">${st.nisn || '-'}</td>
-                      <td style="border: 1px solid #000; padding: 3px 5px; font-weight: 600;">${st.full_name}</td>
-                      <td style="border: 1px solid #000; padding: 3px 5px; text-align: center;">${st.class_name || '-'}</td>
-                      <td style="border: 1px solid #000; padding: 3px 5px; text-align: center; font-weight: bold; text-transform: uppercase; color: #991b1b;">
-                        ${st.reason || 'Alpa'} ${st.note ? '(' + st.note + ')' : ''}
-                      </td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            `}
-          </div>
 
-          <!-- CATATAN KHUSUS PELAKSANAAN -->
-          <div style="margin-bottom: 16px;">
-            <div style="font-size: 11.5px; font-weight: bold; margin-bottom: 3px;">Catatan Khusus Selama Ujian Berlangsung:</div>
-            <div style="border: 1px solid #000; padding: 6px 10px; font-size: 11px; min-height: 35px; background: #ffffff; font-style: italic;">
-              ${notes || 'Pelaksanaan asesmen berlangsung tertib, lancar, dan aman sesuai petunjuk operasional standar.'}
+              <!-- Sekolah/Madrasah -->
+              <div style="display: flex; align-items: flex-end; margin-bottom: 4px;">
+                <div style="width: 195px; flex-shrink: 0;">Sekolah/Madrasah</div>
+                <div style="width: 14px; text-align: center; flex-shrink: 0;">:</div>
+                <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                  ${schoolName}
+                </div>
+              </div>
+
+              <!-- ID Server & Ruang -->
+              <div style="display: flex; align-items: flex-end; margin-bottom: 4px;">
+                <div style="width: 195px; flex-shrink: 0;">ID Server</div>
+                <div style="width: 14px; text-align: center; flex-shrink: 0;">:</div>
+                <div style="width: 130px; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px; flex-shrink: 0;">
+                  ${serverId}
+                </div>
+                <div style="width: 75px; text-align: right; padding-right: 10px; flex-shrink: 0;">Ruang :</div>
+                <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                  ${room}
+                </div>
+              </div>
+
+              <!-- Sesi -->
+              <div style="display: flex; align-items: flex-end; margin-bottom: 4px;">
+                <div style="width: 195px; flex-shrink: 0;">Sesi</div>
+                <div style="width: 14px; text-align: center; flex-shrink: 0;">:</div>
+                <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                  ${session}
+                </div>
+              </div>
+
+              <!-- Jumlah Peserta Seharusnya -->
+              <div style="display: flex; align-items: flex-end; margin-bottom: 4px;">
+                <div style="width: 195px; flex-shrink: 0;">Jumlah Peserta Seharusnya</div>
+                <div style="width: 14px; text-align: center; flex-shrink: 0;">:</div>
+                <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                  ${total}
+                </div>
+              </div>
+
+              <!-- Jumlah Hadir (Ikut Ujian) -->
+              <div style="display: flex; align-items: flex-end; margin-bottom: 4px;">
+                <div style="width: 195px; flex-shrink: 0;">Jumlah Hadir (Ikut Ujian)</div>
+                <div style="width: 14px; text-align: center; flex-shrink: 0;">:</div>
+                <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                  ${present}
+                </div>
+              </div>
+
+              <!-- Jumlah Tidak Mengerjakan -->
+              <div style="display: flex; align-items: flex-end; margin-bottom: 4px;">
+                <div style="width: 195px; flex-shrink: 0;">Jumlah Tidak Mengerjakan</div>
+                <div style="width: 14px; text-align: center; flex-shrink: 0;">:</div>
+                <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                  ${absent}
+                </div>
+              </div>
+
+              <!-- Username Tidak Mengerjakan -->
+              <div style="display: flex; align-items: flex-end; margin-bottom: 4px;">
+                <div style="width: 195px; flex-shrink: 0;">Username Tidak Mengerjakan</div>
+                <div style="width: 14px; text-align: center; flex-shrink: 0;">:</div>
+                <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px; word-break: break-all;">
+                  ${absentUsernames || ''}
+                </div>
+              </div>
+
             </div>
           </div>
 
-          <!-- TANDA TANGAN PENGAWAS & KEPALA SEKOLAH -->
-          <div style="margin-top: 18px; font-size: 11px;">
-            <table style="width: 100%; border-collapse: collapse; border: none; text-align: center;">
-              <tr>
-                <td style="width: 50%; vertical-align: top; border: none; padding-right: 20px;">
-                  <div>Pengawas Ruang 1,</div>
-                  <div style="height: 52px;"></div>
-                  <div style="font-weight: bold; text-decoration: underline;">${p1Name || 'Dra. Hj. Siti Aminah, M.Pd.'}</div>
-                  <div style="font-size: 10px;">NIP. ${p1Nip || '19680512 199403 2 004'}</div>
-                </td>
-                <td style="width: 50%; vertical-align: top; border: none; padding-left: 20px;">
-                  <div>Pengawas Ruang 2,</div>
-                  <div style="height: 52px;"></div>
-                  <div style="font-weight: bold; text-decoration: underline;">${p2Name || '( .................................................... )'}</div>
-                  <div style="font-size: 10px;">NIP. ${p2Nip || '....................................................'}</div>
-                </td>
-              </tr>
-              <tr>
-                <td colspan="2" style="border: none; padding-top: 14px;">
-                  <div>${sp.city || 'Kota Bandung'}, ${examDate || '........................'}</div>
-                  <div style="font-weight: 600; margin-top: 2px;">Mengetahui,<br>Kepala Sekolah,</div>
-                  <div style="height: 48px; position: relative;">
-                    ${sp.stamp_url ? `<img src="${sp.stamp_url}" style="position: absolute; left: 45%; top: -8px; width: 65px; opacity: 0.85;" alt="Cap">` : ''}
-                    ${sp.signature_url ? `<img src="${sp.signature_url}" style="position: absolute; left: 48%; top: -5px; width: 90px;" alt="TTD">` : ''}
-                  </div>
-                  <div style="font-weight: bold; text-decoration: underline;">${headmaster}</div>
-                  <div style="font-size: 10px;">NIP. ${headmasterNip}</div>
-                </td>
-              </tr>
-            </table>
+          <!-- Poin 2: Catatan selama Tes -->
+          <div style="margin-bottom: 14px; font-size: 10pt;">
+            <div style="display: flex; align-items: baseline; margin-bottom: 4px;">
+              <div style="width: 22px; flex-shrink: 0;">2.</div>
+              <div>Catatan selama Tes :</div>
+            </div>
+            <div style="margin-left: 22px; border: 1px solid #000; height: 75px; min-height: 75px; padding: 6px 8px; font-size: 9.5pt; box-sizing: border-box; overflow: hidden; background: #ffffff;">
+              ${notes || ''}
+            </div>
           </div>
+
+          <!-- Yang membuat berita acara -->
+          <div style="margin-bottom: 14px; font-size: 10pt;">
+            <div style="margin-bottom: 8px;">Yang membuat berita acara :</div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <!-- Kolom Kiri: Proktor, Pengawas, Penanggung Jawab (width: 58%) -->
+              <div style="width: 58%;">
+                
+                <!-- 1. Proktor -->
+                <div style="display: flex; align-items: flex-start; margin-bottom: 10px;">
+                  <div style="width: 22px; flex-shrink: 0;">1.</div>
+                  <div style="width: 125px; flex-shrink: 0;">Proktor</div>
+                  <div style="flex: 1;">
+                    <div style="border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                      ${proctorName || ''}
+                    </div>
+                    <div style="display: flex; align-items: flex-end; margin-top: 4px;">
+                      <div style="width: 35px; flex-shrink: 0;">NIP</div>
+                      <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                        ${proctorNip || ''}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 2. Pengawas -->
+                <div style="display: flex; align-items: flex-start; margin-bottom: 10px;">
+                  <div style="width: 22px; flex-shrink: 0;">2.</div>
+                  <div style="width: 125px; flex-shrink: 0;">Pengawas</div>
+                  <div style="flex: 1;">
+                    <div style="border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                      ${supervisorName || ''}
+                    </div>
+                    <div style="display: flex; align-items: flex-end; margin-top: 4px;">
+                      <div style="width: 35px; flex-shrink: 0;">NIP</div>
+                      <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                        ${supervisorNip || ''}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 3. Penanggung Jawab -->
+                <div style="display: flex; align-items: flex-start; margin-bottom: 4px;">
+                  <div style="width: 22px; flex-shrink: 0;">3.</div>
+                  <div style="width: 125px; flex-shrink: 0;">Penanggung Jawab</div>
+                  <div style="flex: 1;">
+                    <div style="border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                      ${headmasterName || ''}
+                    </div>
+                    <div style="display: flex; align-items: flex-end; margin-top: 4px;">
+                      <div style="width: 35px; flex-shrink: 0;">NIP</div>
+                      <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 1px; min-height: 16px;">
+                        ${headmasterNip || ''}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Kolom Kanan: TTD (width: 38%) -->
+              <div style="width: 38%; padding-left: 20px; box-sizing: border-box;">
+                <div style="text-align: center; font-weight: bold; margin-bottom: 12px; font-size: 10pt;">TTD</div>
+                
+                <!-- TTD 1 -->
+                <div style="display: flex; align-items: flex-end; height: 34px; margin-bottom: 12px;">
+                  <div style="width: 22px; flex-shrink: 0;">1.</div>
+                  <div style="flex: 1; border-bottom: 1px solid #000; height: 100%;"></div>
+                </div>
+
+                <!-- TTD 2 -->
+                <div style="display: flex; align-items: flex-end; height: 34px; margin-bottom: 12px;">
+                  <div style="width: 22px; flex-shrink: 0;">2.</div>
+                  <div style="flex: 1; border-bottom: 1px solid #000; height: 100%;"></div>
+                </div>
+
+                <!-- TTD 3 -->
+                <div style="display: flex; align-items: flex-end; height: 34px; margin-bottom: 4px;">
+                  <div style="width: 22px; flex-shrink: 0;">3.</div>
+                  <div style="flex: 1; border-bottom: 1px solid #000; height: 100%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Catatan Box (Rangkap 3 & Upload Web TKA) -->
+          <div style="border: 1px solid #000; width: 62%; padding: 4px 8px; margin-top: 14px; margin-bottom: 20px; font-size: 9pt; line-height: 1.35; box-sizing: border-box;">
+            <div style="font-weight: bold; font-style: italic;">Catatan:</div>
+            <div>- Dibuat rangkap 3 (tiga), masing-masing untuk Sekolah, Kota/Kabupaten dan Provinsi</div>
+            <div>- Untuk pusat di upload melalui web TKA</div>
+          </div>
+
+          <!-- Footer: Bar Pemindai Optical Pusmendik Kemendikbud -->
+          <div style="display: flex; align-items: stretch; justify-content: space-between; width: 100%; height: 26px; box-sizing: border-box;">
+            <div style="width: 26px; height: 26px; border: 1.5px solid #000; box-sizing: border-box; flex-shrink: 0;"></div>
+            <div style="flex: 1; border: 1.5px solid #000; margin: 0 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10.5pt; letter-spacing: 0.5px; box-sizing: border-box;">
+              KEMENTERIAN PENDIDIKAN DASAR DAN MENENGAH
+            </div>
+            <div style="width: 26px; height: 26px; border: 1.5px solid #000; box-sizing: border-box; flex-shrink: 0;"></div>
+          </div>
+
         </div>
       `;
     };
-
-    // Helper Generator Dokumen Daftar Hadir (Absensi Siswa A4 Format Standar TKA / Ujian Nasional)
+// Helper Generator Dokumen Daftar Hadir (Absensi Siswa A4 Format Standar TKA / Ujian Nasional)
     window.renderBAAbsensiOfficialDoc = function() {
       const container = document.getElementById('baAbsensiPreviewContent');
       if (!container || !window.currentBAData) return;

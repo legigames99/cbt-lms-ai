@@ -301,7 +301,7 @@
       box-sizing: border-box;
     }
   
-    /* ============================================================== */
+        /* ============================================================== */
     /* THEME MODE: HIGH-CONTRAST LIGHT MODE OVERRIDES                 */
     /* ============================================================== */
     html.light-mode,
@@ -331,7 +331,7 @@
       font-weight: 800 !important;
     }
     html.light-mode .nav-item {
-      color: #334155 !important;
+      color: #1e293b !important;
       font-weight: 600 !important;
     }
     html.light-mode .nav-item:hover {
@@ -340,14 +340,14 @@
     }
     html.light-mode .nav-item.active {
       background-color: #e0e7ff !important;
-      color: #3730a3 !important;
+      color: #312e81 !important;
       border-left: 3px solid #4f46e5 !important;
       font-weight: 800 !important;
     }
 
     /* Topbar Header */
     html.light-mode header {
-      background-color: rgba(255, 255, 255, 0.96) !important;
+      background-color: rgba(255, 255, 255, 0.98) !important;
       border-color: #cbd5e1 !important;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
     }
@@ -358,11 +358,11 @@
     html.light-mode #topbarSchoolBadge {
       background-color: #e0e7ff !important;
       border-color: #a5b4fc !important;
-      color: #3730a3 !important;
+      color: #312e81 !important;
       font-weight: 700 !important;
     }
     html.light-mode #topbarAcademicYear {
-      color: #334155 !important;
+      color: #1e293b !important;
       font-weight: 600 !important;
     }
     html.light-mode header .bg-slate-950 {
@@ -388,7 +388,7 @@
     }
 
     /* Containers, Cards, Sections & Panels (KECUALI A4 & CETAK RESMI) */
-    html.light-mode .bg-slate-900:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(.print-card):not(button):not(input):not(select),
+    html.light-mode .bg-slate-900:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(button):not(input):not(select),
     html.light-mode .bg-slate-900\/40,
     html.light-mode .bg-slate-900\/50,
     html.light-mode .bg-slate-900\/60,
@@ -398,7 +398,7 @@
       border-color: #cbd5e1 !important;
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
     }
-    html.light-mode .bg-slate-950:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(.print-card):not(button):not(input):not(select),
+    html.light-mode .bg-slate-950:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(button):not(input):not(select),
     html.light-mode .bg-slate-950\/40,
     html.light-mode .bg-slate-950\/50,
     html.light-mode .bg-slate-950\/60,
@@ -407,7 +407,7 @@
       background-color: #f8fafc !important;
       border-color: #cbd5e1 !important;
     }
-    html.light-mode .bg-slate-800:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(.print-card):not(button):not(input):not(select),
+    html.light-mode .bg-slate-800:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(button):not(input):not(select),
     html.light-mode .bg-slate-800\/40,
     html.light-mode .bg-slate-800\/50,
     html.light-mode .bg-slate-800\/60,
@@ -417,38 +417,39 @@
     }
 
     /* Dark tinted backgrounds to clean light pastels */
-    html.light-mode .bg-indigo-950\/20,
-    html.light-mode .bg-indigo-950\/30,
-    html.light-mode .bg-indigo-950\/40,
-    html.light-mode .bg-indigo-950\/60,
-    html.light-mode .bg-indigo-950\/70 {
+    html.light-mode [class*="bg-indigo-950"],
+    html.light-mode .bg-indigo-950 {
       background-color: #e0e7ff !important;
+      border-color: #c7d2fe !important;
     }
-    html.light-mode .bg-amber-950\/20,
-    html.light-mode .bg-amber-950\/30,
-    html.light-mode .bg-amber-950\/60,
-    html.light-mode .bg-amber-950\/80 {
+    html.light-mode [class*="bg-amber-950"],
+    html.light-mode .bg-amber-950 {
       background-color: #fef3c7 !important;
+      border-color: #fcd34d !important;
     }
-    html.light-mode .bg-emerald-950\/10,
-    html.light-mode .bg-emerald-950\/20,
-    html.light-mode .bg-emerald-950\/30,
-    html.light-mode .bg-emerald-950\/70 {
+    html.light-mode [class*="bg-emerald-950"],
+    html.light-mode .bg-emerald-950 {
       background-color: #dcfce7 !important;
+      border-color: #86efac !important;
     }
-    html.light-mode .bg-rose-950\/20,
-    html.light-mode .bg-rose-950\/30,
-    html.light-mode .bg-rose-950\/40,
-    html.light-mode .bg-rose-950\/50,
-    html.light-mode .bg-rose-950\/60,
-    html.light-mode .bg-rose-950\/80 {
+    html.light-mode [class*="bg-purple-950"],
+    html.light-mode .bg-purple-950 {
+      background-color: #f3e8ff !important;
+      border-color: #d8b4fe !important;
+    }
+    html.light-mode [class*="bg-rose-950"],
+    html.light-mode .bg-rose-950 {
       background-color: #ffe4e6 !important;
+      border-color: #fca5a5 !important;
     }
-    html.light-mode .bg-blue-950\/20,
-    html.light-mode .bg-blue-950\/30,
-    html.light-mode .bg-blue-950\/60,
-    html.light-mode .bg-sky-950\/60 {
+    html.light-mode [class*="bg-blue-950"],
+    html.light-mode [class*="bg-sky-950"],
+    html.light-mode [class*="bg-cyan-950"],
+    html.light-mode .bg-blue-950,
+    html.light-mode .bg-sky-950,
+    html.light-mode .bg-cyan-950 {
       background-color: #e0f2fe !important;
+      border-color: #bae6fd !important;
     }
 
     /* Borders & Dividers */
@@ -482,9 +483,8 @@
     }
 
     /* ============================================================== */
-    /* HIGH-CONTRAST TYPOGRAPHY OVERRIDES                             */
+    /* HIGH-CONTRAST TYPOGRAPHY OVERRIDES (WCAG AAA STANDARD)        */
     /* ============================================================== */
-    /* All headings & labels */
     html.light-mode h1,
     html.light-mode h2,
     html.light-mode h3,
@@ -496,7 +496,7 @@
     }
 
     html.light-mode p {
-      color: #334155 !important;
+      color: #1e293b !important;
     }
 
     html.light-mode label {
@@ -505,7 +505,7 @@
     }
 
     /* General texts */
-    html.light-mode .text-white:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(button.bg-indigo-600):not(button.bg-indigo-600 *):not(button.bg-rose-600):not(button.bg-rose-600 *):not(button.bg-emerald-600):not(button.bg-emerald-600 *):not(button.bg-amber-600):not(button.bg-amber-600 *):not(button.bg-blue-600):not(button.bg-blue-600 *):not(button.bg-purple-600):not(button.bg-purple-600 *):not(button[class*="bg-gradient-to-r"]):not(button[class*="bg-gradient-to-r"] *):not(a.bg-indigo-600):not(a.bg-indigo-600 *) {
+    html.light-mode .text-white:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(button.bg-indigo-600):not(button.bg-indigo-600 *):not(button.bg-rose-600):not(button.bg-rose-600 *):not(button.bg-emerald-600):not(button.bg-emerald-600 *):not(button.bg-amber-600):not(button.bg-amber-600 *):not(button.bg-blue-600):not(button.bg-blue-600 *):not(button.bg-purple-600):not(button.bg-purple-600 *):not(button[class*="bg-gradient-to-r"]):not(button[class*="bg-gradient-to-r"] *):not(a.bg-indigo-600):not(a.bg-indigo-600 *):not(span.bg-emerald-500):not(span.bg-purple-600) {
       color: #0f172a !important;
     }
     html.light-mode .text-slate-100,
@@ -513,52 +513,71 @@
     html.light-mode .text-slate-300 {
       color: #0f172a !important;
     }
-    html.light-mode .text-slate-400,
-    html.light-mode .text-slate-500 {
+    html.light-mode .text-slate-400 {
       color: #1e293b !important;
-      font-weight: 500 !important;
+    }
+    html.light-mode .text-slate-500 {
+      color: #334155 !important;
     }
     html.light-mode .text-slate-600 {
-      color: #334155 !important;
+      color: #475569 !important;
     }
 
     /* Colored texts deepened for high contrast on light backgrounds */
-    html.light-mode .text-indigo-400,
-    html.light-mode .text-indigo-300,
-    html.light-mode .text-indigo-200 {
-      color: #3730a3 !important;
+    html.light-mode [class*="text-indigo-400"],
+    html.light-mode [class*="text-indigo-300"],
+    html.light-mode [class*="text-indigo-200"] {
+      color: #312e81 !important;
       font-weight: 700 !important;
     }
-    html.light-mode .text-amber-400,
-    html.light-mode .text-amber-300,
-    html.light-mode .text-amber-200 {
-      color: #92400e !important;
+    html.light-mode [class*="text-amber-400"],
+    html.light-mode [class*="text-amber-300"],
+    html.light-mode [class*="text-amber-200"] {
+      color: #78350f !important;
       font-weight: 700 !important;
     }
-    html.light-mode .text-emerald-400,
-    html.light-mode .text-emerald-300,
-    html.light-mode .text-emerald-200 {
-      color: #166534 !important;
+    html.light-mode [class*="text-emerald-400"],
+    html.light-mode [class*="text-emerald-300"],
+    html.light-mode [class*="text-emerald-200"] {
+      color: #14532d !important;
       font-weight: 700 !important;
     }
-    html.light-mode .text-rose-400,
-    html.light-mode .text-rose-300,
-    html.light-mode .text-rose-200 {
-      color: #9f1239 !important;
+    html.light-mode [class*="text-rose-400"],
+    html.light-mode [class*="text-rose-300"],
+    html.light-mode [class*="text-rose-200"] {
+      color: #881337 !important;
       font-weight: 700 !important;
     }
-    html.light-mode .text-blue-400,
-    html.light-mode .text-blue-300,
-    html.light-mode .text-blue-200,
-    html.light-mode .text-sky-400,
-    html.light-mode .text-sky-300 {
-      color: #075985 !important;
+    html.light-mode [class*="text-blue-400"],
+    html.light-mode [class*="text-blue-300"],
+    html.light-mode [class*="text-blue-200"],
+    html.light-mode [class*="text-sky-400"],
+    html.light-mode [class*="text-sky-300"],
+    html.light-mode [class*="text-sky-200"] {
+      color: #0c4a6e !important;
       font-weight: 700 !important;
     }
-    html.light-mode .text-purple-400,
-    html.light-mode .text-purple-300 {
+    html.light-mode [class*="text-cyan-400"],
+    html.light-mode [class*="text-cyan-300"],
+    html.light-mode [class*="text-cyan-200"],
+    html.light-mode [class*="text-teal-400"],
+    html.light-mode [class*="text-teal-300"],
+    html.light-mode [class*="text-teal-200"] {
+      color: #0e7490 !important;
+      font-weight: 700 !important;
+    }
+    html.light-mode [class*="text-purple-400"],
+    html.light-mode [class*="text-purple-300"],
+    html.light-mode [class*="text-purple-200"] {
       color: #581c87 !important;
       font-weight: 700 !important;
+    }
+
+    /* KaTeX Math formulas contrast */
+    html.light-mode .katex,
+    html.light-mode .katex-display,
+    html.light-mode .katex * {
+      color: #0f172a !important;
     }
 
     /* Solid color buttons text stays crisp white */
@@ -577,10 +596,13 @@
       color: #ffffff !important;
     }
 
-    /* Outlined & secondary buttons (e.g. Buat Jadwal Ujian, Cetak Berita Acara, Cetak Absensi) */
+    /* Outlined & secondary buttons & link buttons */
     html.light-mode button.bg-slate-800,
     html.light-mode button.bg-slate-900,
-    html.light-mode button.bg-slate-950 {
+    html.light-mode button.bg-slate-950,
+    html.light-mode a.bg-slate-800,
+    html.light-mode a.bg-slate-900,
+    html.light-mode a.bg-slate-950 {
       background-color: #ffffff !important;
       border: 1.5px solid #cbd5e1 !important;
       box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
@@ -588,9 +610,45 @@
     }
     html.light-mode button.bg-slate-800:hover,
     html.light-mode button.bg-slate-900:hover,
-    html.light-mode button.bg-slate-950:hover {
+    html.light-mode button.bg-slate-950:hover,
+    html.light-mode a.bg-slate-800:hover,
+    html.light-mode a.bg-slate-900:hover,
+    html.light-mode a.bg-slate-950:hover {
       background-color: #f1f5f9 !important;
       border-color: #94a3b8 !important;
+      color: #0f172a !important;
+    }
+
+    /* Option item letter & badges */
+    html.light-mode span.bg-slate-800 {
+      background-color: #e2e8f0 !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+      font-weight: 800 !important;
+    }
+    html.light-mode span.bg-emerald-500 {
+      background-color: #16a34a !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+    }
+    html.light-mode span.bg-purple-600 {
+      background-color: #9333ea !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+    }
+
+    /* Code blocks */
+    html.light-mode pre.bg-slate-950 {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.light-mode pre.bg-slate-950 code {
+      color: #0f172a !important;
+    }
+    html.light-mode code.bg-slate-950 {
+      background-color: #f1f5f9 !important;
+      color: #b45309 !important;
+      border-color: #cbd5e1 !important;
     }
 
     /* Inputs, Selects & Textareas */
@@ -604,8 +662,8 @@
     }
     html.light-mode input::placeholder,
     html.light-mode textarea::placeholder {
-      color: #64748b !important;
-      font-weight: normal !important;
+      color: #475569 !important;
+      font-weight: 500 !important;
     }
     html.light-mode select {
       color-scheme: light !important;
@@ -617,6 +675,7 @@
     }
 
     /* Tables */
+    html.light-mode thead.bg-slate-900,
     html.light-mode thead.bg-slate-950,
     html.light-mode th.bg-slate-950,
     html.light-mode thead,
@@ -637,31 +696,36 @@
     }
 
     /* Badges & Chips */
+    html.light-mode [class*="bg-emerald-500\/"],
     html.light-mode .bg-emerald-500\/10,
     html.light-mode .bg-emerald-500\/15,
     html.light-mode .bg-emerald-500\/20,
     html.light-mode .bg-emerald-500\/30 {
       background-color: #dcfce7 !important;
-      color: #166534 !important;
+      color: #14532d !important;
       border-color: #86efac !important;
       font-weight: 700 !important;
     }
+    html.light-mode [class*="bg-rose-500\/"],
     html.light-mode .bg-rose-500\/10,
     html.light-mode .bg-rose-500\/20,
     html.light-mode .bg-rose-500\/30 {
       background-color: #ffe4e6 !important;
-      color: #9f1239 !important;
+      color: #881337 !important;
       border-color: #fda4af !important;
       font-weight: 700 !important;
     }
+    html.light-mode [class*="bg-amber-500\/"],
     html.light-mode .bg-amber-500\/10,
     html.light-mode .bg-amber-500\/20,
     html.light-mode .bg-amber-500\/30 {
       background-color: #fef3c7 !important;
-      color: #92400e !important;
+      color: #78350f !important;
       border-color: #fcd34d !important;
       font-weight: 700 !important;
     }
+    html.light-mode [class*="bg-indigo-500\/"],
+    html.light-mode [class*="bg-indigo-600\/"],
     html.light-mode .bg-indigo-500\/10,
     html.light-mode .bg-indigo-500\/15,
     html.light-mode .bg-indigo-500\/20,
@@ -669,16 +733,33 @@
     html.light-mode .bg-indigo-600\/20,
     html.light-mode .bg-indigo-600\/30 {
       background-color: #e0e7ff !important;
-      color: #3730a3 !important;
+      color: #312e81 !important;
       border-color: #a5b4fc !important;
       font-weight: 700 !important;
     }
+    html.light-mode [class*="bg-blue-500\/"],
+    html.light-mode [class*="bg-blue-600\/"],
     html.light-mode .bg-blue-500\/10,
     html.light-mode .bg-blue-500\/20,
     html.light-mode .bg-blue-600\/20 {
       background-color: #e0f2fe !important;
-      color: #075985 !important;
+      color: #0c4a6e !important;
       border-color: #7dd3fc !important;
+      font-weight: 700 !important;
+    }
+    html.light-mode [class*="bg-cyan-500\/"],
+    html.light-mode [class*="bg-cyan-600\/"],
+    html.light-mode .bg-cyan-500\/20 {
+      background-color: #cffafe !important;
+      color: #0e7490 !important;
+      border-color: #67e8f9 !important;
+      font-weight: 700 !important;
+    }
+    html.light-mode [class*="bg-purple-500\/"],
+    html.light-mode .bg-purple-500\/20 {
+      background-color: #f3e8ff !important;
+      color: #581c87 !important;
+      border-color: #d8b4fe !important;
       font-weight: 700 !important;
     }
 
@@ -693,7 +774,7 @@
     html.light-mode #btnToggleTheme,
     html.light-mode #btnToggleThemeKelola {
       background-color: #e0e7ff !important;
-      color: #3730a3 !important;
+      color: #312e81 !important;
       border-color: #a5b4fc !important;
     }
     html.light-mode #btnToggleTheme:hover,

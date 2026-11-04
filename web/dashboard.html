@@ -851,30 +851,30 @@
           <span>Materi & Penugasan</span>
         </a>
 
-        <div class="pt-3 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Master & Akademik</div>
+        <div id="sidebarHeaderMaster" class="sidebar-admin-only pt-3 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Master & Akademik</div>
 
-        <a href="#upload-master" onclick="switchTab('upload-master')" id="nav-upload-master" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <a href="#upload-master" onclick="switchTab('upload-master')" id="nav-upload-master" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
           <i class="fa-solid fa-file-arrow-up w-4 text-center text-emerald-400"></i>
           <span>Upload Data Master</span>
           <span class="ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold font-mono">Excel</span>
         </a>
 
-        <a href="#siswa" onclick="switchTab('siswa')" id="nav-siswa" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <a href="#siswa" onclick="switchTab('siswa')" id="nav-siswa" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
           <i class="fa-solid fa-user-graduate w-4 text-center text-indigo-400"></i>
           <span>Data Siswa</span>
         </a>
 
-        <a href="#kelas" onclick="switchTab('kelas')" id="nav-kelas" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <a href="#kelas" onclick="switchTab('kelas')" id="nav-kelas" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
           <i class="fa-solid fa-chalkboard-user w-4 text-center text-blue-400"></i>
           <span>Data Kelas & Rombel</span>
         </a>
 
-        <a href="#mapel" onclick="switchTab('mapel')" id="nav-mapel" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <a href="#mapel" onclick="switchTab('mapel')" id="nav-mapel" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
           <i class="fa-solid fa-book-bookmark w-4 text-center text-amber-400"></i>
           <span>Mata Pelajaran (Mapel)</span>
         </a>
 
-        <a href="#kartu-peserta" onclick="switchTab('kartu-peserta')" id="nav-kartu-peserta" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <a href="#kartu-peserta" onclick="switchTab('kartu-peserta')" id="nav-kartu-peserta" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
           <i class="fa-solid fa-id-card-clip w-4 text-center text-emerald-400"></i>
           <span>Kartu Peserta Ujian</span>
         </a>
@@ -3958,6 +3958,30 @@
             </select>
           </div>
         </div>
+        <div id="userFormSubjectContainer">
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Mata Pelajaran yang Diampu (Khusus Guru) <span class="text-blue-400">*</span></label>
+          <div class="relative">
+            <select id="userFormSubject" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 transition">
+              <option value="Fisika">Fisika</option>
+              <option value="Matematika Wajib">Matematika Wajib</option>
+              <option value="Matematika Peminatan">Matematika Peminatan</option>
+              <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+              <option value="Bahasa Inggris">Bahasa Inggris</option>
+              <option value="Kimia">Kimia</option>
+              <option value="Biologi">Biologi</option>
+              <option value="Sejarah">Sejarah</option>
+              <option value="Ekonomi">Ekonomi</option>
+              <option value="Sosiologi">Sosiologi</option>
+              <option value="Geografi">Geografi</option>
+              <option value="Informatika / TIK">Informatika / TIK</option>
+              <option value="Pendidikan Pancasila (PPKn)">Pendidikan Pancasila (PPKn)</option>
+              <option value="Pendidikan Agama & Budi Pekerti">Pendidikan Agama & Budi Pekerti</option>
+              <option value="Pemrograman & RPL">Pemrograman & RPL</option>
+              <option value="Jaringan Komputer & Telekomunikasi">Jaringan Komputer & Telekomunikasi (TKJ)</option>
+            </select>
+          </div>
+          <p class="text-[10px] text-slate-500 mt-1">Guru hanya akan melihat bank soal, jadwal ujian, monitoring, dan nilai untuk mata pelajaran ini.</p>
+        </div>
 
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1.5">
@@ -5930,10 +5954,13 @@
         return;
       }
 
-      // Proteksi Role Guru: Guru hanya untuk Ujian dan LMS, menu Pengaturan dinonaktifkan
-      const teacherRestrictedTabs = ['pengaturan', 'pengaturan-user', 'pengaturan-redis', 'pengaturan-ai', 'server'];
+      // Proteksi Role Guru: Guru HANYA untuk Ujian dan LMS (tanpa Master Data & tanpa Pengaturan)
+      const teacherRestrictedTabs = [
+        'upload-master', 'siswa', 'kelas', 'mapel', 'kartu-peserta',
+        'server', 'pengaturan', 'pengaturan-user', 'pengaturan-redis', 'pengaturan-ai'
+      ];
       if ((_userRole === 'teacher' || _userRole === 'guru') && teacherRestrictedTabs.includes(tabName)) {
-        alert('⚠️ AKSES DIBATASI\n\nAkun Guru / Pengajar hanya memiliki hak akses untuk fitur Ujian dan LMS.\nMenu Pengaturan sistem hanya dapat dibuka dan dikelola oleh Administrator.');
+        alert('⚠️ AKSES DIBATASI\n\nAkun Guru / Pengajar hanya memiliki hak akses untuk fitur Ujian dan LMS.\nMenu Master Data dan Pengaturan sistem hanya dapat diakses oleh Administrator.');
         tabName = 'overview';
       }
       // Purge unwanted browser autofill on all search and filter inputs
@@ -6138,9 +6165,22 @@
         const res = await fetch('/api/v1/cbt/question-banks');
         if (!res.ok) return;
         const json = await res.json();
-        cachedQuestionBanks = json.data || [];
+        let banks = json.data || [];
+        const teacherSubject = getLoggedInTeacherSubject();
+        if (teacherSubject) {
+          banks = banks.filter(b => isSubjectMatch(b.subject, teacherSubject) || isSubjectMatch(b.title, teacherSubject));
+        }
+        cachedQuestionBanks = banks;
         renderBankSoalGrid(cachedQuestionBanks);
         populateBankSelectDropdown(cachedQuestionBanks);
+
+        // Update Stat Total Bank Soal di Dashboard Utama
+        const elStatBanks = document.getElementById('statTotalBanks');
+        if (elStatBanks) elStatBanks.innerText = cachedQuestionBanks.length;
+        const elStatBanksSub = document.getElementById('statTotalBanksSub');
+        if (elStatBanksSub && teacherSubject) {
+          elStatBanksSub.innerText = `Bank Soal ${teacherSubject}`;
+        }
       } catch (err) {
         console.warn('Gagal memuat bank soal:', err);
       }
@@ -13106,6 +13146,10 @@
           }
         }
 
+        const teacherSubject = getLoggedInTeacherSubject();
+        if (teacherSubject) {
+          schList = schList.filter(s => isSubjectMatch(s.title, teacherSubject) || isSubjectMatch(s.bank_name, teacherSubject));
+        }
         const schSelect = document.getElementById('baScheduleSelect');
         if (schSelect && schList.length > 0) {
           schSelect.innerHTML = schList.map(s => {
@@ -14264,6 +14308,28 @@
         .replace(/'/g, '&#039;');
     }
 
+    function getLoggedInTeacherSubject() {
+      try {
+        const uStr = localStorage.getItem('cbt_user');
+        if (!uStr) return null;
+        const u = JSON.parse(uStr);
+        if (u && (u.role === 'teacher' || u.role === 'guru')) {
+          return (u.subject || 'Fisika').trim();
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function isSubjectMatch(itemText, teacherSubject) {
+      if (!teacherSubject) return true;
+      if (!itemText) return false;
+      const tSub = teacherSubject.toLowerCase().trim();
+      const text = itemText.toLowerCase().trim();
+      if (text.includes(tSub) || tSub.includes(text)) return true;
+      const parts = tSub.split(/[,/&]+/).map(p => p.trim()).filter(Boolean);
+      return parts.some(p => text.includes(p) || p.includes(text));
+    }
+
     function applyUserRolePermissions() {
       const uStr = localStorage.getItem('cbt_user');
       if (!uStr) return;
@@ -14272,6 +14338,7 @@
 
       const role = (u.role || '').toLowerCase();
       const fullName = u.full_name || u.username || 'Pengguna';
+      const teacherSubject = (u.subject || 'Fisika').trim();
 
       const elName = document.getElementById('sidebarUserName');
       if (elName) elName.innerText = fullName;
@@ -14280,21 +14347,31 @@
 
       const elRole = document.getElementById('sidebarUserRole');
       const elTopbarRoleBadge = document.getElementById('topbarUserRoleBadge');
-      const elTopbarRoleText = document.getElementById('topbarRoleText');
 
       if (role === 'teacher' || role === 'guru') {
         if (elRole) {
-          elRole.innerText = 'Guru / Pengajar';
+          elRole.innerText = `Guru • ${teacherSubject}`;
           elRole.className = 'text-[10px] text-blue-400 font-bold capitalize';
         }
         if (elTopbarRoleBadge) {
           elTopbarRoleBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-xl flex items-center gap-1.5 shadow-sm bg-blue-500/20 text-blue-300 border border-blue-500/30';
-          elTopbarRoleBadge.innerHTML = '<i class="fa-solid fa-chalkboard-user text-[11px] text-blue-400"></i><span>Guru / Pengajar (Ujian & LMS)</span>';
+          elTopbarRoleBadge.innerHTML = `<i class="fa-solid fa-chalkboard-user text-[11px] text-blue-400"></i><span>Guru / Pengajar • ${teacherSubject}</span>`;
         }
 
-        // SEMBUNYIKAN MENU PENGATURAN UNTUK GURU
+        // SEMBUNYIKAN SEMUA MENU NON-UJIAN & NON-LMS (Master Data, Server Lockdown, Pengaturan)
         document.querySelectorAll('.sidebar-admin-only').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.btn-admin-only').forEach(el => el.classList.add('hidden'));
+
+        // Saring materi LMS agar hanya menampilkan materi mapel yang diampu
+        const materiCards = document.querySelectorAll('#tab-materi .bg-slate-900');
+        materiCards.forEach(card => {
+          const cardText = card.innerText || '';
+          if (!isSubjectMatch(cardText, teacherSubject)) {
+            card.classList.add('hidden');
+          } else {
+            card.classList.remove('hidden');
+          }
+        });
 
       } else if (role === 'admin') {
         if (elRole) {
@@ -14321,7 +14398,6 @@
         }
         document.querySelectorAll('.sidebar-admin-only').forEach(el => el.classList.remove('hidden'));
       } else if (role === 'student') {
-        // Siswa langsung diarahkan ke portal ujian
         window.location.replace('/exam');
       }
     }
@@ -14379,7 +14455,8 @@
         let matchQuery = true;
         if (q) {
           matchQuery = (u.username && u.username.toLowerCase().includes(q)) ||
-                       (u.full_name && u.full_name.toLowerCase().includes(q));
+                       (u.full_name && u.full_name.toLowerCase().includes(q)) ||
+                       (u.subject && u.subject.toLowerCase().includes(q));
         }
         return matchRole && matchQuery;
       });
@@ -14414,8 +14491,9 @@
           roleBadge = `<span class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] font-bold font-mono flex items-center gap-1.5 inline-flex"><i class="fa-solid fa-shield-halved text-[10px]"></i> Administrator</span>`;
           scopeBadge = `<span class="text-[11px] text-indigo-300 font-semibold flex items-center gap-1"><i class="fa-solid fa-check text-emerald-400"></i> Full Access Semua Menu & Pengaturan</span>`;
         } else if (roleName === 'teacher') {
-          roleBadge = `<span class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[11px] font-bold font-mono flex items-center gap-1.5 inline-flex"><i class="fa-solid fa-chalkboard-user text-[10px]"></i> Guru / Pengajar</span>`;
-          scopeBadge = `<span class="text-[11px] text-blue-300 font-semibold flex items-center gap-1"><i class="fa-solid fa-book-open text-blue-400"></i> Ujian & LMS (Tanpa Pengaturan)</span>`;
+          const mapelText = u.subject || 'Fisika';
+          roleBadge = `<div class="space-y-1"><span class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[11px] font-bold font-mono flex items-center gap-1.5 inline-flex"><i class="fa-solid fa-chalkboard-user text-[10px]"></i> Guru / Pengajar</span><div class="text-[11px] text-slate-400">Mapel: <strong class="text-blue-400 font-semibold">${escapeHtml(mapelText)}</strong></div></div>`;
+          scopeBadge = `<span class="text-[11px] text-blue-300 font-semibold flex items-center gap-1"><i class="fa-solid fa-book-open text-blue-400"></i> Ujian & LMS Khusus ${escapeHtml(mapelText)}</span>`;
         } else {
           roleBadge = `<span class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold font-mono flex items-center gap-1.5 inline-flex"><i class="fa-solid fa-desktop text-[10px]"></i> Proktor</span>`;
           scopeBadge = `<span class="text-[11px] text-amber-300 font-semibold flex items-center gap-1"><i class="fa-solid fa-eye text-amber-400"></i> Monitoring Ujian & Sesi</span>`;
@@ -14481,6 +14559,8 @@
       document.getElementById('userFormUsername').value = '';
       document.getElementById('userFormUsername').disabled = false;
       document.getElementById('userFormRole').value = 'teacher';
+      const elSub = document.getElementById('userFormSubject');
+      if (elSub) elSub.value = 'Fisika';
       document.getElementById('userFormPassword').value = '';
       document.getElementById('userFormPassword').required = true;
       document.getElementById('userFormPasswordReq').classList.remove('hidden');
@@ -14497,6 +14577,8 @@
       document.getElementById('userFormFullName').value = user.full_name || '';
       document.getElementById('userFormUsername').value = user.username || '';
       document.getElementById('userFormRole').value = user.role === 'guru' ? 'teacher' : (user.role || 'teacher');
+      const elSub = document.getElementById('userFormSubject');
+      if (elSub) elSub.value = user.subject || 'Fisika';
       document.getElementById('userFormPassword').value = '';
       document.getElementById('userFormPassword').required = false;
       document.getElementById('userFormPasswordReq').classList.add('hidden');
@@ -14518,7 +14600,14 @@
 
     window.handleRoleFormChange = function() {
       const role = document.getElementById('userFormRole').value;
+      const subContainer = document.getElementById('userFormSubjectContainer');
       const infoBox = document.getElementById('userRoleInfoBox');
+
+      if (role === 'teacher') {
+        if (subContainer) subContainer.classList.remove('hidden');
+      } else {
+        if (subContainer) subContainer.classList.add('hidden');
+      }
 
       if (infoBox) {
         if (role === 'admin') {
@@ -14526,14 +14615,14 @@
             <div class="text-indigo-400 font-bold flex items-center gap-1.5">
               <i class="fa-solid fa-shield-halved"></i> Hak Akses: Administrator (Full Access)
             </div>
-            <p class="text-slate-400">Pengguna memiliki hak akses penuh ke seluruh menu: Bank Soal, Jadwal, Monitoring, Nilai, LMS, Master Data, Pengaturan Sekolah, Pengaturan Redis, AI Server, dan Pengaturan User.</p>
+            <p class="text-slate-400">Pengguna memiliki hak akses penuh ke seluruh menu sistem: Bank Soal seluruh mapel, Jadwal, Monitoring, Nilai, LMS, Master Data, Server Lockdown, Redis Cache, dan Konfigurasi AI.</p>
           `;
         } else {
           infoBox.innerHTML = `
             <div class="text-blue-400 font-bold flex items-center gap-1.5">
               <i class="fa-solid fa-chalkboard-user"></i> Hak Akses: Guru / Pengajar (Ujian & LMS)
             </div>
-            <p class="text-slate-400">Pengguna difokuskan untuk mengelola Ujian (Bank Soal, Buat Soal AI, Jadwal, Live Monitor, Nilai, Berita Acara) & LMS (Materi & Tugas). <strong class="text-rose-400">Menu Pengaturan dinonaktifkan / disembunyikan</strong>.</p>
+            <p class="text-slate-400">Pengguna difokuskan khusus pada modul Ujian & LMS untuk <strong>mata pelajaran yang diampunya saja</strong>. Modul Master Data dan Pengaturan sistem disembunyikan.</p>
           `;
         }
       }
@@ -14545,6 +14634,7 @@
       const fullName = document.getElementById('userFormFullName').value.trim();
       const username = document.getElementById('userFormUsername').value.trim().toLowerCase();
       const role = document.getElementById('userFormRole').value;
+      const subject = document.getElementById('userFormSubject') ? document.getElementById('userFormSubject').value : 'Fisika';
       const password = document.getElementById('userFormPassword').value.trim();
 
       const token = localStorage.getItem('cbt_token');
@@ -14566,6 +14656,7 @@
               full_name: fullName,
               username,
               role,
+              subject,
               password: password || undefined
             })
           });
@@ -14580,6 +14671,7 @@
               full_name: fullName,
               username,
               role,
+              subject,
               password
             })
           });

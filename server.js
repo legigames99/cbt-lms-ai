@@ -161,7 +161,7 @@ let USERS = [
 const USERS_FILE = path.join(__dirname, 'users.json');
 let STAFF_USERS = [
   { id: 1, username: 'admin', pass: 'admin123', full_name: 'Administrator Sekolah', role: 'admin', created_at: '2026-01-01T00:00:00.000Z' },
-  { id: 2, username: 'guru', pass: 'guru123', full_name: 'Drs. Budi Pratama, M.Pd.', role: 'teacher', created_at: '2026-01-01T00:00:00.000Z' },
+  { id: 2, username: 'guru', pass: 'guru123', full_name: 'Drs. Budi Pratama, M.Pd.', role: 'teacher', subject: 'Fisika', created_at: '2026-01-01T00:00:00.000Z' },
   { id: 3, username: 'proktor', pass: 'proktor123', full_name: 'Proktor Lab 1', role: 'proctor', created_at: '2026-01-01T00:00:00.000Z' },
 ];
 
@@ -3884,6 +3884,7 @@ const server = http.createServer(async (req, res) => {
       username: u.username,
       full_name: u.full_name || u.username,
       role: (u.role === 'guru') ? 'teacher' : (u.role || 'teacher'),
+      subject: u.subject || (u.role === 'teacher' ? 'Fisika' : ''),
       created_at: u.created_at || '2026-01-01T00:00:00.000Z',
       has_password: Boolean(u.pass)
     }));
@@ -3933,6 +3934,7 @@ const server = http.createServer(async (req, res) => {
     let role = (body.role || 'teacher').trim().toLowerCase();
     if (role === 'guru') role = 'teacher';
     const className = (body.class_name || '').trim();
+    const subject = (body.subject || (role === 'teacher' ? 'Fisika' : '')).trim();
 
     if (!username || username.length < 3) {
       return sendJSON(400, { status: 'error', message: 'Username minimal 3 karakter.' });
@@ -3966,6 +3968,7 @@ const server = http.createServer(async (req, res) => {
       pass: password,
       full_name: fullName,
       role,
+      subject,
       class_name: className,
       created_at: nowIso
     };
@@ -4046,6 +4049,9 @@ const server = http.createServer(async (req, res) => {
 
     if (body.class_name !== undefined) {
       targetUser.class_name = body.class_name.trim();
+    }
+    if (body.subject !== undefined) {
+      targetUser.subject = body.subject.trim();
     }
 
     // Cek perubahan role
@@ -4186,6 +4192,7 @@ const server = http.createServer(async (req, res) => {
           username: user.username,
           full_name: user.full_name,
           role: user.role,
+          subject: user.subject || (user.role === 'teacher' ? 'Fisika' : ''),
           class_name: user.class_name,
         },
       },

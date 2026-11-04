@@ -283,22 +283,22 @@
     }
   
     /* ============================================================== */
-    /* THEME MODE: LIGHT MODE OVERRIDES (ZERO STRUCTURAL MUTATION)     */
+    /* THEME MODE: HIGH-CONTRAST LIGHT MODE OVERRIDES                 */
     /* ============================================================== */
     html.light-mode,
     html.light-mode body {
-      background-color: #f8fafc !important;
+      background-color: #f1f5f9 !important;
       color: #0f172a !important;
     }
 
     html.light-mode .custom-scrollbar::-webkit-scrollbar-track { background: #e2e8f0 !important; }
-    html.light-mode .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1 !important; }
+    html.light-mode .custom-scrollbar::-webkit-scrollbar-thumb { background: #94a3b8 !important; }
 
     /* Aside / Sidebar */
     html.light-mode aside {
       background-color: #ffffff !important;
-      border-color: #e2e8f0 !important;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.03) !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05) !important;
     }
     html.light-mode aside .bg-slate-950 {
       background-color: #f8fafc !important;
@@ -309,109 +309,201 @@
     }
     html.light-mode aside #sidebarUserName {
       color: #0f172a !important;
+      font-weight: 700 !important;
     }
     html.light-mode .nav-item {
-      color: #475569 !important;
+      color: #334155 !important;
+      font-weight: 600 !important;
     }
     html.light-mode .nav-item:hover {
       background-color: #f1f5f9 !important;
-      color: #1e293b !important;
+      color: #0f172a !important;
     }
     html.light-mode .nav-item.active {
-      background-color: rgba(99, 102, 241, 0.12) !important;
-      color: #4f46e5 !important;
-      border-left: 3px solid #6366f1 !important;
+      background-color: #e0e7ff !important;
+      color: #3730a3 !important;
+      border-left: 3px solid #4f46e5 !important;
+      font-weight: 700 !important;
     }
 
     /* Topbar Header */
     html.light-mode header {
-      background-color: rgba(255, 255, 255, 0.92) !important;
-      border-color: #e2e8f0 !important;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+      background-color: rgba(255, 255, 255, 0.95) !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
     }
     html.light-mode #topbarTitle {
       color: #0f172a !important;
+      font-weight: 800 !important;
     }
     html.light-mode #topbarSchoolBadge {
-      background-color: #eef2ff !important;
-      border-color: #c7d2fe !important;
-      color: #4338ca !important;
+      background-color: #e0e7ff !important;
+      border-color: #a5b4fc !important;
+      color: #3730a3 !important;
+      font-weight: 700 !important;
     }
     html.light-mode #topbarAcademicYear {
-      color: #64748b !important;
+      color: #334155 !important;
+      font-weight: 600 !important;
     }
     html.light-mode header .bg-slate-950 {
       background-color: #f8fafc !important;
-      border-color: #e2e8f0 !important;
+      border-color: #cbd5e1 !important;
     }
     html.light-mode header .text-slate-300 {
-      color: #334155 !important;
+      color: #0f172a !important;
+      font-weight: 600 !important;
     }
 
-    /* Containers, Cards, Sections & Panels (kecuali lembar cetak A4 & pratinjau resmi) */
-    html.light-mode .bg-slate-900:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *) {
+    /* Containers, Cards, Sections & Panels (KECUALI A4 & CETAK RESMI) */
+    html.light-mode .bg-slate-900:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(.print-card) {
       background-color: #ffffff !important;
-      border-color: #e2e8f0 !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
     }
-    html.light-mode .bg-slate-950:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *) {
+    html.light-mode .bg-slate-950:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(.print-card) {
       background-color: #f8fafc !important;
-      border-color: #e2e8f0 !important;
+      border-color: #cbd5e1 !important;
     }
-    html.light-mode .bg-slate-800:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *) {
+    html.light-mode .bg-slate-800:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(.print-card) {
       background-color: #f1f5f9 !important;
-      border-color: #e2e8f0 !important;
+      border-color: #cbd5e1 !important;
     }
-    html.light-mode .bg-slate-800/50:not(.official-a4-page):not(.official-a4-page *) {
+    html.light-mode .bg-slate-800\/50,
+    html.light-mode .bg-slate-800\/60,
+    html.light-mode .bg-slate-800\/80 {
       background-color: #f1f5f9 !important;
     }
-    html.light-mode .bg-slate-800/80:not(.official-a4-page):not(.official-a4-page *) {
-      background-color: #e2e8f0 !important;
+
+    /* Dark tinted backgrounds to clean light pastels */
+    html.light-mode .bg-indigo-950\/20,
+    html.light-mode .bg-indigo-950\/30,
+    html.light-mode .bg-indigo-950\/40,
+    html.light-mode .bg-indigo-950\/60,
+    html.light-mode .bg-indigo-950\/70 {
+      background-color: #e0e7ff !important;
+    }
+    html.light-mode .bg-amber-950\/20,
+    html.light-mode .bg-amber-950\/30 {
+      background-color: #fef3c7 !important;
+    }
+    html.light-mode .bg-emerald-950\/10,
+    html.light-mode .bg-emerald-950\/20,
+    html.light-mode .bg-emerald-950\/30,
+    html.light-mode .bg-emerald-950\/70 {
+      background-color: #dcfce7 !important;
+    }
+    html.light-mode .bg-rose-950\/20,
+    html.light-mode .bg-rose-950\/30,
+    html.light-mode .bg-rose-950\/40,
+    html.light-mode .bg-rose-950\/50,
+    html.light-mode .bg-rose-950\/60 {
+      background-color: #ffe4e6 !important;
+    }
+    html.light-mode .bg-blue-950\/20,
+    html.light-mode .bg-blue-950\/30,
+    html.light-mode .bg-sky-950\/60 {
+      background-color: #e0f2fe !important;
     }
 
     /* Borders & Dividers */
     html.light-mode .border-slate-800:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *),
-    html.light-mode .border-slate-700:not(.official-a4-page):not(.official-a4-page *) {
-      border-color: #e2e8f0 !important;
+    html.light-mode .border-slate-700:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *) {
+      border-color: #cbd5e1 !important;
     }
     html.light-mode .divide-slate-800 > :not([hidden]) ~ :not([hidden]) {
       border-color: #e2e8f0 !important;
     }
 
-    /* Shadows halus */
-    html.light-mode .shadow-xl,
-    html.light-mode .shadow-2xl,
-    html.light-mode .shadow-lg {
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
-    }
-
-    /* Typography / Teks */
+    /* HIGH-CONTRAST TYPOGRAPHY OVERRIDES */
+    /* General texts */
     html.light-mode .text-white:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(button.bg-indigo-600):not(button.bg-indigo-600 *):not(button.bg-rose-600):not(button.bg-rose-600 *):not(button.bg-emerald-600):not(button.bg-emerald-600 *):not(button.bg-amber-600):not(button.bg-amber-600 *):not(button.bg-blue-600):not(button.bg-blue-600 *):not(button.bg-purple-600):not(button.bg-purple-600 *):not(a.bg-indigo-600):not(a.bg-indigo-600 *) {
       color: #0f172a !important;
     }
-    html.light-mode .text-slate-200:not(.official-a4-page):not(.official-a4-page *) {
-      color: #1e293b !important;
+    html.light-mode .text-slate-100,
+    html.light-mode .text-slate-200,
+    html.light-mode .text-slate-300 {
+      color: #0f172a !important;
     }
-    html.light-mode .text-slate-300:not(.official-a4-page):not(.official-a4-page *) {
+    html.light-mode .text-slate-400,
+    html.light-mode .text-slate-500 {
+      color: #1e293b !important;
+      font-weight: 500 !important;
+    }
+    html.light-mode .text-slate-600 {
       color: #334155 !important;
     }
-    html.light-mode .text-slate-400:not(.official-a4-page):not(.official-a4-page *) {
-      color: #64748b !important;
+
+    /* Colored texts deepened for high contrast on light backgrounds */
+    html.light-mode .text-indigo-400,
+    html.light-mode .text-indigo-300,
+    html.light-mode .text-indigo-200 {
+      color: #3730a3 !important;
+      font-weight: 700 !important;
     }
-    html.light-mode .text-slate-500:not(.official-a4-page):not(.official-a4-page *) {
-      color: #64748b !important;
+    html.light-mode .text-amber-400,
+    html.light-mode .text-amber-300,
+    html.light-mode .text-amber-200 {
+      color: #92400e !important;
+      font-weight: 700 !important;
+    }
+    html.light-mode .text-emerald-400,
+    html.light-mode .text-emerald-300,
+    html.light-mode .text-emerald-200 {
+      color: #166534 !important;
+      font-weight: 700 !important;
+    }
+    html.light-mode .text-rose-400,
+    html.light-mode .text-rose-300,
+    html.light-mode .text-rose-200 {
+      color: #9f1239 !important;
+      font-weight: 700 !important;
+    }
+    html.light-mode .text-blue-400,
+    html.light-mode .text-blue-300,
+    html.light-mode .text-blue-200,
+    html.light-mode .text-sky-400,
+    html.light-mode .text-sky-300 {
+      color: #075985 !important;
+      font-weight: 700 !important;
+    }
+    html.light-mode .text-purple-400,
+    html.light-mode .text-purple-300 {
+      color: #581c87 !important;
+      font-weight: 700 !important;
     }
 
-    /* Inputs, Selects & Textareas */
+    /* Solid color buttons text stays crisp white */
+    html.light-mode button.bg-indigo-600,
+    html.light-mode button.bg-indigo-600 *,
+    html.light-mode button.bg-rose-600,
+    html.light-mode button.bg-rose-600 *,
+    html.light-mode button.bg-emerald-600,
+    html.light-mode button.bg-emerald-600 *,
+    html.light-mode button.bg-blue-600,
+    html.light-mode button.bg-blue-600 *,
+    html.light-mode a.bg-indigo-600,
+    html.light-mode a.bg-indigo-600 * {
+      color: #ffffff !important;
+    }
+
+    /* Form labels & inputs */
+    html.light-mode label {
+      color: #0f172a !important;
+      font-weight: 700 !important;
+    }
     html.light-mode input:not([type="checkbox"]):not([type="radio"]),
     html.light-mode textarea,
     html.light-mode select {
       background-color: #ffffff !important;
       color: #0f172a !important;
-      border-color: #cbd5e1 !important;
+      border: 1.5px solid #94a3b8 !important;
+      font-weight: 600 !important;
     }
     html.light-mode input::placeholder,
     html.light-mode textarea::placeholder {
-      color: #94a3b8 !important;
+      color: #64748b !important;
+      font-weight: normal !important;
     }
     html.light-mode select {
       color-scheme: light !important;
@@ -420,70 +512,98 @@
       background-color: #ffffff !important;
       color: #0f172a !important;
     }
-    html.light-mode select option:hover,
-    html.light-mode select option:focus,
-    html.light-mode select option:checked {
-      background-color: #e0e7ff !important;
-      color: #4338ca !important;
-    }
 
     /* Tables */
     html.light-mode thead.bg-slate-950,
     html.light-mode th.bg-slate-950,
-    html.light-mode thead {
-      background-color: #f1f5f9 !important;
-      color: #475569 !important;
+    html.light-mode thead,
+    html.light-mode th {
+      background-color: #e2e8f0 !important;
+      color: #0f172a !important;
+      font-weight: 800 !important;
+      border-bottom: 2px solid #cbd5e1 !important;
+    }
+    html.light-mode tbody tr {
+      border-bottom: 1px solid #e2e8f0 !important;
     }
     html.light-mode tbody tr:hover {
-      background-color: #f8fafc !important;
+      background-color: #f1f5f9 !important;
+    }
+    html.light-mode tbody td {
+      color: #0f172a !important;
     }
 
-    /* Badges & Status Pills */
+    /* Badges & Chips */
     html.light-mode .bg-emerald-500\/10,
-    html.light-mode .bg-emerald-500\/20 {
+    html.light-mode .bg-emerald-500\/20,
+    html.light-mode .bg-emerald-500\/30 {
       background-color: #dcfce7 !important;
-      color: #15803d !important;
-      border-color: #bbf7d0 !important;
+      color: #166534 !important;
+      border-color: #86efac !important;
+      font-weight: 700 !important;
     }
     html.light-mode .bg-rose-500\/10,
-    html.light-mode .bg-rose-500\/20 {
+    html.light-mode .bg-rose-500\/20,
+    html.light-mode .bg-rose-500\/30 {
       background-color: #ffe4e6 !important;
-      color: #be123c !important;
-      border-color: #fecdd3 !important;
+      color: #9f1239 !important;
+      border-color: #fda4af !important;
+      font-weight: 700 !important;
     }
     html.light-mode .bg-amber-500\/10,
-    html.light-mode .bg-amber-500\/20 {
+    html.light-mode .bg-amber-500\/20,
+    html.light-mode .bg-amber-500\/30 {
       background-color: #fef3c7 !important;
-      color: #b45309 !important;
-      border-color: #fde68a !important;
+      color: #92400e !important;
+      border-color: #fcd34d !important;
+      font-weight: 700 !important;
     }
     html.light-mode .bg-indigo-500\/10,
-    html.light-mode .bg-indigo-500\/20 {
+    html.light-mode .bg-indigo-500\/20,
+    html.light-mode .bg-indigo-500\/30,
+    html.light-mode .bg-indigo-600\/20,
+    html.light-mode .bg-indigo-600\/30 {
       background-color: #e0e7ff !important;
-      color: #4338ca !important;
-      border-color: #c7d2fe !important;
+      color: #3730a3 !important;
+      border-color: #a5b4fc !important;
+      font-weight: 700 !important;
     }
     html.light-mode .bg-blue-500\/10,
-    html.light-mode .bg-blue-500\/20 {
+    html.light-mode .bg-blue-500\/20,
+    html.light-mode .bg-blue-600\/20 {
       background-color: #e0f2fe !important;
-      color: #0369a1 !important;
-      border-color: #bae6fd !important;
+      color: #075985 !important;
+      border-color: #7dd3fc !important;
+      font-weight: 700 !important;
+    }
+
+    /* Outlined buttons (e.g. Cetak Berita Acara, Cetak Absensi, Cetak Paket) */
+    html.light-mode button.bg-slate-800 {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+    }
+    html.light-mode button.bg-slate-800:hover {
+      background-color: #f1f5f9 !important;
     }
 
     /* Modals dialog background (backdrop blur tetap gelap elegan) */
     html.light-mode .fixed .bg-slate-900:not(#modalPrintOfficialExamDoc .bg-white):not(#modalPrintCards .bg-white) {
       background-color: #ffffff !important;
-      border-color: #e2e8f0 !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15) !important;
     }
 
     /* Tombol Toggle Theme */
-    html.light-mode #btnToggleTheme {
-      background-color: #f1f5f9 !important;
-      color: #4338ca !important;
-      border-color: #cbd5e1 !important;
+    html.light-mode #btnToggleTheme,
+    html.light-mode #btnToggleThemeKelola {
+      background-color: #e0e7ff !important;
+      color: #3730a3 !important;
+      border-color: #a5b4fc !important;
     }
-    html.light-mode #btnToggleTheme:hover {
-      background-color: #e2e8f0 !important;
+    html.light-mode #btnToggleTheme:hover,
+    html.light-mode #btnToggleThemeKelola:hover {
+      background-color: #c7d2fe !important;
     }
 
   </style>

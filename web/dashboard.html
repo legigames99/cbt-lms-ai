@@ -1237,9 +1237,10 @@
       <section id="tab-monitoring" class="hidden space-y-6">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 flex-wrap">
               <span>Pengawasan Ujian (Live Proktor)</span>
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <span id="proctorTabRoleBadge"></span>
             </h3>
             <p class="text-xs text-slate-400">Pantau status pengerjaan, jawaban tersinkronisasi, dan deteksi perpindahan tab browser siswa.</p>
           </div>
@@ -5186,9 +5187,12 @@
             <i class="fa-solid fa-calendar-check"></i>
           </div>
           <div>
-            <h4 class="text-base font-bold text-white flex items-center gap-2">
-              Pusat Pemilihan Jadwal Ujian (Live Proktor)
-            </h4>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h4 class="text-base font-bold text-white">
+                Pusat Pemilihan Jadwal Ujian (Live Proktor)
+              </h4>
+              <span id="proctorHubRoleInfo"></span>
+            </div>
             <p class="text-xs text-slate-400">Cari dan pilih jadwal ujian yang ingin dipantau secara realtime oleh proktor.</p>
           </div>
         </div>
@@ -5995,9 +5999,27 @@
       }
 
       if (tabName === 'monitoring') {
+        const teacherSubject = getLoggedInTeacherSubject();
+        if (teacherSubject && currentSchedules && currentSchedules.length > 0) {
+          const allowed = currentSchedules.filter(s => isSubjectMatch(s.title, teacherSubject) || isSubjectMatch(s.bank_name, teacherSubject));
+          const curId = getProctorSelectedScheduleId();
+          if (!allowed.some(s => Number(s.id) === Number(curId)) && allowed.length > 0) {
+            const pSelect = document.getElementById('proctorScheduleFilter');
+            if (pSelect) pSelect.value = String(allowed[0].id);
+          }
+        }
         fetchProctorSessions();
       }
       if (tabName === 'nilai') {
+        const teacherSubject = getLoggedInTeacherSubject();
+        if (teacherSubject && currentSchedules && currentSchedules.length > 0) {
+          const allowed = currentSchedules.filter(s => isSubjectMatch(s.title, teacherSubject) || isSubjectMatch(s.bank_name, teacherSubject));
+          const curId = getNilaiSelectedScheduleId();
+          if (!allowed.some(s => Number(s.id) === Number(curId)) && allowed.length > 0) {
+            const nSelect = document.getElementById('nilaiScheduleFilter');
+            if (nSelect) nSelect.value = String(allowed[0].id);
+          }
+        }
         fetchNilaiSessions();
       }
       if (tabName === 'jadwal') {
@@ -7701,11 +7723,29 @@
       const container = document.getElementById('proctorHubCardsContainer');
       if (!container) return;
 
+      const teacherSubject = getLoggedInTeacherSubject();
       // KHUSUS LIVE PROKTOR: HANYA tampilkan Jadwal yang Sedang AKTIF!
-      const activeSchedules = currentSchedules.filter(s => s.is_active !== false);
+      let activeSchedules = (currentSchedules || []).filter(s => s.is_active !== false);
+
+      // KHUSUS GURU: Hanya tampilkan jadwal aktif untuk mata pelajaran yang diampu guru
+      // PROKTOR & ADMIN: Tampilkan SEMUA jadwal pelajaran aktif tanpa batas
+      if (teacherSubject) {
+        activeSchedules = activeSchedules.filter(s =>
+          isSubjectMatch(s.title, teacherSubject) || isSubjectMatch(s.bank_name, teacherSubject)
+        );
+      }
 
       const cAct = document.getElementById('hubCount_active');
       if (cAct) cAct.innerText = activeSchedules.length;
+
+      const hubRoleInfo = document.getElementById('proctorHubRoleInfo');
+      if (hubRoleInfo) {
+        if (teacherSubject) {
+          hubRoleInfo.innerHTML = `<span class="px-2.5 py-1 rounded-xl bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[11px] font-bold inline-flex items-center gap-1.5"><i class="fa-solid fa-book-open text-blue-400"></i> Khusus Mapel: ${escapeHtml(teacherSubject)}</span>`;
+        } else {
+          hubRoleInfo.innerHTML = `<span class="px-2.5 py-1 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold inline-flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-amber-400"></i> Semua Jadwal Pelajaran (Mode Proktor / Admin)</span>`;
+        }
+      }
 
       let filtered = activeSchedules;
       if (proctorHubSearchQuery) {
@@ -7718,16 +7758,26 @@
       }
 
       if (filtered.length === 0) {
-        container.innerHTML = `
-          <div class="p-8 text-center bg-slate-950/40 border border-dashed border-slate-800 rounded-2xl space-y-2">
-            <i class="fa-solid fa-calendar-xmark text-3xl text-slate-600"></i>
-            <p class="text-sm font-semibold text-slate-300">Tidak ada jadwal ujian aktif yang cocok</p>
-            <p class="text-xs text-slate-500">Jadwal yang tidak aktif berada di Halaman Arsip pada menu Jadwal Ujian.</p>
-            <button onclick="closeModal('modalSelectScheduleProctor'); switchTab('jadwal');" class="mt-2 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition">
-              Buka Menu Jadwal Ujian &rarr;
-            </button>
-          </div>
-        `;
+        if (teacherSubject) {
+          container.innerHTML = `
+            <div class="p-8 text-center bg-slate-950/40 border border-dashed border-slate-800 rounded-2xl space-y-2">
+              <i class="fa-solid fa-calendar-xmark text-3xl text-blue-400"></i>
+              <p class="text-sm font-semibold text-slate-300">Tidak ada jadwal ujian aktif untuk mata pelajaran ${escapeHtml(teacherSubject)}</p>
+              <p class="text-xs text-slate-500">Anda hanya memiliki hak akses untuk memantau mata pelajaran ${escapeHtml(teacherSubject)}. Jadwal ujian mapel lain hanya dapat dipantau oleh Proktor dan Administrator.</p>
+            </div>
+          `;
+        } else {
+          container.innerHTML = `
+            <div class="p-8 text-center bg-slate-950/40 border border-dashed border-slate-800 rounded-2xl space-y-2">
+              <i class="fa-solid fa-calendar-xmark text-3xl text-slate-600"></i>
+              <p class="text-sm font-semibold text-slate-300">Tidak ada jadwal ujian aktif yang cocok</p>
+              <p class="text-xs text-slate-500">Jadwal yang tidak aktif berada di Halaman Arsip pada menu Jadwal Ujian.</p>
+              <button onclick="closeModal('modalSelectScheduleProctor'); switchTab('jadwal');" class="mt-2 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition">
+                Buka Menu Jadwal Ujian &rarr;
+              </button>
+            </div>
+          `;
+        }
         return;
       }
 
@@ -7778,6 +7828,14 @@
     };
 
     window.selectScheduleFromHub = function(scheduleId) {
+      const teacherSubject = getLoggedInTeacherSubject();
+      if (teacherSubject) {
+        const sch = (currentSchedules || []).find(s => Number(s.id) === Number(scheduleId));
+        if (sch && !isSubjectMatch(sch.title, teacherSubject) && !isSubjectMatch(sch.bank_name, teacherSubject)) {
+          alert(`⚠️ AKSES TERBATAS\n\nJadwal #${scheduleId} bukan bagian dari mata pelajaran ${teacherSubject}.\nGuru hanya memiliki hak akses untuk memantau mata pelajaran yang diampunya.`);
+          return;
+        }
+      }
       closeModal('modalSelectScheduleProctor');
       switchToProctorSchedule(scheduleId);
     };
@@ -7816,24 +7874,30 @@
       const pSelect = document.getElementById('proctorScheduleFilter');
       const nSelect = document.getElementById('nilaiScheduleFilter');
 
+      const teacherSubject = getLoggedInTeacherSubject();
+      let allowedSchedules = schedules;
+      if (teacherSubject) {
+        allowedSchedules = schedules.filter(s => isSubjectMatch(s.title, teacherSubject) || isSubjectMatch(s.bank_name, teacherSubject));
+      }
+
       if (pSelect) {
         const curP = pSelect.value;
-        if (!schedules.some(s => String(s.id) === String(curP)) && schedules.length > 0) {
-          pSelect.value = String(schedules[0].id);
+        if (!allowedSchedules.some(s => String(s.id) === String(curP)) && allowedSchedules.length > 0) {
+          pSelect.value = String(allowedSchedules[0].id);
         }
       }
 
       if (nSelect) {
         const curN = nSelect.value;
         if (nSelect.tagName === 'SELECT') {
-          nSelect.innerHTML = schedules.map(sch => `<option value="${sch.id}">Jadwal #${sch.id}: ${sch.title} (${sch.token_code})${sch.is_active === false ? ' [TIDAK AKTIF]' : ''}</option>`).join('');
+          nSelect.innerHTML = allowedSchedules.map(sch => `<option value="${sch.id}">Jadwal #${sch.id}: ${sch.title} (${sch.token_code})${sch.is_active === false ? ' [TIDAK AKTIF]' : ''}</option>`).join('');
         }
-        if (schedules.some(s => String(s.id) === String(curN))) {
+        if (allowedSchedules.some(s => String(s.id) === String(curN))) {
           nSelect.value = curN;
-        } else if (schedules.length > 0) {
-          nSelect.value = String(schedules[0].id);
+        } else if (allowedSchedules.length > 0) {
+          nSelect.value = String(allowedSchedules[0].id);
         }
-        const curSch = schedules.find(s => String(s.id) === String(nSelect.value)) || schedules[0];
+        const curSch = allowedSchedules.find(s => String(s.id) === String(nSelect.value)) || allowedSchedules[0];
         const lbl = document.getElementById('nilaiCurrentScheduleLabel');
         if (lbl && curSch) {
           lbl.innerText = `${curSch.id}. ${curSch.title} (${curSch.token_code})`;
@@ -7842,6 +7906,14 @@
     }
 
     window.switchToProctorSchedule = function(scheduleId) {
+      const teacherSubject = getLoggedInTeacherSubject();
+      if (teacherSubject) {
+        const sch = (currentSchedules || []).find(s => Number(s.id) === Number(scheduleId));
+        if (sch && !isSubjectMatch(sch.title, teacherSubject) && !isSubjectMatch(sch.bank_name, teacherSubject)) {
+          alert(`⚠️ AKSES TERBATAS\n\nJadwal #${scheduleId} bukan mata pelajaran ${teacherSubject}.\nAnda hanya dapat memantau mata pelajaran yang Anda ampu.`);
+          return;
+        }
+      }
       const pSelect = document.getElementById('proctorScheduleFilter');
       if (pSelect) {
         pSelect.value = String(scheduleId);
@@ -7855,6 +7927,14 @@
     };
 
     window.handleProctorScheduleChange = function(newScheduleId) {
+      const teacherSubject = getLoggedInTeacherSubject();
+      if (teacherSubject) {
+        const sch = (currentSchedules || []).find(s => Number(s.id) === Number(newScheduleId));
+        if (sch && !isSubjectMatch(sch.title, teacherSubject) && !isSubjectMatch(sch.bank_name, teacherSubject)) {
+          console.warn(`Jadwal #${newScheduleId} bukan bagian dari mata pelajaran ${teacherSubject}`);
+          return;
+        }
+      }
       const nSelect = document.getElementById('nilaiScheduleFilter');
       if (nSelect && nSelect.value !== String(newScheduleId)) {
         nSelect.value = String(newScheduleId);
@@ -8369,7 +8449,32 @@
       if (document.hidden) return; // Tab browser sedang tidak dilihat, hemat CPU & bandwidth
 
       try {
-        const selectedScheduleId = getProctorSelectedScheduleId();
+        const token = localStorage.getItem('cbt_token');
+        const teacherSubject = getLoggedInTeacherSubject();
+        let selectedScheduleId = getProctorSelectedScheduleId();
+
+        // Validasi hak akses Guru: Hanya boleh memantau jadwal mapel yang diampunya
+        // Proktor & Administrator memiliki wewenang untuk memantau semua jadwal pelajaran
+        if (teacherSubject && currentSchedules && currentSchedules.length > 0) {
+          const allowed = currentSchedules.filter(s => isSubjectMatch(s.title, teacherSubject) || isSubjectMatch(s.bank_name, teacherSubject));
+          if (allowed.length === 0) {
+            const bannerTitle = document.getElementById('proctorActiveScheduleTitle');
+            if (bannerTitle) bannerTitle.innerText = `Tidak ada jadwal ujian untuk Mapel ${teacherSubject}`;
+            const bannerBank = document.getElementById('proctorActiveScheduleBank');
+            if (bannerBank) bannerBank.innerText = 'Silakan hubungi Proktor atau Administrator untuk membuat jadwal.';
+            const tbody = document.getElementById('proctorSessionsTable');
+            if (tbody) {
+              tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400 font-medium">Tidak ada jadwal ujian aktif untuk mata pelajaran <strong>${escapeHtml(teacherSubject)}</strong> saat ini.</td></tr>`;
+            }
+            return;
+          }
+          if (!allowed.some(s => Number(s.id) === Number(selectedScheduleId))) {
+            selectedScheduleId = allowed[0].id;
+            const pSelect = document.getElementById('proctorScheduleFilter');
+            if (pSelect) pSelect.value = String(selectedScheduleId);
+          }
+        }
+
         const filterSelect = document.getElementById('filterClassSelect');
         const selectedClass = filterSelect ? filterSelect.value : '';
 
@@ -8379,7 +8484,10 @@
 
         const url = `/api/v1/cbt/proctor/live-sessions?${params.toString()}`;
 
-        const res = await fetch(url);
+        const headers = {};
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch(url, { headers });
         if (!res.ok) return;
         const json = await res.json();
 
@@ -8628,7 +8736,12 @@
       const container = document.getElementById('nilaiHubCardsContainer');
       if (!container) return;
 
-      const all = currentSchedules || [];
+      const teacherSubject = getLoggedInTeacherSubject();
+      let all = currentSchedules || [];
+      if (teacherSubject) {
+        all = all.filter(s => isSubjectMatch(s.title, teacherSubject) || isSubjectMatch(s.bank_name, teacherSubject));
+      }
+
       const cAll = document.getElementById('nilaiHubCount_all');
       const cAct = document.getElementById('nilaiHubCount_active');
       const cIna = document.getElementById('nilaiHubCount_inactive');
@@ -8740,7 +8853,19 @@
       const secNilai = document.getElementById('tab-nilai');
       if (secNilai && secNilai.classList.contains('hidden') && window.location.hash !== '#nilai') return;
 
-      const scheduleId = getNilaiSelectedScheduleId();
+      const token = localStorage.getItem('cbt_token');
+      const teacherSubject = getLoggedInTeacherSubject();
+      let scheduleId = getNilaiSelectedScheduleId();
+
+      if (teacherSubject && currentSchedules && currentSchedules.length > 0) {
+        const allowed = currentSchedules.filter(s => isSubjectMatch(s.title, teacherSubject) || isSubjectMatch(s.bank_name, teacherSubject));
+        if (allowed.length > 0 && !allowed.some(s => Number(s.id) === Number(scheduleId))) {
+          scheduleId = allowed[0].id;
+          const nSelect = document.getElementById('nilaiScheduleFilter');
+          if (nSelect) nSelect.value = String(scheduleId);
+        }
+      }
+
       const filterClass = document.getElementById('filterClassNilaiSelect')?.value || 'all';
 
       try {
@@ -8748,7 +8873,10 @@
         params.append('schedule_id', scheduleId);
         if (filterClass && filterClass !== 'all') params.append('class', filterClass);
 
-        const res = await fetch(`/api/v1/cbt/proctor/live-sessions?${params.toString()}`);
+        const headers = {};
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch(`/api/v1/cbt/proctor/live-sessions?${params.toString()}`, { headers });
         if (!res.ok) return;
         const json = await res.json();
 
@@ -14357,6 +14485,10 @@
           elTopbarRoleBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-xl flex items-center gap-1.5 shadow-sm bg-blue-500/20 text-blue-300 border border-blue-500/30';
           elTopbarRoleBadge.innerHTML = `<i class="fa-solid fa-chalkboard-user text-[11px] text-blue-400"></i><span>Guru / Pengajar • ${teacherSubject}</span>`;
         }
+        const elProctorTabBadge = document.getElementById('proctorTabRoleBadge');
+        if (elProctorTabBadge) {
+          elProctorTabBadge.innerHTML = `<span class="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[11px] font-bold inline-flex items-center gap-1.5"><i class="fa-solid fa-book-open"></i> Khusus Mapel: ${escapeHtml(teacherSubject)}</span>`;
+        }
 
         // SEMBUNYIKAN SEMUA MENU NON-UJIAN & NON-LMS (Master Data, Server Lockdown, Pengaturan)
         document.querySelectorAll('.sidebar-admin-only').forEach(el => el.classList.add('hidden'));
@@ -14382,6 +14514,10 @@
           elTopbarRoleBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-xl flex items-center gap-1.5 shadow-sm bg-indigo-500/20 text-indigo-300 border border-indigo-500/30';
           elTopbarRoleBadge.innerHTML = '<i class="fa-solid fa-shield-halved text-[11px] text-indigo-400"></i><span>Administrator (Full Access)</span>';
         }
+        const elProctorTabBadge = document.getElementById('proctorTabRoleBadge');
+        if (elProctorTabBadge) {
+          elProctorTabBadge.innerHTML = '<span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] font-bold inline-flex items-center gap-1.5"><i class="fa-solid fa-shield-halved"></i> Semua Jadwal Pelajaran (Administrator)</span>';
+        }
 
         // TAMPILKAN SEMUA MENU UNTUK ADMIN
         document.querySelectorAll('.sidebar-admin-only').forEach(el => el.classList.remove('hidden'));
@@ -14395,6 +14531,10 @@
         if (elTopbarRoleBadge) {
           elTopbarRoleBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-xl flex items-center gap-1.5 shadow-sm bg-amber-500/20 text-amber-300 border border-amber-500/30';
           elTopbarRoleBadge.innerHTML = '<i class="fa-solid fa-desktop text-[11px] text-amber-400"></i><span>Proktor Ujian</span>';
+        }
+        const elProctorTabBadge = document.getElementById('proctorTabRoleBadge');
+        if (elProctorTabBadge) {
+          elProctorTabBadge.innerHTML = '<span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold inline-flex items-center gap-1.5"><i class="fa-solid fa-desktop"></i> Semua Jadwal Pelajaran (Mode Proktor)</span>';
         }
         document.querySelectorAll('.sidebar-admin-only').forEach(el => el.classList.remove('hidden'));
       } else if (role === 'student') {

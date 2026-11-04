@@ -4180,7 +4180,12 @@ const server = http.createServer(async (req, res) => {
     if (!user) {
       return sendJSON(401, { status: 'error', message: 'Username atau password salah' });
     }
-    const token = Buffer.from(JSON.stringify({ uid: user.id, usr: user.username, rol: user.role })).toString('base64');
+    const token = Buffer.from(JSON.stringify({
+      uid: user.id,
+      usr: user.username,
+      rol: user.role,
+      sub: user.subject || (user.role === 'teacher' ? 'Fisika' : '')
+    })).toString('base64');
     return sendJSON(200, {
       status: 'success',
       data: {
@@ -4822,7 +4827,39 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/v1/cbt/proctor/live-sessions' && req.method === 'GET') {
     const classFilter = parsedUrl.searchParams.get('class');
     const scheduleId = parseInt(parsedUrl.searchParams.get('schedule_id'), 10) || SCHEDULES[0]?.id || 1;
-    const curSchedule = SCHEDULES.find((s) => s.id === scheduleId) || SCHEDULES[0];
+    let curSchedule = SCHEDULES.find((s) => s.id === scheduleId) || SCHEDULES[0];
+
+    const tokenUser = getUserFromToken(req);
+    // Guru HANYA dapat memantau jadwal mata pelajaran yang diampunya
+    // Proktor dan Administrator memiliki hak akses untuk memantau SEMUA jadwal pelajaran
+    if (tokenUser && (tokenUser.rol === 'teacher' || tokenUser.rol === 'guru')) {
+      const fullUser = USERS.find(u => u.id === tokenUser.uid || u.username === tokenUser.usr);
+      const teacherSubject = ((fullUser && fullUser.subject) || tokenUser.sub || 'Fisika').trim();
+
+      const isMatch = (curSchedule && curSchedule.title && curSchedule.title.toLowerCase().includes(teacherSubject.toLowerCase())) ||
+                      (curSchedule && curSchedule.bank_name && curSchedule.bank_name.toLowerCase().includes(teacherSubject.toLowerCase()));
+
+      if (!isMatch) {
+        const allowedSch = SCHEDULES.find(s => 
+          (s.title && s.title.toLowerCase().includes(teacherSubject.toLowerCase())) ||
+          (s.bank_name && s.bank_name.toLowerCase().includes(teacherSubject.toLowerCase()))
+        );
+        if (allowedSch) {
+          curSchedule = allowedSch;
+        } else {
+          return sendJSON(200, {
+            status: 'success',
+            schedule: null,
+            data: [],
+            total_students: 0,
+            classes: [],
+            class_counts: {},
+            message: `Tidak ada jadwal ujian untuk mata pelajaran ${teacherSubject}`
+          });
+        }
+      }
+    }
+
     const schQuestions = getQuestionsForSchedule(curSchedule);
 
     // Kunci jawaban ringkas untuk kompatibilitas

@@ -225,12 +225,14 @@
         padding: 3mm 4mm !important;
       }
 
-      /* Layout 6 Kartu per Lembar (2 x 3) - Standar Efisien */
+      /* Layout 6 Kartu per Lembar (2 x 3) - Standar Resmi Nasional (9.5 x 9.0 cm) */
       .grid-cards-6 {
         gap: 2.5mm !important;
       }
       .grid-cards-6 .exam-card-paper {
-        padding: 2mm 3mm !important;
+        padding: 2.5mm 3.5mm !important;
+        min-height: 88mm !important;
+        max-height: 92mm !important;
       }
 
       /* Layout 8 Kartu per Lembar (2 x 4) - Hemat Kertas */
@@ -3495,23 +3497,22 @@
               </div>
 
               <!-- Kartu Peserta Cetak (Visual Kertas Putih) -->
-              <div class="bg-white text-slate-900 rounded-2xl p-5 shadow-2xl border-2 border-dashed border-slate-300 relative select-none">
+              <div class="bg-white text-slate-900 rounded-2xl p-5 shadow-2xl border-2 border-dashed border-slate-300 relative select-none max-w-[440px] mx-auto">
                 <div class="absolute -top-3 right-4 bg-slate-900 text-slate-300 border border-slate-700 rounded-full px-2.5 py-0.5 text-[9px] font-mono flex items-center gap-1 shadow">
                   <i class="fa-solid fa-scissors"></i> Garis Potong Kartu
                 </div>
 
                 <!-- Kop Kartu Preview -->
-                <div class="flex items-center gap-3 pb-2 border-b-2 border-slate-900">
+                <div class="flex items-center gap-3 pb-2 mb-2" style="border-bottom: 3px double #000;">
                   <div id="previewCardLogoContainer" class="w-12 h-12 shrink-0 flex items-center justify-center">
                     <!-- SVG / Image logo rendered dynamically -->
                   </div>
                   <div class="flex-1 text-center">
-                    <div id="previewDinas" class="text-[9px] font-bold uppercase tracking-wider text-slate-700 leading-tight">PEMERINTAH PROVINSI DKI JAKARTA<br>DINAS PENDIDIKAN</div>
-                    <div id="previewSchoolName" class="text-xs font-black uppercase tracking-wide text-slate-900 mt-0.5">SMK NEGERI 5 JAKARTA</div>
-                    <div id="previewAddress" class="text-[8px] text-slate-600 leading-tight mt-0.5">Jl. Pisangan Baru Timur VII No. 6 • NPSN: 20102551</div>
+                    <div id="previewDinas" class="text-[9px] font-bold uppercase tracking-wider text-slate-700 leading-tight">PEMERINTAH PROVINSI DAERAH KOTA BANDUNG<br>DINAS PENDIDIKAN</div>
+                    <div id="previewSchoolName" class="text-xs font-black uppercase tracking-wide text-slate-900 mt-0.5">SMK NEGERI 5 BANDUNG</div>
+                    <div id="previewAddress" class="text-[8px] text-slate-600 leading-tight mt-0.5">Jl. Bojongkoneng 37A • NPSN: 20219143</div>
                   </div>
                 </div>
-                <div class="border-b border-slate-900 mt-0.5 mb-2"></div>
 
                 <!-- Judul Asesmen -->
                 <div class="text-center mb-3">
@@ -10950,8 +10951,8 @@
             <i class="fa-solid fa-scissors"></i> Potong Kartu
           </div>
 
-          <!-- Kop Kartu -->
-          <div class="flex items-center gap-2 pb-1 border-b-2 border-slate-950">
+          <!-- Kop Kartu Standar Resmi -->
+          <div class="flex items-center gap-2 pb-1 mb-1.5" style="border-bottom: 3px double #000;">
             <div class="${logoBoxClass} shrink-0 flex items-center justify-center">
               ${logoSvg}
             </div>
@@ -10961,7 +10962,6 @@
               <div class="${addressTextClass} text-slate-700 leading-tight mt-0.5">${p.address} • NPSN: ${p.npsn}</div>
             </div>
           </div>
-          <div class="border-b border-slate-950 -mt-0.5 mb-1"></div>
 
           <!-- Judul Dokumen -->
           <div class="text-center ${isUltra ? 'mb-0.5' : 'mb-1'}">

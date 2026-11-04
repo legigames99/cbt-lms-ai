@@ -3867,7 +3867,7 @@ const server = http.createServer(async (req, res) => {
   // ENDPOINT MANAJEMEN USER & ROLE (RBAC)
   // ==============================================================
 
-  // GET /api/v1/admin/users (Daftar Pengguna Sistem dengan Filter Role & Pencarian)
+  // GET /api/v1/admin/users (Daftar Pengguna Sistem Khusus Staf: Administrator & Guru)
   if (pathname === '/api/v1/admin/users' && req.method === 'GET') {
     const user = getUserFromToken(req);
     if (!user || (user.rol !== 'admin' && user.rol !== 'proctor')) {
@@ -3877,14 +3877,13 @@ const server = http.createServer(async (req, res) => {
     const roleFilter = parsedUrl.searchParams.get('role') || 'all';
     const searchQuery = (parsedUrl.searchParams.get('search') || '').trim().toLowerCase();
 
-    let list = USERS.map(u => ({
+    // Menu Pengaturan User hanya untuk staf pengelola (Administrator dan Guru). Siswa dikelola di Data Siswa.
+    const staffOnly = USERS.filter(u => u.role !== 'student');
+    let list = staffOnly.map(u => ({
       id: u.id,
       username: u.username,
       full_name: u.full_name || u.username,
-      role: u.role || 'student',
-      class_name: u.class_name || '',
-      nisn: u.nisn || '',
-      nis: u.nis || '',
+      role: (u.role === 'guru') ? 'teacher' : (u.role || 'teacher'),
       created_at: u.created_at || '2026-01-01T00:00:00.000Z',
       has_password: Boolean(u.pass)
     }));
@@ -3900,17 +3899,15 @@ const server = http.createServer(async (req, res) => {
     if (searchQuery) {
       list = list.filter(u =>
         (u.username && u.username.toLowerCase().includes(searchQuery)) ||
-        (u.full_name && u.full_name.toLowerCase().includes(searchQuery)) ||
-        (u.class_name && u.class_name.toLowerCase().includes(searchQuery))
+        (u.full_name && u.full_name.toLowerCase().includes(searchQuery))
       );
     }
 
     const counts = {
-      total: USERS.length,
-      admin: USERS.filter(u => u.role === 'admin').length,
-      teacher: USERS.filter(u => u.role === 'teacher' || u.role === 'guru').length,
-      proctor: USERS.filter(u => u.role === 'proctor').length,
-      student: USERS.filter(u => u.role === 'student').length,
+      total: staffOnly.length,
+      admin: staffOnly.filter(u => u.role === 'admin').length,
+      teacher: staffOnly.filter(u => u.role === 'teacher' || u.role === 'guru').length,
+      student_total: USERS.filter(u => u.role === 'student').length,
     };
 
     return sendJSON(200, {
@@ -3946,8 +3943,14 @@ const server = http.createServer(async (req, res) => {
     if (!fullName) {
       return sendJSON(400, { status: 'error', message: 'Nama lengkap wajib diisi.' });
     }
-    if (!['admin', 'teacher', 'proctor', 'student'].includes(role)) {
-      return sendJSON(400, { status: 'error', message: 'Role pengguna tidak valid.' });
+    if (role === 'student') {
+      return sendJSON(400, {
+        status: 'error',
+        message: 'Menu Pengaturan User dikhususkan untuk Administrator dan Guru. Untuk menambahkan siswa baru, gunakan menu Data Siswa.'
+      });
+    }
+    if (!['admin', 'teacher', 'proctor'].includes(role)) {
+      return sendJSON(400, { status: 'error', message: 'Role pengguna hanya boleh Administrator atau Guru / Pengajar.' });
     }
 
     if (USERS.some(u => u.username && u.username.toLowerCase() === username)) {

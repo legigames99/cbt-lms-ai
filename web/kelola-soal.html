@@ -3224,6 +3224,49 @@ window.setAIBasisMode = function(basis) {
       alert(`File "${file.name}" berhasil diunggah dan diuraikan ke dalam bank soal #${activeBankId}!`);
       closeModal('modalUploadSoal');
     }
+
+    // ==============================================================
+    // THEME MODE HANDLER (DARK MODE / LIGHT MODE)
+    // ==============================================================
+    window.initThemeMode = function() {
+      const savedTheme = localStorage.getItem('cbt_theme_mode') || 'dark';
+      window.applyThemeMode(savedTheme);
+    };
+
+    window.applyThemeMode = function(mode) {
+      const isLight = mode === 'light';
+      const root = document.documentElement;
+      const icon = document.getElementById('themeToggleIconKelola') || document.getElementById('themeToggleIcon');
+      const label = document.getElementById('themeToggleLabelKelola') || document.getElementById('themeToggleLabel');
+
+      if (isLight) {
+        root.classList.add('light-mode');
+        if (icon) {
+          icon.className = 'fa-solid fa-sun text-amber-500';
+        }
+        if (label) {
+          label.textContent = 'Mode Terang';
+        }
+      } else {
+        root.classList.remove('light-mode');
+        if (icon) {
+          icon.className = 'fa-solid fa-moon text-indigo-400';
+        }
+        if (label) {
+          label.textContent = 'Mode Gelap';
+        }
+      }
+      localStorage.setItem('cbt_theme_mode', mode);
+    };
+
+    window.toggleThemeMode = function() {
+      const isCurrentlyLight = document.documentElement.classList.contains('light-mode');
+      window.applyThemeMode(isCurrentlyLight ? 'dark' : 'light');
+    };
+
+    // Auto-init theme mode on script load & when DOM is ready
+    window.initThemeMode();
+    document.addEventListener('DOMContentLoaded', window.initThemeMode);
   </script>
 </body>
 </html>

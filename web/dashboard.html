@@ -13872,8 +13872,8 @@
     window.applyThemeMode = function(mode) {
       const isLight = mode === 'light';
       const root = document.documentElement;
-      const icon = document.getElementById('themeToggleIcon');
-      const label = document.getElementById('themeToggleLabel');
+      const icon = document.getElementById('themeToggleIcon') || document.getElementById('themeToggleIconKelola');
+      const label = document.getElementById('themeToggleLabel') || document.getElementById('themeToggleLabelKelola');
 
       if (isLight) {
         root.classList.add('light-mode');
@@ -13900,8 +13900,9 @@
       window.applyThemeMode(isCurrentlyLight ? 'dark' : 'light');
     };
 
-    // Auto-init theme mode on script load
+    // Auto-init theme mode on script load & DOM ready
     window.initThemeMode();
+    document.addEventListener('DOMContentLoaded', window.initThemeMode);
 
   </script>
 </body>

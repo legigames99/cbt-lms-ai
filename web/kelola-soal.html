@@ -151,14 +151,14 @@
     }
     html.light-mode aside .bg-slate-950 {
       background-color: #f8fafc !important;
-      border-color: #e2e8f0 !important;
+      border-color: #cbd5e1 !important;
     }
     html.light-mode aside .border-slate-800 {
       border-color: #e2e8f0 !important;
     }
     html.light-mode aside #sidebarUserName {
       color: #0f172a !important;
-      font-weight: 700 !important;
+      font-weight: 800 !important;
     }
     html.light-mode .nav-item {
       color: #334155 !important;
@@ -172,12 +172,12 @@
       background-color: #e0e7ff !important;
       color: #3730a3 !important;
       border-left: 3px solid #4f46e5 !important;
-      font-weight: 700 !important;
+      font-weight: 800 !important;
     }
 
     /* Topbar Header */
     html.light-mode header {
-      background-color: rgba(255, 255, 255, 0.95) !important;
+      background-color: rgba(255, 255, 255, 0.96) !important;
       border-color: #cbd5e1 !important;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
     }
@@ -201,27 +201,49 @@
     }
     html.light-mode header .text-slate-300 {
       color: #0f172a !important;
-      font-weight: 600 !important;
+      font-weight: 700 !important;
+    }
+
+    /* BANNERS & CARDS DENGAN GRADASI DIUBAH MENJADI KARTU PUTIH TERANG BERSIH */
+    html.light-mode div.bg-gradient-to-r:not(.h-2):not(#aiModalBar),
+    html.light-mode div.bg-gradient-to-br:not(.h-2):not(#aiModalBar),
+    html.light-mode div[class*="bg-gradient-to-"]:not(.h-2):not(#aiModalBar):not(button *) {
+      background-image: none !important;
+      background-color: #ffffff !important;
+      border: 1.5px solid #cbd5e1 !important;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+    }
+    html.light-mode div[class*="bg-gradient"] .blur-3xl {
+      display: none !important;
     }
 
     /* Containers, Cards, Sections & Panels (KECUALI A4 & CETAK RESMI) */
-    html.light-mode .bg-slate-900:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(.print-card) {
+    html.light-mode .bg-slate-900:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(.print-card):not(button):not(input):not(select),
+    html.light-mode .bg-slate-900\/40,
+    html.light-mode .bg-slate-900\/50,
+    html.light-mode .bg-slate-900\/60,
+    html.light-mode .bg-slate-900\/80,
+    html.light-mode .bg-slate-900\/90 {
       background-color: #ffffff !important;
       border-color: #cbd5e1 !important;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
     }
-    html.light-mode .bg-slate-950:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(.print-card) {
+    html.light-mode .bg-slate-950:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(.print-card):not(button):not(input):not(select),
+    html.light-mode .bg-slate-950\/40,
+    html.light-mode .bg-slate-950\/50,
+    html.light-mode .bg-slate-950\/60,
+    html.light-mode .bg-slate-950\/70,
+    html.light-mode .bg-slate-950\/80 {
       background-color: #f8fafc !important;
       border-color: #cbd5e1 !important;
     }
-    html.light-mode .bg-slate-800:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(.print-card) {
-      background-color: #f1f5f9 !important;
-      border-color: #cbd5e1 !important;
-    }
+    html.light-mode .bg-slate-800:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(.print-card):not(button):not(input):not(select),
+    html.light-mode .bg-slate-800\/40,
     html.light-mode .bg-slate-800\/50,
     html.light-mode .bg-slate-800\/60,
     html.light-mode .bg-slate-800\/80 {
       background-color: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
     }
 
     /* Dark tinted backgrounds to clean light pastels */
@@ -233,7 +255,9 @@
       background-color: #e0e7ff !important;
     }
     html.light-mode .bg-amber-950\/20,
-    html.light-mode .bg-amber-950\/30 {
+    html.light-mode .bg-amber-950\/30,
+    html.light-mode .bg-amber-950\/60,
+    html.light-mode .bg-amber-950\/80 {
       background-color: #fef3c7 !important;
     }
     html.light-mode .bg-emerald-950\/10,
@@ -246,27 +270,72 @@
     html.light-mode .bg-rose-950\/30,
     html.light-mode .bg-rose-950\/40,
     html.light-mode .bg-rose-950\/50,
-    html.light-mode .bg-rose-950\/60 {
+    html.light-mode .bg-rose-950\/60,
+    html.light-mode .bg-rose-950\/80 {
       background-color: #ffe4e6 !important;
     }
     html.light-mode .bg-blue-950\/20,
     html.light-mode .bg-blue-950\/30,
+    html.light-mode .bg-blue-950\/60,
     html.light-mode .bg-sky-950\/60 {
       background-color: #e0f2fe !important;
     }
 
     /* Borders & Dividers */
     html.light-mode .border-slate-800:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *),
-    html.light-mode .border-slate-700:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *) {
+    html.light-mode .border-slate-700:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *),
+    html.light-mode .border-slate-800\/80 {
       border-color: #cbd5e1 !important;
+    }
+    html.light-mode .border-indigo-500\/30,
+    html.light-mode .border-indigo-500\/40 {
+      border-color: #c7d2fe !important;
+    }
+    html.light-mode .border-amber-500\/30,
+    html.light-mode .border-amber-500\/40 {
+      border-color: #fcd34d !important;
+    }
+    html.light-mode .border-emerald-500\/30,
+    html.light-mode .border-emerald-500\/40 {
+      border-color: #86efac !important;
+    }
+    html.light-mode .border-rose-500\/30,
+    html.light-mode .border-rose-500\/40 {
+      border-color: #fda4af !important;
+    }
+    html.light-mode .border-blue-500\/30,
+    html.light-mode .border-blue-500\/40 {
+      border-color: #7dd3fc !important;
     }
     html.light-mode .divide-slate-800 > :not([hidden]) ~ :not([hidden]) {
       border-color: #e2e8f0 !important;
     }
 
-    /* HIGH-CONTRAST TYPOGRAPHY OVERRIDES */
+    /* ============================================================== */
+    /* HIGH-CONTRAST TYPOGRAPHY OVERRIDES                             */
+    /* ============================================================== */
+    /* All headings & labels */
+    html.light-mode h1,
+    html.light-mode h2,
+    html.light-mode h3,
+    html.light-mode h4,
+    html.light-mode h5,
+    html.light-mode h6 {
+      color: #0f172a !important;
+      font-weight: 800 !important;
+    }
+
+    html.light-mode p {
+      color: #334155 !important;
+    }
+
+    html.light-mode label {
+      color: #0f172a !important;
+      font-weight: 700 !important;
+    }
+
     /* General texts */
-    html.light-mode .text-white:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(button.bg-indigo-600):not(button.bg-indigo-600 *):not(button.bg-rose-600):not(button.bg-rose-600 *):not(button.bg-emerald-600):not(button.bg-emerald-600 *):not(button.bg-amber-600):not(button.bg-amber-600 *):not(button.bg-blue-600):not(button.bg-blue-600 *):not(button.bg-purple-600):not(button.bg-purple-600 *):not(a.bg-indigo-600):not(a.bg-indigo-600 *) {
+    html.light-mode .text-white:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(button.bg-indigo-600):not(button.bg-indigo-600 *):not(button.bg-rose-600):not(button.bg-rose-600 *):not(button.bg-emerald-600):not(button.bg-emerald-600 *):not(button.bg-amber-600):not(button.bg-amber-600 *):not(button.bg-blue-600):not(button.bg-blue-600 *):not(button.bg-purple-600):not(button.bg-purple-600 *):not(button[class*="bg-gradient-to-r"]):not(button[class*="bg-gradient-to-r"] *):not(a.bg-indigo-600):not(a.bg-indigo-600 *) {
       color: #0f172a !important;
     }
     html.light-mode .text-slate-100,
@@ -331,16 +400,30 @@
     html.light-mode button.bg-emerald-600 *,
     html.light-mode button.bg-blue-600,
     html.light-mode button.bg-blue-600 *,
+    html.light-mode button[class*="bg-gradient-to-r"],
+    html.light-mode button[class*="bg-gradient-to-r"] *,
     html.light-mode a.bg-indigo-600,
     html.light-mode a.bg-indigo-600 * {
       color: #ffffff !important;
     }
 
-    /* Form labels & inputs */
-    html.light-mode label {
+    /* Outlined & secondary buttons (e.g. Buat Jadwal Ujian, Cetak Berita Acara, Cetak Absensi) */
+    html.light-mode button.bg-slate-800,
+    html.light-mode button.bg-slate-900,
+    html.light-mode button.bg-slate-950 {
+      background-color: #ffffff !important;
+      border: 1.5px solid #cbd5e1 !important;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
       color: #0f172a !important;
-      font-weight: 700 !important;
     }
+    html.light-mode button.bg-slate-800:hover,
+    html.light-mode button.bg-slate-900:hover,
+    html.light-mode button.bg-slate-950:hover {
+      background-color: #f1f5f9 !important;
+      border-color: #94a3b8 !important;
+    }
+
+    /* Inputs, Selects & Textareas */
     html.light-mode input:not([type="checkbox"]):not([type="radio"]),
     html.light-mode textarea,
     html.light-mode select {
@@ -360,6 +443,7 @@
     html.light-mode select option {
       background-color: #ffffff !important;
       color: #0f172a !important;
+      font-weight: 600 !important;
     }
 
     /* Tables */
@@ -384,6 +468,7 @@
 
     /* Badges & Chips */
     html.light-mode .bg-emerald-500\/10,
+    html.light-mode .bg-emerald-500\/15,
     html.light-mode .bg-emerald-500\/20,
     html.light-mode .bg-emerald-500\/30 {
       background-color: #dcfce7 !important;
@@ -408,6 +493,7 @@
       font-weight: 700 !important;
     }
     html.light-mode .bg-indigo-500\/10,
+    html.light-mode .bg-indigo-500\/15,
     html.light-mode .bg-indigo-500\/20,
     html.light-mode .bg-indigo-500\/30,
     html.light-mode .bg-indigo-600\/20,
@@ -424,16 +510,6 @@
       color: #075985 !important;
       border-color: #7dd3fc !important;
       font-weight: 700 !important;
-    }
-
-    /* Outlined buttons (e.g. Cetak Berita Acara, Cetak Absensi, Cetak Paket) */
-    html.light-mode button.bg-slate-800 {
-      background-color: #ffffff !important;
-      border-color: #cbd5e1 !important;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
-    }
-    html.light-mode button.bg-slate-800:hover {
-      background-color: #f1f5f9 !important;
     }
 
     /* Modals dialog background (backdrop blur tetap gelap elegan) */

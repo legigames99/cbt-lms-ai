@@ -283,6 +283,23 @@
         margin: 5mm;
       }
     }
+
+    /* ============================================================== */
+    /* TAMPILAN KARTU PESERTA UJIAN DI LAYAR (STANDAR B3 / A4 KOMPAK) */
+    /* ============================================================== */
+    .a4-page-sheet {
+      max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
+      box-sizing: border-box;
+    }
+    .exam-card-paper {
+      width: 100%;
+      max-width: 375px;
+      margin-left: auto;
+      margin-right: auto;
+      box-sizing: border-box;
+    }
   
     /* ============================================================== */
     /* THEME MODE: HIGH-CONTRAST LIGHT MODE OVERRIDES                 */
@@ -3497,7 +3514,7 @@
               </div>
 
               <!-- Kartu Peserta Cetak (Visual Kertas Putih) -->
-              <div class="bg-white text-slate-900 rounded-2xl p-5 shadow-2xl border-2 border-dashed border-slate-300 relative select-none max-w-[440px] mx-auto">
+              <div class="bg-white text-slate-900 rounded-2xl p-4 sm:p-5 shadow-2xl border-2 border-dashed border-slate-300 relative select-none max-w-[365px] mx-auto transition-all">
                 <div class="absolute -top-3 right-4 bg-slate-900 text-slate-300 border border-slate-700 rounded-full px-2.5 py-0.5 text-[9px] font-mono flex items-center gap-1 shadow">
                   <i class="fa-solid fa-scissors"></i> Garis Potong Kartu
                 </div>
@@ -5281,7 +5298,7 @@
       </div>
 
       <!-- Area Kartu Siap Cetak (Printable Area) -->
-      <div id="printableExamCardsContainer" class="space-y-6">
+      <div id="printableExamCardsContainer" class="space-y-6 overflow-x-auto">
         <!-- Rendered dynamically as A4 sheets -->
       </div>
 
@@ -10804,7 +10821,7 @@
       const gridLayoutClass = `grid-cards-${cardsPerPage}`;
 
       container.innerHTML = chunks.map((chunk, pageIdx) => `
-        <div class="a4-page-sheet mb-8 print:mb-0">
+        <div class="a4-page-sheet max-w-[760px] w-full mx-auto mb-8 print:mb-0 print:max-w-none">
           <!-- Indikator Lembar Halaman Fisik untuk Tampilan Layar (Disembunyikan saat cetak) -->
           <div class="no-print flex items-center justify-between text-xs text-slate-400 bg-slate-800/90 px-4 py-2.5 rounded-t-xl border border-slate-700 border-b-0 shadow-sm">
             <span class="font-bold text-slate-200 flex items-center gap-2">
@@ -10817,7 +10834,7 @@
           </div>
 
           <!-- Grid Kartu Lembar Halaman A4 Sesuai Kapasitas (4, 6, atau 8 Kartu) -->
-          <div class="page-cards-grid ${gridLayoutClass} grid grid-cols-1 md:grid-cols-2 gap-3.5 bg-slate-900/60 p-4 rounded-b-xl border border-slate-700 print:bg-white print:p-0 print:border-none print:m-0">
+          <div class="page-cards-grid ${gridLayoutClass} grid grid-cols-2 gap-2.5 sm:gap-3 bg-slate-900/60 p-3 sm:p-4 rounded-b-xl border border-slate-700 print:bg-white print:p-0 print:border-none print:m-0">
             ${chunk.map(st => renderSingleCardHtml(st, profileToRender, logoSvg, dinasLines, rulesHtml, printOpts)).join('')}
           </div>
         </div>

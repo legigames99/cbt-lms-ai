@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+  <!-- Theme Mode Early Init (Anti-Flicker) -->
+  <script>
+    (function() {
+      try {
+        if (localStorage.getItem('cbt_theme_mode') === 'light') {
+          document.documentElement.classList.add('light-mode');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kelola Butir Soal - CBT & LMS AI Suite</title>
@@ -120,6 +130,115 @@
       body { background: #ffffff !important; color: #000000 !important; }
       .print-card { border: 1px solid #cbd5e1 !important; page-break-inside: avoid; margin-bottom: 1.5rem; }
     }
+  
+    /* ============================================================== */
+    /* THEME MODE: LIGHT MODE OVERRIDES (ZERO STRUCTURAL MUTATION)     */
+    /* ============================================================== */
+    html.light-mode,
+    html.light-mode body {
+      background-color: #f8fafc !important;
+      color: #0f172a !important;
+    }
+
+    html.light-mode .custom-scrollbar::-webkit-scrollbar-track { background: #e2e8f0 !important; }
+    html.light-mode .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1 !important; }
+
+    /* Topbar Header */
+    html.light-mode header {
+      background-color: rgba(255, 255, 255, 0.92) !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    }
+    html.light-mode header h1 {
+      color: #0f172a !important;
+    }
+    html.light-mode header .bg-slate-950 {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode header select {
+      color: #0f172a !important;
+    }
+
+    /* Containers, Cards, Sections & Panels */
+    html.light-mode .bg-slate-900:not(.print-card) {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode .bg-slate-950:not(.print-card) {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode .bg-slate-800:not(.print-card) {
+      background-color: #f1f5f9 !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode .bg-slate-800\/50 {
+      background-color: #f1f5f9 !important;
+    }
+    html.light-mode .bg-slate-800\/80 {
+      background-color: #e2e8f0 !important;
+    }
+
+    /* Borders */
+    html.light-mode .border-slate-800,
+    html.light-mode .border-slate-700 {
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode .divide-slate-800 > :not([hidden]) ~ :not([hidden]) {
+      border-color: #e2e8f0 !important;
+    }
+
+    /* Typography */
+    html.light-mode .text-white:not(button.bg-indigo-600):not(button.bg-indigo-600 *):not(button.bg-rose-600):not(button.bg-rose-600 *):not(button.bg-emerald-600):not(button.bg-emerald-600 *):not(button.bg-amber-600):not(button.bg-amber-600 *):not(button.bg-blue-600):not(button.bg-blue-600 *) {
+      color: #0f172a !important;
+    }
+    html.light-mode .text-slate-100 {
+      color: #0f172a !important;
+    }
+    html.light-mode .text-slate-200 {
+      color: #1e293b !important;
+    }
+    html.light-mode .text-slate-300 {
+      color: #334155 !important;
+    }
+    html.light-mode .text-slate-400 {
+      color: #64748b !important;
+    }
+
+    /* Inputs, Selects & Textareas */
+    html.light-mode input:not([type="checkbox"]):not([type="radio"]),
+    html.light-mode textarea,
+    html.light-mode select {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.light-mode input::placeholder,
+    html.light-mode textarea::placeholder {
+      color: #94a3b8 !important;
+    }
+    html.light-mode select {
+      color-scheme: light !important;
+    }
+    html.light-mode select option {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+    }
+
+    /* Modals dialog background */
+    html.light-mode .fixed .bg-slate-900 {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+    }
+
+    /* Toggle button */
+    html.light-mode #btnToggleThemeKelola {
+      background-color: #f1f5f9 !important;
+      color: #4338ca !important;
+      border-color: #cbd5e1 !important;
+    }
+
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
@@ -161,6 +280,12 @@
             <option value="1">Memuat bank soal...</option>
           </select>
         </div>
+
+        <!-- Tombol Toggle Mode Terang / Gelap -->
+        <button type="button" id="btnToggleThemeKelola" onclick="toggleThemeMode()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Beralih Mode Gelap / Terang">
+          <i id="themeToggleIconKelola" class="fa-solid fa-moon"></i>
+          <span id="themeToggleLabelKelola">Mode Gelap</span>
+        </button>
 
         <a href="/dashboard" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold transition flex items-center gap-1.5">
           <i class="fa-solid fa-chart-pie text-xs text-indigo-400"></i> Dashboard Utama

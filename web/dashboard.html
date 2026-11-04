@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+  <!-- Theme Mode Early Init (Anti-Flicker) -->
+  <script>
+    (function() {
+      try {
+        if (localStorage.getItem('cbt_theme_mode') === 'light') {
+          document.documentElement.classList.add('light-mode');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal Utama - CBT & LMS AI Admin Suite</title>
@@ -271,6 +281,211 @@
         margin: 5mm;
       }
     }
+  
+    /* ============================================================== */
+    /* THEME MODE: LIGHT MODE OVERRIDES (ZERO STRUCTURAL MUTATION)     */
+    /* ============================================================== */
+    html.light-mode,
+    html.light-mode body {
+      background-color: #f8fafc !important;
+      color: #0f172a !important;
+    }
+
+    html.light-mode .custom-scrollbar::-webkit-scrollbar-track { background: #e2e8f0 !important; }
+    html.light-mode .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1 !important; }
+
+    /* Aside / Sidebar */
+    html.light-mode aside {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.03) !important;
+    }
+    html.light-mode aside .bg-slate-950 {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode aside .border-slate-800 {
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode aside #sidebarUserName {
+      color: #0f172a !important;
+    }
+    html.light-mode .nav-item {
+      color: #475569 !important;
+    }
+    html.light-mode .nav-item:hover {
+      background-color: #f1f5f9 !important;
+      color: #1e293b !important;
+    }
+    html.light-mode .nav-item.active {
+      background-color: rgba(99, 102, 241, 0.12) !important;
+      color: #4f46e5 !important;
+      border-left: 3px solid #6366f1 !important;
+    }
+
+    /* Topbar Header */
+    html.light-mode header {
+      background-color: rgba(255, 255, 255, 0.92) !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    }
+    html.light-mode #topbarTitle {
+      color: #0f172a !important;
+    }
+    html.light-mode #topbarSchoolBadge {
+      background-color: #eef2ff !important;
+      border-color: #c7d2fe !important;
+      color: #4338ca !important;
+    }
+    html.light-mode #topbarAcademicYear {
+      color: #64748b !important;
+    }
+    html.light-mode header .bg-slate-950 {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode header .text-slate-300 {
+      color: #334155 !important;
+    }
+
+    /* Containers, Cards, Sections & Panels (kecuali lembar cetak A4 & pratinjau resmi) */
+    html.light-mode .bg-slate-900:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *) {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode .bg-slate-950:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *) {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode .bg-slate-800:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *) {
+      background-color: #f1f5f9 !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode .bg-slate-800/50:not(.official-a4-page):not(.official-a4-page *) {
+      background-color: #f1f5f9 !important;
+    }
+    html.light-mode .bg-slate-800/80:not(.official-a4-page):not(.official-a4-page *) {
+      background-color: #e2e8f0 !important;
+    }
+
+    /* Borders & Dividers */
+    html.light-mode .border-slate-800:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *),
+    html.light-mode .border-slate-700:not(.official-a4-page):not(.official-a4-page *) {
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode .divide-slate-800 > :not([hidden]) ~ :not([hidden]) {
+      border-color: #e2e8f0 !important;
+    }
+
+    /* Shadows halus */
+    html.light-mode .shadow-xl,
+    html.light-mode .shadow-2xl,
+    html.light-mode .shadow-lg {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+    }
+
+    /* Typography / Teks */
+    html.light-mode .text-white:not(.official-a4-page):not(.official-a4-page *):not(.a4-page-sheet):not(.a4-page-sheet *):not(#officialDocPrintArea):not(#officialDocPrintArea *):not(#cardsPrintContainer):not(#cardsPrintContainer *):not(button.bg-indigo-600):not(button.bg-indigo-600 *):not(button.bg-rose-600):not(button.bg-rose-600 *):not(button.bg-emerald-600):not(button.bg-emerald-600 *):not(button.bg-amber-600):not(button.bg-amber-600 *):not(button.bg-blue-600):not(button.bg-blue-600 *):not(button.bg-purple-600):not(button.bg-purple-600 *):not(a.bg-indigo-600):not(a.bg-indigo-600 *) {
+      color: #0f172a !important;
+    }
+    html.light-mode .text-slate-200:not(.official-a4-page):not(.official-a4-page *) {
+      color: #1e293b !important;
+    }
+    html.light-mode .text-slate-300:not(.official-a4-page):not(.official-a4-page *) {
+      color: #334155 !important;
+    }
+    html.light-mode .text-slate-400:not(.official-a4-page):not(.official-a4-page *) {
+      color: #64748b !important;
+    }
+    html.light-mode .text-slate-500:not(.official-a4-page):not(.official-a4-page *) {
+      color: #64748b !important;
+    }
+
+    /* Inputs, Selects & Textareas */
+    html.light-mode input:not([type="checkbox"]):not([type="radio"]),
+    html.light-mode textarea,
+    html.light-mode select {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.light-mode input::placeholder,
+    html.light-mode textarea::placeholder {
+      color: #94a3b8 !important;
+    }
+    html.light-mode select {
+      color-scheme: light !important;
+    }
+    html.light-mode select option {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+    }
+    html.light-mode select option:hover,
+    html.light-mode select option:focus,
+    html.light-mode select option:checked {
+      background-color: #e0e7ff !important;
+      color: #4338ca !important;
+    }
+
+    /* Tables */
+    html.light-mode thead.bg-slate-950,
+    html.light-mode th.bg-slate-950,
+    html.light-mode thead {
+      background-color: #f1f5f9 !important;
+      color: #475569 !important;
+    }
+    html.light-mode tbody tr:hover {
+      background-color: #f8fafc !important;
+    }
+
+    /* Badges & Status Pills */
+    html.light-mode .bg-emerald-500\/10,
+    html.light-mode .bg-emerald-500\/20 {
+      background-color: #dcfce7 !important;
+      color: #15803d !important;
+      border-color: #bbf7d0 !important;
+    }
+    html.light-mode .bg-rose-500\/10,
+    html.light-mode .bg-rose-500\/20 {
+      background-color: #ffe4e6 !important;
+      color: #be123c !important;
+      border-color: #fecdd3 !important;
+    }
+    html.light-mode .bg-amber-500\/10,
+    html.light-mode .bg-amber-500\/20 {
+      background-color: #fef3c7 !important;
+      color: #b45309 !important;
+      border-color: #fde68a !important;
+    }
+    html.light-mode .bg-indigo-500\/10,
+    html.light-mode .bg-indigo-500\/20 {
+      background-color: #e0e7ff !important;
+      color: #4338ca !important;
+      border-color: #c7d2fe !important;
+    }
+    html.light-mode .bg-blue-500\/10,
+    html.light-mode .bg-blue-500\/20 {
+      background-color: #e0f2fe !important;
+      color: #0369a1 !important;
+      border-color: #bae6fd !important;
+    }
+
+    /* Modals dialog background (backdrop blur tetap gelap elegan) */
+    html.light-mode .fixed .bg-slate-900:not(#modalPrintOfficialExamDoc .bg-white):not(#modalPrintCards .bg-white) {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+    }
+
+    /* Tombol Toggle Theme */
+    html.light-mode #btnToggleTheme {
+      background-color: #f1f5f9 !important;
+      color: #4338ca !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.light-mode #btnToggleTheme:hover {
+      background-color: #e2e8f0 !important;
+    }
+
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex font-sans">
@@ -435,6 +650,12 @@
         </div>
 
         <!-- Tombol Link Cepat Siswa -->
+        <!-- Tombol Toggle Mode Terang / Gelap -->
+        <button type="button" id="btnToggleTheme" onclick="toggleThemeMode()" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-amber-300 border border-slate-700 text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Beralih Mode Gelap / Terang">
+          <i id="themeToggleIcon" class="fa-solid fa-moon"></i>
+          <span id="themeToggleLabel">Mode Gelap</span>
+        </button>
+
         <a href="/exam" target="_blank" class="px-3 py-1.5 rounded-xl bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 text-xs font-semibold hover:bg-indigo-600/30 transition flex items-center gap-1.5">
           <i class="fa-solid fa-arrow-up-right-from-square"></i>
           <span>Buka Ruang Ujian</span>
@@ -13426,6 +13647,49 @@
     };
 
     window.addEventListener('focus', purgeDashboardAutofill);
+
+    // ==============================================================
+    // THEME MODE HANDLER (DARK MODE / LIGHT MODE)
+    // ==============================================================
+    window.initThemeMode = function() {
+      const savedTheme = localStorage.getItem('cbt_theme_mode') || 'dark';
+      window.applyThemeMode(savedTheme);
+    };
+
+    window.applyThemeMode = function(mode) {
+      const isLight = mode === 'light';
+      const root = document.documentElement;
+      const icon = document.getElementById('themeToggleIcon');
+      const label = document.getElementById('themeToggleLabel');
+
+      if (isLight) {
+        root.classList.add('light-mode');
+        if (icon) {
+          icon.className = 'fa-solid fa-sun text-amber-500';
+        }
+        if (label) {
+          label.textContent = 'Mode Terang';
+        }
+      } else {
+        root.classList.remove('light-mode');
+        if (icon) {
+          icon.className = 'fa-solid fa-moon text-indigo-400';
+        }
+        if (label) {
+          label.textContent = 'Mode Gelap';
+        }
+      }
+      localStorage.setItem('cbt_theme_mode', mode);
+    };
+
+    window.toggleThemeMode = function() {
+      const isCurrentlyLight = document.documentElement.classList.contains('light-mode');
+      window.applyThemeMode(isCurrentlyLight ? 'dark' : 'light');
+    };
+
+    // Auto-init theme mode on script load
+    window.initThemeMode();
+
   </script>
 </body>
 </html>

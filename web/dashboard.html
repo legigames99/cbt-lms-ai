@@ -879,25 +879,31 @@
           <span>Kartu Peserta Ujian</span>
         </a>
 
-        <a href="#server" onclick="switchTab('server')" id="nav-server" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <a href="#server" onclick="switchTab('server')" id="nav-server" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
           <i class="fa-solid fa-server w-4 text-center"></i>
           <span>Sistem & Lockdown</span>
         </a>
 
-        <div class="pt-3 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Pengaturan</div>
+        <div id="sidebarHeaderPengaturan" class="sidebar-admin-only pt-3 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Pengaturan</div>
 
-        <a href="#pengaturan" onclick="switchTab('pengaturan')" id="nav-pengaturan" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <a href="#pengaturan" onclick="switchTab('pengaturan')" id="nav-pengaturan" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
           <i class="fa-solid fa-school w-4 text-center"></i>
           <span>Pengaturan Sekolah</span>
         </a>
 
-        <a href="#pengaturan-redis" onclick="switchTab('pengaturan-redis')" id="nav-pengaturan-redis" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <a href="#pengaturan-user" onclick="switchTab('pengaturan-user')" id="nav-pengaturan-user" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+          <i class="fa-solid fa-users-gear w-4 text-center text-indigo-400"></i>
+          <span>Pengaturan User & Role</span>
+          <span class="ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold font-mono">RBAC</span>
+        </a>
+
+        <a href="#pengaturan-redis" onclick="switchTab('pengaturan-redis')" id="nav-pengaturan-redis" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
           <i class="fa-solid fa-database w-4 text-center text-rose-500"></i>
           <span>Pengaturan Redis Cache</span>
           <span id="sidebarRedisBadge" class="ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-slate-800 text-slate-400 font-semibold font-mono">RAM</span>
         </a>
 
-        <a href="#pengaturan-ai" onclick="switchTab('pengaturan-ai')" id="nav-pengaturan-ai" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <a href="#pengaturan-ai" onclick="switchTab('pengaturan-ai')" id="nav-pengaturan-ai" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
           <i class="fa-solid fa-wand-magic-sparkles w-4 text-center text-indigo-400"></i>
           <span>Pengaturan AI & Model</span>
           <span class="ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold font-mono">Gemini</span>
@@ -938,6 +944,11 @@
         </span>
         <span class="text-xs text-slate-600">•</span>
         <span id="topbarAcademicYear" class="text-xs text-slate-400 font-medium">Tahun Ajaran 2026/2027 (Semester Ganjil)</span>
+        <span class="text-xs text-slate-600">•</span>
+        <span id="topbarUserRoleBadge" class="text-xs font-bold px-2.5 py-1 rounded-xl flex items-center gap-1.5 shadow-sm bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+          <i class="fa-solid fa-shield-halved text-[10px]"></i>
+          <span id="topbarRoleText">Administrator</span>
+        </span>
       </div>
 
       <div class="flex items-center gap-4">
@@ -3197,6 +3208,154 @@
       </section>
 
       <!-- ============================================================== -->
+      <!-- TAB: PENGATURAN USER & ROLE (RBAC) -->
+      <!-- ============================================================== -->
+      <section id="tab-pengaturan-user" class="hidden space-y-6">
+        <!-- Header Banner -->
+        <div class="bg-gradient-to-r from-indigo-950/60 via-slate-900 to-slate-900 border border-indigo-500/30 rounded-2xl p-6 shadow-xl flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div>
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[10px] font-bold uppercase tracking-wider">Role-Based Access Control</span>
+              <span class="text-xs text-slate-500">•</span>
+              <span class="text-xs text-slate-400">Otorisasi & Manajemen Pengguna CBT / LMS</span>
+            </div>
+            <h3 class="text-xl font-bold text-white flex items-center gap-2.5">
+              <i class="fa-solid fa-users-gear text-indigo-400"></i>
+              <span>Pengaturan User & Hak Akses Pengguna</span>
+            </h3>
+            <p class="text-xs text-slate-400 max-w-3xl mt-1.5 leading-relaxed">
+              Kelola akun pengguna, peran otorisasi, dan pembagian hak akses menu sistem. 
+              <strong>Admin</strong> memiliki akses penuh ke seluruh pengaturan; 
+              <strong>Guru</strong> difokuskan pada manajemen Ujian & LMS (menu pengaturan disembunyikan); 
+              <strong>Siswa</strong> dibatasi khusus untuk mengikuti ujian & materi.
+            </p>
+          </div>
+          <div class="flex items-center gap-3 self-start lg:self-center">
+            <button type="button" onclick="openModalAddUser()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-lg shadow-indigo-600/30 transition flex items-center gap-2">
+              <i class="fa-solid fa-user-plus"></i> Tambah Pengguna Baru
+            </button>
+            <button type="button" onclick="fetchUserManagementList()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition flex items-center gap-2">
+              <i class="fa-solid fa-arrows-rotate"></i> Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Penjelasan Hak Akses Peran (RBAC Summary Cards) -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="bg-slate-900 border border-indigo-500/30 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-shield-halved"></i> Administrator
+                </span>
+                <span id="statUserAdminBadge" class="text-xs px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 font-mono font-bold">1</span>
+              </div>
+              <p class="text-[11px] text-slate-400 leading-relaxed">
+                Akses penuh tanpa batas: Seluruh modul Ujian, Bank Soal, LMS, Master Data, Server Lockdown, Redis Cache, dan Konfigurasi AI.
+              </p>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-slate-800 text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+              <i class="fa-solid fa-check-double"></i> Full Access Semua Menu
+            </div>
+          </div>
+
+          <div class="bg-slate-900 border border-blue-500/30 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-chalkboard-user"></i> Guru / Pengajar
+                </span>
+                <span id="statUserTeacherBadge" class="text-xs px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-300 font-mono font-bold">1</span>
+              </div>
+              <p class="text-[11px] text-slate-400 leading-relaxed">
+                Akses operasional Ujian (Bank Soal, Jadwal, Live Monitor, Nilai, Berita Acara) & LMS (Materi & Tugas). <strong class="text-rose-400">Menu Pengaturan dinonaktifkan</strong>.
+              </p>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-slate-800 text-[10px] text-blue-400 font-semibold flex items-center gap-1">
+              <i class="fa-solid fa-book-open-reader"></i> Ujian & LMS Aktif
+            </div>
+          </div>
+
+          <div class="bg-slate-900 border border-amber-500/30 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-desktop"></i> Proktor Lab
+                </span>
+                <span id="statUserProctorBadge" class="text-xs px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-mono font-bold">1</span>
+              </div>
+              <p class="text-[11px] text-slate-400 leading-relaxed">
+                Pengawasan langsung pelaksanaan CBT di lab, manajemen token ujian dinamis, perpanjangan waktu siswa, dan reset login peserta.
+              </p>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-slate-800 text-[10px] text-amber-400 font-semibold flex items-center gap-1">
+              <i class="fa-solid fa-eye"></i> Pengawasan CBT
+            </div>
+          </div>
+
+          <div class="bg-slate-900 border border-emerald-500/30 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-user-graduate"></i> Siswa / Peserta
+                </span>
+                <span id="statUserStudentBadge" class="text-xs px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono font-bold">15</span>
+              </div>
+              <p class="text-[11px] text-slate-400 leading-relaxed">
+                Akses eksklusif Portal Ruang Ujian Siswa (/exam) untuk mengerjakan soal CBT terenkripsi dan mengakses materi pembelajaran siswa.
+              </p>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-slate-800 text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+              <i class="fa-solid fa-laptop-code"></i> Peserta Ujian Only
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter & Search Bar + Tabel Pengguna -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+          <div class="p-5 border-b border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3 flex-1">
+              <div class="relative flex-1 max-w-md">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                <input type="text" id="userManagementSearch" oninput="renderFilteredUsersTable()" placeholder="Cari nama lengkap, username, atau kelas..." class="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+              </div>
+              <div class="w-52">
+                <select id="userManagementRoleFilter" onchange="renderFilteredUsersTable()" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 transition">
+                  <option value="all">Semua Peran (All Roles)</option>
+                  <option value="admin">Administrator</option>
+                  <option value="teacher">Guru / Pengajar</option>
+                  <option value="proctor">Proktor Ujian</option>
+                  <option value="student">Siswa / Peserta</option>
+                </select>
+              </div>
+            </div>
+            <div class="text-xs text-slate-400 font-medium">
+              Menampilkan <span id="userCountFiltered" class="font-bold text-white font-mono">0</span> dari <span id="userCountTotal" class="font-bold text-white font-mono">0</span> akun
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-slate-400 bg-slate-950/80 uppercase text-[10px] tracking-wider border-b border-slate-800 font-bold">
+                <tr>
+                  <th class="px-5 py-3.5 w-14 text-center">No</th>
+                  <th class="px-5 py-3.5">Pengguna</th>
+                  <th class="px-5 py-3.5">Peran / Role</th>
+                  <th class="px-5 py-3.5">Hak Akses Menu</th>
+                  <th class="px-5 py-3.5">Kelas / Keterangan</th>
+                  <th class="px-5 py-3.5 text-center w-36">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="userManagementTableBody" class="divide-y divide-slate-800/60 text-slate-300">
+                <!-- Dynamically Rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
       <!-- TAB 10: KARTU PESERTA UJIAN (MENU MANDIRI & TERPISAH) -->
       <!-- ============================================================== -->
       <section id="tab-kartu-peserta" class="hidden space-y-6">
@@ -3752,6 +3911,111 @@
       </section>
 
     </main>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: TAMBAH / EDIT PENGGUNA & ROLE -->
+  <!-- ============================================================== -->
+  <div id="modalUserForm" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto custom-scrollbar">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center">
+            <i class="fa-solid fa-users-gear text-lg"></i>
+          </div>
+          <div>
+            <h4 id="modalUserFormTitle" class="text-sm font-bold text-white">Tambah Pengguna Baru</h4>
+            <p class="text-[11px] text-slate-400">Atur profil akun dan hak akses pengguna</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeModal('modalUserForm')" class="text-slate-400 hover:text-white transition">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="formUserManagement" onsubmit="handleSaveUser(event)" class="space-y-4">
+        <input type="hidden" id="userFormId" value="">
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Nama Lengkap & Gelar <span class="text-rose-400">*</span></label>
+          <input type="text" id="userFormFullName" required placeholder="Contoh: Dra. H. Endang Sulastri, M.Pd." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Username <span class="text-rose-400">*</span></label>
+            <input type="text" id="userFormUsername" required placeholder="Contoh: guru_fisika" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 font-mono focus:outline-none focus:border-indigo-500 transition">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Peran / Role <span class="text-rose-400">*</span></label>
+            <select id="userFormRole" onchange="handleRoleFormChange()" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 transition">
+              <option value="admin">Administrator (Full Access)</option>
+              <option value="teacher" selected>Guru / Pengajar (Ujian & LMS)</option>
+              <option value="proctor">Proktor Ujian</option>
+              <option value="student">Siswa (Portal Ujian)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">
+            <span id="userFormPasswordLabel">Password</span>
+            <span id="userFormPasswordReq" class="text-rose-400">*</span>
+            <span id="userFormPasswordHelp" class="text-[10px] text-slate-500 font-normal ml-1"></span>
+          </label>
+          <div class="relative">
+            <input type="password" id="userFormPassword" placeholder="Minimal 4 karakter" class="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 font-mono focus:outline-none focus:border-indigo-500 transition">
+            <button type="button" onclick="togglePasswordVisibility('userFormPassword', 'iconToggleUserPass')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition">
+              <i id="iconToggleUserPass" class="fa-regular fa-eye text-xs"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="userFormClassContainer" class="hidden">
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Kelas / Rombel (Khusus Siswa)</label>
+          <input type="text" id="userFormClass" placeholder="Contoh: XII IPA 1" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+        </div>
+
+        <!-- Box Keterangan Hak Akses Dinamis Sesuai Role Terpilih -->
+        <div id="userRoleInfoBox" class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px] text-slate-400 space-y-1">
+          <!-- Dynamically updated -->
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeModal('modalUserForm')" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+            Batal
+          </button>
+          <button type="submit" id="btnSubmitUserForm" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-indigo-600/30">
+            <i class="fa-solid fa-floppy-disk"></i> Simpan Pengguna
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: KONFIRMASI HAPUS PENGGUNA -->
+  <div id="modalDeleteUserConfirm" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-lg">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div>
+          <h4 class="text-sm font-bold text-white">Hapus Pengguna</h4>
+          <p class="text-[11px] text-slate-400">Tindakan ini tidak dapat dibatalkan</p>
+        </div>
+      </div>
+      <p id="deleteUserMessage" class="text-xs text-slate-300 leading-relaxed"></p>
+      <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+        <button type="button" onclick="closeModal('modalDeleteUserConfirm')" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+          Batal
+        </button>
+        <button type="button" id="btnConfirmDeleteUser" onclick="executeDeleteUser()" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-rose-600/30">
+          <i class="fa-regular fa-trash-can"></i> Hapus Sekarang
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- ==================== MODAL 1: UPLOAD / IMPORT SOAL (WORD .DOCX / .DOC / EXCEL) ==================== -->
@@ -5605,14 +5869,8 @@
 
     // Inisialisasi
     window.addEventListener('DOMContentLoaded', () => {
-      if (userStr) {
-        try {
-          const u = JSON.parse(userStr);
-          document.getElementById('sidebarUserName').innerText = u.full_name || u.username;
-          document.getElementById('sidebarUserRole').innerText = u.role || 'Pengguna';
-          document.getElementById('sidebarUserInitials').innerText = (u.full_name || u.username).substring(0, 2).toUpperCase();
-        } catch (e) {}
-      }
+      // Terapkan Hak Akses Sesuai Role (RBAC)
+      applyUserRolePermissions();
       fetchLiveMetrics();
       setInterval(fetchLiveMetrics, 3000);
 
@@ -5665,6 +5923,21 @@
 
     // Pindah Tab / Menu Navigasi
     window.switchTab = function(tabName) {
+      // Proteksi Role Siswa: Jika siswa membuka dashboard, redirect ke /exam
+      let _uCheck = null;
+      try { _uCheck = JSON.parse(localStorage.getItem('cbt_user') || '{}'); } catch(e){}
+      const _userRole = (_uCheck && _uCheck.role) ? _uCheck.role.toLowerCase() : '';
+      if (_userRole === 'student') {
+        window.location.replace('/exam');
+        return;
+      }
+
+      // Proteksi Role Guru: Guru hanya untuk Ujian dan LMS, menu Pengaturan dinonaktifkan
+      const teacherRestrictedTabs = ['pengaturan', 'pengaturan-user', 'pengaturan-redis', 'pengaturan-ai', 'server'];
+      if ((_userRole === 'teacher' || _userRole === 'guru') && teacherRestrictedTabs.includes(tabName)) {
+        alert('⚠️ AKSES DIBATASI\n\nAkun Guru / Pengajar hanya memiliki hak akses untuk fitur Ujian dan LMS.\nMenu Pengaturan sistem hanya dapat dibuka dan dikelola oleh Administrator.');
+        tabName = 'overview';
+      }
       // Purge unwanted browser autofill on all search and filter inputs
       const searchInputIds = [
         'searchNilaiStudentInput', 'searchStudentInput', 'searchClassInput',
@@ -5737,6 +6010,9 @@
       if (tabName === 'pengaturan-redis') {
         fetchRedisStatus();
       }
+      if (tabName === 'pengaturan-user') {
+        fetchUserManagementList();
+      }
 
       const titleMap = {
         'overview': 'Dashboard Utama',
@@ -5752,6 +6028,7 @@
         'kartu-peserta': 'Kartu Peserta Ujian Siswa',
         'server': 'Sistem & Server',
         'pengaturan': 'Pengaturan Profil Sekolah',
+        'pengaturan-user': 'Pengaturan User & Hak Akses (RBAC)',
         'pengaturan-redis': 'Pengaturan Redis Cache & Shared Memory (1.700 Siswa)',
         'pengaturan-ai': 'Pengaturan AI, Kredensial & Model Gemini'
       };
@@ -13975,7 +14252,441 @@
       });
     };
 
-    window.addEventListener('focus', purgeDashboardAutofill);
+
+    // ==============================================================
+    // MANAJEMEN USER & ROLE-BASED ACCESS CONTROL (RBAC)
+    // ==============================================================
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function applyUserRolePermissions() {
+      const uStr = localStorage.getItem('cbt_user');
+      if (!uStr) return;
+      let u = null;
+      try { u = JSON.parse(uStr); } catch (e) { return; }
+
+      const role = (u.role || '').toLowerCase();
+      const fullName = u.full_name || u.username || 'Pengguna';
+
+      const elName = document.getElementById('sidebarUserName');
+      if (elName) elName.innerText = fullName;
+      const elInit = document.getElementById('sidebarUserInitials');
+      if (elInit) elInit.innerText = fullName.substring(0, 2).toUpperCase();
+
+      const elRole = document.getElementById('sidebarUserRole');
+      const elTopbarRoleBadge = document.getElementById('topbarUserRoleBadge');
+      const elTopbarRoleText = document.getElementById('topbarRoleText');
+
+      if (role === 'teacher' || role === 'guru') {
+        if (elRole) {
+          elRole.innerText = 'Guru / Pengajar';
+          elRole.className = 'text-[10px] text-blue-400 font-bold capitalize';
+        }
+        if (elTopbarRoleBadge) {
+          elTopbarRoleBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-xl flex items-center gap-1.5 shadow-sm bg-blue-500/20 text-blue-300 border border-blue-500/30';
+          elTopbarRoleBadge.innerHTML = '<i class="fa-solid fa-chalkboard-user text-[11px] text-blue-400"></i><span>Guru / Pengajar (Ujian & LMS)</span>';
+        }
+
+        // SEMBUNYIKAN MENU PENGATURAN UNTUK GURU
+        document.querySelectorAll('.sidebar-admin-only').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.btn-admin-only').forEach(el => el.classList.add('hidden'));
+
+      } else if (role === 'admin') {
+        if (elRole) {
+          elRole.innerText = 'Administrator';
+          elRole.className = 'text-[10px] text-indigo-400 font-bold capitalize';
+        }
+        if (elTopbarRoleBadge) {
+          elTopbarRoleBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-xl flex items-center gap-1.5 shadow-sm bg-indigo-500/20 text-indigo-300 border border-indigo-500/30';
+          elTopbarRoleBadge.innerHTML = '<i class="fa-solid fa-shield-halved text-[11px] text-indigo-400"></i><span>Administrator (Full Access)</span>';
+        }
+
+        // TAMPILKAN SEMUA MENU UNTUK ADMIN
+        document.querySelectorAll('.sidebar-admin-only').forEach(el => el.classList.remove('hidden'));
+        document.querySelectorAll('.btn-admin-only').forEach(el => el.classList.remove('hidden'));
+
+      } else if (role === 'proctor') {
+        if (elRole) {
+          elRole.innerText = 'Proktor Ujian';
+          elRole.className = 'text-[10px] text-amber-400 font-bold capitalize';
+        }
+        if (elTopbarRoleBadge) {
+          elTopbarRoleBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-xl flex items-center gap-1.5 shadow-sm bg-amber-500/20 text-amber-300 border border-amber-500/30';
+          elTopbarRoleBadge.innerHTML = '<i class="fa-solid fa-desktop text-[11px] text-amber-400"></i><span>Proktor Ujian</span>';
+        }
+        document.querySelectorAll('.sidebar-admin-only').forEach(el => el.classList.remove('hidden'));
+      } else if (role === 'student') {
+        // Siswa langsung diarahkan ke portal ujian
+        window.location.replace('/exam');
+      }
+    }
+
+    let allManagedUsers = [];
+    let deleteTargetUserId = null;
+
+    async function fetchUserManagementList() {
+      const token = localStorage.getItem('cbt_token');
+      try {
+        const res = await fetch('/api/v1/admin/users', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (res.status === 403) {
+          alert('Akses Ditolak: Anda tidak memiliki wewenang untuk membuka pengaturan user.');
+          switchTab('overview');
+          return;
+        }
+        const json = await res.json();
+        if (json.status === 'success') {
+          allManagedUsers = json.data.users || [];
+          const counts = json.data.counts || {};
+          
+          const elAdmin = document.getElementById('statUserAdminBadge');
+          if (elAdmin) elAdmin.innerText = counts.admin || 0;
+          const elTeach = document.getElementById('statUserTeacherBadge');
+          if (elTeach) elTeach.innerText = counts.teacher || 0;
+          const elProct = document.getElementById('statUserProctorBadge');
+          if (elProct) elProct.innerText = counts.proctor || 0;
+          const elStud = document.getElementById('statUserStudentBadge');
+          if (elStud) elStud.innerText = counts.student || 0;
+
+          renderFilteredUsersTable();
+        }
+      } catch (err) {
+        console.error('Failed to fetch users:', err);
+      }
+    }
+
+    function renderFilteredUsersTable() {
+      const searchInput = document.getElementById('userManagementSearch');
+      const roleSelect = document.getElementById('userManagementRoleFilter');
+      const tbody = document.getElementById('userManagementTableBody');
+      if (!tbody) return;
+
+      const q = searchInput ? searchInput.value.trim().toLowerCase() : '';
+      const role = roleSelect ? roleSelect.value : 'all';
+
+      let filtered = allManagedUsers.filter(u => {
+        let matchRole = true;
+        if (role !== 'all') {
+          if (role === 'teacher') matchRole = (u.role === 'teacher' || u.role === 'guru');
+          else matchRole = (u.role === role);
+        }
+        let matchQuery = true;
+        if (q) {
+          matchQuery = (u.username && u.username.toLowerCase().includes(q)) ||
+                       (u.full_name && u.full_name.toLowerCase().includes(q)) ||
+                       (u.class_name && u.class_name.toLowerCase().includes(q));
+        }
+        return matchRole && matchQuery;
+      });
+
+      const countFil = document.getElementById('userCountFiltered');
+      if (countFil) countFil.innerText = filtered.length;
+      const countTot = document.getElementById('userCountTotal');
+      if (countTot) countTot.innerText = allManagedUsers.length;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="px-5 py-10 text-center text-slate-400">
+              <i class="fa-solid fa-user-slash text-2xl mb-2 text-slate-600 block"></i>
+              Tidak ada pengguna yang cocok dengan filter atau pencarian saat ini.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      let curUid = null;
+      try { curUid = JSON.parse(localStorage.getItem('cbt_user') || '{}').id; } catch(e){}
+
+      tbody.innerHTML = filtered.map((u, idx) => {
+        let roleBadge = '';
+        let scopeBadge = '';
+        let roleName = u.role || 'student';
+        if (roleName === 'guru') roleName = 'teacher';
+
+        if (roleName === 'admin') {
+          roleBadge = `<span class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] font-bold font-mono flex items-center gap-1.5 inline-flex"><i class="fa-solid fa-shield-halved text-[10px]"></i> Administrator</span>`;
+          scopeBadge = `<span class="text-[11px] text-indigo-300 font-semibold flex items-center gap-1"><i class="fa-solid fa-check text-emerald-400"></i> Full Access Semua Menu</span>`;
+        } else if (roleName === 'teacher') {
+          roleBadge = `<span class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[11px] font-bold font-mono flex items-center gap-1.5 inline-flex"><i class="fa-solid fa-chalkboard-user text-[10px]"></i> Guru / Pengajar</span>`;
+          scopeBadge = `<span class="text-[11px] text-blue-300 font-semibold flex items-center gap-1"><i class="fa-solid fa-book-open text-blue-400"></i> Ujian & LMS (Tanpa Pengaturan)</span>`;
+        } else if (roleName === 'proctor') {
+          roleBadge = `<span class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold font-mono flex items-center gap-1.5 inline-flex"><i class="fa-solid fa-desktop text-[10px]"></i> Proktor Ujian</span>`;
+          scopeBadge = `<span class="text-[11px] text-amber-300 font-semibold flex items-center gap-1"><i class="fa-solid fa-eye text-amber-400"></i> Monitoring & Sesi Ujian</span>`;
+        } else {
+          roleBadge = `<span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold font-mono flex items-center gap-1.5 inline-flex"><i class="fa-solid fa-user-graduate text-[10px]"></i> Siswa</span>`;
+          scopeBadge = `<span class="text-[11px] text-emerald-300 font-semibold flex items-center gap-1"><i class="fa-solid fa-laptop text-emerald-400"></i> Portal Ujian & Siswa LMS</span>`;
+        }
+
+        const initials = (u.full_name || u.username || 'US').substring(0, 2).toUpperCase();
+        const isMe = curUid === u.id;
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="px-5 py-3.5 text-center text-slate-500 font-mono text-[11px]">${idx + 1}</td>
+            <td class="px-5 py-3.5">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-slate-800 text-indigo-400 border border-slate-700 flex items-center justify-center font-bold text-xs">
+                  ${initials}
+                </div>
+                <div>
+                  <div class="font-bold text-white flex items-center gap-1.5">
+                    <span>${escapeHtml(u.full_name || u.username)}</span>
+                    ${isMe ? '<span class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-500/30 text-indigo-300 font-mono font-bold">(Akun Anda)</span>' : ''}
+                  </div>
+                  <div class="text-[11px] text-slate-400 font-mono mt-0.5">
+                    @${escapeHtml(u.username)}
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="px-5 py-3.5">${roleBadge}</td>
+            <td class="px-5 py-3.5">${scopeBadge}</td>
+            <td class="px-5 py-3.5 text-slate-400 text-[11px]">
+              ${u.class_name ? `<span class="font-medium text-slate-300 font-mono">${escapeHtml(u.class_name)}</span>` : '<span class="text-slate-600">-</span>'}
+            </td>
+            <td class="px-5 py-3.5 text-center">
+              <div class="flex items-center justify-center gap-1.5">
+                <button type="button" onclick="openModalEditUser(${u.id})" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-indigo-400 transition" title="Edit Profil Pengguna">
+                  <i class="fa-solid fa-pencil text-xs"></i>
+                </button>
+                <button type="button" onclick="openModalChangePassword(${u.id})" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-amber-400 transition" title="Ganti Password">
+                  <i class="fa-solid fa-key text-xs"></i>
+                </button>
+                ${isMe ? `
+                  <button type="button" disabled class="p-1.5 rounded-lg bg-slate-800/50 text-slate-600 cursor-not-allowed" title="Akun aktif tidak dapat dihapus">
+                    <i class="fa-regular fa-trash-can text-xs"></i>
+                  </button>
+                ` : `
+                  <button type="button" onclick="promptDeleteUser(${u.id})" class="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 transition" title="Hapus Pengguna">
+                    <i class="fa-regular fa-trash-can text-xs"></i>
+                  </button>
+                `}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    window.openModalAddUser = function() {
+      document.getElementById('modalUserFormTitle').innerText = 'Tambah Pengguna Baru';
+      document.getElementById('userFormId').value = '';
+      document.getElementById('userFormFullName').value = '';
+      document.getElementById('userFormUsername').value = '';
+      document.getElementById('userFormUsername').disabled = false;
+      document.getElementById('userFormRole').value = 'teacher';
+      document.getElementById('userFormPassword').value = '';
+      document.getElementById('userFormPassword').required = true;
+      document.getElementById('userFormPasswordReq').classList.remove('hidden');
+      document.getElementById('userFormPasswordHelp').innerText = '(Wajib diisi)';
+      document.getElementById('userFormClass').value = '';
+      handleRoleFormChange();
+      openModal('modalUserForm');
+    };
+
+    window.openModalEditUser = function(userId) {
+      const user = allManagedUsers.find(u => u.id === userId);
+      if (!user) return;
+      document.getElementById('modalUserFormTitle').innerText = 'Edit Data Pengguna';
+      document.getElementById('userFormId').value = user.id;
+      document.getElementById('userFormFullName').value = user.full_name || '';
+      document.getElementById('userFormUsername').value = user.username || '';
+      document.getElementById('userFormRole').value = user.role === 'guru' ? 'teacher' : (user.role || 'teacher');
+      document.getElementById('userFormPassword').value = '';
+      document.getElementById('userFormPassword').required = false;
+      document.getElementById('userFormPasswordReq').classList.add('hidden');
+      document.getElementById('userFormPasswordHelp').innerText = '(Kosongkan jika password tidak diubah)';
+      document.getElementById('userFormClass').value = user.class_name || '';
+      handleRoleFormChange();
+      openModal('modalUserForm');
+    };
+
+    window.openModalChangePassword = function(userId) {
+      openModalEditUser(userId);
+      setTimeout(() => {
+        const elPass = document.getElementById('userFormPassword');
+        if (elPass) {
+          elPass.focus();
+          elPass.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 150);
+    };
+
+    window.handleRoleFormChange = function() {
+      const role = document.getElementById('userFormRole').value;
+      const classContainer = document.getElementById('userFormClassContainer');
+      const infoBox = document.getElementById('userRoleInfoBox');
+
+      if (role === 'student') {
+        if (classContainer) classContainer.classList.remove('hidden');
+      } else {
+        if (classContainer) classContainer.classList.add('hidden');
+      }
+
+      if (infoBox) {
+        if (role === 'admin') {
+          infoBox.innerHTML = `
+            <div class="text-indigo-400 font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-shield-halved"></i> Hak Akses: Administrator (Full Access)
+            </div>
+            <p class="text-slate-400">Pengguna memiliki hak akses penuh ke seluruh menu: Bank Soal, Jadwal, Monitoring, Nilai, LMS, Master Data, Pengaturan Sekolah, Pengaturan Redis, AI Server, dan Pengaturan User.</p>
+          `;
+        } else if (role === 'teacher') {
+          infoBox.innerHTML = `
+            <div class="text-blue-400 font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-chalkboard-user"></i> Hak Akses: Guru / Pengajar (Ujian & LMS)
+            </div>
+            <p class="text-slate-400">Pengguna difokuskan untuk mengelola Ujian (Bank Soal, Buat Soal AI, Jadwal, Live Monitor, Nilai, Berita Acara) & LMS (Materi & Tugas). <strong class="text-rose-400">Menu Pengaturan dinonaktifkan / disembunyikan</strong>.</p>
+          `;
+        } else if (role === 'proctor') {
+          infoBox.innerHTML = `
+            <div class="text-amber-400 font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-desktop"></i> Hak Akses: Proktor Ujian (Pengawasan Lab)
+            </div>
+            <p class="text-slate-400">Pengguna dapat mengawasi sesi ujian realtime, merilis token dinamis, menambah durasi siswa, dan mereset login peserta ujian.</p>
+          `;
+        } else {
+          infoBox.innerHTML = `
+            <div class="text-emerald-400 font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-user-graduate"></i> Hak Akses: Siswa / Peserta
+            </div>
+            <p class="text-slate-400">Pengguna hanya dapat masuk ke portal Ruang Ujian Siswa (/exam) untuk mengerjakan ujian dan mengakses materi pembelajaran siswa.</p>
+          `;
+        }
+      }
+    };
+
+    window.handleSaveUser = async function(e) {
+      e.preventDefault();
+      const id = document.getElementById('userFormId').value;
+      const fullName = document.getElementById('userFormFullName').value.trim();
+      const username = document.getElementById('userFormUsername').value.trim().toLowerCase();
+      const role = document.getElementById('userFormRole').value;
+      const password = document.getElementById('userFormPassword').value.trim();
+      const className = document.getElementById('userFormClass').value.trim();
+
+      const token = localStorage.getItem('cbt_token');
+      const btn = document.getElementById('btnSubmitUserForm');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+
+      try {
+        let res;
+        if (id) {
+          res = await fetch('/api/v1/admin/users/update', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+              id: parseInt(id, 10),
+              full_name: fullName,
+              username,
+              role,
+              password: password || undefined,
+              class_name: className
+            })
+          });
+        } else {
+          res = await fetch('/api/v1/admin/users', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+              full_name: fullName,
+              username,
+              role,
+              password,
+              class_name: className
+            })
+          });
+        }
+
+        const json = await res.json();
+        if (json.status === 'success') {
+          alert(json.message || 'Pengguna berhasil disimpan!');
+          closeModal('modalUserForm');
+          fetchUserManagementList();
+        } else {
+          alert('Gagal menyimpan pengguna: ' + (json.message || 'Terjadi kesalahan'));
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan jaringan: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Pengguna';
+      }
+    };
+
+    window.promptDeleteUser = function(userId) {
+      const user = allManagedUsers.find(u => u.id === userId);
+      if (!user) return;
+      deleteTargetUserId = userId;
+      document.getElementById('deleteUserMessage').innerHTML = `Apakah Anda yakin ingin menghapus akun pengguna <strong>${escapeHtml(user.full_name || user.username)}</strong> (@${escapeHtml(user.username)}) dengan peran <strong>${user.role}</strong>? Akun ini tidak akan dapat login lagi ke sistem.`;
+      openModal('modalDeleteUserConfirm');
+    };
+
+    window.executeDeleteUser = async function() {
+      if (!deleteTargetUserId) return;
+      const token = localStorage.getItem('cbt_token');
+      const btn = document.getElementById('btnConfirmDeleteUser');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menghapus...';
+
+      try {
+        const res = await fetch('/api/v1/admin/users/delete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ id: deleteTargetUserId })
+        });
+        const json = await res.json();
+        if (json.status === 'success') {
+          alert(json.message || 'Pengguna berhasil dihapus!');
+          closeModal('modalDeleteUserConfirm');
+          deleteTargetUserId = null;
+          fetchUserManagementList();
+        } else {
+          alert('Gagal menghapus pengguna: ' + (json.message || 'Terjadi kesalahan'));
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan jaringan: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-regular fa-trash-can"></i> Hapus Sekarang';
+      }
+    };
+
+    window.togglePasswordVisibility = function(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (!input || !icon) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-regular fa-eye-slash text-xs text-indigo-400';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-regular fa-eye text-xs text-slate-400';
+      }
+    };
+
+
+        window.addEventListener('focus', purgeDashboardAutofill);
 
     // ==============================================================
     // THEME MODE HANDLER (DARK MODE / LIGHT MODE)

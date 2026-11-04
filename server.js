@@ -155,6 +155,49 @@ let USERS = [
   },
 ];
 
+// ==============================================================
+// PERSISTENSI USER PENGELOLA & ROLE (users.json)
+// ==============================================================
+const USERS_FILE = path.join(__dirname, 'users.json');
+let STAFF_USERS = [
+  { id: 1, username: 'admin', pass: 'admin123', full_name: 'Administrator Sekolah', role: 'admin', created_at: '2026-01-01T00:00:00.000Z' },
+  { id: 2, username: 'guru', pass: 'guru123', full_name: 'Drs. Budi Pratama, M.Pd.', role: 'teacher', created_at: '2026-01-01T00:00:00.000Z' },
+  { id: 3, username: 'proktor', pass: 'proktor123', full_name: 'Proktor Lab 1', role: 'proctor', created_at: '2026-01-01T00:00:00.000Z' },
+];
+
+function saveUsersToFile() {
+  try {
+    fs.writeFileSync(USERS_FILE, JSON.stringify(STAFF_USERS, null, 2), 'utf8');
+  } catch (e) {
+    console.error('Failed to save users.json:', e.message);
+  }
+}
+
+function loadUsersFromFile() {
+  try {
+    if (fs.existsSync(USERS_FILE)) {
+      const raw = fs.readFileSync(USERS_FILE, 'utf8');
+      const saved = JSON.parse(raw);
+      if (Array.isArray(saved) && saved.length > 0) {
+        STAFF_USERS = saved;
+        console.log(`[Master Data] Memuat ${STAFF_USERS.length} user pengelola dari users.json`);
+        return;
+      }
+    }
+  } catch (e) {
+    console.error('Failed to load users.json:', e.message);
+  }
+  saveUsersToFile();
+}
+
+loadUsersFromFile();
+
+function syncGlobalUsers() {
+  const students = USERS.filter(u => u.role === 'student');
+  USERS.length = 0;
+  USERS.push(...STAFF_USERS, ...students);
+}
+
 // Persistensi Data Master Siswa (students.json)
 const STUDENTS_FILE = path.join(__dirname, 'students.json');
 
@@ -173,9 +216,8 @@ function loadStudentsFromFile() {
       const raw = fs.readFileSync(STUDENTS_FILE, 'utf8');
       const saved = JSON.parse(raw);
       if (Array.isArray(saved)) {
-        const nonStudents = USERS.filter(u => u.role !== 'student');
         USERS.length = 0;
-        USERS.push(...nonStudents, ...saved);
+        USERS.push(...STAFF_USERS, ...saved);
         console.log(`[Master Data] Memuat ${saved.length} siswa dari students.json`);
         return;
       }
@@ -3135,6 +3177,10 @@ const server = http.createServer(async (req, res) => {
 
   // POST /api/v1/school/profile/update (Simpan Identitas & Kop Sekolah)
   if (pathname === '/api/v1/school/profile/update' && req.method === 'POST') {
+    const authUser = getUserFromToken(req);
+    if (authUser && (authUser.rol === 'teacher' || authUser.rol === 'guru' || authUser.rol === 'student')) {
+      return sendJSON(403, { status: 'error', message: 'Akses ditolak: Menu Pengaturan Sekolah hanya dapat diubah oleh Administrator.' });
+    }
     const body = await parseBody(req);
     const updatableKeys = [
       'name', 'npsn', 'level', 'status', 'dinas', 'address', 'village',
@@ -3815,6 +3861,307 @@ const server = http.createServer(async (req, res) => {
       });
     }
     return sendJSON(404, { status: 'error', message: 'Siswa tidak ditemukan' });
+  }
+
+  // ==============================================================
+  // ENDPOINT MANAJEMEN USER & ROLE (RBAC)
+  // ==============================================================
+
+  // GET /api/v1/admin/users (Daftar Pengguna Sistem dengan Filter Role & Pencarian)
+  if (pathname === '/api/v1/admin/users' && req.method === 'GET') {
+    const user = getUserFromToken(req);
+    if (!user || (user.rol !== 'admin' && user.rol !== 'proctor')) {
+      return sendJSON(403, { status: 'error', message: 'Akses ditolak: Hanya Administrator yang berhak mengakses pengaturan pengguna.' });
+    }
+
+    const roleFilter = parsedUrl.searchParams.get('role') || 'all';
+    const searchQuery = (parsedUrl.searchParams.get('search') || '').trim().toLowerCase();
+
+    let list = USERS.map(u => ({
+      id: u.id,
+      username: u.username,
+      full_name: u.full_name || u.username,
+      role: u.role || 'student',
+      class_name: u.class_name || '',
+      nisn: u.nisn || '',
+      nis: u.nis || '',
+      created_at: u.created_at || '2026-01-01T00:00:00.000Z',
+      has_password: Boolean(u.pass)
+    }));
+
+    if (roleFilter !== 'all') {
+      if (roleFilter === 'teacher') {
+        list = list.filter(u => u.role === 'teacher' || u.role === 'guru');
+      } else {
+        list = list.filter(u => u.role === roleFilter);
+      }
+    }
+
+    if (searchQuery) {
+      list = list.filter(u =>
+        (u.username && u.username.toLowerCase().includes(searchQuery)) ||
+        (u.full_name && u.full_name.toLowerCase().includes(searchQuery)) ||
+        (u.class_name && u.class_name.toLowerCase().includes(searchQuery))
+      );
+    }
+
+    const counts = {
+      total: USERS.length,
+      admin: USERS.filter(u => u.role === 'admin').length,
+      teacher: USERS.filter(u => u.role === 'teacher' || u.role === 'guru').length,
+      proctor: USERS.filter(u => u.role === 'proctor').length,
+      student: USERS.filter(u => u.role === 'student').length,
+    };
+
+    return sendJSON(200, {
+      status: 'success',
+      data: {
+        users: list,
+        counts
+      }
+    });
+  }
+
+  // POST /api/v1/admin/users (Tambah Pengguna Baru)
+  if (pathname === '/api/v1/admin/users' && req.method === 'POST') {
+    const user = getUserFromToken(req);
+    if (!user || user.rol !== 'admin') {
+      return sendJSON(403, { status: 'error', message: 'Akses ditolak: Hanya Administrator yang berhak menambahkan pengguna baru.' });
+    }
+
+    const body = await parseBody(req);
+    const username = (body.username || '').trim().toLowerCase();
+    const password = (body.password || body.pass || '').trim();
+    const fullName = (body.full_name || body.name || '').trim();
+    let role = (body.role || 'teacher').trim().toLowerCase();
+    if (role === 'guru') role = 'teacher';
+    const className = (body.class_name || '').trim();
+
+    if (!username || username.length < 3) {
+      return sendJSON(400, { status: 'error', message: 'Username minimal 3 karakter.' });
+    }
+    if (!password || password.length < 4) {
+      return sendJSON(400, { status: 'error', message: 'Password minimal 4 karakter.' });
+    }
+    if (!fullName) {
+      return sendJSON(400, { status: 'error', message: 'Nama lengkap wajib diisi.' });
+    }
+    if (!['admin', 'teacher', 'proctor', 'student'].includes(role)) {
+      return sendJSON(400, { status: 'error', message: 'Role pengguna tidak valid.' });
+    }
+
+    if (USERS.some(u => u.username && u.username.toLowerCase() === username)) {
+      return sendJSON(400, { status: 'error', message: `Username '${username}' sudah digunakan oleh akun lain.` });
+    }
+
+    const nextId = USERS.reduce((max, u) => Math.max(max, Number(u.id) || 0), 0) + 1;
+    const nowIso = new Date().toISOString();
+
+    const newUser = {
+      id: nextId,
+      username,
+      pass: password,
+      full_name: fullName,
+      role,
+      class_name: className,
+      created_at: nowIso
+    };
+
+    if (role === 'student') {
+      newUser.nisn = body.nisn || '';
+      newUser.nis = body.nis || '';
+      newUser.exam_no = body.exam_no || `26-01-05-${nextId}`;
+      newUser.room = body.room || 'Ruang Lab Komputer 01';
+      newUser.session = body.session || 'Sesi 1 (07:30 - 09:30)';
+      newUser.server = body.server || 'SRV-01';
+      USERS.push(newUser);
+      saveStudentsToFile();
+    } else {
+      STAFF_USERS.push(newUser);
+      saveUsersToFile();
+      syncGlobalUsers();
+    }
+
+    return sendJSON(201, {
+      status: 'success',
+      message: `Pengguna ${fullName} (${role}) berhasil ditambahkan!`,
+      data: {
+        id: newUser.id,
+        username: newUser.username,
+        full_name: newUser.full_name,
+        role: newUser.role,
+        class_name: newUser.class_name,
+        created_at: newUser.created_at
+      }
+    });
+  }
+
+  // PUT /api/v1/admin/users/:id atau POST /api/v1/admin/users/update (Edit Pengguna)
+  if (((pathname.startsWith('/api/v1/admin/users/') && req.method === 'PUT') || (pathname === '/api/v1/admin/users/update' && req.method === 'POST')) ) {
+    const user = getUserFromToken(req);
+    if (!user || user.rol !== 'admin') {
+      return sendJSON(403, { status: 'error', message: 'Akses ditolak: Hanya Administrator yang berhak mengubah data pengguna.' });
+    }
+
+    const body = await parseBody(req);
+    let targetId = null;
+    if (pathname === '/api/v1/admin/users/update') {
+      targetId = parseInt(body.id, 10);
+    } else if (pathname.startsWith('/api/v1/admin/users/')) {
+      targetId = parseInt(pathname.split('/')[5], 10);
+    } else {
+      targetId = parseInt(body.id, 10);
+    }
+
+    if (!targetId) {
+      return sendJSON(400, { status: 'error', message: 'ID pengguna tidak valid.' });
+    }
+
+    const targetUser = USERS.find(u => u.id === targetId);
+    if (!targetUser) {
+      return sendJSON(404, { status: 'error', message: 'Pengguna tidak ditemukan.' });
+    }
+
+    // Cek perubahan username
+    if (body.username) {
+      const newUsername = body.username.trim().toLowerCase();
+      if (newUsername !== targetUser.username.toLowerCase()) {
+        if (USERS.some(u => u.id !== targetId && u.username.toLowerCase() === newUsername)) {
+          return sendJSON(400, { status: 'error', message: `Username '${newUsername}' sudah digunakan oleh akun lain.` });
+        }
+        targetUser.username = newUsername;
+      }
+    }
+
+    if (body.full_name) {
+      targetUser.full_name = body.full_name.trim();
+    }
+
+    if (body.password && body.password.trim().length >= 4) {
+      targetUser.pass = body.password.trim();
+    }
+
+    if (body.class_name !== undefined) {
+      targetUser.class_name = body.class_name.trim();
+    }
+
+    // Cek perubahan role
+    if (body.role) {
+      let newRole = body.role.trim().toLowerCase();
+      if (newRole === 'guru') newRole = 'teacher';
+      if (!['admin', 'teacher', 'proctor', 'student'].includes(newRole)) {
+        return sendJSON(400, { status: 'error', message: 'Role tidak valid.' });
+      }
+
+      // Cegah penurunan role jika admin tersisa 1
+      if (targetUser.role === 'admin' && newRole !== 'admin') {
+        const totalAdmins = USERS.filter(u => u.role === 'admin').length;
+        if (totalAdmins <= 1) {
+          return sendJSON(400, { status: 'error', message: 'Tidak dapat mengubah role administrator satu-satunya di sistem.' });
+        }
+      }
+
+      const prevRole = targetUser.role;
+      targetUser.role = newRole;
+
+      // Sinkronisasi antara STAFF_USERS dan students.json
+      if (prevRole === 'student' && newRole !== 'student') {
+        // Pindah dari students ke staff
+        STAFF_USERS.push({
+          id: targetUser.id,
+          username: targetUser.username,
+          pass: targetUser.pass,
+          full_name: targetUser.full_name,
+          role: targetUser.role,
+          created_at: targetUser.created_at || new Date().toISOString()
+        });
+      } else if (prevRole !== 'student' && newRole === 'student') {
+        // Pindah dari staff ke students
+        STAFF_USERS = STAFF_USERS.filter(u => u.id !== targetId);
+      }
+    }
+
+    // Update data di STAFF_USERS jika target adalah staff
+    const staffIdx = STAFF_USERS.findIndex(u => u.id === targetId);
+    if (staffIdx !== -1) {
+      STAFF_USERS[staffIdx] = {
+        id: targetUser.id,
+        username: targetUser.username,
+        pass: targetUser.pass,
+        full_name: targetUser.full_name,
+        role: targetUser.role,
+        created_at: targetUser.created_at || STAFF_USERS[staffIdx].created_at || new Date().toISOString()
+      };
+    }
+
+    saveUsersToFile();
+    saveStudentsToFile();
+    syncGlobalUsers();
+
+    return sendJSON(200, {
+      status: 'success',
+      message: `Data pengguna ${targetUser.full_name} berhasil diperbarui!`,
+      data: {
+        id: targetUser.id,
+        username: targetUser.username,
+        full_name: targetUser.full_name,
+        role: targetUser.role,
+        class_name: targetUser.class_name
+      }
+    });
+  }
+
+  // DELETE /api/v1/admin/users/:id atau POST /api/v1/admin/users/delete (Hapus Pengguna)
+  if (((pathname.startsWith('/api/v1/admin/users/') && req.method === 'DELETE') || (pathname === '/api/v1/admin/users/delete' && req.method === 'POST')) ) {
+    const user = getUserFromToken(req);
+    if (!user || user.rol !== 'admin') {
+      return sendJSON(403, { status: 'error', message: 'Akses ditolak: Hanya Administrator yang berhak menghapus pengguna.' });
+    }
+
+    let targetId = null;
+    let body = {};
+    if (pathname === '/api/v1/admin/users/delete') {
+      body = await parseBody(req);
+      targetId = parseInt(body.id, 10);
+    } else if (pathname.startsWith('/api/v1/admin/users/')) {
+      targetId = parseInt(pathname.split('/')[5], 10);
+    } else {
+      body = await parseBody(req);
+      targetId = parseInt(body.id, 10);
+    }
+
+    if (!targetId) {
+      return sendJSON(400, { status: 'error', message: 'ID pengguna tidak valid.' });
+    }
+
+    if (user.uid === targetId) {
+      return sendJSON(400, { status: 'error', message: 'Tidak dapat menghapus akun Anda sendiri yang sedang aktif login.' });
+    }
+
+    const targetUser = USERS.find(u => u.id === targetId);
+    if (!targetUser) {
+      return sendJSON(404, { status: 'error', message: 'Pengguna tidak ditemukan.' });
+    }
+
+    if (targetUser.role === 'admin') {
+      const totalAdmins = USERS.filter(u => u.role === 'admin').length;
+      if (totalAdmins <= 1) {
+        return sendJSON(400, { status: 'error', message: 'Tidak dapat menghapus administrator satu-satunya di sistem.' });
+      }
+    }
+
+    STAFF_USERS = STAFF_USERS.filter(u => u.id !== targetId);
+    const uIdx = USERS.findIndex(u => u.id === targetId);
+    if (uIdx !== -1) USERS.splice(uIdx, 1);
+
+    saveUsersToFile();
+    saveStudentsToFile();
+    syncGlobalUsers();
+
+    return sendJSON(200, {
+      status: 'success',
+      message: `Pengguna '${targetUser.full_name}' (${targetUser.username}) berhasil dihapus.`
+    });
   }
 
   // POST /api/v1/auth/login
@@ -5899,6 +6246,10 @@ const server = http.createServer(async (req, res) => {
 
   // POST /api/v1/admin/redis/save (Simpan Pengaturan Redis)
   if (pathname === '/api/v1/admin/redis/save' && req.method === 'POST') {
+    const authUser = getUserFromToken(req);
+    if (authUser && (authUser.rol === 'teacher' || authUser.rol === 'guru' || authUser.rol === 'student')) {
+      return sendJSON(403, { status: 'error', message: 'Akses ditolak: Menu Pengaturan Redis hanya dapat diubah oleh Administrator.' });
+    }
     const body = await parseBody(req);
     const updated = redisManager.saveRedisConfig({
       enabled: Boolean(body.enabled),
@@ -5977,6 +6328,10 @@ const server = http.createServer(async (req, res) => {
 
   // POST /api/v1/admin/lockdown/toggle
   if (pathname === '/api/v1/admin/lockdown/toggle' && req.method === 'POST') {
+    const authUser = getUserFromToken(req);
+    if (authUser && (authUser.rol === 'teacher' || authUser.rol === 'guru' || authUser.rol === 'student')) {
+      return sendJSON(403, { status: 'error', message: 'Akses ditolak: Lockdown Server hanya dapat dikelola oleh Administrator.' });
+    }
     const body = await parseBody(req);
     lockdownMode = !!body.enabled;
     return sendJSON(200, {

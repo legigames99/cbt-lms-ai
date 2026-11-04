@@ -1874,7 +1874,11 @@
             </p>
           </div>
 
-
+          <div class="flex items-center gap-3 shrink-0 flex-wrap">
+            <button type="button" onclick="downloadAllInOneTemplate()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-600/30">
+              <i class="fa-solid fa-file-excel text-emerald-100"></i> Download Template Lengkap (3-in-1)
+            </button>
+          </div>
         </div>
 
         <!-- 3 Pilihan Kategori Upload (Tab Switcher) -->
@@ -1924,7 +1928,9 @@
               </p>
             </div>
 
-
+            <button type="button" onclick="downloadActiveCategoryTemplate()" id="btnDownloadCategoryTemplate" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-md shadow-emerald-600/30 shrink-0">
+              <i class="fa-solid fa-download"></i> <span id="btnDownloadTemplateText">Download Template Siswa (.xlsx)</span>
+            </button>
           </div>
 
           <!-- Area Drag & Drop File Excel -->
@@ -1939,6 +1945,11 @@
             <p class="text-[11px] text-slate-400">
               Format yang didukung: <span class="text-slate-300 font-mono">.XLSX</span>, <span class="text-slate-300 font-mono">.XLS</span>, atau <span class="text-slate-300 font-mono">.CSV</span>
             </p>
+            <div class="pt-2">
+              <button type="button" onclick="event.stopPropagation(); downloadActiveCategoryTemplate();" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 text-xs font-bold transition">
+                <i class="fa-solid fa-file-arrow-down"></i> <span id="dropzoneTemplateText">Unduh Template Excel Siswa (.xlsx)</span>
+              </button>
+            </div>
             <div id="masterSelectedFileInfo" class="hidden pt-2 text-xs font-semibold text-emerald-400 flex items-center justify-center gap-2">
               <i class="fa-solid fa-file-circle-check"></i>
               <span id="masterSelectedFileName">file.xlsx</span>
@@ -2010,6 +2021,9 @@
             <p class="text-xs text-slate-400">Kelola master siswa, ruang lab, sesi ujian, dan cetak kartu peserta resmi.</p>
           </div>
           <div class="flex items-center gap-3 flex-wrap">
+            <button onclick="handleDownloadExcelTemplate()" class="px-4 py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition flex items-center gap-2">
+              <i class="fa-solid fa-file-excel"></i> Template Excel Siswa
+            </button>
             <button onclick="switchTab('kartu-peserta')" class="px-4 py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition flex items-center gap-2">
               <i class="fa-solid fa-id-card-clip"></i> Menu Kartu Peserta →
             </button>
@@ -2126,6 +2140,9 @@
           </div>
 
           <div class="flex items-center gap-3 shrink-0 flex-wrap">
+            <button onclick="activeMasterCategory='kelas'; downloadActiveCategoryTemplate();" class="px-4 py-2.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-bold transition flex items-center gap-2">
+              <i class="fa-solid fa-file-excel"></i> Template Excel Kelas
+            </button>
             <button onclick="switchTab('siswa')" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold transition flex items-center gap-2">
               <i class="fa-solid fa-user-graduate text-indigo-400"></i> Kelola Siswa →
             </button>
@@ -2232,6 +2249,9 @@
           </div>
 
           <div class="flex items-center gap-3 shrink-0 flex-wrap">
+            <button onclick="activeMasterCategory='mapel'; downloadActiveCategoryTemplate();" class="px-4 py-2.5 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 text-xs font-bold transition flex items-center gap-2">
+              <i class="fa-solid fa-file-excel"></i> Template Excel Mapel
+            </button>
             <button onclick="switchTab('bank-soal')" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold transition flex items-center gap-2">
               <i class="fa-solid fa-box-archive text-amber-400"></i> Kelola Bank Soal →
             </button>
@@ -11603,18 +11623,31 @@
       const titleEl = document.getElementById('uploadActiveTitle');
       const descEl = document.getElementById('uploadActiveDesc');
 
+      const btnDownload = document.getElementById('btnDownloadCategoryTemplate');
+      const btnDownloadText = document.getElementById('btnDownloadTemplateText');
+      const dropzoneText = document.getElementById('dropzoneTemplateText');
+
       if (cat === 'siswa') {
         if (btnSiswa) btnSiswa.className = 'cursor-pointer p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-950/20 hover:bg-emerald-950/30 transition flex items-center gap-3.5 shadow-lg shadow-emerald-950/30';
         if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-user-graduate text-emerald-400"></i> Upload Data Master Siswa';
         if (descEl) descEl.innerHTML = 'Kolom Template: <span class="text-emerald-300 font-mono">No. Peserta, Nama Lengkap, Kelas, NISN, Ruang, Sesi, Password</span>';
+        if (btnDownload) btnDownload.className = 'px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-md shadow-emerald-600/30 shrink-0';
+        if (btnDownloadText) btnDownloadText.innerText = 'Download Template Siswa (.xlsx)';
+        if (dropzoneText) dropzoneText.innerText = 'Unduh Template Excel Siswa (.xlsx)';
       } else if (cat === 'kelas') {
         if (btnKelas) btnKelas.className = 'cursor-pointer p-4 rounded-2xl border-2 border-blue-500 bg-blue-950/20 hover:bg-blue-950/30 transition flex items-center gap-3.5 shadow-lg shadow-blue-950/30';
         if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-chalkboard-user text-blue-400"></i> Upload Data Kelas & Rombongan Belajar';
         if (descEl) descEl.innerHTML = 'Kolom Template: <span class="text-blue-300 font-mono">Nama Rombel/Kelas, Tingkat (X/XI/XII), Jurusan, Wali Kelas, Ruang Lab CBT</span>';
+        if (btnDownload) btnDownload.className = 'px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-md shadow-blue-600/30 shrink-0';
+        if (btnDownloadText) btnDownloadText.innerText = 'Download Template Kelas (.xlsx)';
+        if (dropzoneText) dropzoneText.innerText = 'Unduh Template Excel Kelas (.xlsx)';
       } else if (cat === 'mapel') {
         if (btnMapel) btnMapel.className = 'cursor-pointer p-4 rounded-2xl border-2 border-amber-500 bg-amber-950/20 hover:bg-amber-950/30 transition flex items-center gap-3.5 shadow-lg shadow-amber-950/30';
         if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-book-bookmark text-amber-400"></i> Upload Master Mata Pelajaran (Mapel)';
         if (descEl) descEl.innerHTML = 'Kolom Template: <span class="text-amber-300 font-mono">Kode Mapel, Nama Mata Pelajaran, Jenjang, Kelompok Kurikulum</span>';
+        if (btnDownload) btnDownload.className = 'px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-md shadow-amber-600/30 shrink-0';
+        if (btnDownloadText) btnDownloadText.innerText = 'Download Template Mapel (.xlsx)';
+        if (dropzoneText) dropzoneText.innerText = 'Unduh Template Excel Mapel (.xlsx)';
       }
     };
 

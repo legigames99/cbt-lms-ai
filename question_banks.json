@@ -2218,6 +2218,167 @@
           }
         ],
         "answer": "B"
+      },
+      {
+        "id": 6,
+        "type": "mcq",
+        "cog": "C3",
+        "stem": "Dalam praktikum administrasi server, seorang siswa kelas XII melakukan instalasi panel kontrol web hosting gratis open-source, yaitu <code>CyberPanel</code>, di atas sistem operasi Ubuntu server. Sebelum instalasi dimulai melalui skrip otomatis, port standar berapakah yang wajib dipastikan terbuka pada sistem Firewall server agar layanan web berbasis OpenLiteSpeed dan antarmuka panel dapat diakses publik?",
+        "weight": 1,
+        "explanation": "CyberPanel secara default menggunakan port 8090 untuk mengakses antarmuka manajemen berbasis web administraturnya (baik melalui HTTP maupun HTTPS). Port 21 digunakan untuk FTP, port 3306 untuk database, port 53 untuk DNS, dan port 22 untuk SSH. Mengetahui port default panel hosting sangat penting agar administrator tidak mengalami kendala saat pertama kali membuka halaman login panel setelah instalasi selesai.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Port 21 untuk FTP"
+          },
+          {
+            "id": "B",
+            "text": "Port 8090 untuk akses web CyberPanel"
+          },
+          {
+            "id": "C",
+            "text": "Port 3306 untuk basis data MySQL"
+          },
+          {
+            "id": "D",
+            "text": "Port 53 untuk layanan DNS BIND"
+          },
+          {
+            "id": "E",
+            "text": "Port 22 untuk akses aman SSH"
+          }
+        ],
+        "answer": "B"
+      },
+      {
+        "id": 7,
+        "type": "mcq_complex",
+        "cog": "C4",
+        "stem": "Seorang administrator jaringan sekolah sedang mengevaluasi keamanan server web hosting menggunakan cPanel/WHM atau panel open-source mandiri. Manakah dari tindakan berikut yang merupakan langkah preventif yang tepat untuk mengamankan akses panel hosting dari serangan siber brute-force? (Pilih semua jawaban yang benar)",
+        "weight": 1.5,
+        "explanation": "Mengubah port default (A), mengaktifkan CSF/Fail2ban untuk memblokir IP penyerang (C), dan menggunakan autentikasi dua faktor (E) adalah praktik terbaik keamanan server. Meniadakan SSL (B) justru membahayakan enkripsi data, dan menggunakan password sederhana (D) memperbesar celah pembobolan akun.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Mengubah port default akses panel administrasi dari port standar ke port kustom yang tidak umum."
+          },
+          {
+            "id": "B",
+            "text": "Meniadakan sepenuhnya fitur SSL/TLS pada domain utama agar server lebih cepat diakses."
+          },
+          {
+            "id": "C",
+            "text": "Mengaktifkan layanan pemblokir otomatis seperti ConfigServer Security & Firewall (CSF) atau Fail2ban."
+          },
+          {
+            "id": "D",
+            "text": "Membiarkan sandi (password) akun root menggunakan kombinasi angka sederhana agar mudah diingat siswa."
+          },
+          {
+            "id": "E",
+            "text": "Menerapkan autentikasi dua faktor (Two-Factor Authentication/2FA) bagi seluruh pengguna tingkat administrator."
+          }
+        ],
+        "answer": [
+          "A",
+          "C",
+          "E"
+        ]
+      },
+      {
+        "id": 8,
+        "type": "true_false",
+        "cog": "C3",
+        "stem": "Evaluasi pernyataan berikut terkait fungsi komponen dan prasyarat sistem sebelum melakukan instalasi hosting panel (seperti aaPanel, CyberPanel, atau HestiaCP) di lingkungan Linux.",
+        "weight": 1.5,
+        "explanation": "Pernyataan 0 benar karena instalasi panel di atas OS bersih menghindari konflik port dan dependensi paket. Pernyataan 1 salah karena record DNS sangat penting untuk penerbitan SSL otomatis dan resolusi domain panel. Pernyataan 2 benar karena skrip panel hosting dirancang mandiri untuk menyiapkan tumpukan LAMP/LEMP secara otomatis.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "statements": [
+          {
+            "id": 0,
+            "text": "Sebagian besar panel hosting mandiri (self-hosted control panel) menyarankan instalasi dilakukan pada sistem operasi Linux bersih (fresh install) tanpa adanya tumpukan layanan web server atau database yang sudah terpasang sebelumnya.",
+            "key": "B"
+          },
+          {
+            "id": 1,
+            "text": "Record DNS bertipe 'A' atau 'CNAME' yang mengarahkan domain utama ke alamat IP publik server tidak diperlukan saat proses instalasi panel hosting.",
+            "key": "S"
+          },
+          {
+            "id": 2,
+            "text": "Layanan web server seperti Nginx atau Apache, serta database server seperti MariaDB, umumnya akan otomatis terpasang dan dikonfigurasi oleh skrip instalasi panel hosting.",
+            "key": "B"
+          }
+        ],
+        "answer": {
+          "0": "B",
+          "1": "S",
+          "2": "B"
+        }
+      },
+      {
+        "id": 9,
+        "type": "matching",
+        "cog": "C3",
+        "stem": "Pasangkan istilah atau komponen penting dalam pengelolaan hosting panel di sebelah kiri dengan deskripsi fungsi yang sesuai di sebelah kanan:",
+        "weight": 2,
+        "explanation": "phpMyAdmin berfungsi untuk manajemen database (B), Let's Encrypt menyediakan SSL gratis (C), dan server FTP digunakan untuk transfer berkas website (A).",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "premises": [
+          {
+            "id": 0,
+            "text": "phpMyAdmin"
+          },
+          {
+            "id": 1,
+            "text": "Let's Encrypt"
+          },
+          {
+            "id": 2,
+            "text": "FTP Server (vsftpd/ProFTPD)"
+          }
+        ],
+        "targets": [
+          {
+            "id": "A",
+            "text": "Layanan yang memfasilitasi pengelolaan berkas website antara komputer lokal dan direktori server secara jarak jauh."
+          },
+          {
+            "id": "B",
+            "text": "Aplikasi berbasis web untuk mengelola basis data relasional MySQL atau MariaDB secara grafis."
+          },
+          {
+            "id": "C",
+            "text": "Penyedia sertifikat SSL/TLS gratis yang sering terintegrasi secara otomatis di dalam panel hosting untuk mengamankan trafik HTTPS."
+          }
+        ],
+        "answer": {
+          "0": "B",
+          "1": "C",
+          "2": "A"
+        }
+      },
+      {
+        "id": 10,
+        "type": "short_essay",
+        "cog": "C2",
+        "stem": "Sebutkan nama layanan protokol jaringan yang secara default berjalan pada port 443 dan digunakan untuk mengamankan seluruh komunikasi data berbasis web (HTTPS) pada situs yang dikelola melalui hosting panel!",
+        "weight": 1,
+        "explanation": "Port 443 digunakan untuk protokol HTTPS yang mengandalkan teknologi enkripsi SSL (Secure Sockets Layer) atau TLS (Transport Layer Security) guna menjaga kerahasiaan data antara peramban pengguna dan server web hosting.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "answer_keys": [
+          "SSL",
+          "TLS",
+          "Secure Sockets Layer",
+          "Transport Layer Security"
+        ]
       }
     ]
   }

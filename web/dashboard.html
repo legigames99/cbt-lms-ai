@@ -1572,6 +1572,19 @@
                 <label class="block font-semibold text-slate-300 mb-1">Catatan selama Tes (Kosongkan jika nihil / tidak ada kendala)</label>
                 <input type="text" id="baNotes" oninput="if(window.renderBAPreviewOfficialDoc) window.renderBAPreviewOfficialDoc()" placeholder="Catatan selama ujian..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition">
               </div>
+
+              <div class="sm:col-span-2 lg:col-span-4 pt-2 border-t border-slate-800/80">
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="block font-semibold text-slate-300 text-xs flex items-center gap-1.5">
+                    <i class="fa-solid fa-list-ol text-amber-400"></i> Keterangan Lembar Daftar Hadir (Bagian Bawah Lembar Absensi A4)
+                  </label>
+                  <button type="button" onclick="resetBAAttendanceFooterNote()" class="text-[11px] text-amber-400 hover:text-amber-300 font-semibold transition flex items-center gap-1" title="Kembalikan redaksi catatan ke standar">
+                    <i class="fa-solid fa-rotate-left text-[10px]"></i> Reset ke Teks Standar
+                  </button>
+                </div>
+                <textarea id="baAttendanceFooterNote" rows="3" oninput="if(window.renderBAAbsensiOfficialDoc) window.renderBAAbsensiOfficialDoc()" placeholder="1. Dibuat rangkap 3 (tiga), masing-masing untuk sekolah, kota/kab dan Provinsi.&#10;2. Pengawas ruang menyilang Nama Peserta yang tidak hadir.&#10;3. Daftar hadir untuk pusat di upload melalui laman CBT / TKA." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-white text-xs font-mono focus:outline-none focus:border-indigo-500 transition leading-relaxed"></textarea>
+                <p class="text-[10px] text-slate-500 mt-1">Setiap baris baru akan tercetak sebagai butir keterangan di bawah tabel daftar hadir peserta ujian. Ubah atau kosongkan sesuai kebijakan sekolah.</p>
+              </div>
             </div>
           </div>
 
@@ -13530,6 +13543,11 @@
         setVal('baHeadmasterNip', att.headmaster_nip || sp.headmaster_nip || '197811022008011003');
         setVal('baNotes', att.notes);
 
+        const defaultFooterNote = `1. Dibuat rangkap 3 (tiga), masing-masing untuk sekolah, kota/kab dan Provinsi.
+2. Pengawas ruang menyilang Nama Peserta yang tidak hadir.
+3. Daftar hadir untuk pusat di upload melalui laman CBT / TKA.`;
+        setVal('baAttendanceFooterNote', att.attendance_footer_note !== undefined && att.attendance_footer_note !== '' ? att.attendance_footer_note : (sp.attendance_notes || localStorage.getItem('cbt_ba_attendance_footer_note') || defaultFooterNote));
+
         window.renderBeritaAcaraUI();
       } catch (err) {
         console.error('Kendala fetch berita acara:', err);
@@ -13743,6 +13761,8 @@
       const headmaster_name = getVal('baHeadmasterName');
       const headmaster_nip = getVal('baHeadmasterNip');
       const notes = getVal('baNotes');
+      const attendance_footer_note = getVal('baAttendanceFooterNote');
+      localStorage.setItem('cbt_ba_attendance_footer_note', attendance_footer_note);
 
       const studentDict = {};
       (window.currentBAData.students || []).forEach(st => {
@@ -13773,6 +13793,7 @@
             headmaster_name,
             headmaster_nip,
             notes,
+            attendance_footer_note,
             students: studentDict
           })
         });
@@ -14184,6 +14205,15 @@
       const assessmentTitle = (sch.title || sp.exam_title_2 || 'TES KEMAMPUAN AKADEMIK SMK').toUpperCase();
       const examYear = (sp.academic_year ? sp.academic_year.split('/')[0] : '2026');
 
+      const defaultFooterNote = `1. Dibuat rangkap 3 (tiga), masing-masing untuk sekolah, kota/kab dan Provinsi.
+2. Pengawas ruang menyilang Nama Peserta yang tidak hadir.
+3. Daftar hadir untuk pusat di upload melalui laman CBT / TKA.`;
+
+      const footerRaw = (document.getElementById('baAttendanceFooterNote')?.value !== undefined && document.getElementById('baAttendanceFooterNote')?.value !== null)
+        ? document.getElementById('baAttendanceFooterNote').value
+        : (att.attendance_footer_note !== undefined && att.attendance_footer_note !== '' ? att.attendance_footer_note : (sp.attendance_notes || localStorage.getItem('cbt_ba_attendance_footer_note') || defaultFooterNote));
+      const footerLines = footerRaw ? footerRaw.split('\n').map(l => l.trim()).filter(Boolean) : [];
+
       container.innerHTML = `
         <div class="official-a4-page" style="border: 2px solid #000; padding: 18px 24px; min-height: 980px; box-sizing: border-box; background: #ffffff; color: #000000; font-family: Arial, Helvetica, sans-serif; line-height: 1.35;">
           <!-- HEADER KOP & JUDUL DAFTAR HADIR -->
@@ -14297,13 +14327,13 @@
             </tbody>
           </table>
 
-          <!-- KETERANGAN BAWAH -->
+          <!-- KETERANGAN BAWAH (DINAMIS & DAPAT DIUBAH DARI FORM BERITA ACARA) -->
+          ${footerLines.length > 0 ? `
           <div style="font-size: 9.5px; margin-top: 6px; line-height: 1.4; color: #000000;">
             <div style="font-weight: bold; font-style: italic;">Keterangan :</div>
-            <div style="padding-left: 2px;">1. Dibuat rangkap 3 (tiga), masing-masing untuk sekolah, kota/kab dan Provinsi.</div>
-            <div style="padding-left: 2px;">2. Pengawas ruang menyilang Nama Peserta yang tidak hadir.</div>
-            <div style="padding-left: 2px;">3. Daftar hadir untuk pusat di upload melalui laman CBT / TKA.</div>
+            ${footerLines.map(line => `<div style="padding-left: 2px;">${escapeHtml(line)}</div>`).join('')}
           </div>
+          ` : ''}
 
           <!-- KOTAK REKAPITULASI (KIRI) & TANDA TANGAN (KANAN) -->
           <table style="width: 100%; border-collapse: collapse; border: none; margin-top: 10px; color: #000000;">
@@ -14399,6 +14429,16 @@
       if (printArea && baSrc && absSrc) {
         printArea.innerHTML = baSrc.innerHTML + absSrc.innerHTML;
         openModal('modalPrintOfficialExamDoc');
+      }
+    };
+
+    window.resetBAAttendanceFooterNote = function() {
+      const defaultFooter = `1. Dibuat rangkap 3 (tiga), masing-masing untuk sekolah, kota/kab dan Provinsi.\n2. Pengawas ruang menyilang Nama Peserta yang tidak hadir.\n3. Daftar hadir untuk pusat di upload melalui laman CBT / TKA.`;
+      const el = document.getElementById('baAttendanceFooterNote');
+      if (el) {
+        el.value = defaultFooter;
+        localStorage.setItem('cbt_ba_attendance_footer_note', defaultFooter);
+        if (window.renderBAAbsensiOfficialDoc) window.renderBAAbsensiOfficialDoc();
       }
     };
 

@@ -320,6 +320,7 @@ const DEFAULT_SCHOOL_PROFILE = {
   stamp_offset_x: 10,
   stamp_offset_y: -5,
   exam_rules: '1. Membawa Kartu Peserta Ujian ini selama berlangsungnya tes.\n2. Hadir di ruang ujian 15 menit sebelum ujian dimulai.\n3. Dilarang membawa HP, alat komunikasi atau catatan ke dalam ruang ujian.\n4. Mentaati tata tertib dan petunjuk dari pengawas ujian.',
+  attendance_notes: '1. Dibuat rangkap 3 (tiga), masing-masing untuk sekolah, kota/kab dan Provinsi.\n2. Pengawas ruang menyilang Nama Peserta yang tidak hadir.\n3. Daftar hadir untuk pusat di upload melalui laman CBT / TKA.',
   show_student_photo: true,
   show_signatures: true,
   show_exam_rules: true,
@@ -4371,7 +4372,8 @@ const server = http.createServer(async (req, res) => {
           proctor_2_nip: savedMeta.proctor_2_nip || '197311072022212005',
           headmaster_name: savedMeta.headmaster_name || schoolProfile.headmaster_name || 'Eddy Mustofa, S.Pd., M.MPd',
           headmaster_nip: savedMeta.headmaster_nip || schoolProfile.headmaster_nip || '197811022008011003',
-          notes: savedMeta.notes !== undefined ? savedMeta.notes : ''
+          notes: savedMeta.notes !== undefined ? savedMeta.notes : '',
+          attendance_footer_note: savedMeta.attendance_footer_note !== undefined ? savedMeta.attendance_footer_note : (schoolProfile.attendance_notes || '')
         },
         students: populatedStudents,
         summary: {
@@ -4426,6 +4428,7 @@ const server = http.createServer(async (req, res) => {
       headmaster_name: body.headmaster_name || '',
       headmaster_nip: body.headmaster_nip || '',
       notes: body.notes !== undefined ? body.notes : '',
+      attendance_footer_note: body.attendance_footer_note !== undefined ? body.attendance_footer_note : (body.attendance_notes !== undefined ? body.attendance_notes : ''),
       updated_at: Date.now()
     };
 

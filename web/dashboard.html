@@ -321,9 +321,12 @@
       border-color: #cbd5e1 !important;
       box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05) !important;
     }
-    html.light-mode aside .bg-slate-950 {
+    html.light-mode aside .bg-slate-950,
+    html.light-mode aside .bg-slate-900\/50,
+    html.light-mode aside .bg-slate-900\/80,
+    html.light-mode aside .bg-slate-900\/90 {
       background-color: #f8fafc !important;
-      border-color: #cbd5e1 !important;
+      border-color: #e2e8f0 !important;
     }
     html.light-mode aside .border-slate-800 {
       border-color: #e2e8f0 !important;
@@ -333,7 +336,7 @@
       font-weight: 800 !important;
     }
     html.light-mode .nav-item {
-      color: #1e293b !important;
+      color: #334155 !important;
       font-weight: 600 !important;
     }
     html.light-mode .nav-item:hover {
@@ -346,6 +349,17 @@
       border-left: 3px solid #4f46e5 !important;
       font-weight: 800 !important;
     }
+    html.light-mode aside .text-teal-300 { color: #0f766e !important; }
+    html.light-mode aside .bg-teal-500\/20 { background-color: #ccfbf1 !important; border-color: #99f6e4 !important; }
+    html.light-mode aside .text-indigo-300 { color: #4338ca !important; }
+    html.light-mode aside .bg-indigo-500\/20 { background-color: #e0e7ff !important; border-color: #c7d2fe !important; }
+    html.light-mode aside .text-emerald-300 { color: #047857 !important; }
+    html.light-mode aside .bg-emerald-500\/20 { background-color: #d1fae5 !important; border-color: #a7f3d0 !important; }
+    html.light-mode aside .text-amber-300 { color: #b45309 !important; }
+    html.light-mode aside .bg-amber-500\/20 { background-color: #fef3c7 !important; border-color: #fde68a !important; }
+    html.light-mode aside .bg-slate-800 { background-color: #e2e8f0 !important; }
+    html.light-mode aside .text-slate-400 { color: #64748b !important; }
+    html.light-mode aside .text-slate-500 { color: #64748b !important; }
 
     /* Topbar Header */
     html.light-mode header {
@@ -795,141 +809,139 @@
   </div>
 
   <!-- ==================== SIDEBAR UTAMA ==================== -->
-  <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between shrink-0 h-screen sticky top-0 select-none z-40">
-    <div>
-      <!-- Header Sidebar -->
-      <div class="p-5 border-b border-slate-800 flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-lg font-bold">
-          <i class="fa-solid fa-graduation-cap"></i>
-        </div>
-        <div>
-          <h1 class="font-bold text-sm text-white tracking-wide">CBT & LMS AI</h1>
-          <p class="text-[10px] text-indigo-400 uppercase tracking-wider font-semibold">Engine CBT & LMS AI</p>
-        </div>
+  <aside class="w-72 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 h-screen sticky top-0 select-none z-40">
+    <!-- Header Sidebar -->
+    <div class="p-4 border-b border-slate-800 flex items-center gap-3 shrink-0">
+      <div class="w-9 h-9 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-base font-bold shrink-0">
+        <i class="fa-solid fa-graduation-cap"></i>
       </div>
-
-      <!-- Menu Navigasi -->
-      <nav class="p-3 space-y-1 text-xs font-medium">
-        <a href="#overview" onclick="switchTab('overview')" id="nav-overview" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-chart-pie w-4 text-center"></i>
-          <span>Dashboard Utama</span>
-        </a>
-
-        <div class="pt-3 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Ujian & Bank Soal</div>
-
-        <a href="#bank-soal" onclick="switchTab('bank-soal')" id="nav-bank-soal" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-box-archive w-4 text-center"></i>
-          <span>Bank Soal & Butir Soal</span>
-        </a>
-
-        <a href="#jadwal" onclick="switchTab('jadwal')" id="nav-jadwal" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-regular fa-calendar-check w-4 text-center"></i>
-          <span>Jadwal Ujian (CBT)</span>
-        </a>
-
-        <a href="#monitoring" onclick="switchTab('monitoring')" id="nav-monitoring" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-desktop w-4 text-center"></i>
-          <span>Monitoring Proktor</span>
-          <span class="ml-auto w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        </a>
-
-        <a href="#berita-acara" onclick="switchTab('berita-acara')" id="nav-berita-acara" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-file-signature w-4 text-center text-amber-400"></i>
-          <span>Berita Acara & Absensi</span>
-          <span class="ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold font-mono">Resmi</span>
-        </a>
-
-        <a href="#nilai" onclick="switchTab('nilai')" id="nav-nilai" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-award w-4 text-center"></i>
-          <span>Hasil & Analisis Nilai</span>
-        </a>
-
-        <div class="pt-3 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Pembelajaran (LMS)</div>
-
-        <a href="#materi" onclick="switchTab('materi')" id="nav-materi" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-book-open w-4 text-center"></i>
-          <span>Materi & Penugasan</span>
-        </a>
-
-        <div id="sidebarHeaderMaster" class="sidebar-admin-only pt-3 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Master & Akademik</div>
-
-        <a href="#upload-master" onclick="switchTab('upload-master')" id="nav-upload-master" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-file-arrow-up w-4 text-center text-emerald-400"></i>
-          <span>Upload Data Master</span>
-          <span class="ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold font-mono">Excel</span>
-        </a>
-
-        <a href="#siswa" onclick="switchTab('siswa')" id="nav-siswa" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-user-graduate w-4 text-center text-indigo-400"></i>
-          <span>Data Siswa</span>
-        </a>
-
-        <a href="#kelas" onclick="switchTab('kelas')" id="nav-kelas" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-chalkboard-user w-4 text-center text-blue-400"></i>
-          <span>Data Kelas & Rombel</span>
-        </a>
-
-        <a href="#mapel" onclick="switchTab('mapel')" id="nav-mapel" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-book-bookmark w-4 text-center text-amber-400"></i>
-          <span>Mata Pelajaran (Mapel)</span>
-        </a>
-
-        <a href="#kartu-peserta" onclick="switchTab('kartu-peserta')" id="nav-kartu-peserta" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-id-card-clip w-4 text-center text-emerald-400"></i>
-          <span>Kartu Peserta Ujian</span>
-        </a>
-
-        <a href="#server" onclick="switchTab('server')" id="nav-server" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-server w-4 text-center"></i>
-          <span>Sistem & Lockdown</span>
-        </a>
-
-        <div id="sidebarHeaderPengaturan" class="sidebar-admin-only pt-3 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Pengaturan</div>
-
-        <a href="#pengaturan" onclick="switchTab('pengaturan')" id="nav-pengaturan" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-school w-4 text-center"></i>
-          <span>Pengaturan Sekolah</span>
-        </a>
-
-        <a href="#pengaturan-user" onclick="switchTab('pengaturan-user')" id="nav-pengaturan-user" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-users-gear w-4 text-center text-indigo-400"></i>
-          <span>Pengaturan User & Role</span>
-          <span class="ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold font-mono">RBAC</span>
-        </a>
-
-        <a href="#pengaturan-redis" onclick="switchTab('pengaturan-redis')" id="nav-pengaturan-redis" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-database w-4 text-center text-rose-500"></i>
-          <span>Pengaturan Redis Cache</span>
-          <span id="sidebarRedisBadge" class="ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-slate-800 text-slate-400 font-semibold font-mono">RAM</span>
-        </a>
-
-        <a href="#pengaturan-ai" onclick="switchTab('pengaturan-ai')" id="nav-pengaturan-ai" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-wand-magic-sparkles w-4 text-center text-indigo-400"></i>
-          <span>Pengaturan AI & Model</span>
-          <span class="ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold font-mono">Gemini</span>
-        </a>
-
-        <a href="#backup-restore" onclick="switchTab('backup-restore')" id="nav-backup-restore" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-database w-4 text-center text-teal-400"></i>
-          <span>Backup & Restore Data</span>
-          <span class="ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-teal-500/20 text-teal-300 border border-teal-500/30 font-semibold font-mono">JSON</span>
-        </a>
-      </nav>
+      <div class="min-w-0">
+        <h1 class="font-bold text-sm text-white tracking-wide truncate">CBT & LMS AI</h1>
+        <p class="text-[10px] text-indigo-400 uppercase tracking-wider font-semibold truncate">Engine CBT & LMS AI</p>
+      </div>
     </div>
 
-    <!-- User Profile & Logout -->
-    <div class="p-4 border-t border-slate-800 bg-slate-900/50">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-xs text-white">
+    <!-- Menu Navigasi (Scrollable Mandiri & Rapi) -->
+    <nav class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-1 text-xs font-medium">
+      <a href="#overview" onclick="switchTab('overview')" id="nav-overview" class="nav-item active flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-chart-pie w-4 text-center shrink-0"></i>
+        <span class="truncate">Dashboard Utama</span>
+      </a>
+
+      <div class="pt-2.5 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Ujian & Bank Soal</div>
+
+      <a href="#bank-soal" onclick="switchTab('bank-soal')" id="nav-bank-soal" class="nav-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-box-archive w-4 text-center shrink-0"></i>
+        <span class="truncate">Bank Soal & Butir Soal</span>
+      </a>
+
+      <a href="#jadwal" onclick="switchTab('jadwal')" id="nav-jadwal" class="nav-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-regular fa-calendar-check w-4 text-center shrink-0"></i>
+        <span class="truncate">Jadwal Ujian (CBT)</span>
+      </a>
+
+      <a href="#monitoring" onclick="switchTab('monitoring')" id="nav-monitoring" class="nav-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-desktop w-4 text-center shrink-0"></i>
+        <span class="truncate">Monitoring Proktor</span>
+        <span class="ml-auto shrink-0 w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      </a>
+
+      <a href="#berita-acara" onclick="switchTab('berita-acara')" id="nav-berita-acara" class="nav-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-file-signature w-4 text-center text-amber-400 shrink-0"></i>
+        <span class="truncate">Berita Acara & Absensi</span>
+        <span class="ml-auto shrink-0 text-[9px] px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold font-mono">Resmi</span>
+      </a>
+
+      <a href="#nilai" onclick="switchTab('nilai')" id="nav-nilai" class="nav-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-award w-4 text-center shrink-0"></i>
+        <span class="truncate">Hasil & Analisis Nilai</span>
+      </a>
+
+      <div class="pt-2.5 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Pembelajaran (LMS)</div>
+
+      <a href="#materi" onclick="switchTab('materi')" id="nav-materi" class="nav-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-book-open w-4 text-center shrink-0"></i>
+        <span class="truncate">Materi & Penugasan</span>
+      </a>
+
+      <div id="sidebarHeaderMaster" class="sidebar-admin-only pt-2.5 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Master & Akademik</div>
+
+      <a href="#upload-master" onclick="switchTab('upload-master')" id="nav-upload-master" class="sidebar-admin-only nav-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-file-arrow-up w-4 text-center text-emerald-400 shrink-0"></i>
+        <span class="truncate">Upload Data Master</span>
+        <span class="ml-auto shrink-0 text-[9px] px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold font-mono">Excel</span>
+      </a>
+
+      <a href="#siswa" onclick="switchTab('siswa')" id="nav-siswa" class="sidebar-admin-only nav-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-user-graduate w-4 text-center text-indigo-400 shrink-0"></i>
+        <span class="truncate">Data Siswa</span>
+      </a>
+
+      <a href="#kelas" onclick="switchTab('kelas')" id="nav-kelas" class="sidebar-admin-only nav-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-chalkboard-user w-4 text-center text-blue-400 shrink-0"></i>
+        <span class="truncate">Data Kelas & Rombel</span>
+      </a>
+
+      <a href="#mapel" onclick="switchTab('mapel')" id="nav-mapel" class="sidebar-admin-only nav-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-book-bookmark w-4 text-center text-amber-400 shrink-0"></i>
+        <span class="truncate">Mata Pelajaran (Mapel)</span>
+      </a>
+
+      <a href="#kartu-peserta" onclick="switchTab('kartu-peserta')" id="nav-kartu-peserta" class="sidebar-admin-only nav-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-id-card-clip w-4 text-center text-emerald-400 shrink-0"></i>
+        <span class="truncate">Kartu Peserta Ujian</span>
+      </a>
+
+      <a href="#server" onclick="switchTab('server')" id="nav-server" class="sidebar-admin-only nav-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-server w-4 text-center shrink-0"></i>
+        <span class="truncate">Sistem & Lockdown</span>
+      </a>
+
+      <div id="sidebarHeaderPengaturan" class="sidebar-admin-only pt-2.5 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Pengaturan</div>
+
+      <a href="#pengaturan" onclick="switchTab('pengaturan')" id="nav-pengaturan" class="sidebar-admin-only nav-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-school w-4 text-center shrink-0"></i>
+        <span class="truncate">Pengaturan Sekolah</span>
+      </a>
+
+      <a href="#pengaturan-user" onclick="switchTab('pengaturan-user')" id="nav-pengaturan-user" class="sidebar-admin-only nav-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-users-gear w-4 text-center text-indigo-400 shrink-0"></i>
+        <span class="truncate">Pengaturan User & Role</span>
+        <span class="ml-auto shrink-0 text-[9px] px-1.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold font-mono">RBAC</span>
+      </a>
+
+      <a href="#pengaturan-redis" onclick="switchTab('pengaturan-redis')" id="nav-pengaturan-redis" class="sidebar-admin-only nav-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-database w-4 text-center text-rose-500 shrink-0"></i>
+        <span class="truncate">Pengaturan Redis Cache</span>
+        <span id="sidebarRedisBadge" class="ml-auto shrink-0 text-[9px] px-1.5 py-0.5 rounded-md bg-slate-800 text-slate-400 font-semibold font-mono">RAM</span>
+      </a>
+
+      <a href="#pengaturan-ai" onclick="switchTab('pengaturan-ai')" id="nav-pengaturan-ai" class="sidebar-admin-only nav-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-wand-magic-sparkles w-4 text-center text-indigo-400 shrink-0"></i>
+        <span class="truncate">Pengaturan AI & Model</span>
+        <span class="ml-auto shrink-0 text-[9px] px-1.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold font-mono">Gemini</span>
+      </a>
+
+      <a href="#backup-restore" onclick="switchTab('backup-restore')" id="nav-backup-restore" class="sidebar-admin-only nav-item flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-database w-4 text-center text-teal-400 shrink-0"></i>
+        <span class="truncate">Backup & Restore Data</span>
+        <span class="ml-auto shrink-0 text-[9px] px-1.5 py-0.5 rounded-md bg-teal-500/20 text-teal-300 border border-teal-500/30 font-semibold font-mono">JSON</span>
+      </a>
+    </nav>
+
+    <!-- User Profile & Logout (Pinned Menempel di Bawah) -->
+    <div class="p-3.5 border-t border-slate-800 bg-slate-900/90 backdrop-blur shrink-0">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-xs text-white shrink-0">
             <span id="sidebarUserInitials">AD</span>
           </div>
-          <div class="overflow-hidden">
-            <div id="sidebarUserName" class="text-xs font-semibold text-white truncate max-w-[110px]">Administrator</div>
-            <div id="sidebarUserRole" class="text-[10px] text-indigo-400 capitalize">Admin</div>
+          <div class="min-w-0 truncate">
+            <div id="sidebarUserName" class="text-xs font-semibold text-white truncate">Administrator</div>
+            <div id="sidebarUserRole" class="text-[10px] text-indigo-400 capitalize truncate">Admin</div>
           </div>
         </div>
-        <button onclick="handleLogout()" title="Keluar" class="text-slate-400 hover:text-rose-400 p-1.5 transition">
+        <button onclick="handleLogout()" title="Keluar" class="text-slate-400 hover:text-rose-400 p-1.5 rounded-lg hover:bg-slate-800 transition shrink-0">
           <i class="fa-solid fa-arrow-right-from-bracket"></i>
         </button>
       </div>

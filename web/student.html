@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+  <!-- Theme Mode Early Init (Anti-Flicker) - Default Sinkron dengan CBT Theme Preference -->
+  <script>
+    (function() {
+      try {
+        const theme = localStorage.getItem('cbt_theme_mode');
+        if (theme === 'light') {
+          document.documentElement.classList.add('light-mode');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ruang Ujian Siswa - CBT Local-First</title>
@@ -26,6 +37,10 @@
     .katex-display { margin: 0.6em 0; overflow-x: auto; overflow-y: hidden; }
     .option-card:hover { border-color: #6366f1; }
     .option-card.selected { border-color: #6366f1; background-color: rgba(99, 102, 241, 0.15); }
+
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 
     code {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -96,6 +111,370 @@
       color: #cbd5e1;
       font-style: italic;
     }
+
+    /* ============================================================== */
+    /* THEME MODE: HIGH-CONTRAST LIGHT MODE FOR STUDENT INTERFACE     */
+    /* ============================================================== */
+    html.light-mode,
+    html.light-mode body {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+
+    html.light-mode .custom-scrollbar::-webkit-scrollbar-track { background: #e2e8f0 !important; }
+    html.light-mode .custom-scrollbar::-webkit-scrollbar-thumb { background: #94a3b8 !important; }
+
+    /* Topbar Header */
+    html.light-mode header {
+      background-color: rgba(255, 255, 255, 0.98) !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+    }
+    html.light-mode #topbarExamTitle {
+      color: #0f172a !important;
+    }
+    html.light-mode #topbarStudentName {
+      color: #64748b !important;
+    }
+    html.light-mode #timerContainer {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      color: #b45309 !important;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    }
+    html.light-mode #btnToggleTheme {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    html.light-mode #btnToggleTheme:hover {
+      background-color: #e2e8f0 !important;
+    }
+    html.light-mode header button[onclick*="handleLogout"] {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      color: #64748b !important;
+    }
+    html.light-mode header button[onclick*="handleLogout"]:hover {
+      background-color: #fee2e2 !important;
+      border-color: #fca5a5 !important;
+      color: #dc2626 !important;
+    }
+
+    /* Main Panels, Cards & Wells */
+    html.light-mode .bg-slate-800:not(button):not(input):not(select):not(.bg-indigo-600):not(.bg-emerald-600):not(.bg-rose-600):not(.bg-amber-500) {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+    }
+    html.light-mode .bg-slate-900:not(button):not(input):not(select):not(textarea):not(pre):not(code):not(.terminal-box),
+    html.light-mode .bg-slate-900\/40,
+    html.light-mode .bg-slate-900\/60,
+    html.light-mode .bg-slate-900\/80 {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode .border-slate-700,
+    html.light-mode .border-slate-700\/50,
+    html.light-mode .border-slate-700\/60,
+    html.light-mode .border-slate-700\/80,
+    html.light-mode .border-slate-800 {
+      border-color: #e2e8f0 !important;
+    }
+
+    /* Typography & Contrast */
+    html.light-mode .text-slate-100,
+    html.light-mode .text-slate-200 {
+      color: #0f172a !important;
+    }
+    html.light-mode .text-slate-300,
+    html.light-mode .text-slate-400 {
+      color: #475569 !important;
+    }
+    html.light-mode .text-slate-500 {
+      color: #64748b !important;
+    }
+    html.light-mode h1,
+    html.light-mode h2,
+    html.light-mode h3 {
+      color: #0f172a !important;
+    }
+    html.light-mode #waitTitle {
+      color: #0f172a !important;
+    }
+    html.light-mode #currentQNumber {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.light-mode #currentQCognitive {
+      background-color: #e0e7ff !important;
+      color: #3730a3 !important;
+      border-color: #c7d2fe !important;
+    }
+
+    /* Stem & KaTeX & Rich Text */
+    html.light-mode #qStemHTML {
+      color: #0f172a !important;
+    }
+    html.light-mode code {
+      background-color: #f1f5f9 !important;
+      color: #0284c7 !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.light-mode pre {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.light-mode pre code {
+      color: #166534 !important;
+    }
+    html.light-mode pre.bg-slate-950 {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.light-mode pre.bg-slate-950 code {
+      color: #15803d !important;
+    }
+    html.light-mode code.bg-slate-950 {
+      background-color: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+      color: #b45309 !important;
+    }
+    html.light-mode mark {
+      background-color: #fef08a !important;
+      color: #854d0e !important;
+    }
+    html.light-mode blockquote {
+      border-left-color: #4f46e5 !important;
+      color: #334155 !important;
+      background-color: #f8fafc !important;
+    }
+
+    /* Waiting Room & Inputs */
+    html.light-mode #tokenCodeInput {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #312e81 !important;
+    }
+    html.light-mode #tokenCodeInput:focus {
+      border-color: #4f46e5 !important;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
+    }
+    html.light-mode #noTokenNoticeContainer {
+      background-color: #ecfdf5 !important;
+      border-color: #a7f3d0 !important;
+      color: #065f46 !important;
+    }
+
+    /* Option Cards - MCQ */
+    html.light-mode .option-card {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+    }
+    html.light-mode .option-card:hover {
+      border-color: #6366f1 !important;
+      background-color: #f8fafc !important;
+    }
+    html.light-mode .option-card.selected {
+      background-color: #eef2ff !important;
+      border-color: #4f46e5 !important;
+    }
+    html.light-mode .option-card .text-slate-200 {
+      color: #1e293b !important;
+    }
+    html.light-mode .option-card.selected .text-slate-200 {
+      color: #1e1b4b !important;
+      font-weight: 600 !important;
+    }
+    html.light-mode .option-card > div:first-child.bg-slate-800 {
+      background-color: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+      color: #475569 !important;
+    }
+    html.light-mode .option-card.selected > div:first-child {
+      background-color: #4f46e5 !important;
+      border-color: #4338ca !important;
+      color: #ffffff !important;
+    }
+
+    /* MCQ Complex */
+    html.light-mode .bg-purple-500\/15 {
+      background-color: #faf5ff !important;
+      border-color: #e9d5ff !important;
+      color: #6b21a8 !important;
+    }
+    html.light-mode .option-card.selected.ring-purple-500 {
+      background-color: #faf5ff !important;
+      border-color: #7c3aed !important;
+    }
+    html.light-mode .option-card.selected .bg-purple-600 {
+      background-color: #7c3aed !important;
+      border-color: #6d28d9 !important;
+      color: #ffffff !important;
+    }
+
+    /* True / False Matrix */
+    html.light-mode .bg-amber-500\/15 {
+      background-color: #fffbeb !important;
+      border-color: #fde68a !important;
+      color: #92400e !important;
+    }
+    html.light-mode #qOptionsList .border-slate-700 {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.light-mode #qOptionsList .border-slate-800 {
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode #qOptionsList button.bg-slate-800 {
+      background-color: #f1f5f9 !important;
+      border: 1px solid #cbd5e1 !important;
+      color: #475569 !important;
+    }
+    html.light-mode #qOptionsList button.bg-slate-800:hover {
+      background-color: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+
+    /* Matching Pairs */
+    html.light-mode .bg-cyan-500\/15 {
+      background-color: #ecfeff !important;
+      border-color: #a5f3fc !important;
+      color: #155e75 !important;
+    }
+    html.light-mode select {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+      color-scheme: light !important;
+    }
+
+    /* Short Essay & Inputs */
+    html.light-mode .bg-emerald-500\/15 {
+      background-color: #ecfdf5 !important;
+      border-color: #a7f3d0 !important;
+      color: #065f46 !important;
+    }
+    html.light-mode #qOptionsList input[type="text"] {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.light-mode #qOptionsList input[type="text"]:focus {
+      border-color: #10b981 !important;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
+    }
+
+    /* Long Essay & Textarea */
+    html.light-mode .bg-indigo-500\/15 {
+      background-color: #eef2ff !important;
+      border-color: #c7d2fe !important;
+      color: #3730a3 !important;
+    }
+    html.light-mode textarea {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.light-mode textarea:focus {
+      border-color: #6366f1 !important;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
+    }
+
+    /* Action & Navigation Buttons */
+    html.light-mode #btnPrevQ {
+      background-color: #f1f5f9 !important;
+      color: #334155 !important;
+      border: 1px solid #cbd5e1 !important;
+    }
+    html.light-mode #btnPrevQ:hover {
+      background-color: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+    html.light-mode #btnDoubtQ.bg-amber-600\/20 {
+      background-color: #fef3c7 !important;
+      border-color: #fcd34d !important;
+      color: #92400e !important;
+    }
+    html.light-mode #btnDoubtQ.bg-amber-600\/20:hover {
+      background-color: #fde68a !important;
+    }
+    html.light-mode #btnDoubtQ.bg-amber-500 {
+      background-color: #f59e0b !important;
+      color: #ffffff !important;
+    }
+
+    /* Number Grid Navigation */
+    html.light-mode #numberGrid {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode #numberGrid button.bg-slate-900 {
+      background-color: #ffffff !important;
+      color: #475569 !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+    }
+    html.light-mode #numberGrid button.bg-slate-900:hover {
+      background-color: #f1f5f9 !important;
+      border-color: #94a3b8 !important;
+      color: #0f172a !important;
+    }
+    html.light-mode #numberGrid button.bg-slate-800 {
+      background-color: #ffffff !important;
+      color: #0891b2 !important;
+      border-color: #06b6d4 !important;
+      box-shadow: 0 0 14px rgba(6, 182, 212, 0.45) !important;
+    }
+    html.light-mode #numberGrid button.bg-amber-500.scale-105 {
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.55) !important;
+    }
+    html.light-mode #numberGrid .border-slate-900 {
+      border-color: #ffffff !important;
+    }
+    html.light-mode #answeredCounter {
+      background-color: #e0e7ff !important;
+      color: #3730a3 !important;
+      border-color: #c7d2fe !important;
+    }
+    html.light-mode #numberGrid + div span.bg-slate-900 {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+    }
+
+    /* Modals & Dialogs */
+    html.light-mode #finishConfirmModal > div,
+    html.light-mode #examDoneModal > div,
+    html.light-mode #antiCheatModal > div,
+    html.light-mode #alreadySubmittedScreen > div {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    }
+    html.light-mode #finishConfirmModal .bg-slate-900\/80,
+    html.light-mode #alreadySubmittedScreen .bg-slate-900\/80 {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode #finishConfirmModal button[onclick*="classList.add('hidden')"],
+    html.light-mode #alreadySubmittedScreen button[onclick*="handleLogout"] {
+      background-color: #f1f5f9 !important;
+      border: 1px solid #cbd5e1 !important;
+      color: #334155 !important;
+    }
+    html.light-mode #finishConfirmModal button[onclick*="classList.add('hidden')"]:hover,
+    html.light-mode #alreadySubmittedScreen button[onclick*="handleLogout"]:hover {
+      background-color: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+    html.light-mode #antiCheatModal .bg-rose-950\/60 {
+      background-color: #fff1f2 !important;
+      border-color: #fecdd3 !important;
+      color: #be123c !important;
+    }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
@@ -118,10 +497,18 @@
       <span id="timerText">00:00:00</span>
     </div>
 
-    <button onclick="handleLogout()" class="text-xs text-slate-400 hover:text-rose-400 transition flex items-center gap-1.5">
-      <i class="fa-solid fa-arrow-right-from-bracket"></i>
-      <span class="hidden sm:inline">Keluar</span>
-    </button>
+    <div class="flex items-center gap-2.5">
+      <!-- TOMBOL TOGGLE TEMA TERANG / GELAP -->
+      <button type="button" id="btnToggleTheme" onclick="toggleThemeMode()" class="px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-700 text-amber-300 border border-slate-700 text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Beralih Mode Gelap / Terang">
+        <i id="themeToggleIcon" class="fa-solid fa-sun text-amber-500"></i>
+        <span id="themeToggleLabel" class="hidden sm:inline">Mode Terang</span>
+      </button>
+
+      <button onclick="handleLogout()" class="px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 border border-slate-700 hover:border-rose-500/40 text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Keluar dari sesi ujian">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        <span class="hidden sm:inline">Keluar</span>
+      </button>
+    </div>
   </header>
 
   <!-- TOAST NOTIFIKASI TAMBAHAN WAKTU PROKTOR -->
@@ -345,6 +732,55 @@
       </button>
     </div>
   </div>
+
+  <!-- CONTROLLER MODE GELAP & MODE TERANG SISWA -->
+  <script>
+    window.applyThemeMode = function(mode) {
+      const isLight = (mode === 'light');
+      const root = document.documentElement;
+      const icon = document.getElementById('themeToggleIcon');
+      const label = document.getElementById('themeToggleLabel');
+
+      if (isLight) {
+        root.classList.add('light-mode');
+        if (icon) {
+          icon.className = 'fa-solid fa-sun text-amber-500';
+        }
+        if (label) {
+          label.textContent = 'Mode Terang';
+        }
+      } else {
+        root.classList.remove('light-mode');
+        if (icon) {
+          icon.className = 'fa-solid fa-moon text-indigo-400';
+        }
+        if (label) {
+          label.textContent = 'Mode Gelap';
+        }
+      }
+      localStorage.setItem('cbt_theme_mode', mode);
+    };
+
+    window.toggleThemeMode = function() {
+      const isCurrentlyLight = document.documentElement.classList.contains('light-mode');
+      window.applyThemeMode(isCurrentlyLight ? 'dark' : 'light');
+    };
+
+    window.initThemeMode = function() {
+      const saved = localStorage.getItem('cbt_theme_mode');
+      if (saved === 'light') {
+        window.applyThemeMode('light');
+      } else {
+        window.applyThemeMode('dark');
+      }
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', window.initThemeMode);
+    } else {
+      window.initThemeMode();
+    }
+  </script>
 
   <script type="module">
     import { ExamEngine } from './exam_engine.js';

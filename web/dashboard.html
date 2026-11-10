@@ -1135,8 +1135,9 @@
       <section id="tab-jadwal" class="hidden space-y-6">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 flex-wrap">
               <span>Manajemen Jadwal Ujian & Paket Enkripsi</span>
+              <span id="jadwalTabRoleBadge"></span>
             </h3>
             <p class="text-xs text-slate-400">Atur token sesi, waktu pelaksanaan, dan enkripsi paket soal ke dalam file JSON statis.</p>
           </div>
@@ -1166,7 +1167,7 @@
             </div>
             <div class="text-xs text-slate-400 flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-              <span>Menampilkan jadwal ujian yang sedang aktif dan dapat diakses siswa.</span>
+              <span id="schActiveHintText">Menampilkan jadwal ujian yang sedang aktif dan dapat diakses siswa.</span>
             </div>
           </div>
 
@@ -1202,7 +1203,7 @@
             </div>
             <div class="text-xs text-slate-400 flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-slate-500"></span>
-              <span>Jadwal tidak aktif disimpan di halaman arsip ini agar tidak membingungkan proktor saat memantau ujian aktif.</span>
+              <span id="schInactiveHintText">Jadwal tidak aktif disimpan di halaman arsip ini agar tidak membingungkan proktor saat memantau ujian aktif.</span>
             </div>
           </div>
 
@@ -6120,6 +6121,16 @@
       if (id === 'modalCreateSchedule') {
         if (typeof initAvailableClassPool === 'function') initAvailableClassPool();
         if (typeof toggleScheduleClassMode === 'function') toggleScheduleClassMode('create');
+        const teacherSubject = getLoggedInTeacherSubject();
+        if (teacherSubject) {
+          const schTitle = document.getElementById('schTitle');
+          if (schTitle) {
+            schTitle.value = `Penilaian Akhir Semester ${teacherSubject} XII`;
+          }
+        }
+        if (typeof populateBankSelectDropdown === 'function' && cachedQuestionBanks && cachedQuestionBanks.length > 0) {
+          populateBankSelectDropdown(cachedQuestionBanks);
+        }
       }
       if (id === 'modalAIGenerator') {
         window.syncAIGeneratorModelDefault();
@@ -6225,6 +6236,14 @@
       const exportSelect = document.getElementById('exportWordBankSelect');
       if (exportSelect) {
         exportSelect.innerHTML = banks.map(b => `<option value="${b.id}" ${b.id === currentActiveBankId ? 'selected' : ''}>#${b.id} - ${b.title} (${b.subject || 'Umum'})</option>`).join('');
+      }
+      const schBankSelect = document.getElementById('schBank');
+      if (schBankSelect) {
+        schBankSelect.innerHTML = banks.map(b => `<option value="${escapeHtml(b.title)}">${escapeHtml(b.title)} (${b.subject || 'Umum'})</option>`).join('');
+      }
+      const editSchBankSelect = document.getElementById('editSchBank');
+      if (editSchBankSelect) {
+        editSchBankSelect.innerHTML = banks.map(b => `<option value="${escapeHtml(b.title)}">${escapeHtml(b.title)} (${b.subject || 'Umum'})</option>`).join('');
       }
     }
 
@@ -7442,14 +7461,18 @@
           }
 
           // Update Kotak Statistik Ujian Aktif di Dashboard Utama
-          const activeSchedules = currentSchedules.filter(s => s.is_active !== false);
+          const teacherSubject = getLoggedInTeacherSubject();
+          let activeSchedules = currentSchedules.filter(s => s.is_active !== false);
+          if (teacherSubject) {
+            activeSchedules = activeSchedules.filter(s => isSubjectMatch(s.title, teacherSubject) || isSubjectMatch(s.bank_name, teacherSubject));
+          }
           const elStatActive = document.getElementById('statActiveSchedules');
           if (elStatActive) elStatActive.innerText = activeSchedules.length;
 
           const elStatActiveSub = document.getElementById('statActiveSchedulesSub');
           if (elStatActiveSub) {
             if (activeSchedules.length === 0) {
-              elStatActiveSub.innerText = 'Tidak ada jadwal ujian aktif';
+              elStatActiveSub.innerText = teacherSubject ? `Tidak ada jadwal aktif (${teacherSubject})` : 'Tidak ada jadwal ujian aktif';
               elStatActiveSub.className = 'text-[11px] text-slate-500 font-medium mt-1';
             } else {
               const first = activeSchedules[0];
@@ -7506,13 +7529,32 @@
       const activeTbody = document.getElementById('schedulesActiveTableBody');
       const inactiveTbody = document.getElementById('schedulesInactiveTableBody');
 
-      const activeList = schedules.filter(s => s.is_active !== false);
-      const inactiveList = schedules.filter(s => s.is_active === false);
+      const teacherSubject = getLoggedInTeacherSubject();
+      let list = schedules || [];
+      if (teacherSubject) {
+        list = list.filter(s => isSubjectMatch(s.title, teacherSubject) || isSubjectMatch(s.bank_name, teacherSubject));
+      }
+
+      const activeList = list.filter(s => s.is_active !== false);
+      const inactiveList = list.filter(s => s.is_active === false);
 
       const subCountAct = document.getElementById('schSubCountActive');
       const subCountInact = document.getElementById('schSubCountInactive');
       if (subCountAct) subCountAct.innerText = activeList.length;
       if (subCountInact) subCountInact.innerText = inactiveList.length;
+
+      const hintActive = document.getElementById('schActiveHintText');
+      if (hintActive) {
+        hintActive.innerText = teacherSubject
+          ? `Menampilkan jadwal ujian aktif khusus mata pelajaran ${teacherSubject}.`
+          : 'Menampilkan jadwal ujian yang sedang aktif dan dapat diakses siswa.';
+      }
+      const hintInactive = document.getElementById('schInactiveHintText');
+      if (hintInactive) {
+        hintInactive.innerText = teacherSubject
+          ? `Arsip jadwal tidak aktif khusus mata pelajaran ${teacherSubject}.`
+          : 'Jadwal tidak aktif disimpan di halaman arsip ini agar tidak membingungkan proktor saat memantau ujian aktif.';
+      }
 
       // 1. Render Tabel Jadwal Ujian Aktif
       if (activeTbody) {
@@ -7526,7 +7568,10 @@
         }
 
         if (filteredActive.length === 0) {
-          activeTbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-slate-500 font-medium">Tidak ada jadwal ujian aktif yang cocok dengan pencarian.</td></tr>`;
+          const emptyMsg = teacherSubject
+            ? `Tidak ada jadwal ujian aktif untuk mata pelajaran ${escapeHtml(teacherSubject)}.`
+            : `Tidak ada jadwal ujian aktif yang cocok dengan pencarian.`;
+          activeTbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-slate-500 font-medium">${emptyMsg}</td></tr>`;
         } else {
           activeTbody.innerHTML = filteredActive.map(sch => {
             const encFile = sch.package_file || `exam_${sch.id}_enc.json`;
@@ -7631,7 +7676,10 @@
         }
 
         if (filteredInactive.length === 0) {
-          inactiveTbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-slate-500 font-medium">Halaman arsip jadwal tidak aktif masih kosong.</td></tr>`;
+          const emptyMsg = teacherSubject
+            ? `Halaman arsip jadwal tidak aktif untuk mata pelajaran ${escapeHtml(teacherSubject)} masih kosong.`
+            : `Halaman arsip jadwal tidak aktif masih kosong.`;
+          inactiveTbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-slate-500 font-medium">${emptyMsg}</td></tr>`;
         } else {
           inactiveTbody.innerHTML = filteredInactive.map(sch => {
             const encFile = sch.package_file || `exam_${sch.id}_enc.json`;
@@ -7845,6 +7893,14 @@
     // ==============================================================
     window.handleToggleScheduleActive = async function(scheduleId, event) {
       if (event) event.stopPropagation();
+      const teacherSubject = getLoggedInTeacherSubject();
+      if (teacherSubject && currentSchedules && currentSchedules.length > 0) {
+        const sch = currentSchedules.find(s => Number(s.id) === Number(scheduleId));
+        if (sch && !isSubjectMatch(sch.title, teacherSubject) && !isSubjectMatch(sch.bank_name, teacherSubject)) {
+          alert(`⚠️ AKSES TERBATAS\n\nJadwal #${scheduleId} bukan bagian dari mata pelajaran ${teacherSubject}.\nGuru hanya memiliki hak akses untuk mengubah status jadwal mata pelajaran yang diampunya.`);
+          return;
+        }
+      }
       try {
         const res = await fetch(`/api/v1/cbt/schedules/${scheduleId}/toggle-status`, {
           method: 'POST',
@@ -8296,6 +8352,14 @@
     // Edit Jadwal Ujian (CBT)
     window.openModalEditSchedule = async function(scheduleId = 1) {
       window.currentEditingScheduleId = scheduleId;
+      const teacherSubject = getLoggedInTeacherSubject();
+      if (teacherSubject && currentSchedules && currentSchedules.length > 0) {
+        const sch = currentSchedules.find(s => Number(s.id) === Number(scheduleId));
+        if (sch && !isSubjectMatch(sch.title, teacherSubject) && !isSubjectMatch(sch.bank_name, teacherSubject)) {
+          alert(`⚠️ AKSES TERBATAS\n\nJadwal #${scheduleId} bukan bagian dari mata pelajaran ${teacherSubject}.\nGuru hanya memiliki hak akses untuk mengedit jadwal mata pelajaran yang diampunya.`);
+          return;
+        }
+      }
       try {
         const res = await fetch('/api/v1/cbt/schedules');
         if (res.ok) {
@@ -8303,6 +8367,14 @@
           const sch = (json.data || []).find(s => s.id === scheduleId) || (json.data && json.data[0]);
           if (sch) {
             document.getElementById('editSchTitle').value = sch.title;
+            const editBankSelect = document.getElementById('editSchBank');
+            if (editBankSelect && cachedQuestionBanks && cachedQuestionBanks.length > 0) {
+              let bankOptions = cachedQuestionBanks.map(b => `<option value="${escapeHtml(b.title)}">${escapeHtml(b.title)} (${b.subject || 'Umum'})</option>`);
+              if (sch.bank_name && !cachedQuestionBanks.some(b => b.title === sch.bank_name)) {
+                bankOptions.unshift(`<option value="${escapeHtml(sch.bank_name)}">${escapeHtml(sch.bank_name)}</option>`);
+              }
+              editBankSelect.innerHTML = bankOptions.join('');
+            }
             document.getElementById('editSchBank').value = sch.bank_name;
             document.getElementById('editSchStartTime').value = sch.start_time;
             document.getElementById('editSchDuration').value = sch.duration_minutes;
@@ -8398,6 +8470,14 @@
     };
 
     window.handleDeleteSchedule = async function(scheduleId, scheduleTitle) {
+      const teacherSubject = getLoggedInTeacherSubject();
+      if (teacherSubject && currentSchedules && currentSchedules.length > 0) {
+        const sch = currentSchedules.find(s => Number(s.id) === Number(scheduleId));
+        if (sch && !isSubjectMatch(sch.title, teacherSubject) && !isSubjectMatch(sch.bank_name, teacherSubject)) {
+          alert(`⚠️ AKSES TERBATAS\n\nJadwal #${scheduleId} bukan bagian dari mata pelajaran ${teacherSubject}.\nGuru hanya memiliki hak akses untuk menghapus jadwal mata pelajaran yang diampunya.`);
+          return;
+        }
+      }
       if (!confirm(`Hapus jadwal ujian #${scheduleId} "${scheduleTitle}"?\nPerhatian: Sesi pengerjaan siswa pada jadwal ini juga akan terhapus.`)) return;
 
       try {
@@ -8418,6 +8498,14 @@
     };
 
     window.recompilePackage = async function(scheduleId = 1) {
+      const teacherSubject = getLoggedInTeacherSubject();
+      if (teacherSubject && currentSchedules && currentSchedules.length > 0) {
+        const sch = currentSchedules.find(s => Number(s.id) === Number(scheduleId));
+        if (sch && !isSubjectMatch(sch.title, teacherSubject) && !isSubjectMatch(sch.bank_name, teacherSubject)) {
+          alert(`⚠️ AKSES TERBATAS\n\nJadwal #${scheduleId} bukan bagian dari mata pelajaran ${teacherSubject}.\nGuru hanya memiliki hak akses untuk mengompilasi jadwal mata pelajaran yang diampunya.`);
+          return;
+        }
+      }
       try {
         const res = await fetch(`/api/v1/cbt/schedules/${scheduleId}/publish-package`, {
           method: 'POST',
@@ -14573,6 +14661,10 @@
         if (elProctorTabBadge) {
           elProctorTabBadge.innerHTML = `<span class="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[11px] font-bold inline-flex items-center gap-1.5"><i class="fa-solid fa-book-open"></i> Khusus Mapel: ${escapeHtml(teacherSubject)}</span>`;
         }
+        const elJadwalTabBadge = document.getElementById('jadwalTabRoleBadge');
+        if (elJadwalTabBadge) {
+          elJadwalTabBadge.innerHTML = `<span class="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[11px] font-bold inline-flex items-center gap-1.5"><i class="fa-solid fa-book-open"></i> Khusus Mapel: ${escapeHtml(teacherSubject)}</span>`;
+        }
 
         // SEMBUNYIKAN SEMUA MENU NON-UJIAN & NON-LMS (Master Data, Server Lockdown, Pengaturan)
         document.querySelectorAll('.sidebar-admin-only').forEach(el => el.classList.add('hidden'));
@@ -14602,6 +14694,10 @@
         if (elProctorTabBadge) {
           elProctorTabBadge.innerHTML = '<span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] font-bold inline-flex items-center gap-1.5"><i class="fa-solid fa-shield-halved"></i> Semua Jadwal Pelajaran (Administrator)</span>';
         }
+        const elJadwalTabBadge = document.getElementById('jadwalTabRoleBadge');
+        if (elJadwalTabBadge) {
+          elJadwalTabBadge.innerHTML = '<span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] font-bold inline-flex items-center gap-1.5"><i class="fa-solid fa-shield-halved"></i> Semua Jadwal Pelajaran (Administrator)</span>';
+        }
 
         // TAMPILKAN SEMUA MENU UNTUK ADMIN
         document.querySelectorAll('.sidebar-admin-only').forEach(el => el.classList.remove('hidden'));
@@ -14619,6 +14715,10 @@
         const elProctorTabBadge = document.getElementById('proctorTabRoleBadge');
         if (elProctorTabBadge) {
           elProctorTabBadge.innerHTML = '<span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold inline-flex items-center gap-1.5"><i class="fa-solid fa-desktop"></i> Semua Jadwal Pelajaran (Mode Proktor)</span>';
+        }
+        const elJadwalTabBadgeProctor = document.getElementById('jadwalTabRoleBadge');
+        if (elJadwalTabBadgeProctor) {
+          elJadwalTabBadgeProctor.innerHTML = '<span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold inline-flex items-center gap-1.5"><i class="fa-solid fa-desktop"></i> Semua Jadwal Pelajaran (Mode Proktor)</span>';
         }
         document.querySelectorAll('.sidebar-admin-only').forEach(el => el.classList.remove('hidden'));
       } else if (role === 'student') {

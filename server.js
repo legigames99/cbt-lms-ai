@@ -2494,11 +2494,13 @@ function generateDocxDocument({ title, school, subject, teacher, targetClass, qu
           bodyXml += `</w:p>`;
         });
       } else if (q.type === 'matching') {
+        const correctPairs = q.answer || {};
         (q.premises || []).forEach((p, pIdx) => {
+          const cTargetId = correctPairs[p.id] !== undefined ? correctPairs[p.id] : (correctPairs[pIdx] !== undefined ? correctPairs[pIdx] : correctPairs[String(pIdx)]);
           const target = (q.targets || [])[pIdx];
           bodyXml += `<w:p><w:pPr><w:ind w:left="480"/><w:spacing w:after="40"/></w:pPr>`;
-          if (includeKeys && target) {
-            bodyXml += `<w:r><w:rPr><w:b/></w:rPr><w:t>PREMIS ${pIdx + 1}: ${xmlEscape(p.text)}   --->   TARGET ${target.id}: ${xmlEscape(target.text)}</w:t></w:r>`;
+          if (includeKeys && cTargetId) {
+            bodyXml += `<w:r><w:rPr><w:b/></w:rPr><w:t>${pIdx + 1}. ${xmlEscape(p.text)}   --->   Kunci: [ ${cTargetId} ] ${target ? `|  ${target.id}. ${xmlEscape(target.text)}` : ''}</w:t></w:r>`;
           } else {
             bodyXml += `<w:r><w:t>${pIdx + 1}. ${xmlEscape(p.text)}   --->   [ ... ] ${target ? `${target.id}. ${xmlEscape(target.text)}` : ''}</w:t></w:r>`;
           }
@@ -2814,8 +2816,12 @@ function generateWordHtmlDocument({ title, school, subject, teacher, targetClass
   if (includeQuestions) {
     questions.forEach((q, idx) => {
       const qNum = idx + 1;
+      let stemHtml = (q.stem || '').trim();
+      // Bersihkan tag <p> terluar agar nomor soal (1.) sejajar dalam satu baris paragraf
+      stemHtml = stemHtml.replace(/^<p\b[^>]*>/i, '').replace(/<\/p>$/i, '').trim();
+
       qHtml += `<div style="margin-bottom: 16px; page-break-inside: avoid;">`;
-      qHtml += `<p style="margin: 0 0 6px 0; font-weight: bold;">${qNum}. ${q.stem || ''}</p>`;
+      qHtml += `<p style="margin: 0 0 6px 0; font-weight: bold; line-height: 1.5;">${qNum}. ${stemHtml}</p>`;
 
       let typeLabel = '';
       if (q.type === 'mcq') typeLabel = 'Pilihan Ganda Tunggal';
@@ -2847,10 +2853,12 @@ function generateWordHtmlDocument({ title, school, subject, teacher, targetClass
         qHtml += `</table>`;
       } else if (q.type === 'matching') {
         qHtml += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse: collapse; margin-left: 24px; margin-bottom: 6px; font-size: 10pt;">`;
-        qHtml += `<tr style="background:#f3f4f6;"><th>Premis / Konsep</th><th>Jodohkan dengan</th><th>Pilihan Target</th></tr>`;
+        qHtml += `<tr style="background:#f3f4f6;"><th>Premis / Konsep</th><th>Pasangan</th><th>Pilihan Target</th></tr>`;
+        const correctPairs = q.answer || {};
         (q.premises || []).forEach((p, pIdx) => {
+          const cTargetId = correctPairs[p.id] !== undefined ? correctPairs[p.id] : (correctPairs[pIdx] !== undefined ? correctPairs[pIdx] : correctPairs[String(pIdx)]);
           const target = (q.targets || [])[pIdx];
-          const arrow = (includeKeys && target) ? `➔ <strong>${target.id}</strong>` : '➔ [ &nbsp;&nbsp;&nbsp; ]';
+          const arrow = (includeKeys && cTargetId) ? `➔ <strong>${cTargetId}</strong>` : '➔ [ &nbsp;&nbsp;&nbsp; ]';
           qHtml += `<tr><td>${p.text}</td><td align="center">${arrow}</td><td>${target ? `<strong>${target.id}.</strong> ${target.text}` : ''}</td></tr>`;
         });
         qHtml += `</table>`;

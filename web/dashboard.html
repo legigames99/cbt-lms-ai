@@ -9054,7 +9054,12 @@
     // ==============================================================
     // EKSPOR REKAP NILAI & ANALISIS BUTIR SOAL LENGKAP (EXCEL / .XLS)
     // ==============================================================
-    window.exportNilaiExcelWithAnalysis = function() {
+    window.exportNilaiExcelWithAnalysis = async function() {
+      // Pastikan data nilai dan butir soal terambil dari server jika belum ada di memori
+      if (!lastNilaiSessionsData || lastNilaiSessionsData.length === 0) {
+        await fetchNilaiSessions();
+      }
+
       const students = lastNilaiSessionsData && lastNilaiSessionsData.length > 0 ? [...lastNilaiSessionsData] : [];
       if (students.length === 0) {
         alert('Tidak ada data nilai siswa untuk jadwal ujian ini.');
@@ -9072,11 +9077,11 @@
       };
 
       const profile = lastSchoolProfile || {
-        name: 'SMK NEGERI 5 JAKARTA',
-        dinas: 'PEMERINTAH PROVINSI DAERAH KHUSUS IBUKOTA JAKARTA\nDINAS PENDIDIKAN',
-        address: 'Jl. Pisangan Baru Timur VII No. 6, Matraman, Jakarta Timur',
-        npsn: '20102551',
-        city: 'Jakarta',
+        name: 'SMK NEGERI 5 BANDUNG',
+        dinas: 'PEMERINTAH PROVINSI DAERAH KOTA BANDUNG\nDINAS PENDIDIKAN',
+        address: 'Jl. Bojongkoneng 37A',
+        npsn: '20219143',
+        city: 'Bandung',
         headmaster_name: 'Drs. H. Ahmad Fauzi, M.Pd.',
         headmaster_nip: '19710815 199802 1 003'
       };
@@ -9111,20 +9116,83 @@
       // Urutkan siswa untuk tampilan rekap & matriks secara alfabetis (A - Z nama lengkap)
       students.sort((a, b) => (a.full_name || '').localeCompare(b.full_name || '', 'id', { sensitivity: 'base' }));
 
+      // Helper evaluasi jawaban siswa multi-tipe (PG, PG Kompleks, B/S, Menjodohkan, Isian, Esai AI)
+      function checkStudentAnswerMatch(qDef, studentAnswer, fallbackKey) {
+        if (!studentAnswer || studentAnswer.a === undefined || studentAnswer.a === null || studentAnswer.a === '') {
+          return { isCorrect: false, optChoice: null, optChoices: [] };
+        }
+        const rawA = studentAnswer.a;
+        const type = qDef?.type || 'mcq';
+
+        if (type === 'mcq') {
+          const strA = String(rawA).trim().toUpperCase();
+          const isCorr = strA === String(qDef?.answer || fallbackKey).trim().toUpperCase();
+          return { isCorrect: isCorr, optChoice: strA, optChoices: [strA] };
+        } else if (type === 'mcq_complex') {
+          const arr = Array.isArray(rawA) ? rawA : [rawA];
+          const correctKeys = Array.isArray(qDef?.answer) 
+            ? qDef.answer.map(c => String(c).trim().toUpperCase()) 
+            : String(qDef?.answer || fallbackKey).split(',').map(s => s.trim().toUpperCase());
+          const chosen = arr.map(c => String(c).trim().toUpperCase());
+          const overlap = chosen.filter(c => correctKeys.includes(c)).length;
+          const wrong = chosen.filter(c => !correctKeys.includes(c)).length;
+          const ratio = Math.max(0, (overlap / (correctKeys.length || 1)) - (wrong * 0.25));
+          return { isCorrect: ratio >= 0.75, optChoice: null, optChoices: chosen };
+        } else if (type === 'true_false') {
+          const statements = qDef?.statements || [];
+          const stAnswers = typeof rawA === 'object' && rawA !== null ? rawA : {};
+          let matches = 0;
+          statements.forEach((st, sIdx) => {
+            const choice = stAnswers[st.id] !== undefined ? stAnswers[st.id] : (stAnswers[sIdx] !== undefined ? stAnswers[sIdx] : stAnswers[String(sIdx)]);
+            if (choice && String(choice).trim().toUpperCase() === String(st.key).trim().toUpperCase()) matches++;
+          });
+          const ratio = statements.length > 0 ? (matches / statements.length) : 0;
+          return { isCorrect: ratio >= 0.7, optChoice: null, optChoices: [] };
+        } else if (type === 'matching') {
+          const premises = qDef?.premises || [];
+          const correctPairs = qDef?.answer || {};
+          const studentPairs = typeof rawA === 'object' && rawA !== null ? rawA : {};
+          let matches = 0;
+          premises.forEach((p, pIdx) => {
+            const sTarget = studentPairs[p.id] !== undefined ? studentPairs[p.id] : (studentPairs[pIdx] !== undefined ? studentPairs[pIdx] : studentPairs[String(pIdx)]);
+            const cTarget = correctPairs[p.id] !== undefined ? correctPairs[p.id] : (correctPairs[pIdx] !== undefined ? correctPairs[pIdx] : correctPairs[String(pIdx)]);
+            if (sTarget && cTarget && String(sTarget).trim().toUpperCase() === String(cTarget).trim().toUpperCase()) matches++;
+          });
+          const ratio = premises.length > 0 ? (matches / premises.length) : 0;
+          return { isCorrect: ratio >= 0.7, optChoice: null, optChoices: [] };
+        } else if (type === 'short_essay') {
+          const sText = String(rawA || '').replace(/\s+/g, ' ').replace(/[.;,]+$/, '').trim().toLowerCase();
+          const validKeys = (qDef?.answer_keys || []).map(k => String(k).replace(/\s+/g, ' ').replace(/[.;,]+$/, '').trim().toLowerCase());
+          const isCorr = validKeys.includes(sText);
+          return { isCorrect: isCorr, optChoice: null, optChoices: [] };
+        } else if (type === 'long_essay') {
+          const score = studentAnswer.ai_score;
+          const ratio = score !== undefined ? (score / (qDef?.max_score || 100)) : (String(rawA).trim().length > 20 ? 0.8 : 0);
+          return { isCorrect: ratio >= 0.75, optChoice: null, optChoices: [] };
+        } else {
+          const strA = typeof rawA === 'object' ? JSON.stringify(rawA) : String(rawA).trim().toUpperCase();
+          return { isCorrect: strA === String(fallbackKey).trim().toUpperCase(), optChoice: null, optChoices: [] };
+        }
+      }
+
       // 3. ANALISIS BUTIR SOAL
       let sumPq = 0;
       const itemAnalysis = qIds.map((qId, idx) => {
+        const qDef = (lastNilaiQuestions || []).find(q => Number(q.id) === Number(qId)) || { id: qId, type: 'mcq' };
         const key = answerKeys[qId] || 'C';
         const optCounts = { A: 0, B: 0, C: 0, D: 0, E: 0 };
         let correctCount = 0;
 
         students.forEach(st => {
-          const stAns = (st.answers && st.answers[qId] && st.answers[qId].a) ? st.answers[qId].a.toUpperCase() : '-';
-          if (optCounts[stAns] !== undefined) {
-            optCounts[stAns]++;
+          const res = checkStudentAnswerMatch(qDef, st.answers && st.answers[qId], key);
+          if (res.isCorrect) correctCount++;
+          if (res.optChoice && optCounts[res.optChoice] !== undefined) {
+            optCounts[res.optChoice]++;
           }
-          if (stAns === key) {
-            correctCount++;
+          if (res.optChoices && Array.isArray(res.optChoices)) {
+            res.optChoices.forEach(c => {
+              if (optCounts[c] !== undefined) optCounts[c]++;
+            });
           }
         });
 
@@ -9149,12 +9217,12 @@
         let correctUpper = 0;
         let correctLower = 0;
         upperGroup.forEach(st => {
-          const a = (st.answers && st.answers[qId] && st.answers[qId].a) ? st.answers[qId].a.toUpperCase() : '-';
-          if (a === key) correctUpper++;
+          const res = checkStudentAnswerMatch(qDef, st.answers && st.answers[qId], key);
+          if (res.isCorrect) correctUpper++;
         });
         lowerGroup.forEach(st => {
-          const a = (st.answers && st.answers[qId] && st.answers[qId].a) ? st.answers[qId].a.toUpperCase() : '-';
-          if (a === key) correctLower++;
+          const res = checkStudentAnswerMatch(qDef, st.answers && st.answers[qId], key);
+          if (res.isCorrect) correctLower++;
         });
 
         const dVal = groupSize > 0 ? ((correctUpper - correctLower) / groupSize) : 0;
@@ -9201,13 +9269,16 @@
         });
 
         let distractorSummary = 'Semua Pengecoh Berfungsi Baik (≥5%)';
-        if (nonEffectiveDistractors.length > 0) {
+        if (qDef.type !== 'mcq' && qDef.type !== 'mcq_complex') {
+          distractorSummary = `Tipe Soal: ${qDef.type.toUpperCase()}`;
+        } else if (nonEffectiveDistractors.length > 0) {
           distractorSummary = `Pengecoh [${nonEffectiveDistractors.join(', ')}] Kurang Berfungsi (<5%)`;
         }
 
         return {
           qNum: idx + 1,
           qId: qId,
+          type: qDef.type,
           key: key,
           optCounts: optCounts,
           correctCount: correctCount,
@@ -9634,7 +9705,7 @@
       ${itemAnalysis.map(it => `
       <Row>
         <Cell ss:StyleID="TdCenterBold"><Data ss:Type="String">#${it.qNum}</Data></Cell>
-        <Cell ss:StyleID="BadgeKey"><Data ss:Type="String">${it.key}</Data></Cell>
+        <Cell ss:StyleID="BadgeKey"><Data ss:Type="String">${escapeXml(it.key)}</Data></Cell>
         <Cell ss:StyleID="TdCenter"><Data ss:Type="String">${it.optCounts.A} (${(it.optCounts.A / totalStudents * 100).toFixed(0)}%)</Data></Cell>
         <Cell ss:StyleID="TdCenter"><Data ss:Type="String">${it.optCounts.B} (${(it.optCounts.B / totalStudents * 100).toFixed(0)}%)</Data></Cell>
         <Cell ss:StyleID="TdCenter"><Data ss:Type="String">${it.optCounts.C} (${(it.optCounts.C / totalStudents * 100).toFixed(0)}%)</Data></Cell>
@@ -9674,7 +9745,7 @@
       <Row ss:Height="20">
         <Cell ss:MergeAcross="3" ss:StyleID="BadgeKey"><Data ss:Type="String">KUNCI JAWABAN RESMI</Data></Cell>
         <Cell ss:StyleID="BadgeKey"><Data ss:Type="String">-</Data></Cell>
-        ${qIds.map(qId => `<Cell ss:StyleID="BadgeKey"><Data ss:Type="String">${answerKeys[qId] || 'C'}</Data></Cell>`).join('')}
+        ${qIds.map(qId => `<Cell ss:StyleID="BadgeKey"><Data ss:Type="String">${escapeXml(answerKeys[qId] || 'C')}</Data></Cell>`).join('')}
         <Cell ss:StyleID="BadgeKey"><Data ss:Type="Number">${totalQuestions}</Data></Cell>
         <Cell ss:StyleID="BadgeKey"><Data ss:Type="Number">100</Data></Cell>
       </Row>
@@ -9684,10 +9755,23 @@
         <Cell ss:MergeAcross="2" ss:StyleID="TdTextBold"><Data ss:Type="String">${escapeXml(st.full_name)}</Data></Cell>
         <Cell ss:StyleID="TdCenter"><Data ss:Type="String">${escapeXml(st.class_name || 'XII IPA 1')}</Data></Cell>
         ${qIds.map(qId => {
+          const qDef = (lastNilaiQuestions || []).find(q => Number(q.id) === Number(qId)) || { id: qId, type: 'mcq' };
           const key = answerKeys[qId] || 'C';
-          const ans = (st.answers && st.answers[qId] && st.answers[qId].a) ? st.answers[qId].a.toUpperCase() : '-';
-          const isRight = ans === key;
-          return `<Cell ss:StyleID="${isRight ? 'BadgePass' : 'BadgeFail'}"><Data ss:Type="String">${ans} (${isRight ? '1' : '0'})</Data></Cell>`;
+          const res = checkStudentAnswerMatch(qDef, st.answers && st.answers[qId], key);
+          let ansDisplay = '-';
+          const rawA = st.answers && st.answers[qId] ? st.answers[qId].a : null;
+          if (rawA !== null && rawA !== undefined && rawA !== '') {
+            if (Array.isArray(rawA)) {
+              ansDisplay = rawA.join(',');
+            } else if (typeof rawA === 'object') {
+              ansDisplay = Object.values(rawA).join('-');
+            } else {
+              ansDisplay = String(rawA).trim();
+              if (ansDisplay.length > 15) ansDisplay = ansDisplay.substring(0, 15) + '...';
+            }
+          }
+          const isRight = res.isCorrect;
+          return `<Cell ss:StyleID="${isRight ? 'BadgePass' : 'BadgeFail'}"><Data ss:Type="String">${escapeXml(ansDisplay)} (${isRight ? '1' : '0'})</Data></Cell>`;
         }).join('')}
         <Cell ss:StyleID="TdCenterBold"><Data ss:Type="Number">${st.correct_count}</Data></Cell>
         <Cell ss:StyleID="TdNumber"><Data ss:Type="Number">${(st.score || 0).toFixed(2)}</Data></Cell>

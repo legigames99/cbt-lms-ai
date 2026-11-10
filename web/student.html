@@ -250,15 +250,31 @@
     <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
       <div>
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between">
-          <span>Daftar Nomor Soal</span>
-          <span id="answeredCounter" class="text-indigo-400 font-mono">0/0</span>
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-list-ol text-indigo-400"></i> Daftar Nomor Soal</span>
+          <span id="answeredCounter" class="text-indigo-400 font-mono font-bold bg-slate-900/80 px-2 py-0.5 rounded-md border border-slate-700">0/0</span>
         </h3>
 
-        <!-- GRID NOMOR -->
-        <div id="numberGrid" class="grid grid-cols-5 gap-2 max-h-96 overflow-y-auto pr-1"></div>
+        <!-- GRID NOMOR (Bantalan p-2 mencegah indikator aktif terpotong) -->
+        <div id="numberGrid" class="grid grid-cols-5 gap-2.5 max-h-96 overflow-y-auto p-2 rounded-xl bg-slate-900/40 border border-slate-700/50 custom-scrollbar"></div>
+
+        <!-- Petunjuk Keterangan Status Nomor -->
+        <div class="grid grid-cols-3 gap-2 pt-3 mt-3 border-t border-slate-700/60 text-[10px] text-slate-400">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-md bg-indigo-600 inline-block border border-indigo-400 shrink-0"></span>
+            <span class="truncate">Terjawab</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-md bg-amber-500 inline-block border border-amber-300 shrink-0"></span>
+            <span class="truncate">Ragu-Ragu</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-md bg-slate-900 inline-block border border-slate-700 shrink-0"></span>
+            <span class="truncate">Belum</span>
+          </div>
+        </div>
       </div>
 
-      <div class="mt-6 pt-4 border-t border-slate-700/60">
+      <div class="mt-5 pt-3 border-t border-slate-700/60">
         <button onclick="handleFinishExam()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20">
           <i class="fa-solid fa-check-double"></i> Selesaikan Ujian
         </button>
@@ -919,6 +935,7 @@
 
     function renderNumberGrid() {
       const grid = document.getElementById('numberGrid');
+      if (!grid) return;
       grid.innerHTML = '';
       let answeredCount = 0;
 
@@ -933,17 +950,53 @@
 
         if (hasAnswer) answeredCount++;
 
-        let colorClasses = 'bg-slate-900 text-slate-400 border-slate-700'; // Kosong
+        // Base styles
+        let colorClasses = 'bg-slate-900 text-slate-400 border-slate-700 hover:border-slate-500 hover:text-slate-200'; // Belum dijawab
+        let indicatorHtml = '';
+
         if (isDoubt) {
-          colorClasses = 'bg-amber-500 text-slate-900 font-bold border-amber-400'; // Ragu
+          colorClasses = 'bg-amber-500 text-slate-950 font-bold border-amber-400 hover:bg-amber-400 shadow-sm shadow-amber-500/20'; // Ragu
         } else if (hasAnswer) {
-          colorClasses = 'bg-indigo-600 text-white font-bold border-indigo-500'; // Terjawab
+          colorClasses = 'bg-indigo-600 text-white font-bold border-indigo-500 hover:bg-indigo-500 shadow-sm shadow-indigo-600/20'; // Terjawab
         }
 
-        const ringClass = isCurrent ? 'ring-2 ring-white ring-offset-2 ring-offset-slate-800 scale-105' : '';
+        // Active State (Sedang Dikerjakan): Elegan, bersinar lembut, jelas, dan tanpa terpotong
+        let activeClasses = '';
+        if (isCurrent) {
+          if (isDoubt) {
+            activeClasses = 'scale-105 z-10 border-2 border-white ring-2 ring-amber-300/70 shadow-[0_0_14px_rgba(245,158,11,0.55)] font-extrabold';
+            indicatorHtml = `
+              <span class="absolute bottom-1 w-3.5 h-1 bg-slate-950 rounded-full"></span>
+              <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-200 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-200 border border-slate-900"></span>
+              </span>
+            `;
+          } else if (hasAnswer) {
+            activeClasses = 'scale-105 z-10 border-2 border-white ring-2 ring-indigo-400/80 shadow-[0_0_14px_rgba(99,102,241,0.55)] font-extrabold';
+            indicatorHtml = `
+              <span class="absolute bottom-1 w-3.5 h-1 bg-white rounded-full"></span>
+              <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400 border border-slate-900"></span>
+              </span>
+            `;
+          } else {
+            // Sedang aktif pada butir soal yang belum dijawab
+            colorClasses = 'bg-slate-800 text-white font-extrabold';
+            activeClasses = 'scale-105 z-10 border-2 border-cyan-400 ring-2 ring-cyan-400/50 shadow-[0_0_14px_rgba(34,211,238,0.45)]';
+            indicatorHtml = `
+              <span class="absolute bottom-1 w-3.5 h-1 bg-cyan-400 rounded-full shadow-sm"></span>
+              <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400 border border-slate-900"></span>
+              </span>
+            `;
+          }
+        }
 
-        btn.className = `h-10 rounded-xl text-xs border font-medium flex items-center justify-center transition ${colorClasses} ${ringClass}`;
-        btn.innerText = idx + 1;
+        btn.className = `relative h-10 rounded-xl text-xs border font-medium flex items-center justify-center transition-all duration-200 select-none ${colorClasses} ${activeClasses}`;
+        btn.innerHTML = `<span class="relative z-10">${idx + 1}</span>${indicatorHtml}`;
         btn.onclick = () => {
           currentIndex = idx;
           renderCurrentQuestion();

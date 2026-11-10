@@ -11,7 +11,7 @@
         "status": "hadir",
         "reason": "",
         "note": "Sedang mengerjakan ujian",
-        "is_manual": true
+        "is_manual": false
       },
       "1003": {
         "status": "tidak_hadir",

@@ -908,6 +908,12 @@
           <span>Pengaturan AI & Model</span>
           <span class="ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold font-mono">Gemini</span>
         </a>
+
+        <a href="#backup-restore" onclick="switchTab('backup-restore')" id="nav-backup-restore" class="sidebar-admin-only nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+          <i class="fa-solid fa-database w-4 text-center text-teal-400"></i>
+          <span>Backup & Restore Data</span>
+          <span class="ml-auto text-[9px] px-1.5 py-0.5 rounded-md bg-teal-500/20 text-teal-300 border border-teal-500/30 font-semibold font-mono">JSON</span>
+        </a>
       </nav>
     </div>
 
@@ -3928,6 +3934,358 @@
         </div>
       </section>
 
+      <!-- ============================================================== -->
+      <!-- TAB: BACKUP & RESTORE DATABASE & PENGATURAN -->
+      <!-- ============================================================== -->
+      <section id="tab-backup-restore" class="hidden space-y-6">
+        <!-- Header Banner -->
+        <div class="bg-gradient-to-r from-teal-950/60 via-slate-900 to-slate-900 border border-teal-500/30 rounded-2xl p-6 shadow-xl flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div>
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="px-2.5 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/40 text-[10px] font-bold uppercase tracking-wider">Disaster Recovery & Snapshots</span>
+              <span class="text-xs text-slate-500">•</span>
+              <span class="text-xs text-slate-400">ANBK & Pusmendik Compatible Data Management</span>
+            </div>
+            <h3 class="text-xl font-bold text-white flex items-center gap-2.5">
+              <i class="fa-solid fa-database text-teal-400"></i>
+              <span>Pusat Backup & Restore Database CBT & LMS AI</span>
+            </h3>
+            <p class="text-xs text-slate-400 max-w-3xl mt-1.5 leading-relaxed">
+              Amankan dan pulihkan seluruh data sekolah secara menyeluruh: 
+              <strong>Bank Soal & Butir Soal</strong>, <strong>Data Siswa & Kelas</strong>, 
+              <strong>Jadwal Ujian CBT</strong>, <strong>Profil Sekolah</strong>, 
+              <strong>User & Hak Akses Pengelola</strong>, dan <strong>Berita Acara & Absensi</strong>.
+              File cadangan dapat langsung diunduh ke komputer Anda (.json) atau disimpan sebagai snapshot server untuk pemulihan instan.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3 self-start lg:self-center">
+            <button type="button" onclick="handleExportBackup()" class="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-xs font-bold text-white shadow-lg shadow-teal-600/30 transition flex items-center gap-2">
+              <i class="fa-solid fa-cloud-arrow-down"></i> Unduh Cadangan (.JSON)
+            </button>
+            <button type="button" onclick="handleCreateServerSnapshot()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-lg shadow-indigo-600/30 transition flex items-center gap-2">
+              <i class="fa-solid fa-floppy-disk"></i> Buat Snapshot Server
+            </button>
+            <button type="button" onclick="fetchBackupOverview(); fetchBackupList();" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition flex items-center gap-2">
+              <i class="fa-solid fa-arrows-rotate"></i> Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Kartu Statistik Data Sistem -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Stat 1: Bank Soal & Butir -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-book-open text-teal-400"></i> Bank Soal & Butir
+                </span>
+                <span id="bkStatBanks" class="text-xs px-2.5 py-0.5 rounded-md bg-teal-500/20 text-teal-300 font-mono font-bold">0 Bank</span>
+              </div>
+              <div class="text-2xl font-bold text-white font-mono" id="bkStatQuestions">0</div>
+              <p class="text-[11px] text-slate-400 mt-1">Total butir soal aktif terkompilasi</p>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-slate-800 text-[10px] text-teal-400 font-semibold flex items-center gap-1">
+              <i class="fa-solid fa-circle-check"></i> Standard TKA, ANBK, AKM
+            </div>
+          </div>
+
+          <!-- Stat 2: Siswa & Akademik -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-users text-indigo-400"></i> Siswa Terdaftar
+                </span>
+                <span id="bkStatClasses" class="text-xs px-2.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 font-mono font-bold">0 Kelas</span>
+              </div>
+              <div class="text-2xl font-bold text-white font-mono" id="bkStatStudents">0</div>
+              <p class="text-[11px] text-slate-400 mt-1">Siswa peserta ujian terdaftar</p>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-slate-800 text-[10px] text-indigo-400 font-semibold flex items-center gap-1">
+              <i class="fa-solid fa-graduation-cap"></i> Kelas & Rombongan Belajar
+            </div>
+          </div>
+
+          <!-- Stat 3: Jadwal & Kehadiran -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-calendar-check text-emerald-400"></i> Jadwal & Absensi
+                </span>
+                <span id="bkStatAttendance" class="text-xs px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono font-bold">0 Absensi</span>
+              </div>
+              <div class="text-2xl font-bold text-white font-mono" id="bkStatSchedules">0</div>
+              <p class="text-[11px] text-slate-400 mt-1">Jadwal ujian terdaftar di sistem</p>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-slate-800 text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+              <i class="fa-solid fa-clipboard-check"></i> Berita Acara Resmi
+            </div>
+          </div>
+
+          <!-- Stat 4: Snapshot Server -->
+          <div class="bg-slate-900 border border-teal-500/30 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-box-archive text-teal-400"></i> Snapshot Server
+                </span>
+                <span id="bkStatSnapshotBadge" class="text-xs px-2.5 py-0.5 rounded-md bg-teal-500/20 text-teal-300 font-mono font-bold">Tersimpan</span>
+              </div>
+              <div class="text-2xl font-bold text-white font-mono" id="bkStatSnapshotCount">0</div>
+              <p class="text-[11px] text-slate-400 mt-1 truncate" id="bkStatLastSnapshotText">Belum ada snapshot dibuat</p>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-slate-800 text-[10px] text-teal-300 font-semibold flex items-center gap-1">
+              <i class="fa-solid fa-shield-halved"></i> Auto Pre-Restore Protection
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid 2 Kolom: Form Restore (Kiri) dan Daftar Snapshot Server (Kanan) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- KOLOM KIRI: FORM RESTORE & PEMULIHAN DATA (7 Kolom) -->
+          <div class="lg:col-span-7 space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+              
+              <div class="border-b border-slate-800 pb-4">
+                <h4 class="text-base font-bold text-white flex items-center gap-2">
+                  <i class="fa-solid fa-clock-rotate-left text-teal-400"></i>
+                  <span>Pemulihan Data (Restore / Impor Database)</span>
+                </h4>
+                <p class="text-xs text-slate-400 mt-1">
+                  Pulihkan data sistem dari file backup (.json) komputer Anda atau dari snapshot cadangan server.
+                </p>
+              </div>
+
+              <!-- Langkah 1: Pemilihan Sumber File -->
+              <div class="space-y-3">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center justify-between">
+                  <span class="flex items-center gap-1.5">
+                    <span class="w-5 h-5 rounded-full bg-teal-500/20 text-teal-400 text-center leading-5 text-[11px] font-bold">1</span>
+                    Pilih Sumber File Cadangan (.JSON)
+                  </span>
+                  <span id="restoreSourceBadge" class="text-[10px] font-semibold text-slate-400">Unggah dari Komputer</span>
+                </label>
+
+                <!-- Dropzone Upload File -->
+                <div id="backupDropZone" onclick="document.getElementById('backupFileInput').click()" class="border-2 border-dashed border-slate-700 hover:border-teal-500 bg-slate-950/60 hover:bg-slate-950/90 rounded-2xl p-6 text-center cursor-pointer transition group">
+                  <input type="file" id="backupFileInput" accept=".json,application/json" onchange="handleBackupFileSelect(event)" class="hidden" />
+                  <div class="w-12 h-12 rounded-2xl bg-teal-500/10 group-hover:bg-teal-500/20 text-teal-400 flex items-center justify-center mx-auto mb-3 transition">
+                    <i class="fa-solid fa-file-arrow-up text-xl"></i>
+                  </div>
+                  <p class="text-xs font-bold text-white group-hover:text-teal-300 transition">
+                    Klik untuk memilih file backup atau seret file .json ke sini
+                  </p>
+                  <p class="text-[11px] text-slate-500 mt-1">
+                    Format yang didukung: File cadangan JSON CBT (cbt_backup_*.json)
+                  </p>
+                </div>
+
+                <!-- Preview File Cadangan yang Terpilih (Muncul jika file valid) -->
+                <div id="backupPreviewContainer" class="hidden bg-slate-950 border border-teal-500/40 rounded-2xl p-4 space-y-3">
+                  <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                    <div class="flex items-center gap-2">
+                      <i class="fa-solid fa-file-circle-check text-teal-400 text-lg"></i>
+                      <div>
+                        <div class="text-xs font-bold text-white" id="pvFileName">cbt_backup.json</div>
+                        <div class="text-[10px] text-slate-400" id="pvFileSize">140 KB • Valid JSON Schema</div>
+                      </div>
+                    </div>
+                    <button type="button" onclick="clearSelectedBackupFile()" class="text-xs text-rose-400 hover:text-rose-300 px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 transition">
+                      <i class="fa-solid fa-xmark"></i> Batal
+                    </button>
+                  </div>
+
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-[10px]">
+                    <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                      <span class="text-slate-400 block">Bank Soal</span>
+                      <strong class="text-teal-300 text-xs font-mono" id="pvStatBanks">0</strong>
+                    </div>
+                    <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                      <span class="text-slate-400 block">Total Butir</span>
+                      <strong class="text-teal-300 text-xs font-mono" id="pvStatQuestions">0</strong>
+                    </div>
+                    <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                      <span class="text-slate-400 block">Data Siswa</span>
+                      <strong class="text-indigo-300 text-xs font-mono" id="pvStatStudents">0</strong>
+                    </div>
+                    <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                      <span class="text-slate-400 block">Jadwal Ujian</span>
+                      <strong class="text-emerald-300 text-xs font-mono" id="pvStatSchedules">0</strong>
+                    </div>
+                  </div>
+
+                  <div class="text-[11px] text-slate-400 flex items-center justify-between pt-1">
+                    <span>Waktu Dibuat: <strong class="text-slate-200" id="pvCreatedTime">-</strong></span>
+                    <span>Pembuat: <strong class="text-slate-200" id="pvCreatedBy">-</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Langkah 2: Pilihan Mode Pemulihan -->
+              <div class="space-y-3">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                  <span class="w-5 h-5 rounded-full bg-teal-500/20 text-teal-400 text-center leading-5 text-[11px] font-bold">2</span>
+                  Pilih Mode Pemulihan Data
+                </label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <!-- Mode Replace -->
+                  <label class="cursor-pointer">
+                    <input type="radio" name="restoreMode" value="replace" checked class="peer sr-only" />
+                    <div class="p-3.5 rounded-xl border border-slate-800 bg-slate-950/60 peer-checked:border-teal-500 peer-checked:bg-teal-950/30 transition flex flex-col justify-between h-full">
+                      <div class="flex items-center gap-2 mb-1.5">
+                        <i class="fa-solid fa-arrows-rotate text-teal-400"></i>
+                        <span class="text-xs font-bold text-white peer-checked:text-teal-300">Timpa Bersih (Replace)</span>
+                      </div>
+                      <p class="text-[11px] text-slate-400 leading-relaxed">
+                        Menggantikan seluruh database komponen yang dipilih dengan data baru dari file backup.
+                      </p>
+                    </div>
+                  </label>
+
+                  <!-- Mode Merge -->
+                  <label class="cursor-pointer">
+                    <input type="radio" name="restoreMode" value="merge" class="peer sr-only" />
+                    <div class="p-3.5 rounded-xl border border-slate-800 bg-slate-950/60 peer-checked:border-teal-500 peer-checked:bg-teal-950/30 transition flex flex-col justify-between h-full">
+                      <div class="flex items-center gap-2 mb-1.5">
+                        <i class="fa-solid fa-code-merge text-indigo-400"></i>
+                        <span class="text-xs font-bold text-white peer-checked:text-teal-300">Gabungkan Data (Merge)</span>
+                      </div>
+                      <p class="text-[11px] text-slate-400 leading-relaxed">
+                        Menggabungkan data dari backup tanpa menghapus rekaman data yang sudah ada di server.
+                      </p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Langkah 3: Checklist Komponen yang Ingin Dipulihkan -->
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <label class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                    <span class="w-5 h-5 rounded-full bg-teal-500/20 text-teal-400 text-center leading-5 text-[11px] font-bold">3</span>
+                    Pilih Komponen yang Dipulihkan
+                  </label>
+                  <div class="flex items-center gap-2 text-[11px]">
+                    <button type="button" onclick="toggleAllRestoreComponents(true)" class="text-teal-400 hover:underline font-semibold">Pilih Semua</button>
+                    <span class="text-slate-600">•</span>
+                    <button type="button" onclick="toggleAllRestoreComponents(false)" class="text-slate-400 hover:underline">Kosongkan</button>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <label class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 cursor-pointer text-xs">
+                    <input type="checkbox" id="cbRestoreBankSoal" checked class="rounded border-slate-700 text-teal-500 focus:ring-teal-500 bg-slate-900" />
+                    <i class="fa-solid fa-book-open text-teal-400 w-4 text-center"></i>
+                    <span class="text-slate-200 font-medium">Bank Soal & Butir Soal</span>
+                  </label>
+
+                  <label class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 cursor-pointer text-xs">
+                    <input type="checkbox" id="cbRestoreSiswa" checked class="rounded border-slate-700 text-teal-500 focus:ring-teal-500 bg-slate-900" />
+                    <i class="fa-solid fa-user-graduate text-indigo-400 w-4 text-center"></i>
+                    <span class="text-slate-200 font-medium">Data Siswa Terdaftar</span>
+                  </label>
+
+                  <label class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 cursor-pointer text-xs">
+                    <input type="checkbox" id="cbRestoreKelas" checked class="rounded border-slate-700 text-teal-500 focus:ring-teal-500 bg-slate-900" />
+                    <i class="fa-solid fa-school-flag text-amber-400 w-4 text-center"></i>
+                    <span class="text-slate-200 font-medium">Master Kelas & Rombel</span>
+                  </label>
+
+                  <label class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 cursor-pointer text-xs">
+                    <input type="checkbox" id="cbRestoreMapel" checked class="rounded border-slate-700 text-teal-500 focus:ring-teal-500 bg-slate-900" />
+                    <i class="fa-solid fa-layer-group text-blue-400 w-4 text-center"></i>
+                    <span class="text-slate-200 font-medium">Master Mata Pelajaran</span>
+                  </label>
+
+                  <label class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 cursor-pointer text-xs">
+                    <input type="checkbox" id="cbRestoreJadwal" checked class="rounded border-slate-700 text-teal-500 focus:ring-teal-500 bg-slate-900" />
+                    <i class="fa-solid fa-calendar-days text-emerald-400 w-4 text-center"></i>
+                    <span class="text-slate-200 font-medium">Jadwal Ujian CBT</span>
+                  </label>
+
+                  <label class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 cursor-pointer text-xs">
+                    <input type="checkbox" id="cbRestoreProfil" checked class="rounded border-slate-700 text-teal-500 focus:ring-teal-500 bg-slate-900" />
+                    <i class="fa-solid fa-building-columns text-purple-400 w-4 text-center"></i>
+                    <span class="text-slate-200 font-medium">Profil & Identitas Sekolah</span>
+                  </label>
+
+                  <label class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 cursor-pointer text-xs">
+                    <input type="checkbox" id="cbRestoreUser" checked class="rounded border-slate-700 text-teal-500 focus:ring-teal-500 bg-slate-900" />
+                    <i class="fa-solid fa-users-gear text-indigo-400 w-4 text-center"></i>
+                    <span class="text-slate-200 font-medium">User & Hak Akses (RBAC)</span>
+                  </label>
+
+                  <label class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 cursor-pointer text-xs">
+                    <input type="checkbox" id="cbRestoreAbsensi" checked class="rounded border-slate-700 text-teal-500 focus:ring-teal-500 bg-slate-900" />
+                    <i class="fa-solid fa-clipboard-check text-rose-400 w-4 text-center"></i>
+                    <span class="text-slate-200 font-medium">Berita Acara & Absensi</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Proteksi Rollback Alert -->
+              <div class="bg-teal-950/30 border border-teal-500/30 rounded-xl p-3.5 flex items-start gap-3">
+                <i class="fa-solid fa-shield-halved text-teal-400 text-base mt-0.5"></i>
+                <div class="text-[11px] text-slate-300 leading-relaxed">
+                  <strong class="text-teal-300">Proteksi Keselamatan Otomatis Aktif:</strong>
+                  Sebelum pemulihan diterapkan, server secara otomatis mencadangkan database saat ini ke dalam snapshot keselamatan (<code class="text-teal-300 font-mono">cbt_backup_auto_prerestore_*.json</code>). Anda selalu dapat melakukan pembatalan (rollback) kapan saja.
+                </div>
+              </div>
+
+              <!-- Tombol Eksekusi Restore -->
+              <div>
+                <button type="button" id="btnExecuteRestore" onclick="confirmExecuteRestore()" disabled class="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-500 disabled:bg-slate-800 disabled:text-slate-500 disabled:cursor-not-allowed text-xs font-bold text-white shadow-lg shadow-teal-600/30 transition flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-bolt"></i>
+                  <span>Pulihkan Database Sekarang</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- KOLOM KANAN: DAFTAR SNAPSHOT SERVER (5 Kolom) -->
+          <div class="lg:col-span-5 space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div>
+                  <h4 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-box-archive text-indigo-400"></i>
+                    <span>Snapshot di Server</span>
+                  </h4>
+                  <p class="text-[11px] text-slate-400">Direktori: <code class="text-teal-400 font-mono">backups/</code></p>
+                </div>
+                <button type="button" onclick="handleCreateServerSnapshot()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-[11px] font-bold text-white transition flex items-center gap-1.5 shadow-md shadow-indigo-600/20">
+                  <i class="fa-solid fa-plus"></i> Snapshot Baru
+                </button>
+              </div>
+
+              <!-- Input Filter Snapshot -->
+              <div>
+                <div class="relative">
+                  <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                  <input type="text" id="searchSnapshotInput" oninput="filterServerSnapshots(this.value)" placeholder="Cari nama snapshot atau tanggal..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500" />
+                </div>
+              </div>
+
+              <!-- Daftar Item Snapshot -->
+              <div id="serverSnapshotsListContainer" class="space-y-3 max-h-[520px] overflow-y-auto pr-1">
+                <div class="text-center py-8 text-slate-500 text-xs">
+                  <i class="fa-solid fa-spinner fa-spin text-lg mb-2 block"></i> Memuat daftar snapshot...
+                </div>
+              </div>
+
+              <div class="pt-2 border-t border-slate-800 text-[10px] text-slate-500 text-center">
+                Snapshot di server dapat diunduh ke komputer atau langsung dipulihkan ke database dengan 1 klik.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -5975,7 +6333,7 @@
       // Proteksi Role Guru: Guru HANYA untuk Ujian dan LMS (tanpa Master Data & tanpa Pengaturan)
       const teacherRestrictedTabs = [
         'upload-master', 'siswa', 'kelas', 'mapel', 'kartu-peserta',
-        'server', 'pengaturan', 'pengaturan-user', 'pengaturan-redis', 'pengaturan-ai'
+        'server', 'pengaturan', 'pengaturan-user', 'pengaturan-redis', 'pengaturan-ai', 'backup-restore'
       ];
       if ((_userRole === 'teacher' || _userRole === 'guru') && teacherRestrictedTabs.includes(tabName)) {
         alert('⚠️ AKSES DIBATASI\n\nAkun Guru / Pengajar hanya memiliki hak akses untuk fitur Ujian dan LMS.\nMenu Master Data dan Pengaturan sistem hanya dapat diakses oleh Administrator.');
@@ -6074,6 +6432,10 @@
       if (tabName === 'pengaturan-user') {
         fetchUserManagementList();
       }
+      if (tabName === 'backup-restore') {
+        fetchBackupOverview();
+        fetchBackupList();
+      }
 
       const titleMap = {
         'overview': 'Dashboard Utama',
@@ -6091,7 +6453,8 @@
         'pengaturan': 'Pengaturan Profil Sekolah',
         'pengaturan-user': 'Pengaturan User & Hak Akses (RBAC)',
         'pengaturan-redis': 'Pengaturan Redis Cache & Shared Memory (1.700 Siswa)',
-        'pengaturan-ai': 'Pengaturan AI, Kredensial & Model Gemini'
+        'pengaturan-ai': 'Pengaturan AI, Kredensial & Model Gemini',
+        'backup-restore': 'Backup & Restore Database & Pengaturan'
       };
       document.getElementById('topbarTitle').innerText = titleMap[tabName] || 'Portal CBT & LMS';
     };
@@ -15153,6 +15516,472 @@
       const isCurrentlyLight = document.documentElement.classList.contains('light-mode');
       window.applyThemeMode(isCurrentlyLight ? 'dark' : 'light');
     };
+
+    // ==============================================================
+    // CLIENT LOGIC: BACKUP & RESTORE DATABASE / PENGATURAN
+    // ==============================================================
+    window.selectedBackupData = null;
+    window.selectedBackupSource = 'uploaded'; // 'uploaded' | 'server_file'
+    window.selectedServerFilename = null;
+    window.cachedServerSnapshots = [];
+
+    window.fetchBackupOverview = function() {
+      fetch('/api/v1/admin/backup/overview')
+        .then(res => res.json())
+        .then(json => {
+          if (json.status === 'success' && json.data && json.data.statistics) {
+            const st = json.data.statistics;
+            const elBanks = document.getElementById('bkStatBanks');
+            const elQuestions = document.getElementById('bkStatQuestions');
+            const elStudents = document.getElementById('bkStatStudents');
+            const elClasses = document.getElementById('bkStatClasses');
+            const elSchedules = document.getElementById('bkStatSchedules');
+            const elAttendance = document.getElementById('bkStatAttendance');
+            const elSnapCount = document.getElementById('bkStatSnapshotCount');
+            const elSnapText = document.getElementById('bkStatLastSnapshotText');
+
+            if (elBanks) elBanks.textContent = (st.question_banks || 0) + ' Bank';
+            if (elQuestions) elQuestions.textContent = st.questions || 0;
+            if (elStudents) elStudents.textContent = st.students || 0;
+            if (elClasses) elClasses.textContent = (st.classes || 0) + ' Kelas';
+            if (elSchedules) elSchedules.textContent = st.schedules || 0;
+            if (elAttendance) elAttendance.textContent = (st.attendance || 0) + ' Absensi';
+            if (elSnapCount) elSnapCount.textContent = st.server_snapshot_count || 0;
+            if (elSnapText) {
+              if (st.latest_snapshot) {
+                elSnapText.textContent = 'Terakhir: ' + st.latest_snapshot.timestamp;
+              } else {
+                elSnapText.textContent = 'Belum ada snapshot dibuat';
+              }
+            }
+          }
+        })
+        .catch(err => console.error('Gagal mengambil overview backup:', err));
+    };
+
+    window.fetchBackupList = function() {
+      const container = document.getElementById('serverSnapshotsListContainer');
+      if (container) {
+        container.innerHTML = '<div class="text-center py-6 text-slate-500 text-xs"><i class="fa-solid fa-spinner fa-spin text-lg mb-2 block"></i> Memuat daftar snapshot server...</div>';
+      }
+      fetch('/api/v1/admin/backup/list')
+        .then(res => res.json())
+        .then(json => {
+          if (json.status === 'success') {
+            window.cachedServerSnapshots = json.backups || [];
+            window.renderServerSnapshots(window.cachedServerSnapshots);
+          }
+        })
+        .catch(err => {
+          if (container) {
+            container.innerHTML = '<div class="text-center py-6 text-rose-400 text-xs"><i class="fa-solid fa-triangle-exclamation mb-1 block"></i> Gagal memuat daftar snapshot server</div>';
+          }
+        });
+    };
+
+    window.renderServerSnapshots = function(list) {
+      const container = document.getElementById('serverSnapshotsListContainer');
+      if (!container) return;
+
+      if (!list || list.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-10 border border-dashed border-slate-800 rounded-2xl p-6 bg-slate-950/40">
+            <i class="fa-solid fa-box-open text-2xl text-slate-600 mb-2 block"></i>
+            <p class="text-xs font-semibold text-slate-400">Belum Ada Snapshot Cadangan di Server</p>
+            <p class="text-[11px] text-slate-500 mt-1 max-w-xs mx-auto">
+              Klik tombol "Buat Snapshot Baru" di atas untuk menyimpan snapshot instan di folder backups/ server.
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      list.forEach(item => {
+        const isPre = item.is_prerestore;
+        const badgeClass = isPre ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-teal-500/20 text-teal-300 border-teal-500/30';
+        const badgeLabel = isPre ? 'Auto Pre-Restore' : 'Snapshot Cadangan';
+        const iconClass = isPre ? 'fa-solid fa-shield-halved text-amber-400' : 'fa-solid fa-file-shield text-teal-400';
+
+        const stats = item.statistics || {};
+        const pills = [];
+        if (stats.question_banks) pills.push(`${stats.question_banks} Bank`);
+        if (stats.questions) pills.push(`${stats.questions} Soal`);
+        if (stats.students) pills.push(`${stats.students} Siswa`);
+        if (stats.schedules) pills.push(`${stats.schedules} Jadwal`);
+        const pillsHtml = pills.length > 0
+          ? pills.map(p => `<span class="px-1.5 py-0.5 rounded bg-slate-800 text-[9px] text-slate-300 font-mono">${p}</span>`).join(' ')
+          : '<span class="text-[9px] text-slate-500">Semua Data</span>';
+
+        html += `
+          <div class="bg-slate-950/70 border border-slate-800 hover:border-slate-700 rounded-2xl p-3.5 transition space-y-2.5">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-start gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center shrink-0 mt-0.5">
+                  <i class="${iconClass} text-xs"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-xs font-bold text-white font-mono break-all">${item.filename}</span>
+                    <span class="text-[9px] px-1.5 py-0.5 rounded border ${badgeClass} font-semibold">${badgeLabel}</span>
+                  </div>
+                  <div class="text-[10px] text-slate-400 flex items-center gap-2 mt-0.5">
+                    <span><i class="fa-regular fa-clock text-slate-500"></i> ${item.timestamp_local || item.created_at}</span>
+                    <span>•</span>
+                    <span class="font-mono text-slate-300">${item.size_formatted}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Content preview pills -->
+            <div class="flex items-center gap-1.5 flex-wrap pt-1 border-t border-slate-900">
+              <span class="text-[10px] text-slate-500">Isi:</span>
+              ${pillsHtml}
+            </div>
+
+            <!-- Action buttons -->
+            <div class="flex items-center justify-end gap-2 pt-1 border-t border-slate-900">
+              <button type="button" onclick="handleDownloadServerSnapshot('${item.filename}')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold transition flex items-center gap-1">
+                <i class="fa-solid fa-download"></i> Unduh
+              </button>
+              <button type="button" onclick="handleSelectSnapshotForRestore('${item.filename}')" class="px-2.5 py-1 rounded-lg bg-teal-600/80 hover:bg-teal-500 text-white text-[11px] font-bold transition flex items-center gap-1 shadow-sm">
+                <i class="fa-solid fa-bolt"></i> Pulihkan
+              </button>
+              <button type="button" onclick="handleDeleteServerSnapshot('${item.filename}')" class="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 text-[11px] font-semibold transition">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    };
+
+    window.filterServerSnapshots = function(keyword) {
+      if (!window.cachedServerSnapshots) return;
+      const q = (keyword || '').toLowerCase().trim();
+      if (!q) {
+        window.renderServerSnapshots(window.cachedServerSnapshots);
+        return;
+      }
+      const filtered = window.cachedServerSnapshots.filter(item => 
+        (item.filename && item.filename.toLowerCase().includes(q)) ||
+        (item.timestamp_local && item.timestamp_local.toLowerCase().includes(q))
+      );
+      window.renderServerSnapshots(filtered);
+    };
+
+    window.handleExportBackup = function() {
+      window.location.href = '/api/v1/admin/backup/export';
+    };
+
+    window.handleCreateServerSnapshot = function() {
+      const btn = event && event.target ? event.target.closest('button') : null;
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+      }
+      fetch('/api/v1/admin/backup/create', { method: 'POST' })
+        .then(res => res.json())
+        .then(json => {
+          if (json.status === 'success') {
+            alert('✅ Snapshot cadangan server berhasil dibuat!\n\nNama file: ' + (json.snapshot ? json.snapshot.filename : '') + '\nUkuran: ' + (json.snapshot ? json.snapshot.sizeFormatted : ''));
+            window.fetchBackupOverview();
+            window.fetchBackupList();
+          } else {
+            alert('❌ Gagal membuat snapshot: ' + (json.message || 'Terjadi kesalahan sistem'));
+          }
+        })
+        .catch(err => {
+          alert('❌ Gagal menghubungi server: ' + err.message);
+        })
+        .finally(() => {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Buat Snapshot Server';
+          }
+        });
+    };
+
+    window.handleDownloadServerSnapshot = function(filename) {
+      if (!filename) return;
+      window.location.href = '/api/v1/admin/backup/download-file?filename=' + encodeURIComponent(filename);
+    };
+
+    window.handleDeleteServerSnapshot = function(filename) {
+      if (!filename) return;
+      if (!confirm(`⚠️ PERINGATAN HAPUS CADANGAN\n\nApakah Anda yakin ingin menghapus file snapshot server ini?\nFile: ${filename}\n\nTindakan ini tidak dapat dibatalkan.`)) {
+        return;
+      }
+      fetch('/api/v1/admin/backup/delete-file', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename })
+      })
+        .then(res => res.json())
+        .then(json => {
+          if (json.status === 'success') {
+            alert('✅ ' + json.message);
+            window.fetchBackupOverview();
+            window.fetchBackupList();
+          } else {
+            alert('❌ ' + (json.message || 'Gagal menghapus file snapshot'));
+          }
+        })
+        .catch(err => alert('❌ Gagal menghubungi server: ' + err.message));
+    };
+
+    window.handleBackupFileSelect = function(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      window.processBackupFile(file);
+    };
+
+    window.processBackupFile = function(file) {
+      if (!file) return;
+      if (!file.name.toLowerCase().endsWith('.json')) {
+        alert('⚠️ File tidak valid. Harap pilih file cadangan dengan ekstensi .json');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          window.selectedBackupData = parsed;
+          window.selectedBackupSource = 'uploaded';
+          window.selectedServerFilename = null;
+
+          const data = parsed.data || parsed;
+          const stats = parsed.statistics || {};
+
+          const totalBanks = Array.isArray(data.question_banks) ? data.question_banks.length : (stats.question_banks || 0);
+          let totalQuestions = 0;
+          if (Array.isArray(data.question_banks)) {
+            data.question_banks.forEach(b => {
+              if (b && Array.isArray(b.questions)) totalQuestions += b.questions.length;
+            });
+          } else if (stats.questions) {
+            totalQuestions = stats.questions;
+          }
+          const totalStudents = Array.isArray(data.students) ? data.students.length : (stats.students || 0);
+          const totalSchedules = Array.isArray(data.schedules) ? data.schedules.length : (stats.schedules || 0);
+
+          document.getElementById('pvFileName').textContent = file.name;
+          document.getElementById('pvFileSize').textContent = formatBytesClient(file.size) + ' • Terverifikasi JSON Valid';
+          document.getElementById('pvStatBanks').textContent = totalBanks + ' Bank';
+          document.getElementById('pvStatQuestions').textContent = totalQuestions;
+          document.getElementById('pvStatStudents').textContent = totalStudents + ' Siswa';
+          document.getElementById('pvStatSchedules').textContent = totalSchedules + ' Jadwal';
+
+          const info = parsed.backup_info || {};
+          document.getElementById('pvCreatedTime').textContent = info.timestamp_local || info.created_at || 'Saat ini';
+          document.getElementById('pvCreatedBy').textContent = info.created_by || 'Administrator';
+
+          document.getElementById('backupPreviewContainer').classList.remove('hidden');
+          document.getElementById('restoreSourceBadge').textContent = 'Unggahan: ' + file.name;
+          document.getElementById('restoreSourceBadge').className = 'text-[10px] font-semibold text-teal-400 font-mono';
+
+          const btnExec = document.getElementById('btnExecuteRestore');
+          if (btnExec) btnExec.disabled = false;
+        } catch (err) {
+          alert('❌ Gagal membaca file: Isi file bukan format JSON yang valid atau terkorupsi (' + err.message + ')');
+        }
+      };
+      reader.readAsText(file, 'utf8');
+    };
+
+    window.clearSelectedBackupFile = function() {
+      window.selectedBackupData = null;
+      window.selectedBackupSource = 'uploaded';
+      window.selectedServerFilename = null;
+
+      const input = document.getElementById('backupFileInput');
+      if (input) input.value = '';
+
+      document.getElementById('backupPreviewContainer').classList.add('hidden');
+      document.getElementById('restoreSourceBadge').textContent = 'Unggah dari Komputer';
+      document.getElementById('restoreSourceBadge').className = 'text-[10px] font-semibold text-slate-400';
+
+      const btnExec = document.getElementById('btnExecuteRestore');
+      if (btnExec) btnExec.disabled = true;
+    };
+
+    window.handleSelectSnapshotForRestore = function(filename) {
+      if (!filename) return;
+      window.selectedBackupSource = 'server_file';
+      window.selectedServerFilename = filename;
+      window.selectedBackupData = null;
+
+      const found = (window.cachedServerSnapshots || []).find(s => s.filename === filename);
+      const stats = (found && found.statistics) || {};
+
+      document.getElementById('pvFileName').textContent = filename;
+      document.getElementById('pvFileSize').textContent = (found ? found.size_formatted : '') + ' • Snapshot Server (' + filename + ')';
+      document.getElementById('pvStatBanks').textContent = (stats.question_banks || 0) + ' Bank';
+      document.getElementById('pvStatQuestions').textContent = stats.questions || 0;
+      document.getElementById('pvStatStudents').textContent = (stats.students || 0) + ' Siswa';
+      document.getElementById('pvStatSchedules').textContent = (stats.schedules || 0) + ' Jadwal';
+      document.getElementById('pvCreatedTime').textContent = (found && (found.timestamp_local || found.created_at)) || '-';
+      document.getElementById('pvCreatedBy').textContent = (found && found.created_by) || 'Server';
+
+      document.getElementById('backupPreviewContainer').classList.remove('hidden');
+      document.getElementById('restoreSourceBadge').textContent = 'Snapshot Server: ' + filename;
+      document.getElementById('restoreSourceBadge').className = 'text-[10px] font-semibold text-indigo-400 font-mono';
+
+      const btnExec = document.getElementById('btnExecuteRestore');
+      if (btnExec) btnExec.disabled = false;
+
+      const targetSec = document.getElementById('tab-backup-restore');
+      if (targetSec) targetSec.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.toggleAllRestoreComponents = function(checked) {
+      const ids = [
+        'cbRestoreBankSoal', 'cbRestoreSiswa', 'cbRestoreKelas', 'cbRestoreMapel',
+        'cbRestoreJadwal', 'cbRestoreProfil', 'cbRestoreUser', 'cbRestoreAbsensi'
+      ];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.checked = !!checked;
+      });
+    };
+
+    window.confirmExecuteRestore = function() {
+      if (window.selectedBackupSource === 'uploaded' && !window.selectedBackupData) {
+        alert('⚠️ Harap pilih file cadangan .json terlebih dahulu.');
+        return;
+      }
+      if (window.selectedBackupSource === 'server_file' && !window.selectedServerFilename) {
+        alert('⚠️ Harap pilih snapshot server terlebih dahulu.');
+        return;
+      }
+
+      const components = {
+        question_banks: !!(document.getElementById('cbRestoreBankSoal') && document.getElementById('cbRestoreBankSoal').checked),
+        students: !!(document.getElementById('cbRestoreSiswa') && document.getElementById('cbRestoreSiswa').checked),
+        classes: !!(document.getElementById('cbRestoreKelas') && document.getElementById('cbRestoreKelas').checked),
+        subjects: !!(document.getElementById('cbRestoreMapel') && document.getElementById('cbRestoreMapel').checked),
+        schedules: !!(document.getElementById('cbRestoreJadwal') && document.getElementById('cbRestoreJadwal').checked),
+        school_profile: !!(document.getElementById('cbRestoreProfil') && document.getElementById('cbRestoreProfil').checked),
+        users: !!(document.getElementById('cbRestoreUser') && document.getElementById('cbRestoreUser').checked),
+        exam_attendance: !!(document.getElementById('cbRestoreAbsensi') && document.getElementById('cbRestoreAbsensi').checked),
+      };
+
+      const selectedNames = [];
+      if (components.question_banks) selectedNames.push('Bank Soal & Butir Soal');
+      if (components.students) selectedNames.push('Data Siswa');
+      if (components.classes) selectedNames.push('Kelas & Rombel');
+      if (components.subjects) selectedNames.push('Mata Pelajaran');
+      if (components.schedules) selectedNames.push('Jadwal Ujian CBT');
+      if (components.school_profile) selectedNames.push('Profil Sekolah');
+      if (components.users) selectedNames.push('User & Role Pengelola');
+      if (components.exam_attendance) selectedNames.push('Berita Acara & Absensi');
+
+      if (selectedNames.length === 0) {
+        alert('⚠️ Harap pilih minimal satu komponen data yang ingin dipulihkan.');
+        return;
+      }
+
+      const modeRadio = document.querySelector('input[name="restoreMode"]:checked');
+      const restoreMode = modeRadio ? modeRadio.value : 'replace';
+      const modeLabel = restoreMode === 'merge' ? 'GABUNGKAN DATA (MERGE)' : 'TIMPA BERSIH (REPLACE)';
+
+      const confirmMessage = 
+        `⚠️ KONFIRMASI PEMULIHAN DATABASE & PENGATURAN\n\n` +
+        `Mode Pemulihan: ${modeLabel}\n` +
+        `Sumber: ${window.selectedBackupSource === 'server_file' ? window.selectedServerFilename : 'File Unggahan'}\n\n` +
+        `Komponen yang akan dipulihkan (${selectedNames.length}):\n` +
+        selectedNames.map(n => ` • ${n}`).join('\n') +
+        `\n\n🛡️ Server akan secara otomatis membuat snapshot keselamatan cadangan sebelum pemulihan diterapkan.\n\nLanjutkan pemulihan database sekarang?`;
+
+      if (!confirm(confirmMessage)) return;
+
+      const btn = document.getElementById('btnExecuteRestore');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memulihkan Data Sistem...';
+
+      const payload = {
+        source: window.selectedBackupSource,
+        filename: window.selectedServerFilename,
+        backup_data: window.selectedBackupData,
+        restore_mode: restoreMode,
+        components
+      };
+
+      fetch('/api/v1/admin/backup/restore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(res => res.json())
+        .then(json => {
+          if (json.status === 'success') {
+            const resData = json.result || {};
+            alert(
+              `✅ PEMULIHAN DATABASE BERHASIL!\n\n` +
+              `Mode: ${resData.mode || restoreMode}\n` +
+              `Komponen yang dipulihkan:\n` +
+              ((resData.restoredComponents || selectedNames).map(c => ` • ${c}`).join('\n')) +
+              `\n\n🛡️ Snapshot Keselamatan Otomatis: ${resData.prerestore_snapshot || 'Tersimpan'}\n\n` +
+              `Seluruh data master dan memori server telah dimuat ulang.`
+            );
+            window.fetchBackupOverview();
+            window.fetchBackupList();
+            if (typeof fetchQuestionBanks === 'function') fetchQuestionBanks();
+            if (typeof fetchMasterStudents === 'function') fetchMasterStudents();
+            if (typeof fetchScheduleList === 'function') fetchScheduleList();
+            if (typeof fetchSchoolProfile === 'function') fetchSchoolProfile();
+          } else {
+            alert('❌ Gagal memulihkan database: ' + (json.message || 'Terjadi kesalahan sistem'));
+          }
+        })
+        .catch(err => {
+          alert('❌ Gagal menghubungi server: ' + err.message);
+        })
+        .finally(() => {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        });
+    };
+
+    function formatBytesClient(bytes) {
+      if (!bytes || bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Drag and Drop handler setup on dropzone
+    document.addEventListener('DOMContentLoaded', function() {
+      const dropZone = document.getElementById('backupDropZone');
+      if (dropZone) {
+        ['dragenter', 'dragover'].forEach(eventName => {
+          dropZone.addEventListener(eventName, function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.add('border-teal-500', 'bg-slate-950');
+          }, false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+          dropZone.addEventListener(eventName, function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('border-teal-500', 'bg-slate-950');
+          }, false);
+        });
+        dropZone.addEventListener('drop', function(e) {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+          if (files && files.length > 0) {
+            window.processBackupFile(files[0]);
+          }
+        }, false);
+      }
+    });
 
     // Auto-init theme mode on script load & DOM ready
     window.initThemeMode();

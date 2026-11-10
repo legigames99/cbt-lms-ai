@@ -2058,327 +2058,166 @@
         "id": 1,
         "type": "mcq",
         "cog": "C2",
-        "stem": "Saat praktikum jaringan komputer di kelas XI TKJ, siswa diminta untuk meratakan akses pengelolaan server Ubuntu 24.04 dari jarak jauh. Guru menjelaskan bahwa protokol pengelolaan jarak jauh terbagi menjadi dua jenis, yaitu yang mengenkripsi data dan yang mengirimkan data dalam bentuk teks biasa (plaintext). Protokol manakah yang direkomendasikan untuk digunakan karena faktor keamanan data?",
+        "stem": "Dalam praktikum administrasi server web, seorang siswa diminta untuk menginstal paket webserver Apache pada sistem operasi berbasis Debian/Ubuntu menggunakan terminal. Perintah manakah yang paling tepat untuk menjalankan instalasi tersebut?",
         "weight": 1,
-        "explanation": "SSH (Secure Shell) adalah protokol standar yang aman untuk administrasi jarak jauh karena menerapkan enkripsi kriptografi pada lalu lintas datanya. Sebaliknya, Telnet mengirimkan data termasuk kata sandi dalam bentuk plaintext (teks biasa) sehingga sangat rentan terhadap penyadapan.",
+        "explanation": "Pada sistem operasi berbasis Debian atau Ubuntu, paket resmi untuk webserver Apache adalah 'apache2' dan manajer paket yang digunakan adalah apt atau apt-get. Perintah 'sudo apt-get install apache2' adalah perintah yang benar dan baku. Opsi B dan C umum digunakan pada sistem berbasis RedHat/CentOS (httpd/yum), sedangkan opsi D adalah perintah untuk menjalankan layanan, bukan menginstalnya.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "Telnet karena menggunakan port 23 yang lebih cepat dalam transmisi data."
+            "text": "sudo apt-get install apache2"
           },
           {
             "id": "B",
-            "text": "SSH (Secure Shell) karena melakukan enkripsi pada seluruh data yang dikirimkan."
+            "text": "sudo apt-get install httpd"
           },
           {
             "id": "C",
-            "text": "FTP karena mendukung transfer berkas konfigurasi dengan baik."
+            "text": "sudo yum install apache2"
           },
           {
             "id": "D",
-            "text": "HTTP karena berbasis web browser yang mudah diakses."
+            "text": "sudo systemctl start apache2"
           },
           {
             "id": "E",
-            "text": "DHCP karena otomatis memberikan alamat IP ke server."
-          }
-        ],
-        "answer": "B"
-      },
-      {
-        "id": 2,
-        "type": "mcq",
-        "cog": "C3",
-        "stem": "Sebelum melakukan instalasi layanan SSH server pada sistem operasi Ubuntu 24.04, langkah awal yang harus dilakukan oleh siswa di terminal adalah memperbarui daftar paket repositori sistem. Perintah manakah yang paling tepat untuk menjalankan tugas tersebut?",
-        "weight": 1,
-        "explanation": "Perintah <code>sudo apt update</code> digunakan untuk menyegarkan dan memperbarui daftar paket dari repositori resmi Ubuntu agar sistem mengenali versi terbaru dari paket yang akan diinstal.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "options": [
-          {
-            "id": "A",
-            "text": "<code>sudo apt update</code>"
-          },
-          {
-            "id": "B",
-            "text": "<code>sudo systemctl start ssh</code>"
-          },
-          {
-            "id": "C",
-            "text": "<code>sudo apt install telnetd</code>"
-          },
-          {
-            "id": "D",
-            "text": "<code>sudo ufw allow ssh</code>"
-          },
-          {
-            "id": "E",
-            "text": "<code>ssh -v localhost</code>"
+            "text": "sudo apt-get install nginx"
           }
         ],
         "answer": "A"
       },
       {
-        "id": 3,
+        "id": 2,
         "type": "mcq",
         "cog": "C3",
-        "stem": "Siswa kelas XI TKJ sedang memasang paket OpenSSH server pada Ubuntu 24.04 di komputer server laboratorium. Setelah proses instalasi selesai, paket aplikasi apa yang harus diinstal agar server tersebut dapat menerima koneksi melalui Telnet?",
+        "stem": "Siswa melakukan pengujian akses webserver Apache yang baru saja diinstal dengan mengetikkan alamat <code>http://localhost</code> atau alamat IP server pada browser web. Halaman yang muncul pertama kali dan bertuliskan 'Apache2 Ubuntu Default Page' menunjukkan bahwa layanan webserver telah berjalan. Di direktori manakah berkas halaman web bawaan (default) tersebut biasanya disimpan pada sistem Debian/Ubuntu?",
         "weight": 1,
-        "explanation": "Untuk mengaktifkan layanan Telnet Server pada Ubuntu, paket yang harus diinstal adalah pelayan Telnet seperti <code>telnetd</code> atau <code>inetutils-telnetd</code>. Paket <code>openssh-client</code> digunakan untuk klien SSH, sedangkan <code>apache2</code> untuk web server.",
+        "explanation": "Secara default pada distribusi Debian dan Ubuntu, dokumen root atau direktori tempat penyimpanan berkas-berkas situs web utama (termasuk halaman sambutan default Apache) terletak di direktori '/var/www/html/'. Direktori /etc/apache2/sites-available/ digunakan untuk menyimpan berkas konfigurasi virtual host.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "openssh-client"
+            "text": "/etc/apache2/sites-available/"
           },
           {
             "id": "B",
-            "text": "telnetd atau inetutils-telnetd"
+            "text": "/var/www/html/"
           },
           {
             "id": "C",
-            "text": "apache2"
+            "text": "/var/log/apache2/"
           },
           {
             "id": "D",
-            "text": "vsftpd"
+            "text": "/usr/share/apache2/"
           },
           {
             "id": "E",
-            "text": "net-tools"
+            "text": "/home/www/"
           }
         ],
         "answer": "B"
       },
       {
-        "id": 4,
+        "id": 3,
         "type": "mcq",
         "cog": "C3",
-        "stem": "Perhatikan baris perintah berikut yang dijalankan di terminal klien untuk mengakses server Ubuntu 24.04 dengan alamat IP 192.168.10.5 menggunakan akun pengguna <code>adminjar</code>:<br><code>ssh adminjar@192.168.10.5</code><br>Port default berapakah yang secara otomatis digunakan oleh protokol SSH pada koneksi tersebut jika tidak didefinisikan secara khusus?",
+        "stem": "Seorang administrator jaringan ingin mengubah port default webserver Apache yang awalnya mendengarkan pada port 80 menjadi port 8080 karena port 80 sedang digunakan oleh aplikasi lain. Berkas konfigurasi utama manakah yang harus disunting untuk mengubah nomor port tersebut?",
         "weight": 1,
-        "explanation": "Secara default, layanan SSH berjalan pada port TCP 22. Port 21 digunakan untuk FTP, port 23 untuk Telnet, port 80 untuk HTTP, dan port 443 untuk HTTPS.",
+        "explanation": "Pengaturan port global pada webserver Apache di Ubuntu/Debian didefinisikan di dalam berkas 'ports.conf' serta direferensikan dalam konfigurasi utama 'apache2.conf'. Mengubah direktif 'Listen 80' menjadi 'Listen 8080' pada berkas ports.conf (dan menyesuaikan VirtualHost jika diperlukan) adalah langkah yang tepat.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "Port 21"
+            "text": "/etc/apache2/apache2.conf dan /etc/apache2/ports.conf"
           },
           {
             "id": "B",
-            "text": "Port 23"
+            "text": "/var/www/html/index.html"
           },
           {
             "id": "C",
-            "text": "Port 80"
+            "text": "/etc/hosts"
           },
           {
             "id": "D",
-            "text": "Port 443"
+            "text": "/etc/resolv.conf"
           },
           {
             "id": "E",
-            "text": "Port 22"
+            "text": "/etc/apache2/sites-available/000-default.conf"
           }
         ],
-        "answer": "E"
+        "answer": "A"
+      },
+      {
+        "id": 4,
+        "type": "mcq",
+        "cog": "C4",
+        "stem": "Perhatikan cuplikan pesan error berikut saat siswa mencoba memulai layanan Apache menggunakan perintah <code>sudo systemctl start apache2</code>:<br><code>Job for apache2.service failed because the control process exited with error code. See 'systemctl status apache2.service' and 'journalctl -xe' for details.</code><br>Setelah diperiksa melalui perintah log, ditemukan informasi tambahan: <code>AH00072: make_sock: could not bind to address [::]:80</code>. Analisis penyebab utama dari kegagalan tersebut adalah...",
+        "weight": 1,
+        "explanation": "Pesan error 'could not bind to address [::]:80' mengindikasikan bahwa port 80 sedang digunakan (occupied) oleh program atau layanan lain (seperti Nginx, Skype, atau layanan web lainnya). Akibatnya, Apache tidak dapat mengikat (bind) dirinya ke port tersebut saat layanan dijalankan.",
+        "generated_by": "gemini-3.5-flash-lite",
+        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Berkas HTML utama pada direktori root tidak ditemukan."
+          },
+          {
+            "id": "B",
+            "text": "Port 80 sudah digunakan oleh proses atau aplikasi lain di sistem."
+          },
+          {
+            "id": "C",
+            "text": "Hak akses pada direktori /var/www/html diatur terlalu ketat (chmod 000)."
+          },
+          {
+            "id": "D",
+            "text": "Paket aplikasi Apache belum terinstal secara sempurna di sistem."
+          },
+          {
+            "id": "E",
+            "text": "Alamat IP server belum dikonfigurasi dengan benar pada kartu jaringan."
+          }
+        ],
+        "answer": "B"
       },
       {
         "id": 5,
         "type": "mcq",
         "cog": "C4",
-        "stem": "Seorang siswa mencoba melakukan koneksi Telnet dari komputer klien ke server Ubuntu 24.04 di jaringan lokal. Namun, koneksi selalu ditolak atau mengalami waktu habis (connection timed out), meskipun koneksi ping ke IP server berhasil. Berdasarkan analisis praktikum jaringan, apa penyebab paling umum dari masalah tersebut pada sistem Ubuntu baru?",
+        "stem": "Sekolah berencana mengonfigurasi fitur Virtual Host pada webserver Apache agar satu komputer server dapat menampung dua situs web berbeda, yaitu 'www.praktikumjaringan.sch.id' dan 'www.smknusantara.sch.id'. Setelah membuat dua berkas konfigurasi berbeda di direktori 'sites-available', perintah manakah yang harus dieksekusi agar konfigurasi situs tersebut dapat diaktifkan oleh sistem Apache?",
         "weight": 1,
-        "explanation": "Jika ping berhasil tetapi layanan Telnet tidak bisa diakses (connection timed out atau connection refused), penyebab utamanya adalah paket Telnet server belum terinstal dengan benar atau layanan daemon-nya belum aktif di server. Ping hanya menguji lapisan jaringan (ICMP), bukan ketersediaan aplikasi port layanan tertentu.",
+        "explanation": "Perintah 'a2ensite' (Apache 2 Enable Site) adalah utilitas khusus pada Debian/Ubuntu untuk mengaktifkan berkas konfigurasi virtual host yang ada di direktori sites-available dengan cara membuat tautan simbolik (symlink) ke direktori sites-enabled. Setelah itu, layanan Apache perlu dimuat ulang (reload) agar konfigurasi baru diterapkan.",
         "generated_by": "gemini-3.5-flash-lite",
         "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
         "options": [
           {
             "id": "A",
-            "text": "Kabel UTP yang digunakan rusak total sehingga tidak bisa melewatkan paket data."
+            "text": "sudo apt-get update && sudo apt-get upgrade"
           },
           {
             "id": "B",
-            "text": "Layanan Telnet server belum diinstal atau daemon Telnet belum diaktifkan/dijalankan."
+            "text": "sudo a2ensite dan sudo systemctl reload apache2"
           },
           {
             "id": "C",
-            "text": "Alamat IP klien berada dalam satu segmen yang sama dengan server."
+            "text": "sudo ufw allow 80/tcp"
           },
           {
             "id": "D",
-            "text": "Kunci SSH pada klien belum disalin ke server."
+            "text": "sudo systemctl enable apache2"
           },
           {
             "id": "E",
-            "text": "Versi kernel Linux pada klien tidak kompatibel dengan server."
+            "text": "sudo chmod -R 777 /var/www/html"
           }
         ],
         "answer": "B"
-      },
-      {
-        "id": 6,
-        "type": "mcq",
-        "cog": "C3",
-        "stem": "Dalam praktikum administrasi server, seorang siswa kelas XII melakukan instalasi panel kontrol web hosting gratis open-source, yaitu <code>CyberPanel</code>, di atas sistem operasi Ubuntu server. Sebelum instalasi dimulai melalui skrip otomatis, port standar berapakah yang wajib dipastikan terbuka pada sistem Firewall server agar layanan web berbasis OpenLiteSpeed dan antarmuka panel dapat diakses publik?",
-        "weight": 1,
-        "explanation": "CyberPanel secara default menggunakan port 8090 untuk mengakses antarmuka manajemen berbasis web administraturnya (baik melalui HTTP maupun HTTPS). Port 21 digunakan untuk FTP, port 3306 untuk database, port 53 untuk DNS, dan port 22 untuk SSH. Mengetahui port default panel hosting sangat penting agar administrator tidak mengalami kendala saat pertama kali membuka halaman login panel setelah instalasi selesai.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "options": [
-          {
-            "id": "A",
-            "text": "Port 21 untuk FTP"
-          },
-          {
-            "id": "B",
-            "text": "Port 8090 untuk akses web CyberPanel"
-          },
-          {
-            "id": "C",
-            "text": "Port 3306 untuk basis data MySQL"
-          },
-          {
-            "id": "D",
-            "text": "Port 53 untuk layanan DNS BIND"
-          },
-          {
-            "id": "E",
-            "text": "Port 22 untuk akses aman SSH"
-          }
-        ],
-        "answer": "B"
-      },
-      {
-        "id": 7,
-        "type": "mcq_complex",
-        "cog": "C4",
-        "stem": "Seorang administrator jaringan sekolah sedang mengevaluasi keamanan server web hosting menggunakan cPanel/WHM atau panel open-source mandiri. Manakah dari tindakan berikut yang merupakan langkah preventif yang tepat untuk mengamankan akses panel hosting dari serangan siber brute-force? (Pilih semua jawaban yang benar)",
-        "weight": 1.5,
-        "explanation": "Mengubah port default (A), mengaktifkan CSF/Fail2ban untuk memblokir IP penyerang (C), dan menggunakan autentikasi dua faktor (E) adalah praktik terbaik keamanan server. Meniadakan SSL (B) justru membahayakan enkripsi data, dan menggunakan password sederhana (D) memperbesar celah pembobolan akun.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "options": [
-          {
-            "id": "A",
-            "text": "Mengubah port default akses panel administrasi dari port standar ke port kustom yang tidak umum."
-          },
-          {
-            "id": "B",
-            "text": "Meniadakan sepenuhnya fitur SSL/TLS pada domain utama agar server lebih cepat diakses."
-          },
-          {
-            "id": "C",
-            "text": "Mengaktifkan layanan pemblokir otomatis seperti ConfigServer Security & Firewall (CSF) atau Fail2ban."
-          },
-          {
-            "id": "D",
-            "text": "Membiarkan sandi (password) akun root menggunakan kombinasi angka sederhana agar mudah diingat siswa."
-          },
-          {
-            "id": "E",
-            "text": "Menerapkan autentikasi dua faktor (Two-Factor Authentication/2FA) bagi seluruh pengguna tingkat administrator."
-          }
-        ],
-        "answer": [
-          "A",
-          "C",
-          "E"
-        ]
-      },
-      {
-        "id": 8,
-        "type": "true_false",
-        "cog": "C3",
-        "stem": "Evaluasi pernyataan berikut terkait fungsi komponen dan prasyarat sistem sebelum melakukan instalasi hosting panel (seperti aaPanel, CyberPanel, atau HestiaCP) di lingkungan Linux.",
-        "weight": 1.5,
-        "explanation": "Pernyataan 0 benar karena instalasi panel di atas OS bersih menghindari konflik port dan dependensi paket. Pernyataan 1 salah karena record DNS sangat penting untuk penerbitan SSL otomatis dan resolusi domain panel. Pernyataan 2 benar karena skrip panel hosting dirancang mandiri untuk menyiapkan tumpukan LAMP/LEMP secara otomatis.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "statements": [
-          {
-            "id": 0,
-            "text": "Sebagian besar panel hosting mandiri (self-hosted control panel) menyarankan instalasi dilakukan pada sistem operasi Linux bersih (fresh install) tanpa adanya tumpukan layanan web server atau database yang sudah terpasang sebelumnya.",
-            "key": "B"
-          },
-          {
-            "id": 1,
-            "text": "Record DNS bertipe 'A' atau 'CNAME' yang mengarahkan domain utama ke alamat IP publik server tidak diperlukan saat proses instalasi panel hosting.",
-            "key": "S"
-          },
-          {
-            "id": 2,
-            "text": "Layanan web server seperti Nginx atau Apache, serta database server seperti MariaDB, umumnya akan otomatis terpasang dan dikonfigurasi oleh skrip instalasi panel hosting.",
-            "key": "B"
-          }
-        ],
-        "answer": {
-          "0": "B",
-          "1": "S",
-          "2": "B"
-        }
-      },
-      {
-        "id": 9,
-        "type": "matching",
-        "cog": "C3",
-        "stem": "Pasangkan istilah atau komponen penting dalam pengelolaan hosting panel di sebelah kiri dengan deskripsi fungsi yang sesuai di sebelah kanan:",
-        "weight": 2,
-        "explanation": "phpMyAdmin berfungsi untuk manajemen database (B), Let's Encrypt menyediakan SSL gratis (C), dan server FTP digunakan untuk transfer berkas website (A).",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "premises": [
-          {
-            "id": 0,
-            "text": "phpMyAdmin"
-          },
-          {
-            "id": 1,
-            "text": "Let's Encrypt"
-          },
-          {
-            "id": 2,
-            "text": "FTP Server (vsftpd/ProFTPD)"
-          }
-        ],
-        "targets": [
-          {
-            "id": "A",
-            "text": "Layanan yang memfasilitasi pengelolaan berkas website antara komputer lokal dan direktori server secara jarak jauh."
-          },
-          {
-            "id": "B",
-            "text": "Aplikasi berbasis web untuk mengelola basis data relasional MySQL atau MariaDB secara grafis."
-          },
-          {
-            "id": "C",
-            "text": "Penyedia sertifikat SSL/TLS gratis yang sering terintegrasi secara otomatis di dalam panel hosting untuk mengamankan trafik HTTPS."
-          }
-        ],
-        "answer": {
-          "0": "B",
-          "1": "C",
-          "2": "A"
-        }
-      },
-      {
-        "id": 10,
-        "type": "short_essay",
-        "cog": "C2",
-        "stem": "Sebutkan nama layanan protokol jaringan yang secara default berjalan pada port 443 dan digunakan untuk mengamankan seluruh komunikasi data berbasis web (HTTPS) pada situs yang dikelola melalui hosting panel!",
-        "weight": 1,
-        "explanation": "Port 443 digunakan untuk protokol HTTPS yang mengandalkan teknologi enkripsi SSL (Secure Sockets Layer) atau TLS (Transport Layer Security) guna menjaga kerahasiaan data antara peramban pengguna dan server web hosting.",
-        "generated_by": "gemini-3.5-flash-lite",
-        "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-        "answer_keys": [
-          "SSL",
-          "TLS",
-          "Secure Sockets Layer",
-          "Transport Layer Security"
-        ]
       }
     ]
   }

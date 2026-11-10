@@ -328,18 +328,25 @@ const DEFAULT_SCHOOL_PROFILE = {
 };
 
 let schoolProfile = { ...DEFAULT_SCHOOL_PROFILE };
-if (fs.existsSync(SCHOOL_PROFILE_PATH)) {
-  try {
-    const raw = fs.readFileSync(SCHOOL_PROFILE_PATH, 'utf8');
-    schoolProfile = { ...schoolProfile, ...JSON.parse(raw) };
-  } catch (err) {
-    console.error('[Pengaturan] Gagal membaca school_profile.json, menggunakan default:', err.message);
+
+function loadSchoolProfileFromFile() {
+  if (fs.existsSync(SCHOOL_PROFILE_PATH)) {
+    try {
+      const raw = fs.readFileSync(SCHOOL_PROFILE_PATH, 'utf8');
+      schoolProfile = { ...DEFAULT_SCHOOL_PROFILE, ...JSON.parse(raw) };
+    } catch (err) {
+      console.error('[Pengaturan] Gagal membaca school_profile.json, menggunakan default:', err.message);
+      schoolProfile = { ...DEFAULT_SCHOOL_PROFILE };
+    }
+  } else {
+    try {
+      schoolProfile = { ...DEFAULT_SCHOOL_PROFILE };
+      fs.writeFileSync(SCHOOL_PROFILE_PATH, JSON.stringify(schoolProfile, null, 2), 'utf8');
+    } catch (err) {}
   }
-} else {
-  try {
-    fs.writeFileSync(SCHOOL_PROFILE_PATH, JSON.stringify(schoolProfile, null, 2), 'utf8');
-  } catch (err) {}
 }
+
+loadSchoolProfileFromFile();
 
 // ==============================================================
 // SANITASI & NORMALISASI STRUKTUR ASESMEN (STANDAR TKA & AI GENERATOR)
@@ -525,20 +532,25 @@ function repairCorruptedQuestionBanks(banks) {
 const QUESTION_BANKS_FILE = path.join(__dirname, 'question_banks.json');
 let QUESTION_BANKS = [];
 
-if (fs.existsSync(QUESTION_BANKS_FILE)) {
-  try {
-    const raw = fs.readFileSync(QUESTION_BANKS_FILE, 'utf8');
-    QUESTION_BANKS = JSON.parse(raw);
-    const repaired = repairCorruptedQuestionBanks(QUESTION_BANKS);
-    if (repaired > 0) {
-      console.log(`[Bank Soal] Berhasil memulihkan ${repaired} butir soal yang opsi jawabannya terkorupsi!`);
-      saveQuestionBanksToFile();
+function loadQuestionBanksFromFile() {
+  if (fs.existsSync(QUESTION_BANKS_FILE)) {
+    try {
+      const raw = fs.readFileSync(QUESTION_BANKS_FILE, 'utf8');
+      QUESTION_BANKS = JSON.parse(raw);
+      const repaired = repairCorruptedQuestionBanks(QUESTION_BANKS);
+      if (repaired > 0) {
+        console.log(`[Bank Soal] Berhasil memulihkan ${repaired} butir soal yang opsi jawabannya terkorupsi!`);
+        saveQuestionBanksToFile();
+      }
+      console.log(`[Bank Soal] Berhasil memuat ${QUESTION_BANKS.length} bank soal dari question_banks.json`);
+    } catch (err) {
+      console.error('[Bank Soal] Gagal membaca question_banks.json, menggunakan fallback:', err.message);
+      QUESTION_BANKS = [];
     }
-    console.log(`[Bank Soal] Berhasil memuat ${QUESTION_BANKS.length} bank soal dari question_banks.json`);
-  } catch (err) {
-    console.error('[Bank Soal] Gagal membaca question_banks.json, menggunakan fallback:', err.message);
   }
 }
+
+loadQuestionBanksFromFile();
 
 function saveQuestionBanksToFile() {
   try {
@@ -1457,6 +1469,279 @@ function saveExamAttendanceToFile() {
 }
 
 loadExamAttendanceFromFile();
+
+// ==============================================================
+// BACKUP & RESTORE ENGINE (Pusmendik / ANBK Standard)
+// ==============================================================
+const BACKUP_DIR = path.join(__dirname, 'backups');
+const BACKUP_LATEST_DIR = path.join(BACKUP_DIR, 'latest');
+if (!fs.existsSync(BACKUP_DIR)) fs.mkdirSync(BACKUP_DIR, { recursive: true });
+if (!fs.existsSync(BACKUP_LATEST_DIR)) fs.mkdirSync(BACKUP_LATEST_DIR, { recursive: true });
+
+function formatBackupBytes(bytes) {
+  if (!bytes || bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function reloadAllMasterData() {
+  loadUsersFromFile();
+  loadStudentsFromFile();
+  loadSubjectsFromFile();
+  loadClassesFromFile();
+  loadSchoolProfileFromFile();
+  loadQuestionBanksFromFile();
+  loadSchedulesFromFile();
+  loadExamAttendanceFromFile();
+  syncGlobalUsers();
+  console.log('[Backup Engine] Seluruh data master & pengaturan berhasil dimuat ulang ke memori server!');
+}
+
+function generateConsolidatedBackupData(callerName = 'Administrator') {
+  const readJsonSafe = (filePath, fallback) => {
+    try {
+      if (fs.existsSync(filePath)) {
+        return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      }
+    } catch (e) {
+      console.error(`[Backup Engine] Gagal membaca ${filePath}:`, e.message);
+    }
+    return fallback;
+  };
+
+  const qbData = readJsonSafe(QUESTION_BANKS_FILE, QUESTION_BANKS);
+  const stData = readJsonSafe(STUDENTS_FILE, USERS.filter(u => u.role === 'student'));
+  const clData = readJsonSafe(CLASSES_FILE, MASTER_CLASSES);
+  const sbData = readJsonSafe(SUBJECTS_FILE, MASTER_SUBJECTS);
+  const scData = readJsonSafe(SCHEDULES_FILE, SCHEDULES);
+  const spData = readJsonSafe(SCHOOL_PROFILE_PATH, schoolProfile);
+  const usData = readJsonSafe(USERS_FILE, STAFF_USERS);
+  const eaData = readJsonSafe(EXAM_ATTENDANCE_FILE, EXAM_ATTENDANCE);
+  const rcPath = path.join(__dirname, 'redis_config.json');
+  const rcData = readJsonSafe(rcPath, null);
+
+  let totalQuestions = 0;
+  if (Array.isArray(qbData)) {
+    qbData.forEach(b => {
+      if (b && Array.isArray(b.questions)) totalQuestions += b.questions.length;
+    });
+  }
+
+  const timestampIso = new Date().toISOString();
+  const timestampLocal = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
+
+  return {
+    backup_info: {
+      system: 'CBT & LMS Terintegrasi AI (Pusmendik / ANBK Standard)',
+      version: '2.0.0-PROD',
+      created_at: timestampIso,
+      timestamp_local: timestampLocal,
+      created_by: callerName,
+      schema_version: '1.0'
+    },
+    statistics: {
+      question_banks: Array.isArray(qbData) ? qbData.length : 0,
+      questions: totalQuestions,
+      students: Array.isArray(stData) ? stData.length : 0,
+      classes: Array.isArray(clData) ? clData.length : 0,
+      subjects: Array.isArray(sbData) ? sbData.length : 0,
+      schedules: Array.isArray(scData) ? scData.length : 0,
+      users: Array.isArray(usData) ? usData.length : 0,
+      exam_attendance: eaData && typeof eaData === 'object' ? Object.keys(eaData).length : 0,
+      has_redis_config: !!rcData,
+      school_profile: 1
+    },
+    data: {
+      question_banks: qbData,
+      students: stData,
+      classes: clData,
+      subjects: sbData,
+      schedules: scData,
+      school_profile: spData,
+      users: usData,
+      exam_attendance: eaData,
+      redis_config: rcData
+    }
+  };
+}
+
+function saveServerSnapshot(callerName = 'Administrator', prefix = 'cbt_backup') {
+  if (!fs.existsSync(BACKUP_DIR)) fs.mkdirSync(BACKUP_DIR, { recursive: true });
+  if (!fs.existsSync(BACKUP_LATEST_DIR)) fs.mkdirSync(BACKUP_LATEST_DIR, { recursive: true });
+
+  const backupData = generateConsolidatedBackupData(callerName);
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  const dateTag = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+  const filename = `${prefix}_${dateTag}.json`;
+  const filePath = path.join(BACKUP_DIR, filename);
+
+  const jsonStr = JSON.stringify(backupData, null, 2);
+  fs.writeFileSync(filePath, jsonStr, 'utf8');
+
+  // Update latest snapshots
+  try {
+    fs.writeFileSync(path.join(BACKUP_DIR, 'cbt_database_master_backup.json'), jsonStr, 'utf8');
+    const filesToSync = [
+      { name: 'question_banks.json', data: backupData.data.question_banks },
+      { name: 'students.json', data: backupData.data.students },
+      { name: 'classes.json', data: backupData.data.classes },
+      { name: 'subjects.json', data: backupData.data.subjects },
+      { name: 'schedules.json', data: backupData.data.schedules },
+      { name: 'school_profile.json', data: backupData.data.school_profile },
+      { name: 'users.json', data: backupData.data.users },
+      { name: 'exam_attendance.json', data: backupData.data.exam_attendance },
+    ];
+    filesToSync.forEach(item => {
+      if (item.data !== undefined && item.data !== null) {
+        fs.writeFileSync(path.join(BACKUP_LATEST_DIR, item.name), JSON.stringify(item.data, null, 2), 'utf8');
+      }
+    });
+  } catch (e) {}
+
+  const stats = fs.statSync(filePath);
+  return {
+    filename,
+    filePath,
+    sizeBytes: stats.size,
+    sizeFormatted: formatBackupBytes(stats.size),
+    created_at: backupData.backup_info.created_at,
+    timestamp_local: backupData.backup_info.timestamp_local,
+    statistics: backupData.statistics
+  };
+}
+
+function executeRestoreData(backupPayload, mode = 'replace', selectedComponents = {}) {
+  // 1. Safety automatic pre-restore snapshot
+  const prerestore = saveServerSnapshot('System (Auto Pre-Restore)', 'cbt_backup_auto_prerestore');
+
+  // 2. Unwrap payload
+  const sourceData = (backupPayload && backupPayload.data) ? backupPayload.data : (backupPayload || {});
+
+  const restoredComponents = [];
+
+  // Helper merge arrays by primary key
+  const mergeArray = (existing, incoming, key = 'id') => {
+    if (!Array.isArray(existing)) existing = [];
+    if (!Array.isArray(incoming)) return existing;
+    const map = new Map();
+    existing.forEach(item => {
+      if (item && item[key] !== undefined) map.set(String(item[key]).toLowerCase(), item);
+    });
+    incoming.forEach(item => {
+      if (item && item[key] !== undefined) {
+        map.set(String(item[key]).toLowerCase(), item);
+      } else {
+        existing.push(item);
+      }
+    });
+    return Array.from(map.values());
+  };
+
+  // 2.1 Question Banks
+  if (selectedComponents.question_banks && sourceData.question_banks) {
+    let finalBanks = sourceData.question_banks;
+    if (mode === 'merge') {
+      finalBanks = mergeArray(QUESTION_BANKS, sourceData.question_banks, 'id');
+    }
+    fs.writeFileSync(QUESTION_BANKS_FILE, JSON.stringify(finalBanks, null, 2), 'utf8');
+    restoredComponents.push('Bank Soal & Butir Soal');
+  }
+
+  // 2.2 Students
+  if (selectedComponents.students && sourceData.students) {
+    let finalStudents = sourceData.students;
+    if (mode === 'merge') {
+      const curStudents = USERS.filter(u => u.role === 'student');
+      finalStudents = mergeArray(curStudents, sourceData.students, 'username');
+    }
+    fs.writeFileSync(STUDENTS_FILE, JSON.stringify(finalStudents, null, 2), 'utf8');
+    restoredComponents.push('Data Siswa');
+  }
+
+  // 2.3 Classes
+  if (selectedComponents.classes && sourceData.classes) {
+    let finalClasses = sourceData.classes;
+    if (mode === 'merge') {
+      finalClasses = mergeArray(MASTER_CLASSES, sourceData.classes, 'id');
+    }
+    fs.writeFileSync(CLASSES_FILE, JSON.stringify(finalClasses, null, 2), 'utf8');
+    restoredComponents.push('Kelas & Rombel');
+  }
+
+  // 2.4 Subjects
+  if (selectedComponents.subjects && sourceData.subjects) {
+    let finalSubjects = sourceData.subjects;
+    if (mode === 'merge') {
+      finalSubjects = mergeArray(MASTER_SUBJECTS, sourceData.subjects, 'id');
+    }
+    fs.writeFileSync(SUBJECTS_FILE, JSON.stringify(finalSubjects, null, 2), 'utf8');
+    restoredComponents.push('Mata Pelajaran (Mapel)');
+  }
+
+  // 2.5 Schedules
+  if (selectedComponents.schedules && sourceData.schedules) {
+    let finalSchedules = sourceData.schedules;
+    if (mode === 'merge') {
+      finalSchedules = mergeArray(SCHEDULES, sourceData.schedules, 'id');
+    }
+    fs.writeFileSync(SCHEDULES_FILE, JSON.stringify(finalSchedules, null, 2), 'utf8');
+    restoredComponents.push('Jadwal Ujian CBT');
+  }
+
+  // 2.6 School Profile
+  if (selectedComponents.school_profile && sourceData.school_profile) {
+    let finalProfile = sourceData.school_profile;
+    if (mode === 'merge') {
+      finalProfile = { ...schoolProfile, ...sourceData.school_profile };
+    }
+    fs.writeFileSync(SCHOOL_PROFILE_PATH, JSON.stringify(finalProfile, null, 2), 'utf8');
+    restoredComponents.push('Profil & Identitas Sekolah');
+  }
+
+  // 2.7 Users (Staff: Admin, Guru, Proktor)
+  if (selectedComponents.users && sourceData.users) {
+    let finalUsers = sourceData.users;
+    if (mode === 'merge') {
+      finalUsers = mergeArray(STAFF_USERS, sourceData.users, 'username');
+    }
+    // Safety: ensure default admin exists so user is never locked out
+    if (!finalUsers.some(u => u.username === 'admin')) {
+      finalUsers.unshift({ id: 1, username: 'admin', pass: 'admin123', full_name: 'Administrator Sekolah', role: 'admin' });
+    }
+    fs.writeFileSync(USERS_FILE, JSON.stringify(finalUsers, null, 2), 'utf8');
+    restoredComponents.push('User & Role Pengelola');
+  }
+
+  // 2.8 Exam Attendance
+  if (selectedComponents.exam_attendance && sourceData.exam_attendance) {
+    let finalAttendance = sourceData.exam_attendance;
+    if (mode === 'merge') {
+      finalAttendance = { ...EXAM_ATTENDANCE, ...sourceData.exam_attendance };
+    }
+    fs.writeFileSync(EXAM_ATTENDANCE_FILE, JSON.stringify(finalAttendance, null, 2), 'utf8');
+    restoredComponents.push('Berita Acara & Absensi');
+  }
+
+  // 2.9 Redis Config
+  if (selectedComponents.redis_config && sourceData.redis_config) {
+    const rcPath = path.join(__dirname, 'redis_config.json');
+    fs.writeFileSync(rcPath, JSON.stringify(sourceData.redis_config, null, 2), 'utf8');
+    restoredComponents.push('Konfigurasi Redis');
+  }
+
+  // 3. Reload everything into server memory immediately
+  reloadAllMasterData();
+
+  return {
+    success: true,
+    restoredComponents,
+    prerestore_snapshot: prerestore.filename,
+    mode
+  };
+}
 
 function getIndonesianDateString(date = new Date()) {
   const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -6397,6 +6682,246 @@ const server = http.createServer(async (req, res) => {
       message: 'Lockdown status updated',
       lockdown_mode: lockdownMode,
     });
+  }
+
+  // ==============================================================
+  // BACKUP & RESTORE API ENDPOINTS (Admin Only)
+  // ==============================================================
+
+  // GET /api/v1/admin/backup/overview
+  if (pathname === '/api/v1/admin/backup/overview' && req.method === 'GET') {
+    const authUser = getUserFromToken(req);
+    if (authUser && (authUser.rol === 'teacher' || authUser.rol === 'guru' || authUser.rol === 'student')) {
+      return sendJSON(403, { status: 'error', message: 'Akses ditolak: Backup & Restore hanya dapat diakses oleh Administrator.' });
+    }
+    let totalQuestions = 0;
+    QUESTION_BANKS.forEach(b => {
+      if (b && Array.isArray(b.questions)) totalQuestions += b.questions.length;
+    });
+
+    let snapshotCount = 0;
+    let latestSnapshot = null;
+    try {
+      if (fs.existsSync(BACKUP_DIR)) {
+        const files = fs.readdirSync(BACKUP_DIR).filter(f => f.endsWith('.json'));
+        snapshotCount = files.length;
+        if (files.length > 0) {
+          const stats = files.map(f => {
+            const st = fs.statSync(path.join(BACKUP_DIR, f));
+            return { filename: f, mtime: st.mtimeMs, size: st.size };
+          }).sort((a, b) => b.mtime - a.mtime);
+          latestSnapshot = {
+            filename: stats[0].filename,
+            size_formatted: formatBackupBytes(stats[0].size),
+            timestamp: new Date(stats[0].mtime).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })
+          };
+        }
+      }
+    } catch (e) {}
+
+    return sendJSON(200, {
+      status: 'success',
+      data: {
+        statistics: {
+          question_banks: QUESTION_BANKS.length,
+          questions: totalQuestions,
+          students: USERS.filter(u => u.role === 'student').length,
+          classes: MASTER_CLASSES.length,
+          subjects: MASTER_SUBJECTS.length,
+          schedules: SCHEDULES.length,
+          users: STAFF_USERS.length,
+          attendance: Object.keys(EXAM_ATTENDANCE).length,
+          server_snapshot_count: snapshotCount,
+          latest_snapshot: latestSnapshot
+        }
+      }
+    });
+  }
+
+  // GET /api/v1/admin/backup/export
+  if (pathname === '/api/v1/admin/backup/export' && req.method === 'GET') {
+    const authUser = getUserFromToken(req);
+    if (authUser && (authUser.rol === 'teacher' || authUser.rol === 'guru' || authUser.rol === 'student')) {
+      return sendJSON(403, { status: 'error', message: 'Akses ditolak: Backup & Restore hanya dapat diakses oleh Administrator.' });
+    }
+    const caller = (authUser && authUser.usr) ? authUser.usr : 'Administrator';
+    const backupData = generateConsolidatedBackupData(caller);
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const filename = `cbt_backup_${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}.json`;
+
+    const jsonStr = JSON.stringify(backupData, null, 2);
+    res.writeHead(200, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Length': Buffer.byteLength(jsonStr, 'utf8')
+    });
+    return res.end(jsonStr);
+  }
+
+  // POST /api/v1/admin/backup/create
+  if (pathname === '/api/v1/admin/backup/create' && req.method === 'POST') {
+    const authUser = getUserFromToken(req);
+    if (authUser && (authUser.rol === 'teacher' || authUser.rol === 'guru' || authUser.rol === 'student')) {
+      return sendJSON(403, { status: 'error', message: 'Akses ditolak: Backup & Restore hanya dapat diakses oleh Administrator.' });
+    }
+    const caller = (authUser && authUser.usr) ? authUser.usr : 'Administrator';
+    const snapshot = saveServerSnapshot(caller, 'cbt_backup');
+    return sendJSON(200, {
+      status: 'success',
+      message: 'Snapshot cadangan server berhasil dibuat!',
+      snapshot
+    });
+  }
+
+  // GET /api/v1/admin/backup/list
+  if (pathname === '/api/v1/admin/backup/list' && req.method === 'GET') {
+    const authUser = getUserFromToken(req);
+    if (authUser && (authUser.rol === 'teacher' || authUser.rol === 'guru' || authUser.rol === 'student')) {
+      return sendJSON(403, { status: 'error', message: 'Akses ditolak: Backup & Restore hanya dapat diakses oleh Administrator.' });
+    }
+    if (!fs.existsSync(BACKUP_DIR)) {
+      return sendJSON(200, { status: 'success', backups: [] });
+    }
+    const items = fs.readdirSync(BACKUP_DIR);
+    const backups = [];
+    items.forEach(file => {
+      const fullPath = path.join(BACKUP_DIR, file);
+      try {
+        const stat = fs.statSync(fullPath);
+        if (stat.isFile() && file.endsWith('.json')) {
+          let info = null;
+          let stats = null;
+          try {
+            const raw = fs.readFileSync(fullPath, 'utf8');
+            if (raw.trim().startsWith('{')) {
+              const parsed = JSON.parse(raw);
+              info = parsed.backup_info || null;
+              stats = parsed.statistics || null;
+            }
+          } catch (pe) {}
+
+          backups.push({
+            filename: file,
+            size_bytes: stat.size,
+            size_formatted: formatBackupBytes(stat.size),
+            mtime_ms: stat.mtimeMs,
+            created_at: info && info.created_at ? info.created_at : new Date(stat.mtime).toISOString(),
+            timestamp_local: info && info.timestamp_local ? info.timestamp_local : new Date(stat.mtime).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }),
+            created_by: info && info.created_by ? info.created_by : 'Administrator',
+            is_prerestore: file.includes('prerestore'),
+            statistics: stats || {}
+          });
+        }
+      } catch (err) {}
+    });
+    backups.sort((a, b) => b.mtime_ms - a.mtime_ms);
+    return sendJSON(200, { status: 'success', backups });
+  }
+
+  // GET /api/v1/admin/backup/download-file?filename=...
+  if (pathname === '/api/v1/admin/backup/download-file' && req.method === 'GET') {
+    const authUser = getUserFromToken(req);
+    if (authUser && (authUser.rol === 'teacher' || authUser.rol === 'guru' || authUser.rol === 'student')) {
+      return sendJSON(403, { status: 'error', message: 'Akses ditolak: Backup & Restore hanya dapat diakses oleh Administrator.' });
+    }
+    const filename = path.basename(parsedUrl.searchParams.get('filename') || '');
+    if (!filename || !filename.endsWith('.json')) {
+      return sendJSON(400, { status: 'error', message: 'Nama file tidak valid' });
+    }
+    const filePath = path.join(BACKUP_DIR, filename);
+    if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+      return sendJSON(404, { status: 'error', message: 'File backup tidak ditemukan di server' });
+    }
+    const stat = fs.statSync(filePath);
+    res.writeHead(200, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Length': stat.size
+    });
+    return fs.createReadStream(filePath).pipe(res);
+  }
+
+  // POST /api/v1/admin/backup/delete-file
+  if (pathname === '/api/v1/admin/backup/delete-file' && req.method === 'POST') {
+    const authUser = getUserFromToken(req);
+    if (authUser && (authUser.rol === 'teacher' || authUser.rol === 'guru' || authUser.rol === 'student')) {
+      return sendJSON(403, { status: 'error', message: 'Akses ditolak: Backup & Restore hanya dapat diakses oleh Administrator.' });
+    }
+    const body = await parseBody(req);
+    const filename = path.basename(body.filename || '');
+    if (!filename || !filename.endsWith('.json')) {
+      return sendJSON(400, { status: 'error', message: 'Nama file tidak valid' });
+    }
+    const filePath = path.join(BACKUP_DIR, filename);
+    if (!fs.existsSync(filePath)) {
+      return sendJSON(404, { status: 'error', message: 'File backup tidak ditemukan di server' });
+    }
+    try {
+      fs.unlinkSync(filePath);
+      return sendJSON(200, { status: 'success', message: `File backup ${filename} berhasil dihapus.` });
+    } catch (e) {
+      return sendJSON(500, { status: 'error', message: `Gagal menghapus file: ${e.message}` });
+    }
+  }
+
+  // POST /api/v1/admin/backup/restore
+  if (pathname === '/api/v1/admin/backup/restore' && req.method === 'POST') {
+    const authUser = getUserFromToken(req);
+    if (authUser && (authUser.rol === 'teacher' || authUser.rol === 'guru' || authUser.rol === 'student')) {
+      return sendJSON(403, { status: 'error', message: 'Akses ditolak: Backup & Restore hanya dapat diakses oleh Administrator.' });
+    }
+    const body = await parseBody(req);
+    let backupPayload = null;
+
+    if (body.source === 'server_file') {
+      const filename = path.basename(body.filename || '');
+      if (!filename || !filename.endsWith('.json')) {
+        return sendJSON(400, { status: 'error', message: 'Nama file snapshot server tidak valid' });
+      }
+      const filePath = path.join(BACKUP_DIR, filename);
+      if (!fs.existsSync(filePath)) {
+        return sendJSON(404, { status: 'error', message: 'File snapshot tidak ditemukan di server' });
+      }
+      try {
+        backupPayload = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      } catch (e) {
+        return sendJSON(400, { status: 'error', message: `File snapshot korup atau bukan JSON valid: ${e.message}` });
+      }
+    } else {
+      backupPayload = body.backup_data;
+    }
+
+    if (!backupPayload || typeof backupPayload !== 'object') {
+      return sendJSON(400, { status: 'error', message: 'Data backup tidak ditemukan atau format JSON tidak sesuai.' });
+    }
+
+    const mode = body.restore_mode === 'merge' ? 'merge' : 'replace';
+    const components = body.components || {
+      question_banks: true,
+      students: true,
+      classes: true,
+      subjects: true,
+      schedules: true,
+      school_profile: true,
+      users: true,
+      exam_attendance: true
+    };
+
+    try {
+      const result = executeRestoreData(backupPayload, mode, components);
+      return sendJSON(200, {
+        status: 'success',
+        message: 'Pemulihan data database & pengaturan berhasil diterapkan!',
+        result
+      });
+    } catch (e) {
+      console.error('[Backup Engine] Gagal memulihkan data:', e);
+      return sendJSON(500, {
+        status: 'error',
+        message: `Gagal memulihkan data: ${e.message}`
+      });
+    }
   }
 
   // Fallback 404

@@ -1,16 +1,22 @@
 {
   "backup_info": {
     "system": "CBT & LMS Terintegrasi AI (Pusmendik / ANBK Standard)",
-    "created_at": "2026-10-23T08:11:23.109Z",
-    "timestamp_local": "23/10/2026, 15.11.23",
-    "version": "2.0.0-PROD"
+    "version": "2.0.0-PROD",
+    "created_at": "2026-11-10T04:20:05.634Z",
+    "timestamp_local": "10/11/2026, 11.20.05",
+    "created_by": "System (Auto Pre-Restore)",
+    "schema_version": "1.0"
   },
   "statistics": {
     "question_banks": 6,
+    "questions": 68,
     "students": 15,
-    "schedules": 8,
     "classes": 14,
     "subjects": 20,
+    "schedules": 8,
+    "users": 3,
+    "exam_attendance": 2,
+    "has_redis_config": true,
     "school_profile": 1
   },
   "data": {
@@ -2065,332 +2071,175 @@
       {
         "id": 6,
         "subject": "Jaringan Komputer & Telekomunikasi",
-        "title": "ASJ",
-        "teacher": "Drs. Budi Pratama, M.Pd.",
+        "title": "ASJ - Administrasi Sistem Jaringan",
+        "teacher": "Legiyanto, S.Pd",
         "target_class": "Semua Kelas",
         "description": "",
         "questions": [
           {
             "id": 1,
             "type": "mcq",
-            "cog": "C4",
-            "stem": "Seorang administrator jaringan di SMK sedang melakukan audit keamanan pada server Ubuntu Server kelas XI TKJ. Saat memeriksa log otentikasi melalui perintah <code>sudo tail -f /var/log/auth.log</code>, ditemukan baris peringatan berikut:<br><br><code>sshd[1942]: Connection reset by authenticating user admin [preauth]</code><br><code>sshd[1948]: Failed password for root from 192.168.10.45 port 54321 ssh2</code><br><br>Berdasarkan cuplikan log tersebut, langkah mitigasi paling tepat yang harus diterapkan dalam konfigurasi <code>/etc/ssh/sshd_config</code> untuk mencegah eksploitasi lanjutan adalah...",
+            "cog": "C2",
+            "stem": "Dalam praktikum administrasi server web, seorang siswa diminta untuk menginstal paket webserver Apache pada sistem operasi berbasis Debian/Ubuntu menggunakan terminal. Perintah manakah yang paling tepat untuk menjalankan instalasi tersebut?",
             "weight": 1,
-            "explanation": "Log menunjukkan adanya percobaan brute-force login menggunakan akun 'root' dari IP lokal 192.168.10.45. Praktik keamanan terbaik (best practice) pada OpenSSH server adalah melarang login langsung sebagai pengguna root (PermitRootLogin no) untuk mencegah penyerang mendapatkan hak akses tertinggi secara langsung, serta menggunakan autentikasi berbasis SSH Key.",
+            "explanation": "Pada sistem operasi berbasis Debian atau Ubuntu, paket resmi untuk webserver Apache adalah 'apache2' dan manajer paket yang digunakan adalah apt atau apt-get. Perintah 'sudo apt-get install apache2' adalah perintah yang benar dan baku. Opsi B dan C umum digunakan pada sistem berbasis RedHat/CentOS (httpd/yum), sedangkan opsi D adalah perintah untuk menjalankan layanan, bukan menginstalnya.",
             "generated_by": "gemini-3.5-flash-lite",
             "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
             "options": [
               {
                 "id": "A",
-                "text": "Mengubah port default SSH dari port 22 ke port yang tidak umum digunakan."
+                "text": "sudo apt-get install apache2"
               },
               {
                 "id": "B",
-                "text": "Menonaktifkan akses login langsung untuk pengguna root (PermitRootLogin no) dan membatasi autentikasi berbasis kunci publik."
+                "text": "sudo apt-get install httpd"
               },
               {
                 "id": "C",
-                "text": "Menonaktifkan protokol SSHv2 dan memaksa penggunaan protokol SSHv1 untuk enkripsi yang lebih cepat."
+                "text": "sudo yum install apache2"
               },
               {
                 "id": "D",
-                "text": "Mengaktifkan X11Forwarding agar sesi grafis dapat dipantau langsung oleh administrator."
+                "text": "sudo systemctl start apache2"
               },
               {
                 "id": "E",
-                "text": "Menaikkan nilai MaxSessions dan MaxStartups untuk menampung koneksi masuk secara bersamaan."
+                "text": "sudo apt-get install nginx"
               }
             ],
-            "answer": "B"
+            "answer": "A"
           },
           {
             "id": 2,
-            "type": "mcq_complex",
-            "cog": "C4",
-            "stem": "Seorang siswa kelas XI TKJ diminta mengonfigurasi akses SSH tanpa password (key-based authentication) dari klien Linux ke server jarak jauh. Siswa tersebut telah menjalankan perintah <code>ssh-keygen -t rsa -b 4096</code> pada mesin klien. Manakah dari pernyataan berikut yang merupakan langkah lanjutan yang benar dan aman? (Pilih dua jawaban yang benar)",
-            "weight": 1.5,
-            "explanation": "Penggunaan SSH key memerlukan transfer kunci PUBLIK (bukan privat) ke server, yang dapat dilakukan secara mudah via perintah `ssh-copy-id`. Selain itu, OpenSSH server sangat ketat terhadap izin berkas; jika direktori `.ssh` atau `authorized_keys` terlalu longgar (misalnya bisa ditulis oleh grup atauothers), server akan menolak autentikasi kunci tersebut demi alasan keamanan.",
-            "generated_by": "gemini-3.5-flash-lite",
-            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-            "options": [
-              {
-                "id": "A",
-                "text": "Menyalin berkas kunci publik (id_rsa.pub) ke direktori tujuan di server menggunakan perintah <code>ssh-copy-id</code>."
-              },
-              {
-                "id": "B",
-                "text": "Menyalin berkas kunci privat (id_rsa) ke direktori <code>/home/user/.ssh/authorized_keys</code> di server."
-              },
-              {
-                "id": "C",
-                "text": "Memastikan direktori <code>~/.ssh</code> di server memiliki hak akses (permissions) 700 dan berkas <code>authorized_keys</code> memiliki hak akses 600."
-              },
-              {
-                "id": "D",
-                "text": "Mengubah parameter konfigurasi server <code>PasswordAuthentication yes</code> menjadi wajib diaktifkan agar kunci publik berfungsi."
-              },
-              {
-                "id": "E",
-                "text": "Menghapus berkas kunci privat di mesin klien segera setelah proses transfer kunci selesai dilakukan."
-              }
-            ],
-            "answer": [
-              "A",
-              "C"
-            ]
-          },
-          {
-            "id": 3,
-            "type": "true_false",
-            "cog": "C4",
-            "stem": "Perhatikan konfigurasi file <code>/etc/ssh/sshd_config</code> pada server remote berikut:\n<code>Port 2222</code>\n<code>PermitRootLogin prohibit-password</code>\n<code>PubkeyAuthentication yes</code>\n<code>PasswordAuthentication no</code>\nTentukan kebenaran dari setiap pernyataan analisis teknis berikut berdasarkan konfigurasi tersebut:",
-            "weight": 1.5,
-            "explanation": "Pernyataan 0 salah karena Port SSH telah diubah ke 2222, sehingga klien harus menyertakan `-p 2222`. Pernyataan 1 benar karena `PermitRootLogin prohibit-password` mengizinkan root login asalkan memakai kunci publik. Pernyataan 2 benar karena `PasswordAuthentication no` menutup total metode login dengan password.",
-            "generated_by": "gemini-3.5-flash-lite",
-            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-            "statements": [
-              {
-                "id": 0,
-                "text": "Klien yang mencoba terhubung menggunakan perintah standar <code>ssh user@server_ip</code> tanpa menentukan port akan langsung berhasil terhubung ke server.",
-                "key": "S"
-              },
-              {
-                "id": 1,
-                "text": "Pengguna root diizinkan masuk ke server, tetapi hanya jika menggunakan metode autentikasi berbasis kunci (SSH key), bukan kata sandi.",
-                "key": "B"
-              },
-              {
-                "id": 2,
-                "text": "Server menolak semua upaya login yang mengandalkan autentikasi berbasis kata sandi (password) dari semua jenis akun pengguna.",
-                "key": "B"
-              }
-            ],
-            "answer": {
-              "0": "S",
-              "1": "B",
-              "2": "B"
-            }
-          },
-          {
-            "id": 4,
-            "type": "matching",
-            "cog": "C4",
-            "stem": "Pasangkan parameter konfigurasi SSH Server di sebelah kiri dengan fungsi atau dampak operasionalnya di sebelah kanan secara tepat:",
-            "weight": 2,
-            "explanation": "ClientAliveInterval mengatur keep-alive untuk mendeteksi koneksi idle/dead. X11Forwarding berkaitan dengan GUI forwarding. MaxAuthTries membatasi jumlah salah ketik password/key sebelum koneksi diputus untuk mencegah brute-force.",
-            "generated_by": "gemini-3.5-flash-lite",
-            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-            "premises": [
-              {
-                "id": 0,
-                "text": "ClientAliveInterval"
-              },
-              {
-                "id": 1,
-                "text": "X11Forwarding"
-              },
-              {
-                "id": 2,
-                "text": "MaxAuthTries"
-              }
-            ],
-            "targets": [
-              {
-                "id": "A",
-                "text": "Menentukan batas maksimum percobaan autentikasi yang diizinkan per koneksi koneksi SSH."
-              },
-              {
-                "id": "B",
-                "text": "Mengatur jeda waktu dalam detik di mana server akan mengirim sinyal kosong ke klien untuk mendeteksi koneksi yang terputus."
-              },
-              {
-                "id": "C",
-                "text": "Mengizinkan penerusan aplikasi grafis berbasis sistem windowing X11 dari jarak jauh."
-              }
-            ],
-            "answer": {
-              "0": "B",
-              "1": "C",
-              "2": "A"
-            }
-          },
-          {
-            "id": 5,
-            "type": "short_essay",
-            "cog": "C3",
-            "stem": "Sebutkan nama utilitas atau perintah bawaan paket OpenSSH yang digunakan untuk melakukan penyalinan berkas secara aman (secure file transfer) melalui protokol SSH di lingkungan terminal Linux.",
-            "weight": 1,
-            "explanation": "Perintah `scp` (Secure Copy Protocol) atau `sftp` (Secure File Transfer Protocol) adalah utilitas standar yang memanfaatkan terowongan SSH untuk menyalin berkas secara terenkripsi antara host lokal dan remote.",
-            "generated_by": "gemini-3.5-flash-lite",
-            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-            "answer_keys": [
-              "scp",
-              "sftp"
-            ]
-          },
-          {
-            "id": 6,
-            "type": "long_essay",
-            "cog": "C5",
-            "stem": "Sebuah perusahaan rintisan mengalami insiden keamanan di mana server produksi berbasis Debian yang menjalankan OpenSSH Server berhasil disusupi oleh penyerang melalui teknik brute-force pada port default (22) dengan akun layanan yang lemah. Sebagai seorang administrator jaringan profesional, Anda ditugaskan untuk melakukan hardoning (pengerasan) total pada layanan SSH tersebut.\nUraikan langkah-langkah komprehensif yang harus Anda lakukan, mencakup:\n1. Identifikasi celah keamanan utama pada skenario di atas.\n2. Analisis minimal 4 parameter penting dalam berkas <code>/etc/ssh/sshd_config</code> yang wajib diubah beserta nilai konfigurasinya.\n3. Implementasi lapisan keamanan tambahan di luar konfigurasi SSH bawaan (misalnya penggunaan firewall atau port knocking/fail2ban).",
-            "weight": 3,
-            "explanation": "Pengerasan SSH server memerlukan pendekatan berlapis, mulai dari perubahan port, pengetatan otentikasi daemon SSH, hingga proteksi eksternal menggunakan fail2ban untuk mitigasi serangan brute-force.",
-            "generated_by": "gemini-3.5-flash-lite",
-            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-            "rubric": "Kriteria penilaian: 35% ketepatan identifikasi celah, 35% ketepatan analisis dan parameter konfigurasi sshd_config, 30% implementasi pengamanan tambahan yang relevan.",
-            "ideal_answer": "1. Identifikasi celah: Penggunaan port default 22 memudahkan pemindaian botnet, izin login root aktif, dan autentikasi berbasis password lemah.\n2. Parameter sshd_config: Port diubah (misal: Port 2233), PermitRootLogin no, PasswordAuthentication no, MaxAuthTries 3.\n3. Lapisan tambahan: Instalasi fail2ban untuk memblokir IP penyerang secara otomatis setelah beberapa kali gagal login, atau pembatasan akses menggunakan UFW/iptables.",
-            "max_score": 100,
-            "keywords": [
-              "Port",
-              "PermitRootLogin",
-              "PasswordAuthentication",
-              "fail2ban",
-              "hardoning"
-            ]
-          },
-          {
-            "id": 7,
             "type": "mcq",
-            "cog": "C4",
-            "stem": "Saat seorang siswa mencoba melakukan koneksi SSH ke server praktikum, muncul pesan error di terminal klien sebagai berikut:<br><br><code>@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</code><br><code>@ WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED! @</code><br><code>@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</code><br><code>IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!</code><br><br>Apa akar masalah (root cause) utama yang memicu kemunculan peringatan keamanan tersebut?",
+            "cog": "C3",
+            "stem": "Siswa melakukan pengujian akses webserver Apache yang baru saja diinstal dengan mengetikkan alamat <code>http://localhost</code> atau alamat IP server pada browser web. Halaman yang muncul pertama kali dan bertuliskan 'Apache2 Ubuntu Default Page' menunjukkan bahwa layanan webserver telah berjalan. Di direktori manakah berkas halaman web bawaan (default) tersebut biasanya disimpan pada sistem Debian/Ubuntu?",
             "weight": 1,
-            "explanation": "Peringatan 'REMOTE HOST IDENTIFICATION HAS CHANGED' muncul ketika RSA/ECDSA/ED25519 host key dari server berbeda dengan yang tercatat di `~/.ssh/known_hosts` klien. Ini biasa terjadi jika server di-reinstall atau identitas IP-nya dipakai oleh perangkat lain.",
+            "explanation": "Secara default pada distribusi Debian dan Ubuntu, dokumen root atau direktori tempat penyimpanan berkas-berkas situs web utama (termasuk halaman sambutan default Apache) terletak di direktori '/var/www/html/'. Direktori /etc/apache2/sites-available/ digunakan untuk menyimpan berkas konfigurasi virtual host.",
             "generated_by": "gemini-3.5-flash-lite",
             "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
             "options": [
               {
                 "id": "A",
-                "text": "Layanan SSH di server belum diaktifkan atau mengalami crash pada port daemon."
+                "text": "/etc/apache2/sites-available/"
               },
               {
                 "id": "B",
-                "text": "Sidik jari (fingerprint) / kunci host di server telah berubah (misalnya karena instalasi ulang OS server), sehingga tidak cocok dengan catatan yang tersimpan di berkas <code>known_hosts</code> klien."
+                "text": "/var/www/html/"
               },
               {
                 "id": "C",
-                "text": "Klien salah memasukkan password sebanyak tiga kali berturut-turut sehingga terkena mekanisme auto-block."
+                "text": "/var/log/apache2/"
               },
               {
                 "id": "D",
-                "text": "Versi protokol SSH yang digunakan oleh klien tidak kompatibel dengan versi yang didukung oleh daemon server."
+                "text": "/usr/share/apache2/"
               },
               {
                 "id": "E",
-                "text": "Kunci privat milik pengguna di mesin klien telah kadaluarsa atau rusak."
+                "text": "/home/www/"
               }
             ],
             "answer": "B"
           },
           {
-            "id": 8,
-            "type": "mcq_complex",
-            "cog": "C4",
-            "stem": "Dalam manajemen terowongan jaringan (SSH Tunneling / Port Forwarding), seorang administrator sistem sering kali perlu meneruskan port lokal ke server jarak jauh. Manakah di antara perintah berikut yang benar dalam mengimplementasikan local port forwarding? (Pilih dua jawaban yang benar)",
-            "weight": 1.5,
-            "explanation": "Opsi A menggunakan flag `-L` yang merupakan sintaks baku untuk local port forwarding (port lokal diteruskan ke tujuan remote). Penjelasan pada opsi C sangat akurat mendeskripsikan cara kerjanya. Opsi D terbalik, dan opsi E benar mengenai dynamic forwarding.",
+            "id": 3,
+            "type": "mcq",
+            "cog": "C3",
+            "stem": "Seorang administrator jaringan ingin mengubah port default webserver Apache yang awalnya mendengarkan pada port 80 menjadi port 8080 karena port 80 sedang digunakan oleh aplikasi lain. Berkas konfigurasi utama manakah yang harus disunting untuk mengubah nomor port tersebut?",
+            "weight": 1,
+            "explanation": "Pengaturan port global pada webserver Apache di Ubuntu/Debian didefinisikan di dalam berkas 'ports.conf' serta direferensikan dalam konfigurasi utama 'apache2.conf'. Mengubah direktif 'Listen 80' menjadi 'Listen 8080' pada berkas ports.conf (dan menyesuaikan VirtualHost jika diperlukan) adalah langkah yang tepat.",
             "generated_by": "gemini-3.5-flash-lite",
             "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
             "options": [
               {
                 "id": "A",
-                "text": "<code>ssh -L 8080:localhost:80 user@remote_server</code>"
+                "text": "/etc/apache2/apache2.conf dan /etc/apache2/ports.conf"
               },
               {
                 "id": "B",
-                "text": "<code>ssh -R 8080:localhost:80 user@remote_server</code>"
+                "text": "/var/www/html/index.html"
               },
               {
                 "id": "C",
-                "text": "Perintah tersebut meneruskan lalu lintas dari port 8080 di mesin lokal ke port 80 pada server remote (atau jaringan lokal di sisi remote)."
+                "text": "/etc/hosts"
               },
               {
                 "id": "D",
-                "text": "Parameter <code>-L</code> digunakan secara eksklusif untuk remote port forwarding, sedangkan <code>-R</code> untuk local port forwarding."
+                "text": "/etc/resolv.conf"
               },
               {
                 "id": "E",
-                "text": "<code>ssh -D 1080 user@remote_server</code> digunakan untuk melakukan dynamic port forwarding (SOCKS proxy)."
+                "text": "/etc/apache2/sites-available/000-default.conf"
               }
             ],
-            "answer": [
-              "A",
-              "C"
-            ]
+            "answer": "A"
           },
           {
-            "id": 9,
-            "type": "true_false",
+            "id": 4,
+            "type": "mcq",
             "cog": "C4",
-            "stem": "Evaluasi pernyataan berikut terkait mekanisme kerja dan protokol keamanan SSH (Secure Shell):\n1. SSH beroperasi pada Layer Aplikasi dalam model OSI dan menggunakan protokol TCP pada port default 22.\n2. Seluruh data autentikasi dan muatan sesi (payload) ditransmisikan dalam bentuk teks biasa (plaintext) sebelum pertukaran kunci selesai dilakukan.\n3. SSH menyediakan enkripsi simetris untuk mengamankan data yang dikirimkan setelah proses negosiasi kunci asimetris selesai.",
-            "weight": 1.5,
-            "explanation": "Pernyataan 0 benar (TCP port 22). Pernyataan 1 salah karena bahkan pada fase awal, SSH melakukan pertukaran kunci (Diffie-Hellman) untuk membangun terowongan terenkripsi sebelum kredensial/autentikasi dikirim. Pernyataan 2 benar (menggunakan asimetris untuk autentikasi/pertukaran kunci, lalu simetris untuk kecepatan enkripsi data sesi).",
+            "stem": "Perhatikan cuplikan pesan error berikut saat siswa mencoba memulai layanan Apache menggunakan perintah <code>sudo systemctl start apache2</code>:<br><code>Job for apache2.service failed because the control process exited with error code. See 'systemctl status apache2.service' and 'journalctl -xe' for details.</code><br>Setelah diperiksa melalui perintah log, ditemukan informasi tambahan: <code>AH00072: make_sock: could not bind to address [::]:80</code>. Analisis penyebab utama dari kegagalan tersebut adalah...",
+            "weight": 1,
+            "explanation": "Pesan error 'could not bind to address [::]:80' mengindikasikan bahwa port 80 sedang digunakan (occupied) oleh program atau layanan lain (seperti Nginx, Skype, atau layanan web lainnya). Akibatnya, Apache tidak dapat mengikat (bind) dirinya ke port tersebut saat layanan dijalankan.",
             "generated_by": "gemini-3.5-flash-lite",
             "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-            "statements": [
-              {
-                "id": 0,
-                "text": "SSH beroperasi pada Layer Aplikasi dalam model OSI dan menggunakan protokol TCP pada port default 22.",
-                "key": "B"
-              },
-              {
-                "id": 1,
-                "text": "Seluruh data autentikasi dan muatan sesi (payload) ditransmisikan dalam bentuk teks biasa (plaintext) sebelum pertukaran kunci selesai dilakukan.",
-                "key": "S"
-              },
-              {
-                "id": 2,
-                "text": "SSH menyediakan enkripsi simetris untuk mengamankan data yang dikirimkan setelah proses negosiasi kunci asimetris selesai.",
-                "key": "B"
-              }
-            ],
-            "answer": {
-              "0": "B",
-              "1": "S",
-              "2": "B"
-            }
-          },
-          {
-            "id": 10,
-            "type": "matching",
-            "cog": "C4",
-            "stem": "Jodohkan perintah troubleshooting atau manajemen layanan SSH di Linux dengan fungsi operasionalnya yang sesuai:",
-            "weight": 2,
-            "explanation": "systemctl restart ssh menerapkan konfigurasi baru, sshd -t sangat berguna untuk memastikan tidak ada error sintaks di sshd_config yang dapat membuat server terkunci (lockout), dan journalctl -u ssh memantau log operasional SSH.",
-            "generated_by": "gemini-3.5-flash-lite",
-            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
-            "premises": [
-              {
-                "id": 0,
-                "text": "sudo systemctl restart ssh"
-              },
-              {
-                "id": 1,
-                "text": "sshd -t"
-              },
-              {
-                "id": 2,
-                "text": "journalctl -u ssh"
-              }
-            ],
-            "targets": [
+            "options": [
               {
                 "id": "A",
-                "text": "Melakukan uji sintaks (syntax check) pada file konfigurasi sshd_config sebelum daemon direstart."
+                "text": "Berkas HTML utama pada direktori root tidak ditemukan."
               },
               {
                 "id": "B",
-                "text": "Menerapkan perubahan parameter konfigurasi baru pada layanan SSH server."
+                "text": "Port 80 sudah digunakan oleh proses atau aplikasi lain di sistem."
               },
               {
                 "id": "C",
-                "text": "Menampilkan log sistem khusus yang berkaitan dengan aktivitas daemon SSH menggunakan systemd journal."
+                "text": "Hak akses pada direktori /var/www/html diatur terlalu ketat (chmod 000)."
+              },
+              {
+                "id": "D",
+                "text": "Paket aplikasi Apache belum terinstal secara sempurna di sistem."
+              },
+              {
+                "id": "E",
+                "text": "Alamat IP server belum dikonfigurasi dengan benar pada kartu jaringan."
               }
             ],
-            "answer": {
-              "0": "B",
-              "1": "A",
-              "2": "C"
-            }
+            "answer": "B"
+          },
+          {
+            "id": 5,
+            "type": "mcq",
+            "cog": "C4",
+            "stem": "Sekolah berencana mengonfigurasi fitur Virtual Host pada webserver Apache agar satu komputer server dapat menampung dua situs web berbeda, yaitu 'www.praktikumjaringan.sch.id' dan 'www.smknusantara.sch.id'. Setelah membuat dua berkas konfigurasi berbeda di direktori 'sites-available', perintah manakah yang harus dieksekusi agar konfigurasi situs tersebut dapat diaktifkan oleh sistem Apache?",
+            "weight": 1,
+            "explanation": "Perintah 'a2ensite' (Apache 2 Enable Site) adalah utilitas khusus pada Debian/Ubuntu untuk mengaktifkan berkas konfigurasi virtual host yang ada di direktori sites-available dengan cara membuat tautan simbolik (symlink) ke direktori sites-enabled. Setelah itu, layanan Apache perlu dimuat ulang (reload) agar konfigurasi baru diterapkan.",
+            "generated_by": "gemini-3.5-flash-lite",
+            "source_engine": "google_gemini_api (gemini-3.5-flash-lite)",
+            "options": [
+              {
+                "id": "A",
+                "text": "sudo apt-get update && sudo apt-get upgrade"
+              },
+              {
+                "id": "B",
+                "text": "sudo a2ensite dan sudo systemctl reload apache2"
+              },
+              {
+                "id": "C",
+                "text": "sudo ufw allow 80/tcp"
+              },
+              {
+                "id": "D",
+                "text": "sudo systemctl enable apache2"
+              },
+              {
+                "id": "E",
+                "text": "sudo chmod -R 777 /var/www/html"
+              }
+            ],
+            "answer": "B"
           }
         ]
       }
@@ -2635,131 +2484,6 @@
         "room": "Ruang Lab Komputer 02",
         "session": "Sesi 2 (10:00 - 12:00)",
         "server": "SRV-02"
-      }
-    ],
-    "schedules": [
-      {
-        "id": 1,
-        "title": "UAS Fisika Peminatan XII",
-        "bank_name": "Bank Termodinamika (5 Soal)",
-        "start_time": "Hari ini, 07:30 WIB",
-        "duration_minutes": 90,
-        "token_code": "56HLYE",
-        "shuffle_questions": true,
-        "shuffle_options": true,
-        "class_target": "Semua Kelas",
-        "package_url": "/static/packages/exam_1_enc.json",
-        "is_active": true,
-        "token_type": "static",
-        "token_interval": 15,
-        "token_updated_at": 1792713080774,
-        "token_prev_code": "5GEKV3",
-        "token_prev_expires_at": 1792713140774
-      },
-      {
-        "id": 2,
-        "title": "Penilaian Akhir Matematika Wajib XII",
-        "bank_name": "Bank Aljabar & Matriks (5 Soal)",
-        "start_time": "Hari ini, 10:00 WIB",
-        "duration_minutes": 120,
-        "token_code": "MTK2026",
-        "shuffle_questions": true,
-        "shuffle_options": true,
-        "class_target": "Semua Kelas",
-        "package_url": "/static/packages/exam_2_enc.json",
-        "is_active": true,
-        "token_type": "static",
-        "token_interval": 15
-      },
-      {
-        "id": 3,
-        "title": "Asesmen Bahasa Indonesia XII",
-        "bank_name": "Bank Teks Editorial & Puisi (5 Soal)",
-        "start_time": "Hari ini, 13:00 WIB",
-        "duration_minutes": 90,
-        "token_code": "BIND2026",
-        "shuffle_questions": true,
-        "shuffle_options": true,
-        "class_target": "Semua Kelas",
-        "package_url": "/static/packages/exam_3_enc.json",
-        "is_active": true,
-        "token_type": "static",
-        "token_interval": 15
-      },
-      {
-        "id": 4,
-        "title": "Penilaian Harian Kimia Organik XII",
-        "bank_name": "Bank Senyawa Karbon & Benzena (5 Soal)",
-        "start_time": "Hari ini, 14:30 WIB",
-        "duration_minutes": 90,
-        "token_code": "KIMIA26",
-        "shuffle_questions": true,
-        "shuffle_options": true,
-        "class_target": "XII IPA 1",
-        "package_url": "/static/packages/exam_4_enc.json",
-        "is_active": true,
-        "token_type": "static",
-        "token_interval": 15
-      },
-      {
-        "id": 5,
-        "title": "Ujian Biologi Genetika & Mutasi XII",
-        "bank_name": "Bank Substansi Genetika (5 Soal)",
-        "start_time": "Besok, 07:30 WIB",
-        "duration_minutes": 75,
-        "token_code": "BIOL2026",
-        "shuffle_questions": true,
-        "shuffle_options": true,
-        "class_target": "XII IPA 2",
-        "package_url": "/static/packages/exam_5_enc.json",
-        "is_active": true,
-        "token_type": "static",
-        "token_interval": 15
-      },
-      {
-        "id": 6,
-        "title": "Asesmen Bahasa Inggris XII (Listening & Reading)",
-        "bank_name": "Bank Narrative & Discussion (5 Soal)",
-        "start_time": "Besok, 10:00 WIB",
-        "duration_minutes": 90,
-        "token_code": "ENG2026",
-        "shuffle_questions": true,
-        "shuffle_options": true,
-        "class_target": "Semua Kelas",
-        "package_url": "/static/packages/exam_6_enc.json",
-        "is_active": true,
-        "token_type": "static",
-        "token_interval": 15
-      },
-      {
-        "id": 7,
-        "title": "Ujian Sekolah Sejarah Indonesia XII",
-        "bank_name": "Bank Pergerakan Nasional & Kemerdekaan (5 Soal)",
-        "start_time": "Lusa, 08:00 WIB",
-        "duration_minutes": 60,
-        "token_code": "SEJ2026",
-        "shuffle_questions": true,
-        "shuffle_options": true,
-        "class_target": "Semua Kelas",
-        "package_url": "/static/packages/exam_7_enc.json",
-        "is_active": true,
-        "token_type": "static",
-        "token_interval": 15
-      },
-      {
-        "id": 8,
-        "title": "Tryout Mandiri UTBK TPS XII",
-        "bank_name": "Bank Penalaran Matematika & Literasi (5 Soal)",
-        "start_time": "Lusa, 13:00 WIB",
-        "duration_minutes": 105,
-        "token_code": "TPS2026",
-        "shuffle_questions": true,
-        "shuffle_options": true,
-        "class_target": "Semua Kelas",
-        "package_url": "/static/packages/exam_8_enc.json",
-        "is_active": true,
-        "token_type": "static",
-        "token_interval": 15
       }
     ],
     "classes": [
@@ -3018,6 +2742,131 @@
         "group": "Umum"
       }
     ],
+    "schedules": [
+      {
+        "id": 1,
+        "title": "UAS Fisika Peminatan XII",
+        "bank_name": "Bank Termodinamika (5 Soal)",
+        "start_time": "Hari ini, 07:30 WIB",
+        "duration_minutes": 90,
+        "token_code": "56HLYE",
+        "shuffle_questions": true,
+        "shuffle_options": true,
+        "class_target": "Semua Kelas",
+        "package_url": "/static/packages/exam_1_enc.json",
+        "is_active": true,
+        "token_type": "static",
+        "token_interval": 15,
+        "token_updated_at": 1792713080774,
+        "token_prev_code": "5GEKV3",
+        "token_prev_expires_at": 1792713140774
+      },
+      {
+        "id": 2,
+        "title": "Penilaian Akhir Matematika Wajib XII",
+        "bank_name": "Bank Aljabar & Matriks (5 Soal)",
+        "start_time": "Hari ini, 10:00 WIB",
+        "duration_minutes": 120,
+        "token_code": "MTK2026",
+        "shuffle_questions": true,
+        "shuffle_options": true,
+        "class_target": "Semua Kelas",
+        "package_url": "/static/packages/exam_2_enc.json",
+        "is_active": true,
+        "token_type": "static",
+        "token_interval": 15
+      },
+      {
+        "id": 3,
+        "title": "Asesmen Bahasa Indonesia XII",
+        "bank_name": "Bank Teks Editorial & Puisi (5 Soal)",
+        "start_time": "Hari ini, 13:00 WIB",
+        "duration_minutes": 90,
+        "token_code": "BIND2026",
+        "shuffle_questions": true,
+        "shuffle_options": true,
+        "class_target": "Semua Kelas",
+        "package_url": "/static/packages/exam_3_enc.json",
+        "is_active": true,
+        "token_type": "static",
+        "token_interval": 15
+      },
+      {
+        "id": 4,
+        "title": "Penilaian Harian Kimia Organik XII",
+        "bank_name": "Bank Senyawa Karbon & Benzena (5 Soal)",
+        "start_time": "Hari ini, 14:30 WIB",
+        "duration_minutes": 90,
+        "token_code": "KIMIA26",
+        "shuffle_questions": true,
+        "shuffle_options": true,
+        "class_target": "XII IPA 1",
+        "package_url": "/static/packages/exam_4_enc.json",
+        "is_active": true,
+        "token_type": "static",
+        "token_interval": 15
+      },
+      {
+        "id": 5,
+        "title": "Ujian Biologi Genetika & Mutasi XII",
+        "bank_name": "Bank Substansi Genetika (5 Soal)",
+        "start_time": "Besok, 07:30 WIB",
+        "duration_minutes": 75,
+        "token_code": "BIOL2026",
+        "shuffle_questions": true,
+        "shuffle_options": true,
+        "class_target": "XII IPA 2",
+        "package_url": "/static/packages/exam_5_enc.json",
+        "is_active": true,
+        "token_type": "static",
+        "token_interval": 15
+      },
+      {
+        "id": 6,
+        "title": "Asesmen Bahasa Inggris XII (Listening & Reading)",
+        "bank_name": "Bank Narrative & Discussion (5 Soal)",
+        "start_time": "Besok, 10:00 WIB",
+        "duration_minutes": 90,
+        "token_code": "ENG2026",
+        "shuffle_questions": true,
+        "shuffle_options": true,
+        "class_target": "Semua Kelas",
+        "package_url": "/static/packages/exam_6_enc.json",
+        "is_active": true,
+        "token_type": "static",
+        "token_interval": 15
+      },
+      {
+        "id": 7,
+        "title": "Ujian Sekolah Sejarah Indonesia XII",
+        "bank_name": "Bank Pergerakan Nasional & Kemerdekaan (5 Soal)",
+        "start_time": "Lusa, 08:00 WIB",
+        "duration_minutes": 60,
+        "token_code": "SEJ2026",
+        "shuffle_questions": true,
+        "shuffle_options": true,
+        "class_target": "Semua Kelas",
+        "package_url": "/static/packages/exam_7_enc.json",
+        "is_active": true,
+        "token_type": "static",
+        "token_interval": 15
+      },
+      {
+        "id": 8,
+        "title": "Tryout Mandiri UTBK TPS XII",
+        "bank_name": "Bank Penalaran Matematika & Literasi (5 Soal)",
+        "start_time": "Lusa, 13:00 WIB",
+        "duration_minutes": 105,
+        "token_code": "TPS2026",
+        "shuffle_questions": true,
+        "shuffle_options": true,
+        "class_target": "Semua Kelas",
+        "package_url": "/static/packages/exam_8_enc.json",
+        "is_active": true,
+        "token_type": "static",
+        "token_interval": 15
+      }
+    ],
     "school_profile": {
       "name": "SMK NEGERI 5 BANDUNG",
       "npsn": "20219143",
@@ -3039,7 +2888,7 @@
       "exam_title_2": "ASESMEN SUMATIF AKHIR SEMESTER (ASAS)",
       "academic_year": "2026/2027",
       "semester": "Ganjil",
-      "signature_place": "Jakarta",
+      "signature_place": "Bandung",
       "signature_date": "21 Oktober 2026",
       "logo_url": "/static/uploads/logo_sekolah_1792567623623.png",
       "signature_url": "/static/uploads/ttd_kepsek_1792626005815.png",
@@ -3052,7 +2901,287 @@
       "show_student_photo": false,
       "show_signatures": true,
       "show_exam_rules": false,
-      "cards_per_page": 10
+      "cards_per_page": 12
+    },
+    "users": [
+      {
+        "id": 1,
+        "username": "admin",
+        "pass": "admin123",
+        "full_name": "Administrator Sekolah",
+        "role": "admin",
+        "created_at": "2026-01-01T00:00:00.000Z"
+      },
+      {
+        "id": 2,
+        "username": "guru",
+        "pass": "guru123",
+        "full_name": "Drs. Budi Pratama, M.Pd.",
+        "role": "teacher",
+        "subject": "Fisika",
+        "created_at": "2026-01-01T00:00:00.000Z"
+      },
+      {
+        "id": 3,
+        "username": "proktor",
+        "pass": "proktor123",
+        "full_name": "Proktor Lab 1",
+        "role": "proctor",
+        "created_at": "2026-01-01T00:00:00.000Z"
+      }
+    ],
+    "exam_attendance": {
+      "1": {
+        "students": {
+          "1001": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Selesai mengerjakan ujian",
+            "is_manual": true
+          },
+          "1002": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Sedang mengerjakan ujian",
+            "is_manual": true
+          },
+          "1003": {
+            "status": "tidak_hadir",
+            "reason": "Alpa",
+            "note": "Belum login / belum mengerjakan ujian",
+            "is_manual": true
+          },
+          "1004": {
+            "status": "tidak_hadir",
+            "reason": "Alpa",
+            "note": "Belum login / belum mengerjakan ujian",
+            "is_manual": true
+          },
+          "1005": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Selesai mengerjakan ujian",
+            "is_manual": true
+          },
+          "1006": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Selesai mengerjakan ujian",
+            "is_manual": true
+          },
+          "1007": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Selesai mengerjakan ujian",
+            "is_manual": true
+          },
+          "1008": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Selesai mengerjakan ujian",
+            "is_manual": true
+          },
+          "1009": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Sedang mengerjakan ujian",
+            "is_manual": true
+          },
+          "1010": {
+            "status": "tidak_hadir",
+            "reason": "Alpa",
+            "note": "Belum login / belum mengerjakan ujian",
+            "is_manual": true
+          },
+          "1011": {
+            "status": "tidak_hadir",
+            "reason": "Alpa",
+            "note": "Belum login / belum mengerjakan ujian",
+            "is_manual": true
+          },
+          "1012": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Selesai mengerjakan ujian",
+            "is_manual": true
+          },
+          "1013": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Selesai mengerjakan ujian",
+            "is_manual": true
+          },
+          "1014": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Selesai mengerjakan ujian",
+            "is_manual": true
+          },
+          "1015": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Selesai mengerjakan ujian",
+            "is_manual": true
+          }
+        },
+        "classes_meta": {
+          "all": {
+            "exam_date": "Selasa, 27 Oktober 2026",
+            "start_time": "09:30",
+            "end_time": "11:15",
+            "username": "K02010105",
+            "server_id": "K02010105-AJ6K",
+            "room": "LAB 1",
+            "session": "2",
+            "proctor_1_name": "Maulana Firdaus Nurrokhim, S.Pd",
+            "proctor_1_nip": "199508162025211133",
+            "proctor_2_name": "Tissa Yuanita",
+            "proctor_2_nip": "197311072022212005",
+            "headmaster_name": "Eddy Mustofa, S.Pd., M.MPd",
+            "headmaster_nip": "197811022008011003",
+            "notes": "",
+            "attendance_footer_note": "1. Dibuat rangkap 3 (tiga), masing-masing untuk sekolah, kota/kab dan Provinsi.\n2. Pengawas ruang menyilang Nama Peserta yang tidak hadir.",
+            "updated_at": 1794282766632
+          },
+          "XII IPA 1": {
+            "exam_date": "Senin, 26 Oktober 2026",
+            "start_time": "07:30 WIB",
+            "end_time": "09:00 WIB",
+            "room": "Ruang Lab Komputer 01",
+            "session": "Sesi 1",
+            "proctor_1_name": "Dra. Hj. Siti Aminah, M.Pd.",
+            "proctor_1_nip": "19680512 199403 2 004",
+            "proctor_2_name": "Rahmat Hidayat, S.Pd.",
+            "proctor_2_nip": "19820719 200801 1 009",
+            "notes": "Pelaksanaan ujian berlangsung tertib, aman, dan lancar.",
+            "updated_at": 1793000981043
+          }
+        },
+        "default_meta": {
+          "exam_date": "Selasa, 27 Oktober 2026",
+          "start_time": "09:30",
+          "end_time": "11:15",
+          "username": "K02010105",
+          "server_id": "K02010105-AJ6K",
+          "room": "LAB 1",
+          "session": "2",
+          "proctor_1_name": "Maulana Firdaus Nurrokhim, S.Pd",
+          "proctor_1_nip": "199508162025211133",
+          "proctor_2_name": "Tissa Yuanita",
+          "proctor_2_nip": "197311072022212005",
+          "headmaster_name": "Eddy Mustofa, S.Pd., M.MPd",
+          "headmaster_nip": "197811022008011003",
+          "notes": "",
+          "attendance_footer_note": "1. Dibuat rangkap 3 (tiga), masing-masing untuk sekolah, kota/kab dan Provinsi.\n2. Pengawas ruang menyilang Nama Peserta yang tidak hadir.",
+          "updated_at": 1794282766632
+        }
+      },
+      "2": {
+        "students": {
+          "1001": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Sedang mengerjakan ujian",
+            "is_manual": false
+          },
+          "1002": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Selesai mengerjakan ujian",
+            "is_manual": false
+          },
+          "1003": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Sedang mengerjakan ujian",
+            "is_manual": false
+          },
+          "1004": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Selesai mengerjakan ujian",
+            "is_manual": false
+          },
+          "1005": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Selesai mengerjakan ujian",
+            "is_manual": false
+          },
+          "1006": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Sedang mengerjakan ujian",
+            "is_manual": false
+          },
+          "1007": {
+            "status": "tidak_hadir",
+            "reason": "Alpa",
+            "note": "Belum login / belum mengerjakan ujian",
+            "is_manual": false
+          },
+          "1008": {
+            "status": "tidak_hadir",
+            "reason": "Alpa",
+            "note": "Belum login / belum mengerjakan ujian",
+            "is_manual": false
+          },
+          "1009": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Selesai mengerjakan ujian",
+            "is_manual": false
+          },
+          "1010": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Selesai mengerjakan ujian",
+            "is_manual": false
+          },
+          "1011": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Selesai mengerjakan ujian",
+            "is_manual": false
+          },
+          "1012": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Selesai mengerjakan ujian",
+            "is_manual": false
+          },
+          "1013": {
+            "status": "hadir",
+            "reason": "",
+            "note": "Sedang mengerjakan ujian",
+            "is_manual": false
+          },
+          "1014": {
+            "status": "tidak_hadir",
+            "reason": "Alpa",
+            "note": "Belum login / belum mengerjakan ujian",
+            "is_manual": false
+          },
+          "1015": {
+            "status": "tidak_hadir",
+            "reason": "Alpa",
+            "note": "Belum login / belum mengerjakan ujian",
+            "is_manual": false
+          }
+        },
+        "classes_meta": {},
+        "default_meta": {}
+      }
+    },
+    "redis_config": {
+      "enabled": true,
+      "host": "127.0.0.1",
+      "port": 6379,
+      "password": "",
+      "db": 0,
+      "key_prefix": "cbt:",
+      "auto_sync_sessions": true,
+      "timeout_ms": 2500
     }
   }
 }

@@ -5,91 +5,91 @@
         "status": "hadir",
         "reason": "",
         "note": "Selesai mengerjakan ujian",
-        "is_manual": false
+        "is_manual": true
       },
       "1002": {
         "status": "hadir",
         "reason": "",
         "note": "Sedang mengerjakan ujian",
-        "is_manual": false
+        "is_manual": true
       },
       "1003": {
         "status": "tidak_hadir",
         "reason": "Alpa",
         "note": "Belum login / belum mengerjakan ujian",
-        "is_manual": false
+        "is_manual": true
       },
       "1004": {
         "status": "tidak_hadir",
         "reason": "Alpa",
         "note": "Belum login / belum mengerjakan ujian",
-        "is_manual": false
+        "is_manual": true
       },
       "1005": {
         "status": "hadir",
         "reason": "",
         "note": "Selesai mengerjakan ujian",
-        "is_manual": false
+        "is_manual": true
       },
       "1006": {
         "status": "hadir",
         "reason": "",
         "note": "Selesai mengerjakan ujian",
-        "is_manual": false
+        "is_manual": true
       },
       "1007": {
         "status": "hadir",
         "reason": "",
         "note": "Selesai mengerjakan ujian",
-        "is_manual": false
+        "is_manual": true
       },
       "1008": {
         "status": "hadir",
         "reason": "",
         "note": "Selesai mengerjakan ujian",
-        "is_manual": false
+        "is_manual": true
       },
       "1009": {
         "status": "hadir",
         "reason": "",
         "note": "Sedang mengerjakan ujian",
-        "is_manual": false
+        "is_manual": true
       },
       "1010": {
         "status": "tidak_hadir",
         "reason": "Alpa",
         "note": "Belum login / belum mengerjakan ujian",
-        "is_manual": false
+        "is_manual": true
       },
       "1011": {
         "status": "tidak_hadir",
         "reason": "Alpa",
         "note": "Belum login / belum mengerjakan ujian",
-        "is_manual": false
+        "is_manual": true
       },
       "1012": {
         "status": "hadir",
         "reason": "",
         "note": "Selesai mengerjakan ujian",
-        "is_manual": false
+        "is_manual": true
       },
       "1013": {
         "status": "hadir",
         "reason": "",
         "note": "Selesai mengerjakan ujian",
-        "is_manual": false
+        "is_manual": true
       },
       "1014": {
         "status": "hadir",
         "reason": "",
         "note": "Selesai mengerjakan ujian",
-        "is_manual": false
+        "is_manual": true
       },
       "1015": {
         "status": "hadir",
         "reason": "",
         "note": "Selesai mengerjakan ujian",
-        "is_manual": false
+        "is_manual": true
       }
     },
     "classes_meta": {
@@ -108,7 +108,8 @@
         "headmaster_name": "Eddy Mustofa, S.Pd., M.MPd",
         "headmaster_nip": "197811022008011003",
         "notes": "",
-        "updated_at": 1793079519510
+        "attendance_footer_note": "1. Dibuat rangkap 3 (tiga), masing-masing untuk sekolah, kota/kab dan Provinsi.\n2. Pengawas ruang menyilang Nama Peserta yang tidak hadir.",
+        "updated_at": 1794282766632
       },
       "XII IPA 1": {
         "exam_date": "Senin, 26 Oktober 2026",
@@ -139,7 +140,8 @@
       "headmaster_name": "Eddy Mustofa, S.Pd., M.MPd",
       "headmaster_nip": "197811022008011003",
       "notes": "",
-      "updated_at": 1793079519510
+      "attendance_footer_note": "1. Dibuat rangkap 3 (tiga), masing-masing untuk sekolah, kota/kab dan Provinsi.\n2. Pengawas ruang menyilang Nama Peserta yang tidak hadir.",
+      "updated_at": 1794282766632
     }
   },
   "2": {
